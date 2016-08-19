@@ -2,12 +2,11 @@
 #define MIPS_H
 
 #include <QMainWindow>
-#include <QtCore/QtGlobal>
 #include <QtSerialPort/QSerialPort>
+#include <QtCore/QtGlobal>
 #include <QLineEdit>
 #include <QTimer>
 #include <QProcess>
-//#include <qtcpsocket.h>
 #include <QtNetwork/QTcpSocket>
 
 
@@ -19,6 +18,14 @@ class Console;
 class SettingsDialog;
 class pseDialog;
 class psgPoint;
+class Comms;
+class Twave;
+class DCbias;
+class DIO;
+class RFdriver;
+class PSG;
+class Program;
+class Help;
 
 class MIPS : public QMainWindow
 {
@@ -27,15 +34,9 @@ class MIPS : public QMainWindow
 public:
     explicit MIPS(QWidget *parent = 0);
     ~MIPS();
-    void openSerialPort();
-    void closeSerialPort();
     virtual void resizeEvent(QResizeEvent* event);
     virtual void mousePressEvent(QMouseEvent * event);
-    QString SendMessage(QString);
-    void SendCommand(QString message);
-    int Referenced(QList<psgPoint*> P, int i);
-    QString BuildTableCommand(QList<psgPoint*> P);
-    void UpdatePSG(void);
+    Ui::MIPS *ui;
 
 private slots:
     void setWidgets(QWidget*, QWidget*);
@@ -45,55 +46,27 @@ private slots:
     void tabSelected();
     void writeData(const QByteArray &data);
     void readData2Console(void);
-    void readData2RingBuffer(void);
-    void UpdateDCbias(void);
-    void handleError(QSerialPort::SerialPortError error);
-    void DCbiasUpdated(void);
     void pollLoop(void);
-    void UpdateDIO(void);
-    void DOUpdated(void);
-    void TrigHigh(void);
-    void TrigLow(void);
-    void TrigPulse(void);
-    void DCbiasPower(void);
-    void UpdateRFdriver(void);
     void loadSettings(void);
     void saveSettings(void);
     void DisplayAboutMessage(void);
-    void programMIPS(void);
-    void executeProgrammerCommand(QString cmd);
-    void setBootloaderBootBit(void);
-    void saveMIPSfirmware(void);
-    void readProcessOutput(void);
-    void connected(void);
-    void disconnected(void);
-    // These slots automatically connect due to naming convention
-    void on_pbDownload_pressed(void);
-    void on_pbViewTable_pressed();
-    void on_pbLoadFromFile_pressed();
-    void on_pbCreateNew_pressed();
-    void on_pbSaveToFile_pressed();
-    void on_pbEditCurrent_pressed();
-    void on_leSequenceNumber_textEdited(const QString &arg1);
-    void on_chkAutoAdvance_clicked(bool checked);
-    void on_pbTrigger_pressed();
-    void on_leSRFFRQ_editingFinished();
-    void on_leSRFDRV_editingFinished();
-    void on_pbRead_pressed();
-    void on_pbWrite_pressed();
+    void clearConsole(void);
+    void MIPScommands(void);
+    void GeneralHelp(void);
 
 private:
-    Ui::MIPS *ui;
+    Comms *comms;
+    Twave *twave;
+    DCbias *dcbias;
+    DIO *dio;
+    RFdriver *rfdriver;
+    PSG *SeqGen;
+    Program *pgm;
     Console *console;
     SettingsDialog *settings;
-    pseDialog *pse;
-    QSerialPort *serial;
+    Help *help;
     QTimer *pollTimer;
-    QList<psgPoint*> psg;
-    QProcess process;
     QString  appPath;
-    QTcpSocket client;
-    bool client_connected;
 };
 
 #endif // MIPS_H

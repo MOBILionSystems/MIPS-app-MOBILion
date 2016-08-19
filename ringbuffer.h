@@ -8,15 +8,16 @@
 
 #define SIZE 10000
 
-class RingBuffer
+class RingBuffer : public QObject
 {
-//    Q_OBJECT
+    Q_OBJECT
 
 public:
     explicit RingBuffer(void);
     char getch(void);
     int  putch(char c);
     int  size(void);
+    int  numLines(void);
     void clear(void);
     void waitforline(int);
     QString getline(void);

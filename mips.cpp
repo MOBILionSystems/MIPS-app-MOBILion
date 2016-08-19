@@ -12,7 +12,7 @@
 //
 // Note!
 //  Opening the serial port on the native USB connection to the DUE and sentting the
-//  data terminal ready lie to false will erase the DUE flash.
+//  data terminal ready line to false will erase the DUE flash.
 //          serial->setDataTerminalReady(false);
 //
 // Gordon Anderson
@@ -31,11 +31,15 @@
 //      1.) Added socket support for networked MIPS.
 //  1.4, January 10, 2016
 //      1.) Added MIPS firmware save and boot bit setting functions
-//  1.5, February 17, 2015
+//  1.5, February 17, 2016
 //      1.) Fixed bug in DC bias page that caused control is focus to update with old value
 //          when returning to page.
 //      2.) Fixed but that did not allow all 16 values to be edited on DC bias page
 //      3.) Fixed range of DC bias page to reflect offset value
+//  1.6, June 27, 2016
+//      1.) Started refactoring the code. Created the comms class and moved all communications to this class.
+//      2.) Add the Twave class and tab.
+//      3.) Still to do, create classes for each module and finish refactoring.
 //
 //  To do list:
 //  1.) Refactor the code, here are some to dos:
@@ -50,10 +54,17 @@
 #include "settingsdialog.h"
 #include "pse.h"
 #include "ringbuffer.h"
+#include "Comms.h"
+#include "Twave.h"
+#include "DCbias.h"
+#include "DIO.h"
+#include "RFdriver.h"
+#include "PSG.h"
+#include "Program.h"
+#include "Help.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
-#include <QMessageBox>
 #include <QTime>
 #include <QThread>
 #include <QIntValidator>
@@ -64,10 +75,7 @@
 #include <QDir>
 #include <QProcess>
 #include <QFileInfo>
-//#include "qtcpsocket.h"
-//#include <QTcpSocket>
 #include <QtNetwork/QTcpSocket>
-
 
 RingBuffer rb;
 
@@ -88,91 +96,41 @@ MIPS::MIPS(QWidget *parent) :
 
     appPath = QApplication::applicationDirPath();
     pollTimer = new QTimer;
-    console = new Console(ui->Terminal);
-    console->setEnabled(false);
-    serial = new QSerialPort(this);
     settings = new SettingsDialog;
+    comms  = new Comms(settings,"",ui->statusBar);
+    console = new Console(ui->Terminal,ui,comms);
+    console->setEnabled(false);
+    twave  = new Twave(ui,comms);
+    dcbias = new DCbias(ui,comms);
+    dio = new DIO(ui,comms);
+    rfdriver = new RFdriver(ui,comms);
+    SeqGen = new PSG(ui,comms);
+    pgm = new Program(ui, comms, console);
+    help = new Help();
 
     ui->actionClear->setEnabled(true);
     ui->actionOpen->setEnabled(true);
     ui->actionSave->setEnabled(true);
+    ui->actionHelp->setEnabled(true);
+    ui->actionMIPS_commands->setEnabled(true);
     ui->actionProgram_MIPS->setEnabled(true);
     ui->actionSave_current_MIPS_firmware->setEnabled(true);
     ui->actionSet_bootloader_boot_flag->setEnabled(true);
 
- //   connect(app, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(setWidgets(QWidget*, QWidget*)));    connect(ui->actionClear, SIGNAL(triggered()), console, SLOT(clear()));
+  //   connect(app, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(setWidgets(QWidget*, QWidget*)));    connect(ui->actionClear, SIGNAL(triggered()), console, SLOT(clear()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(loadSettings()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveSettings()));
-    connect(ui->actionProgram_MIPS, SIGNAL(triggered()), this, SLOT(programMIPS()));
-    connect(ui->actionSave_current_MIPS_firmware, SIGNAL(triggered()), this, SLOT(saveMIPSfirmware()));
-    connect(ui->actionSet_bootloader_boot_flag, SIGNAL(triggered()), this, SLOT(setBootloaderBootBit()));
     connect(ui->pbConfigure, SIGNAL(pressed()), settings, SLOT(show()));
+    connect(ui->actionMIPS_commands, SIGNAL(triggered()), this, SLOT(MIPScommands()));
+    connect(ui->actionHelp, SIGNAL(triggered()), this, SLOT(GeneralHelp()));
     connect(ui->tabMIPS,SIGNAL(currentChanged(int)),this,SLOT(tabSelected()));
     connect(ui->pbConnect,SIGNAL(pressed()),this,SLOT(MIPSconnect()));
     connect(ui->pbDisconnect,SIGNAL(pressed()),this,SLOT(MIPSdisconnect()));
-//  connect(serial, SIGNAL(error(QSerialPort::SerialPortError)), this,SLOT(handleError(QSerialPort::SerialPortError)));
-    connect(serial, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-    connect(&client, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-    connect(&client, SIGNAL(connected()),this, SLOT(connected()));
-    connect(&client, SIGNAL(disconnected()),this, SLOT(disconnected()));
     connect(pollTimer, SIGNAL(timeout()), this, SLOT(pollLoop()));
     connect(ui->actionAbout,SIGNAL(triggered(bool)), this, SLOT(DisplayAboutMessage()));
-    // DCbias page setup
-    QObjectList widgetList = ui->gbDCbias1->children();
-    foreach(QObject *w, widgetList)
-    {
-       if(w->objectName().contains("leSDCB"))
-       {
-            ((QLineEdit *)w)->setValidator(new QDoubleValidator);
-            connect(((QLineEdit *)w),SIGNAL(editingFinished()),this,SLOT(DCbiasUpdated()));
-       }
-    }
-    widgetList = ui->gbDCbias2->children();
-    foreach(QObject *w, widgetList)
-    {
-       if(w->objectName().contains("leSDCB"))
-       {
-            ((QLineEdit *)w)->setValidator(new QDoubleValidator);
-            connect(((QLineEdit *)w),SIGNAL(editingFinished()),this,SLOT(DCbiasUpdated()));
-       }
-    }
-    connect(ui->pbDCbiasUpdate,SIGNAL(pressed()),this,SLOT(UpdateDCbias()));
-    connect(ui->chkPowerEnable,SIGNAL(toggled(bool)),this,SLOT(DCbiasPower()));
-    // DIO page setup
-    widgetList = ui->gbDigitalOut->children();
-    foreach(QObject *w, widgetList)
-    {
-       if(w->objectName().contains("chk"))
-       {
-            connect(((QCheckBox *)w),SIGNAL(stateChanged(int)),this,SLOT(DOUpdated()));
-       }
-    }
-    connect(ui->pbDIOupdate,SIGNAL(pressed()),this,SLOT(UpdateDIO()));
-    connect(ui->pbTrigHigh,SIGNAL(pressed()),this,SLOT(TrigHigh()));
-    connect(ui->pbTrigLow,SIGNAL(pressed()),this,SLOT(TrigLow()));
-    connect(ui->pbTrigPulse,SIGNAL(pressed()),this,SLOT(TrigPulse()));
-    // RF driver page setup
-    connect(ui->pbUpdateRF,SIGNAL(pressed()),this,SLOT(UpdateRFdriver()));
-    ui->leSRFFRQ->setValidator(new QIntValidator);
-    ui->leSRFDRV->setValidator(new QDoubleValidator);
-    // Setup the pulse sequence generation page
-    ui->comboClock->clear();
-    ui->comboClock->addItem("Ext");
-    ui->comboClock->addItem("42000000");
-    ui->comboClock->addItem("10500000");
-    ui->comboClock->addItem("2625000");
-    ui->comboClock->addItem("656250");
-    ui->comboTrigger->clear();
-    ui->comboTrigger->addItem("Software");
-    ui->comboTrigger->addItem("Edge");
-    ui->comboTrigger->addItem("Pos");
-    ui->comboTrigger->addItem("Neg");
-    ui->leSequenceNumber->setValidator(new QIntValidator);
-    ui->leExternClock->setValidator(new QIntValidator);
-    ui->leTimePoint->setValidator(new QIntValidator);
-    ui->leValue->setValidator(new QIntValidator);
+    connect(ui->actionClear, SIGNAL(triggered()), this, SLOT(clearConsole()));
     // Sets the polling loop interval and starts the timer
-    pollTimer->start(200);
+    pollTimer->start(500);
 }
 
 MIPS::~MIPS()
@@ -181,172 +139,42 @@ MIPS::~MIPS()
     delete ui;
 }
 
-
-// This function is called by the MIPS firmware save or write function. The cmd
-// string passed contains the programmer invocation command.
-void MIPS::executeProgrammerCommand(QString cmd)
+void MIPS::MIPScommands(void)
 {
-    QString pcheck;
+    help->SetTitle("MIPS Commands");
+    help->LoadHelpText(":/MIPScommands.txt");
+    help->show();
+}
 
-    // Select the Terminal tab and clear the display
-    console->clear();
-    // Make sure the app is connected to MIPS
-    if(!serial->isOpen())
+void MIPS::GeneralHelp(void)
+{
+    help->SetTitle("MIPS Help");
+    help->LoadHelpText(":/MIPShelp.txt");
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "System")
     {
-        console->putData("This application is not connected to MIPS!\n");
-        return;
     }
-    // Make sure we can locate the programmer tool...
-    #if defined(Q_OS_MAC)
-        pcheck = appPath + "/bossac";
-    #else
-        pcheck = appPath + "/bossac.exe";
-    #endif
-    QFileInfo checkFile(pcheck);
-    if (!checkFile.exists() || !checkFile.isFile())
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
     {
-        console->putData("Can't find the programmer!\n");
-        console->putData(cmd.toStdString().c_str());
-        return;
     }
-    // Enable MIPS's bootloader
-    console->putData("MIPS bootloader enabled!\n");
-    qDebug() << "Bootloader enabled";
-    closeSerialPort();
-    QThread::sleep(1);
-    while(serial->isOpen()) QApplication::processEvents();
-    serial->setBaudRate(QSerialPort::Baud1200);
-    QApplication::processEvents();
-    serial->open(QIODevice::ReadWrite);
-    serial->setDataTerminalReady(false);
-    QThread::sleep(1);
-    serial->close();
-    QApplication::processEvents();
-    QThread::sleep(5);
-    // Perform selected bootloader function and restart MIPS
-    QApplication::processEvents();
-    console->putData(cmd.toStdString().c_str());
-    console->putData("\n");
-    QApplication::processEvents();
-    QStringList arguments;
-    arguments << "-c";
-    arguments << cmd;
-//  arguments << " -h";
-    #if defined(Q_OS_MAC)
-        process.start("/bin/bash",arguments);
-    #else
-        process.start(cmd);
-    #endif
-    console->putData("Operation should start soon...\n");
-    connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readProcessOutput()));
-    connect(&process,SIGNAL(readyReadStandardError()),this,SLOT(readProcessOutput()));
-}
-
-void MIPS::setBootloaderBootBit(void)
-{
-    QString cmd;
-    QString str;
-
-    // Pop up a warning message and make sure the user wants to proceed
-    QMessageBox msgBox;
-    QString msg = "This function will attemp to set the bootloader boot flag in the MIPS system. ";
-    msg += "This function is provided as part of an error recovery process and should not normally be necessary. ";
-    msg += "If the boot flag is set on an erased DUE the results are unpredictable.\n";
-    msgBox.setText(msg);
-    msgBox.setInformativeText("Are you sure you want to contine?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    int ret = msgBox.exec();
-    if(ret == QMessageBox::No) return;
-    // Select the Terminal tab and clear the display
-    ui->tabMIPS->setCurrentIndex(1);
-    // Make sure MIPS is in ready state
-    msg = "Unplug any RF drive heads from MIPS before you proceed. This includes unplugging the FAIMS RF deck as well. ";
-    msg += "It is assumed that you have already established communications with the MIPS system. ";
-    msg += "If the connection is not establised this function will exit with no action.";
-    msgBox.setText(msg);
-    msgBox.setInformativeText("");
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.exec();
-    // Set boot bit
-    cmd = appPath + "/bossac -b -R";
-    executeProgrammerCommand(cmd);
-}
-
-// This function is called from a menu selection to save the current MIPS firmware
-// to a file.
-void MIPS::saveMIPSfirmware(void)
-{
-    QString cmd;
-    QString str;
-
-    // Pop up a warning message and make sure the user wants to proceed
-    QMessageBox msgBox;
-    QString msg = "This will read the current MIPS firmware and save to a file. ";
-    msg += "You should save to a file with the .bin extension and indicate the current version.\n";
-    msgBox.setText(msg);
-    msgBox.setInformativeText("Are you sure you want to contine?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    int ret = msgBox.exec();
-    if(ret == QMessageBox::No) return;
-    // Select the Terminal tab and clear the display
-    ui->tabMIPS->setCurrentIndex(1);
-    // Select the binary file we are going to save MIPS firmware to
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save MIPS firmware .bin file"),"",tr("Files (*.bin *.*)"));
-    if(fileName == "") return;
-    // Make sure MIPS is in ready state
-    msg = "Unplug any RF drive heads from MIPS before you proceed. This includes unplugging the FAIMS RF deck as well. ";
-    msg += "It is assumed that you have already established communications with the MIPS system. ";
-    msg += "If the connection is not establised this function will exit with no action.";
-    msgBox.setText(msg);
-    msgBox.setInformativeText("");
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.exec();
-    // Save current MIPS firmware
-    cmd = appPath + "/bossac -r -b " + fileName + " -R";
-    executeProgrammerCommand(cmd);
-}
-
-// This function allows the user to download a new versoin of the MIPS firware.
-void MIPS::programMIPS(void)
-{
-    QString cmd;
-    QString str;
-
-    // Pop up a warning message and make sure the user wants to proceed
-    QMessageBox msgBox;
-    QString msg = "This will erase the MIPS firmware and attemp to load a new version. ";
-    msg += "Make sure you have a new MIPS binary file to load, it should have a .bin extension.\n";
-    msg += "The MIPS firmware will be erased so if your bin file is invalid or fails to program, MIPS will be rendered useless!\n";
-    msgBox.setText(msg);
-    msgBox.setInformativeText("Are you sure you want to contine?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    int ret = msgBox.exec();
-    if(ret == QMessageBox::No) return;
-    // Select the Terminal tab and clear the display
-    ui->tabMIPS->setCurrentIndex(1);
-    // Select the binary file we are going to load to MIPS
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load MIPS firmware .bin file"),"",tr("Files (*.bin *.*)"));
-    if(fileName == "") return;
-    // Make sure MIPS is in ready state
-    msg = "Unplug any RF drive heads from MIPS before you proceed. This includes unplugging the FAIMS RF deck as well. ";
-    msg += "It is assumed that you have already established communications with the MIPS system. ";
-    msg += "If the connection is not establised this function will exit with no action.";
-    msgBox.setText(msg);
-    msgBox.setInformativeText("");
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.exec();
-    // Program MIPS
-    cmd = appPath + "/bossac -e -w -v -b " + fileName + " -R";
-    executeProgrammerCommand(cmd);
-}
-
-void MIPS::readProcessOutput(void)
-{
-    console->putData(process.readAllStandardOutput());
-    console->putData(process.readAllStandardError());
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Digital IO")
+    {
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "DCbias")
+    {
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "RFdriver")
+    {
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
+    {
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Twave")
+    {
+        help->SetTitle("Twave Help");
+        help->LoadHelpText(":/TWAVEhelp.txt");
+    }
+    help->show();
+    return;
 }
 
 void MIPS::DisplayAboutMessage(void)
@@ -359,91 +187,76 @@ void MIPS::DisplayAboutMessage(void)
 
 void MIPS::loadSettings(void)
 {
-    QStringList resList;
-
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Pulse Sequence File"),"",tr("Files (*.psg *.*)"));
-    if(fileName == "") return;
-    QObjectList widgetList = ui->gbDCbias1->children();
-    widgetList += ui->gbDCbias2->children();
-    widgetList += ui->gbDigitalOut->children();
-    QFile file(fileName);
-    if(file.open(QIODevice::ReadOnly|QIODevice::Text))
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "System")
     {
-        // We're going to streaming the file
-        // to the QString
-        QTextStream stream(&file);
-
-        QString line;
-        do
-        {
-            line = stream.readLine();
-            resList = line.split(",");
-            if(resList.count() == 2)
-            {
-//                qDebug() << resList[0] << resList[1];
-                foreach(QObject *w, widgetList)
-                {
-                    if(w->objectName().mid(0,3) == "leS")
-                    {
-                        if(resList[1] != "") if(w->objectName() == resList[0])
-                        {
-                            ((QLineEdit *)w)->setText(resList[1]);
-                            QMetaObject::invokeMethod(w, "editingFinished");
-                        }
-                    }
-                    if(w->objectName().mid(0,4) == "chkS")
-                    {
-                        if(w->objectName() == resList[0])
-                        {
-                            if(resList[1] == "true")
-                            {
-                                ((QCheckBox *)w)->setChecked(true);
-                            }
-                            else ((QCheckBox *)w)->setChecked(false);
-                        }
-                    }
-                }
-
-            }
-        } while(!line.isNull());
-        file.close();
-        ui->statusBar->showMessage("Settings loaded to " + fileName,2000);
     }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Data from File"),"",tr("Files (*.settings)"));
+        console->Load(fileName);
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Digital IO")
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Files (*.settings)"));
+        dio->Load(fileName);
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "DCbias")
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Files (*.settings)"));
+        dcbias->Load(fileName);
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "RFdriver")
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Files (*.settings)"));
+        rfdriver->Load(fileName);
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
+    {
+        SeqGen->Load();
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Twave")
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Files (*.settings)"));
+        twave->Load(fileName);
+    }
+    return;
 }
 
 void MIPS::saveSettings(void)
 {
-    QString res;
-
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Files (*.settings)"));
-    if(fileName == "") return;
-    QFile file(fileName);
-    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "System")
     {
-        // We're going to streaming text to the file
-        QTextStream stream(&file);
-
-        QObjectList widgetList = ui->gbDCbias1->children();
-        widgetList += ui->gbDCbias2->children();
-        widgetList += ui->gbDigitalOut->children();
-        foreach(QObject *w, widgetList)
-        {
-            if(w->objectName().mid(0,3) == "leS")
-            {
-                res = w->objectName() + "," + ((QLineEdit *)w)->text() + "\n";
-                stream << res;
-            }
-            if(w->objectName().mid(0,4) == "chkS")
-            {
-                res = w->objectName() + ",";
-                if(((QCheckBox *)w)->checkState()) res += "true\n";
-                else res += "false\n";
-                stream << res;
-            }
-        }
-        file.close();
-        ui->statusBar->showMessage("Settings saved to " + fileName,2000);
     }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Data File"),"",tr("Files (*.settings)"));
+        console->Save(fileName);
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Digital IO")
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Files (*.settings)"));
+        dio->Save(fileName);
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "DCbias")
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Files (*.settings)"));
+        dcbias->Save(fileName);
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "RFdriver")
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Files (*.settings)"));
+        rfdriver->Save(fileName);
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
+    {
+        SeqGen->Save();
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Twave")
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Files (*.settings)"));
+        twave->Save(fileName);
+    }
+    return;
 }
 
 void MIPS::pollLoop(void)
@@ -472,189 +285,12 @@ void MIPS::pollLoop(void)
     }
 }
 
-int MIPS::Referenced(QList<psgPoint*> P, int i)
-{
-    int j;
-
-    for(j = 0; j < P.size(); j++)
-    {
-        if(P[j]->Loop)
-        {
-            if(P[j]->LoopName == P[i]->Name) return(P[j]->LoopCount);
-        }
-    }
-    return - 1;
-}
-
-QString MIPS::BuildTableCommand(QList<psgPoint*> P)
-{
-    QString sTable;
-    QString TableName;
-    int i,j,Count;
-    bool NoChange;
-
-    sTable = "";
-    TableName = "A";
-    for(i = 0;i<P.size();i++)
-    {
-        NoChange = true;
-        // Assume non zero values need to be sent at time point 0
-        if(i == 0)
-        {
-            // See if any time point loops to this location
-            Count = Referenced(P, i);
-            if(Count >= 0)
-            {
-                // Here if this time point is referenced so set it up
-                sTable += "0:[" + TableName;
-                sTable += ":" + QString::number(Count) + "," + QString::number(P[i]->TimePoint);
-                TableName = QString::number((int)TableName.mid(1,1).toStdString().c_str()[0] + 1);
-            }
-            else sTable += QString::number(P[i]->TimePoint);
-            for(j = 0; j < 16; j++)
-            {
-                if(P[0]->DCbias[j] != 0)
-                {
-                    sTable += ":" + QString::number(j + 1) + ":" + QString::number(P[0]->DCbias[j]);
-                    NoChange = false;
-                }
-            }
-            for(j = 0; j < 16;j++)
-            {
-                if(P[0]->DigitalO[j])
-                {
-                    sTable += ":" + QString((int)'A' + j) + ":1";
-                    NoChange = false;
-                }
-            }
-            // If nothing changed then update DO A, something has to be defined at this time point
-            if(NoChange)
-            {
-                if(P[i]->DigitalO[0]) sTable += ":A:1";
-                else sTable += ":A:0";
-            }
-        }
-        else
-        {
-            // See if any time point loops to this location
-            NoChange = true;
-            Count = Referenced(P, i);
-            if (Count >= 0)
-            {
-                // Here if this time point is referenced so set it up
-                sTable += "," + QString::number(P[i]->TimePoint) + ":[" + TableName + ":";
-                sTable += QString::number(Count) + ",0";
-                TableName = QString::number((int)TableName.mid(1,1).toStdString().c_str()[0] + 1);
-            }
-                else sTable += "," + QString::number(P[i]->TimePoint);
-                for(j = 0; j < 16; j++)
-                {
-                    if(P[i]->DCbias[j] != P[i - 1]->DCbias[j])
-                    {
-                        sTable += ":" + QString::number(j + 1) + ":" + QString::number(P[i]->DCbias[j]);
-                        NoChange = false;
-                    }
-                }
-                for(j = 0; j < 16; j++)
-                {
-                    if(P[i]->DigitalO[j] != P[i - 1]->DigitalO[j])
-                    {
-                        if (P[i]->DigitalO[j]) sTable += ":" + QString((int)'A' + j) + ":1";
-                        else sTable += ":" + QString((int)'A' + j) + ":0";
-                    }
-                    NoChange = false;
-                }
-                // If nothing changed then update DO A, something has to be defined at this time point
-                if(NoChange)
-                {
-                    if(P[i]->DigitalO[0]) sTable += ":A:1";
-                    else sTable += ":A:0";
-                }
-                if(P[i]->Loop) sTable += "]";
-            }
-    }
-    sTable = "STBLDAT;" + sTable + ";";
-    return sTable;
-}
-
-void MIPS::DCbiasUpdated(void)
-{
-   QObject* obj = sender();
-   QString res;
-
-   if(!((QLineEdit *)obj)->isModified()) return;
-   res = obj->objectName().mid(2).replace("_",",") + "," + ((QLineEdit *)obj)->text() + "\n";
-   SendCommand(res.toStdString().c_str());
-   ((QLineEdit *)obj)->setModified(false);
-}
-
-void MIPS::SendCommand(QString message)
-{
-    QString res;
-
-    if (!serial->isOpen() && !client.isOpen())
-    {
-        ui->statusBar->showMessage("Disconnected!",2000);
-        return;
-    }
-    for(int i=0;i<2;i++)
-    {
-        rb.clear();
-        if (serial->isOpen()) serial->write(message.toStdString().c_str());
-        if (client.isOpen()) client.write(message.toStdString().c_str());
-        rb.waitforline(500);
-        if(rb.size() >= 1)
-        {
-            res = rb.getline();
-            if(res == "") return;
-            if(res == "?")
-            {
-                res = message + " :NAK";
-                ui->statusBar->showMessage(res.toStdString().c_str(),2000);
-                return;
-            }
-        }
-    }
-    res = message + " :Timeout";
-    ui->statusBar->showMessage(res.toStdString().c_str(),2000);
-    return;
-}
-
-QString MIPS::SendMessage(QString message)
-{
-    QString res;
-
-    if (!serial->isOpen() && !client.isOpen())
-    {
-        ui->statusBar->showMessage("Disconnected!",2000);
-        return "";
-    }
-     for(int i=0;i<2;i++)
-    {
-        rb.clear();
-        if (serial->isOpen()) serial->write(message.toStdString().c_str());
-        if (client.isOpen()) client.write(message.toStdString().c_str());
-        rb.waitforline(500);
-        if(rb.size() >= 1)
-        {
-            res = rb.getline();
-            if(res != "") return res;
-        }
-    }
-    res = message + " :Timeout";
-    ui->statusBar->showMessage(res.toStdString().c_str(),2000);
-    res = "";
-    return res;
-}
-
-
 void MIPS::mousePressEvent(QMouseEvent * event)
 {
 //    qDebug() << "event";
 //    return;
     QMainWindow::mousePressEvent(event);
 }
-
 
 void MIPS::resizeEvent(QResizeEvent* event)
 {
@@ -671,96 +307,32 @@ void MIPS::resizeEvent(QResizeEvent* event)
    QMainWindow::resizeEvent(event);
 }
 
-void MIPS::UpdateDCbias(void)
-{
-    QString res;
-    int numchan=0;
-
-    ui->tabMIPS->setEnabled(false);
-    ui->statusBar->showMessage(tr("Updating DC bias controls..."));
-     // Read the number of channels and enable the proper controls
-    res = SendMessage("GCHAN,DCB\n");
-    ui->leGCHAN_DCB->setText(res);
-    ui->gbDCbias1->setEnabled(false);
-    ui->gbDCbias2->setEnabled(false);
-    if(res.toInt() >= 8) ui->gbDCbias1->setEnabled(true);
-    if(res.toInt() > 8) ui->gbDCbias2->setEnabled(true);
-    numchan = res.toInt();
-    res = SendMessage("GDCPWR\n");
-    if(res == "ON") ui->chkPowerEnable->setChecked(true);
-    else  ui->chkPowerEnable->setChecked(false);
-    QObjectList widgetList = ui->gbDCbias1->children();
-    foreach(QObject *w, widgetList)
-    {
-       if(w->objectName().contains("le"))
-       {
-            res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-            ((QLineEdit *)w)->setText(SendMessage(res));
-       }
-    }
-    // Adjust range based on offet value
-    ui->leGDCMIN_1->setText( QString::number(ui->leGDCMIN_1->text().toFloat()  + ui->leSDCBOF_1->text().toFloat()));
-    ui->leGDCMAX_1->setText( QString::number(ui->leGDCMAX_1->text().toFloat()  + ui->leSDCBOF_1->text().toFloat()));
-    if(numchan > 8)
-    {
-        QObjectList widgetList = ui->gbDCbias2->children();
-        foreach(QObject *w, widgetList)
-        {
-           if(w->objectName().contains("le"))
-           {
-                res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-                ((QLineEdit *)w)->setText(SendMessage(res));
-           }
-        }
-        // Adjust range based on offet value
-        ui->leGDCMIN_9->setText( QString::number(ui->leGDCMIN_9->text().toFloat()  + ui->leSDCBOF_9->text().toFloat()));
-        ui->leGDCMAX_9->setText( QString::number(ui->leGDCMAX_9->text().toFloat()  + ui->leSDCBOF_9->text().toFloat()));
-    }
-    ui->tabMIPS->setEnabled(true);
-    ui->statusBar->showMessage(tr(""));
-}
-
-void MIPS::DCbiasPower(void)
-{
-    if(ui->chkPowerEnable->isChecked()) SendCommand("SDCPWR,ON\n");
-    else  SendCommand("SDCPWR,OFF\n");
-}
-
-void MIPS::MIPSdisconnect(void)
-{
-    if(client.isOpen()) client.close();
-    closeSerialPort();
-    ui->lblMIPSconfig->setText("");
-    ui->lblMIPSconnectionNotes->setHidden(false);
-}
-
 void MIPS::MIPSsetup(void)
 {
     QString res;
 
-    disconnect(ui->comboRFchan, SIGNAL(currentTextChanged(QString)),0,0);
     ui->lblMIPSconfig->setText("MIPS: ");
-    res = SendMessage("GVER\n");
+    res = comms->SendMessage("GVER\n");
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + res);
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\nModules present:");
-    res = SendMessage("GCHAN,RF\n");
+
+    res = comms->SendMessage("GCHAN,RF\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 RF driver\n");
     if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 RF drivers\n");
+    rfdriver->SetNumberOfChannels(res.toInt());
 
-    ui->comboRFchan->clear();
-    for(int i=0;i<res.toInt();i++)
-    {
-        ui->comboRFchan->addItem(QString::number(i+1));
-    }
-
-    res = SendMessage("GCHAN,DCB\n");
+    res = comms->SendMessage("GCHAN,DCB\n");
     if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 DC bias (8 output channels)\n");
     if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 DC bias (16 output channels)\n");
-    res = SendMessage("GCHAN,TWAVE\n");
+    dcbias->SetNumberOfChannels(res.toInt());
+
+    res = comms->SendMessage("GCHAN,TWAVE\n");
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   TWAVE\n");
-    res = SendMessage("GCHAN,FAIMS\n");
+
+    res = comms->SendMessage("GCHAN,FAIMS\n");
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   FAIMS\n");
-    res = SendMessage("GCHAN,ESI\n");
+
+    res = comms->SendMessage("GCHAN,ESI\n");
     //serial->write("GCHAN,ESI\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI\n");
     if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ESI\n");
@@ -771,464 +343,79 @@ void MIPS::MIPSsetup(void)
 // If the serial port of socket is connected then this function exits.
 void MIPS::MIPSconnect(void)
 {
-    QTime timer;
-    QString res;
-
-    if(client.isOpen() || serial->isOpen()) return;
-
-    if(ui->leMIPSnetName->text() != "")
+    comms->p = settings->settings();
+    comms->host = ui->leMIPSnetName->text();
+    if(comms->ConnectToMIPS())
     {
-       client_connected = false;
-       client.connectToHost(ui->leMIPSnetName->text(), 2015);
-       ui->statusBar->showMessage(tr("Connecting..."));
-       timer.start();
-       while(timer.elapsed() < 10000)
-       {
-           QApplication::processEvents();
-           if(client_connected)
-           {
-               MIPSsetup();
-               ui->lblMIPSconnectionNotes->setHidden(true);
-               return;
-           }
-       }
-       ui->statusBar->showMessage(tr("MIPS failed to connect!"));
-       client.abort();
-       client.close();
-       return;
-    }
-    else
-    {
-       openSerialPort();
-       serial->setDataTerminalReady(true);
+       console->setEnabled(true);
+       console->setLocalEchoEnabled(settings->settings().localEchoEnabled);
        ui->lblMIPSconnectionNotes->setHidden(true);
+       MIPSsetup();
     }
-    MIPSsetup();
+}
+
+void MIPS::MIPSdisconnect(void)
+{
+    comms->DisconnectFromMIPS();
+    ui->lblMIPSconfig->setText("");
+    ui->lblMIPSconnectionNotes->setHidden(false);
 }
 
 void MIPS::tabSelected()
 {
+    disconnect(comms, SIGNAL(DataReady()),0,0);
+    disconnect(console, SIGNAL(getData(QByteArray)),0,0);
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "System")
     {
         settings->fillPortsInfo();
-        disconnect(serial, SIGNAL(readyRead()),0,0);
-        disconnect(&client, SIGNAL(readyRead()),0,0);
-        connect(serial, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-        connect(&client, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
     {
-        disconnect(serial, SIGNAL(readyRead()),0,0);
-        disconnect(&client, SIGNAL(readyRead()),0,0);
-        disconnect(console, SIGNAL(getData(QByteArray)),0,0);
-        connect(serial, SIGNAL(readyRead()), this, SLOT(readData2Console()));
-        connect(&client, SIGNAL(readyRead()), this, SLOT(readData2Console()));
+        connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
         connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
         console->resize(ui->Terminal);
         console->setEnabled(true);
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Digital IO")
     {
-        disconnect(serial, SIGNAL(readyRead()),0,0);
-        disconnect(&client, SIGNAL(readyRead()),0,0);
-        connect(serial, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-        connect(&client, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-        UpdateDIO();
+        dio->Update();
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "DCbias")
     {
-        disconnect(serial, SIGNAL(readyRead()),0,0);
-        disconnect(&client, SIGNAL(readyRead()),0,0);
-        connect(serial, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-        connect(&client, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-        UpdateDCbias();
+        dcbias->Update();
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "RFdriver")
     {
-        disconnect(serial, SIGNAL(readyRead()),0,0);
-        disconnect(&client, SIGNAL(readyRead()),0,0);
-        connect(serial, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-        connect(&client, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-        connect(ui->comboRFchan,SIGNAL(currentTextChanged(QString)),this,SLOT(UpdateRFdriver()));
-        UpdateRFdriver();
+        rfdriver->Update();
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
     {
-        disconnect(serial, SIGNAL(readyRead()),0,0);
-        disconnect(&client, SIGNAL(readyRead()),0,0);
-        connect(serial, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-        connect(&client, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
-        UpdatePSG();
+        SeqGen->Update();
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Twave")
+    {
+        twave->Update();
     }
 }
 
 void MIPS::writeData(const QByteArray &data)
 {
-    if(client.isOpen()) client.write(data);
-    if(serial->isOpen()) serial->write(data);
+    comms->writeData(data);
 }
 
 void MIPS::readData2Console(void)
 {
     QByteArray data;
 
-    if(serial->isOpen()) data = serial->readAll();
-    if(client.isOpen()) data = client.readAll();
+    data = comms->readall();
     console->putData(data);
-}
-
-void MIPS::readData2RingBuffer(void)
-{
-    int i;
-
-    if(client.isOpen())
-    {
-        QByteArray data = client.readAll();
-        for(i=0;i<data.size();i++) rb.putch(data[i]);
-    }
-    if(serial->isOpen())
-    {
-        QByteArray data = serial->readAll();
-        for(i=0;i<data.size();i++) rb.putch(data[i]);
-    }
-}
-
-void MIPS::openSerialPort()
-{
-    connect(serial, SIGNAL(error(QSerialPort::SerialPortError)), this,SLOT(handleError(QSerialPort::SerialPortError)));
-    SettingsDialog::Settings p = settings->settings();
-    serial->setPortName(p.name);
-    #if defined(Q_OS_MAC)
-        serial->setPortName("cu." + p.name);
-    #endif
-    serial->setBaudRate(p.baudRate);
-    serial->setDataBits(p.dataBits);
-    serial->setParity(p.parity);
-    serial->setStopBits(p.stopBits);
-    serial->setFlowControl(p.flowControl);
-    if (serial->open(QIODevice::ReadWrite))
-    {
-            console->setEnabled(true);
-            console->setLocalEchoEnabled(p.localEchoEnabled);
-            ui->statusBar->showMessage(tr("Connected to %1 : %2, %3, %4, %5, %6")
-                                       .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
-                                       .arg(p.stringParity).arg(p.stringStopBits).arg(p.stringFlowControl));
-    }
-    else
-    {
-        QMessageBox::critical(this, tr("Error"), serial->errorString());
-        ui->statusBar->showMessage(tr("Open error"));
-    }
-}
-
-void MIPS::closeSerialPort()
-{
-    if (serial->isOpen()) serial->close();
-    console->setEnabled(false);
-    ui->statusBar->showMessage(tr("Disconnected"));
-    disconnect(serial, SIGNAL(error(QSerialPort::SerialPortError)),0,0);
-}
-
-void MIPS::handleError(QSerialPort::SerialPortError error)
-{
-    if (error == QSerialPort::ResourceError)
-    {
-        QMessageBox::critical(this, tr("Critical Error"), serial->errorString());
-        closeSerialPort();
-    }
-}
-
-// Digital IO functions
-
-// Slots
-
-// Slot for Digital IO update button
-void MIPS::UpdateDIO(void)
-{
-    QString res;
-
-    ui->tabMIPS->setEnabled(false);
-    ui->statusBar->showMessage(tr("Updating Digital IO controls..."));
-    QObjectList widgetList = ui->gbDigitalOut->children();
-    foreach(QObject *w, widgetList)
-    {
-       if(w->objectName().contains("chk"))
-       {
-            res = "G" + w->objectName().mid(4).replace("_",",") + "\n";
-            if(SendMessage(res).toInt()==1) ((QCheckBox *)w)->setChecked(true);
-            else ((QCheckBox *)w)->setChecked(false);
-       }
-    }
-    widgetList = ui->gbDigitalIn->children();
-    foreach(QObject *w, widgetList)
-    {
-       if(w->objectName().contains("chk"))
-       {
-            res = "G" + w->objectName().mid(4).replace("_",",") + "\n";
-            if(SendMessage(res).toInt()==1) ((QCheckBox *)w)->setChecked(true);
-            else ((QCheckBox *)w)->setChecked(false);
-       }
-    }
-    ui->tabMIPS->setEnabled(true);
-    ui->statusBar->showMessage(tr(""));
-}
-
-// Slot for Digital output check box selection
-void MIPS::DOUpdated(void)
-{
-    QObject* obj = sender();
-    QString res;
-
-    res = obj->objectName().mid(3).replace("_",",") + ",";
-    if(((QCheckBox *)obj)->checkState()) res += "1\n";
-    else res+= "0\n";
-    SendCommand(res.toStdString().c_str());
-}
-
-// Slot for Trigger high pushbutton
-void MIPS::TrigHigh(void)
-{
-    SendCommand("TRIGOUT,HIGH\n");
-}
-
-// Slot for Trigger low pushbutton
-void MIPS::TrigLow(void)
-{
-    SendCommand("TRIGOUT,LOW\n");
-}
-
-// Slot for Trigger pulse pushbutton
-void MIPS::TrigPulse(void)
-{
-    SendCommand("TRIGOUT,PULSE\n");
-}
-// end Digital IO functions
-
-
-// RF driver functions
-
-// Slots
-
-void MIPS::UpdateRFdriver(void)
-{
-    QString res;
-
-    ui->tabMIPS->setEnabled(false);
-    ui->statusBar->showMessage(tr("Updating RF driver controls..."));
-    ui->leSRFFRQ->setText(SendMessage("GRFFRQ," + ui->comboRFchan->currentText() + "\n"));
-    ui->leSRFDRV->setText(SendMessage("GRFDRV," + ui->comboRFchan->currentText() + "\n"));
-    ui->leGRFPPVP->setText(SendMessage("GRFPPVP," + ui->comboRFchan->currentText() + "\n"));
-    ui->leGRFPPVN->setText(SendMessage("GRFPPVN," + ui->comboRFchan->currentText() + "\n"));
-    ui->tabMIPS->setEnabled(true);
-    ui->statusBar->showMessage(tr(""));
-}
-
-// end RF driver functions
-
-// Pulse sequence generator functions
-
-void MIPS::UpdatePSG(void)
-{
-    ui->tabMIPS->setEnabled(false);
-    ui->statusBar->showMessage(tr("Updating Pulse Sequence Generation controls..."));
-
-    if(SendMessage("GTBLADV\n").contains("ON")) ui->chkAutoAdvance->setChecked(true);
-    else ui->chkAutoAdvance->setChecked(false);
-    ui->leSequenceNumber->setText(SendMessage("GTBLNUM\n"));
-
-    ui->tabMIPS->setEnabled(true);
-    ui->statusBar->showMessage(tr(""));
-}
-
-void MIPS::on_pbDownload_pressed(void)
-{
-    QString res;
-
-    // Make sure a table is loaded
-    ui->pbDownload->setDown(false);
-    if(psg.size() == 0)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("There is no Pulse Sequence to download to MIPS!");
-        msgBox.exec();
-        return;
-    }
-    // Make sure system is in local mode
-    SendCommand("SMOD,LOC\n");
-    // Set clock
-    SendCommand("STBLCLK," + ui->comboClock->currentText().toUpper() + "\n");
-    // Set trigger
-    res = ui->comboTrigger->currentText().toUpper();
-    if(res == "SOFTWARE") res = "SW";
-    SendCommand("STBLTRG," + res + "\n");
-    // Send table
-    SendCommand(BuildTableCommand(psg));
-    // Put system in table mode
-    SendCommand("SMOD,TBL\n");
-    rb.waitforline(100);
-    ui->statusBar->showMessage(rb.getline());
-}
-
-void MIPS::on_pbViewTable_pressed()
-{
-    QString table;
-    QList<psgPoint> P;
-
-    ui->pbViewTable->setDown(false);
-    if(psg.size() == 0)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("There is no Pulse Sequence to view!");
-        msgBox.exec();
-        return;
-    }
-
-    table = BuildTableCommand(psg);
-    QMessageBox msgBox;
-    msgBox.setText(table);
-    msgBox.exec();
-}
-
-void MIPS::on_pbLoadFromFile_pressed()
-{
-    psgPoint *P;
-
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Pulse Sequence File"),"",tr("Files (*.psg *.*)"));
-
-    QFile file(fileName);
-    file.open(QIODevice::ReadOnly);
-    QDataStream in(&file);
-
-    psg.clear();
-    while(!in.atEnd())
-    {
-        P = new psgPoint;
-        in >> *P;
-        psg.push_back(P);
-    }
-    file.close();
-    ui->pbLoadFromFile->setDown(false);
-}
-
-void MIPS::on_pbCreateNew_pressed()
-{
-    psgPoint *point = new psgPoint;
-
-    ui->pbCreateNew->setDown(false);
-    if(psg.size() > 0)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("This will overwrite the current Pulse Sequence Table.");
-        msgBox.setInformativeText("Do you want to contine?");
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        msgBox.setDefaultButton(QMessageBox::Yes);
-        int ret = msgBox.exec();
-        if(ret == QMessageBox::No) return;
-    }
-    point->Name = "TP_1";
-    psg.clear();
-    psg.push_back(point);
-    pse = new pseDialog(&psg);
-    pse->show();
-}
-
-void MIPS::on_pbSaveToFile_pressed()
-{
-    QList<psgPoint*>::iterator it;
-
-    ui->pbSaveToFile->setDown(false);
-    if(psg.size() == 0)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("There is no Pulse Sequence to save!");
-        msgBox.exec();
-        return;
-    }
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Pulse Sequence File"),"",tr("Files (*.psg)"));
-    QFile file(fileName);
-    file.open(QIODevice::WriteOnly);
-
-    QDataStream out(&file);   // we will serialize the data into the file
-    for(it = psg.begin(); it != psg.end(); ++it) out << **it;
-
-    file.close();
-    ui->pbSaveToFile->setDown(false);
-}
-
-
-void MIPS::on_pbEditCurrent_pressed()
-{
-    ui->pbEditCurrent->setDown(false);
-    if(psg.size() == 0)
-    {
-        QMessageBox msgBox;
-        msgBox.setText("There is no Pulse Sequence to edit!");
-        msgBox.exec();
-        return;
-    }
-    pse = new pseDialog(&psg);
-    pse->show();
-}
-
-void MIPS::on_leSequenceNumber_textEdited(const QString &arg1)
-{
-    if(arg1 == "") return;
-    SendCommand("STBLNUM," + arg1 + "\n");
-}
-
-void MIPS::on_chkAutoAdvance_clicked(bool checked)
-{
-    if(checked) SendCommand("STBLADV,ON\n");
-    else SendCommand("STBLADV,OFF\n");
-}
-
-void MIPS::on_pbTrigger_pressed()
-{
-    SendCommand("TBLSTRT\n");
-    rb.waitforline(100);
-    ui->statusBar->showMessage(rb.getline());
-    rb.waitforline(500);
-    ui->statusBar->showMessage(ui->statusBar->currentMessage() + " " + rb.getline());
-    rb.waitforline(100);
-    ui->statusBar->showMessage(ui->statusBar->currentMessage() + " " + rb.getline());
-}
-
-void MIPS::on_leSRFFRQ_editingFinished()
-{
-    if(!ui->leSRFFRQ->isModified()) return;
-    SendCommand("SRFFRQ," + ui->comboRFchan->currentText() + "," + ui->leSRFFRQ->text() + "\n");
-    ui->leSRFFRQ->setModified(false);
-}
-
-void MIPS::on_leSRFDRV_editingFinished()
-{
-    if(!ui->leSRFDRV->isModified()) return;
-    SendCommand("SRFDRV," + ui->comboRFchan->currentText() + "," + ui->leSRFDRV->text() + "\n");
-    ui->leSRFDRV->setModified(false);
-}
-
-void MIPS::on_pbRead_pressed()
-{
-    ui->leValue->setText(SendMessage("GTBLVLT," + ui->leTimePoint->text() + "," + ui->leChannel->text() + "\n"));
-}
-
-void MIPS::on_pbWrite_pressed()
-{
-    SendCommand("STBLVLT," + ui->leTimePoint->text() + "," + ui->leChannel->text() + "," + ui->leValue->text() + "\n");
-}
-
-void MIPS::connected(void)
-{
-    ui->statusBar->showMessage(tr("MIPS connected"));
-    client_connected = true;
-}
-
-void MIPS::disconnected(void)
-{
-    ui->statusBar->showMessage(tr("Disconnected"));
 }
 
 void MIPS::setWidgets(QWidget* old, QWidget* now)
 {
 }
 
+void MIPS::clearConsole(void)
+{
+    console->clear();
+}

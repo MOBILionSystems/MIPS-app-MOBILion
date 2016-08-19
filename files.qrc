@@ -2,4 +2,9 @@
     <qresource prefix="/Images">
         <file>MIPS.jpg</file>
     </qresource>
+    <qresource prefix="/">
+        <file>MIPScommands.txt</file>
+        <file>MIPShelp.txt</file>
+        <file>TWAVEhelp.txt</file>
+    </qresource>
 </RCC>

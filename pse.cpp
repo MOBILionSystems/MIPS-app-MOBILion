@@ -5,6 +5,10 @@
 #include <QMessageBox>
 #include <QFile>
 
+namespace Ui {
+class MIPS;
+}
+
 QT_USE_NAMESPACE
 
 //static const char blankString[] = QT_TRANSLATE_NOOP("pseDialog", "N/A");

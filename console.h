@@ -35,7 +35,19 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
+#include "ui_mips.h"
+#include "mips.h"
+#include "comms.h"
+
 #include <QPlainTextEdit>
+#include <QDebug>
+#include <QtCore/QtGlobal>
+#include <QtSerialPort/QSerialPort>
+#include <QStatusBar>
+#include <QMessageBox>
+#include <QObject>
+#include <QApplication>
+#include <QFileInfo>
 
 class Console : public QPlainTextEdit
 {
@@ -45,10 +57,15 @@ signals:
     void getData(const QByteArray &data);
 
 public:
-    explicit Console(QWidget *parent = 0);
+    explicit Console(QWidget *parent = 0,Ui::MIPS *w = NULL, Comms *c = NULL);
     void putData(const QByteArray &data);
     void setLocalEchoEnabled(bool set);
     void resize(QWidget *parent);
+    void Save(QString Filename);
+    void Load(QString Filename);
+
+    Ui::MIPS *cui;
+    Comms *comms;
 
 protected:
     virtual void keyPressEvent(QKeyEvent *e);

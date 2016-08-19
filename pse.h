@@ -2,6 +2,8 @@
 #define PSE_H
 
 #include <QDialog>
+#include "ui_mips.h"
+#include "mips.h"
 
 QT_USE_NAMESPACE
 
@@ -44,10 +46,11 @@ class pseDialog : public QDialog
     Q_OBJECT
 
 public:
-    //    explicit pseDialog(std::vector<psgPoint*> psg, QWidget *parent = 0);
     explicit pseDialog(QList<psgPoint*> *psg, QWidget *parent = 0);
     void UpdateDialog(psgPoint *point);
     ~pseDialog();
+
+    Ui::MIPS *pui;
 
 private slots:
     void on_DIO_checked();

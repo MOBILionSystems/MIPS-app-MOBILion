@@ -37,14 +37,16 @@
 #include <QScrollBar>
 #include <QApplication>
 #include <QClipboard>
-
+#include <QDateTime.h>
 #include <QtCore/QDebug>
+#include <QTextCodec>
 
-Console::Console(QWidget *parent)
-    : QPlainTextEdit(parent)
-    , localEchoEnabled(false)
+Console::Console(QWidget *parent,Ui::MIPS *w, Comms *c) : QPlainTextEdit(parent) , localEchoEnabled(false)
 {
-//    document()->setMaximumBlockCount(100);
+    cui = w;
+    comms = c;
+
+//  document()->setMaximumBlockCount(100);
     QPalette p = palette();
     p.setColor(QPalette::Base, Qt::black);
     p.setColor(QPalette::Text, Qt::yellow);
@@ -112,4 +114,47 @@ void Console::mouseDoubleClickEvent(QMouseEvent *e)
 void Console::contextMenuEvent(QContextMenuEvent *e)
 {
     Q_UNUSED(e)
+}
+
+void Console::Save(QString Filename)
+{
+    if(Filename == "") return;
+    QFile file(Filename);
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        // We're going to streaming text to the file
+        QTextStream stream(&file);
+        QDateTime dateTime = QDateTime::currentDateTime();
+        stream << "# Terminal data, " + dateTime.toString() + "\n";
+        stream <<  document()->toPlainText();
+        qDebug() <<  document()->toPlainText();
+    }
+    file.close();
+    cui->statusBar->showMessage("Data saved to " + Filename,2000);
+}
+
+void Console::Load(QString Filename)
+{
+    QStringList resList;
+
+    if(Filename == "") return;
+    QFile file(Filename);
+    if(file.open(QIODevice::ReadOnly|QIODevice::Text))
+    {
+        // We're going to streaming the file
+        // to the QString
+        QTextStream stream(&file);
+        QString line;
+        do
+        {
+            line = stream.readLine();
+            QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
+            QByteArray encodedString = codec->fromUnicode(line + "\n");
+            putData(encodedString);
+            comms->SendString(line + "\n");
+            QApplication::processEvents();
+        } while(!line.isNull());
+        file.close();
+        cui->statusBar->showMessage("Settings loaded from " + Filename,2000);
+    }
 }

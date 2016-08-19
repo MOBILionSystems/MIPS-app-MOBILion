@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core
+QT       += gui
 QT       += serialport
 QT       += network
 
@@ -17,20 +18,37 @@ CONFIG += static
 
 SOURCES += main.cpp\
         mips.cpp \
-    console.cpp \
-    settingsdialog.cpp \
-    ringbuffer.cpp \
-    pse.cpp
+        console.cpp \
+        settingsdialog.cpp \
+        ringbuffer.cpp \
+        pse.cpp \
+        comms.cpp \
+        twave.cpp \
+    dcbias.cpp \
+    dio.cpp \
+    rfdriver.cpp \
+    psg.cpp \
+    program.cpp \
+    help.cpp
 
 HEADERS  += mips.h \
     console.h \
     settingsdialog.h \
     ringbuffer.h \
-    pse.h
+    pse.h \
+    comms.h \
+    twave.h \
+    dcbias.h \
+    dio.h \
+    rfdriver.h \
+    psg.h \
+    program.h \
+    help.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \
-    pse.ui
+    pse.ui \
+    help.ui
 
 RESOURCES += \
     files.qrc

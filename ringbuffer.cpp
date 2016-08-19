@@ -45,6 +45,11 @@ int RingBuffer::size(void)
     return count;
 }
 
+int RingBuffer::numLines(void)
+{
+    return lines;
+}
+
 char RingBuffer::getch(void)
 {
     char c;
