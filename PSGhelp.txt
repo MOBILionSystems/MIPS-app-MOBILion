@@ -1,0 +1,20 @@
+Pulse Sequence Generation help
+
+The MIPS system can generate pulse sequences using digital outputs and DC bias outputs.
+A pulse sequence allows the user to change the digital output and DC bias voltages at
+user programmed time points. These pulse sequences can use an internal programmable
+clock or an external clock; additionally a pulse sequence can be started using a
+command from the host computer or from an external source. Pulse sequences can contain
+internal loops where a defined sequence can be repeated a programmed number of times.
+Loops can be nested as well at a maximum depth of 5.
+
+The pulse sequence generation capability uses the timer counter capability in the ARM
+microcontroller at the heart of the MIPS system. This timer counter has the capability
+to generate an output pulse when its count matches the value in a compare register. This
+trigger is then used to change the digital and DC bias output levels via hardware in the
+MIPS system. This provides a low jitter and deterministic pulse sequence generation
+capability.
+
+This tab provides the user an Pulse Sequence Editor to make generation and changing a
+pulse squence simple.
+

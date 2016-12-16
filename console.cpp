@@ -151,7 +151,7 @@ void Console::Load(QString Filename)
             QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
             QByteArray encodedString = codec->fromUnicode(line + "\n");
             putData(encodedString);
-            comms->SendString(line + "\n");
+            if(line.trimmed().mid(0,1) != "#") comms->SendString(line + "\n");
             QApplication::processEvents();
         } while(!line.isNull());
         file.close();

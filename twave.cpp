@@ -16,8 +16,10 @@ Twave::Twave(Ui::MIPS *w, Comms *c)
    Compressor = true;
    QObjectList widgetList = tui->gbTwaveCH1->children();
    widgetList += tui->gbTwaveCH2->children();
-   widgetList += tui->gbCompressor->children();
+   widgetList += tui->tabCompressor->children();
    widgetList += tui->gbTiming->children();
+   widgetList += tui->gbTWsweepCH1->children();
+   widgetList += tui->gbTWsweepCH2->children();
    foreach(QObject *w, widgetList)
    {
       if(w->objectName().contains("le"))
@@ -32,6 +34,18 @@ Twave::Twave(Ui::MIPS *w, Comms *c)
    connect(tui->rbSTWCSW_OPEN,SIGNAL(clicked(bool)),this,SLOT(rbSwitchOpen()));
    connect(tui->pbTwaveUpdate,SIGNAL(pressed()),this,SLOT(pbUpdate()));
    connect(tui->pbTwaveForceTrigger,SIGNAL(pressed()),this,SLOT(pbForceTrigger()));
+   connect(tui->rbSTWDIR_1_FWD,SIGNAL(clicked(bool)),this,SLOT(rbTW1fwd()));
+   connect(tui->rbSTWDIR_1_REV,SIGNAL(clicked(bool)),this,SLOT(rbTW1rev()));
+   connect(tui->rbSTWDIR_2_FWD,SIGNAL(clicked(bool)),this,SLOT(rbTW2fwd()));
+   connect(tui->rbSTWDIR_2_REV,SIGNAL(clicked(bool)),this,SLOT(rbTW2rev()));
+   // Buttons for sweep start and stop
+   connect(tui->pbTWsweepCH1start,SIGNAL(pressed()),this,SLOT(pbTWsweepStart()));
+   connect(tui->pbTWsweepCH2start,SIGNAL(pressed()),this,SLOT(pbTWsweepStart()));
+   connect(tui->pbTWsweepStart,SIGNAL(pressed()),this,SLOT(pbTWsweepStart()));
+   connect(tui->pbTWsweepCH1stop,SIGNAL(pressed()),this,SLOT(pbTWsweepStop()));
+   connect(tui->pbTWsweepCH2stop,SIGNAL(pressed()),this,SLOT(pbTWsweepStop()));
+   connect(tui->pbTWsweepStop,SIGNAL(pressed()),this,SLOT(pbTWsweepStop()));
+
 }
 
 // This function saves all the setable parameters to data file.
@@ -53,7 +67,9 @@ void Twave::Save(QString Filename)
         if(NumChannels > 1) widgetList += tui->gbTwaveCH2->children();
         if(Compressor)
         {
-            widgetList += tui->gbCompressor->children();
+            widgetList += tui->tabCompressor->children();
+            widgetList += tui->gbTWsweepCH1->children();
+            widgetList += tui->gbTWsweepCH2->children();
             widgetList += tui->gbTiming->children();
             widgetList += tui->gbMode->children();
             widgetList += tui->gbSwitch->children();
@@ -88,7 +104,9 @@ void Twave::Load(QString Filename)
     if(NumChannels >1) widgetList += tui->gbTwaveCH2->children();
     if(Compressor)
     {
-        widgetList += tui->gbCompressor->children();
+        widgetList += tui->tabCompressor->children();
+        widgetList += tui->gbTWsweepCH1->children();
+        widgetList += tui->gbTWsweepCH2->children();
         widgetList += tui->gbTiming->children();
         widgetList += tui->gbMode->children();
         widgetList += tui->gbSwitch->children();
@@ -148,16 +166,19 @@ void Twave::Update(void)
        case 0:
           tui->gbTwaveCH1->setEnabled(false);
           tui->gbTwaveCH2->setEnabled(false);
-          tui->gbCompressor->setEnabled(false);
+          tui->tabCompressor->setEnabled(false);
+          tui->tabSweep->setEnabled(false);
           return;
        case 1:
           tui->gbTwaveCH1->setEnabled(true);
           tui->gbTwaveCH2->setEnabled(false);
-          tui->gbCompressor->setEnabled(false);
+          tui->tabCompressor->setEnabled(false);
+          tui->tabSweep->setEnabled(true);
        case 2:
           tui->gbTwaveCH1->setEnabled(true);
           tui->gbTwaveCH2->setEnabled(true);
-          if(Compressor) tui->gbCompressor->setEnabled(true);
+          if(Compressor) tui->tabCompressor->setEnabled(true);
+          tui->tabSweep->setEnabled(true);
        default:
           break;
     }
@@ -165,9 +186,11 @@ void Twave::Update(void)
     tui->statusBar->showMessage(tr("Updating Twave IO controls..."));
     QObjectList widgetList = tui->gbTwaveCH1->children();
     if(NumChannels > 1) widgetList += tui->gbTwaveCH2->children();
+    widgetList += tui->gbTWsweepCH1->children();
+    widgetList += tui->gbTWsweepCH2->children();
     if(Compressor)
     {
-       widgetList += tui->gbCompressor->children();
+       widgetList += tui->tabCompressor->children();
        widgetList += tui->gbTiming->children();
     }
     foreach(QObject *w, widgetList)
@@ -178,6 +201,12 @@ void Twave::Update(void)
             ((QLineEdit *)w)->setText(comms->SendMessage(res));
        }
     }
+    res = comms->SendMessage("GTWDIR,1\n");
+    if(res == "FWD") tui->rbSTWDIR_1_FWD->setChecked(true);
+    if(res == "REV") tui->rbSTWDIR_1_REV->setChecked(true);
+    res = comms->SendMessage("GTWDIR,2\n");
+    if(res == "FWD") tui->rbSTWDIR_2_FWD->setChecked(true);
+    if(res == "REV") tui->rbSTWDIR_2_REV->setChecked(true);
     if(Compressor)
     {
         res = comms->SendMessage("GTWCMODE\n");
@@ -219,7 +248,27 @@ void Twave::rbSwitchClose(void)
 
 void Twave::rbSwitchOpen(void)
 {
-    comms->SendCommand("STWCSW,Open\n");
+   comms->SendCommand("STWCSW,Open\n");
+}
+
+void Twave::rbTW1fwd(void)
+{
+   comms->SendCommand("STWDIR,1,FWD\n");
+}
+
+void Twave::rbTW1rev(void)
+{
+    comms->SendCommand("STWDIR,1,REV\n");
+}
+
+void Twave::rbTW2fwd(void)
+{
+    comms->SendCommand("STWDIR,2,FWD\n");
+}
+
+void Twave::rbTW2rev(void)
+{
+    comms->SendCommand("STWDIR,2,REV\n");
 }
 
 void Twave::pbUpdate(void)
@@ -232,3 +281,40 @@ void Twave::pbForceTrigger(void)
    comms->SendCommand("TWCTRG\n");
 }
 
+void Twave::pbTWsweepStart(void)
+{
+   QObject *senderObj = sender();
+   QString senderObjName = senderObj->objectName();
+
+   if(senderObjName == "pbTWsweepCH1start")
+   {
+       comms->SendCommand("STWSGO,1\n");
+   }
+   if(senderObjName == "pbTWsweepCH2start")
+   {
+       comms->SendCommand("STWSGO,2\n");
+   }
+   if(senderObjName == "pbTWsweepStart")
+   {
+       comms->SendCommand("STWSGO,3\n");
+   }
+}
+
+void Twave::pbTWsweepStop(void)
+{
+    QObject *senderObj = sender();
+    QString senderObjName = senderObj->objectName();
+
+    if(senderObjName == "pbTWsweepCH1stop")
+    {
+        comms->SendCommand("STWSHLT,1\n");
+    }
+    if(senderObjName == "pbTWsweepCH2stop")
+    {
+        comms->SendCommand("STWSHLT,2\n");
+    }
+    if(senderObjName == "pbTWsweepStop")
+    {
+        comms->SendCommand("STWSHLT,3\n");
+    }
+}

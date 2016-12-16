@@ -26,6 +26,7 @@ class RFdriver;
 class PSG;
 class Program;
 class Help;
+class ARB;
 
 class MIPS : public QMainWindow
 {
@@ -65,6 +66,7 @@ private:
     Console *console;
     SettingsDialog *settings;
     Help *help;
+    ARB *arb;
     QTimer *pollTimer;
     QString  appPath;
 };

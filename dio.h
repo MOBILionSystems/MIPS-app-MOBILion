@@ -32,6 +32,9 @@ private slots:
     void TrigHigh(void);
     void TrigLow(void);
     void TrigPulse(void);
+    void RFgenerate(void);
+    void SetFreq(void);
+    void SetWidth(void);
 };
 
 #endif // DIO_H

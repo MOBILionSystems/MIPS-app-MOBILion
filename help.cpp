@@ -32,6 +32,11 @@ void Help::SetTitle(QString title)
     QWidget::setWindowTitle (title);
 }
 
+void Help::LoadString(QString DisplayText)
+{
+    ui->plainTextEdit->setPlainText(DisplayText);
+}
+
 void Help::LoadHelpText(QString FileName)
 {
     QStringList resList;

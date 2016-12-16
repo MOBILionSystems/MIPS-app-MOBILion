@@ -81,7 +81,6 @@ void RFdriver::Save(QString Filename)
 // write to UI and update MIPS, for the other channels just update MIPS.
 void RFdriver::Load(QString Filename)
 {
-    int i;
     int SelectedChannel = rui->comboRFchan->currentIndex();
     QString res;
     QStringList resList;

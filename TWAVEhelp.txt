@@ -1,54 +1,101 @@
+Twave Module
+
+The MIPS Traveling Wave generator enables the user to define any 8-bit binary pattern
+that will be used to generate 8 output waveforms. An internal adjustable clock is used
+to rotate this bit pattern to the left on each clock cycle as illustrated in the
+sequence below:
+
+            00000011
+            00000110
+            00001100
+            00011000
+            00110000
+            01100000
+            11000000
+            10000001
+
+At each clock pulse the pattern rotates one bit position to the left with the most
+significant bit rotating back to the least significant bit. Each bit position defines
+a waveform for a total of 8 waveforms. Each waveform is identical but shifted one clock
+cycle from its neighbor. These 8 waveforms appear on the 8 output BNC connectors on
+the rear panel of the MIPS Twave power supply.
+
+The user can reverse the direction of the traveling wave using the provided user interface
+option or by configuring an input to support external control of direction.
+
+The user can control the pulse peak voltage (high state) from 7 to 100 volts and the The
+pulse voltage must always exceed 7 volts for the power supply to operate properly.
+
+The Twave sequence generation can be synchronized using a trigger signal applied to a
+input on the rear panel of the MIPS box. This trigger signal can be definded along with
+its active edge using the MIPS user interface. When this tigger occues it will initialized
+the sequence to the user defined pattern.
+
+This dialog box allows you to control the key twave parameters ans save to a file or recall
+a previous setup using the load and save menu options.
+
 Multi-pass compressor control table.
 
-The multi-pass compressor control table is designed to allow control of the twave 
-parameters and synchronize parameter changes with the operation of the compressor. 
-The table is a simple string of characters with all commands being a single 
-character. The table also contains parameters and these are always whole number 
-parameters and they follow the command character. There are two types of commands, 
-state change commands and twave parameter commands.
+The multi-pass compressor control table is designed to allow control of the twave
+parameters and synchronize parameter changes with the operation of the
+compressor. The table is a simple string of characters with all commands being a
+single character. The table also contains parameters and these are always whole
+number parameters and they follow the command character. There are two types of
+commands, state change commands and twave parameter commands.
 
-State change commands stop the execution of the table until the state has completed, 
-for example a C or compression command will stop the table execution until a full 
-compression cycle has finished.
+State change commands stop the execution of the table until the state has
+completed, for example a C or compression command will stop the table execution
+until a full compression cycle has finished.
 
-Twave parameter commands execute immediately and change controlling parameters 
-such as voltages and timing parameters.
+Twave parameter commands execute immediately and change controlling
+parameters such as voltages and timing parameters.
 
 State change commands
-	N		Normal non-compressed twave cycle
-	C		Compression cycle
-	D		Delay, holds current state and stops the clock
+       N    Normal non-compressed twave cycle
+       C    Compression cycle
+       D    Delay, holds current state and stops the clock
 
 Twave parameter commands
-	S		Controls the output switch state, 1 and 0 for open and close
-	O		Compression order or ratio
-	V		Twave 1 pulse voltage
-	v		Twave 2 pulse voltage
-	F		Twave frequency
-	c		Compression time in mS
-	n		Normal time in mS, a compression cycle is the sum of c and n
-	t		Non compression cycle time
-	s		Stop the twave clock
-	r		Restart the twave clock
-	[		Start of a loop
-	]		End of a loop
+       S    Controls the output switch state, 1 and 0 for open and close
+       O    Compression order or ratio
+       V    Twave 1 pulse voltage
+       v    Twave 2 pulse voltage
+       F    Twave frequency
+       c    Compression time in mS
+       n    Normal time in mS, a compression cycle is the sum of c and n
+       t    Non compression cycle time
+       s    Stop the twave clock
+       r    Restart the twave clock
+       o    Defines gate open time in mS
+       g    Time in mS from start of table to gate open
+       G    Time in mS from start of table to gate close
+       [    Start of a loop
+       ]    End of a loop
+       M    This is a mode command that defines the behavior of the compressor.
+            There are three valid modes, 0, 1, and 2.  Mode 0 is the normal mode
+            and Twave 1 and 2 amplitude controls set respective output pulse
+            voltages in all states. Mode 1 allows the Twave channel 1 amplitude to
+            define the normal mode amplitude on Twave channel 2. Mode 2
+            behaves as Mode 1 with the addition that Twave 2 voltage will define
+            Twave 1 voltage in the compress state.
 
-Compression table commands are case sensitive. Below are a number of compression 
-table commands that illustrate the capability.
+Compression table commands are case sensitive. Below are a number of
+compression table commands that illustrate the capability.
 
-	Both of the following tables show 2 compression cycles followed by 2 normal cycles. 
-	Note that the repeat or count parameter follows the command and its assumed to be 1 
-	if not defined.
-			CCNN
-			C2N2
-	The following table shows changing parameters before defining twave states. In this 
-	case the compression time is set to 200mS, the twave channel 2 pulse voltage it set 
-	to 30 volts and the order is set to 5 then a compression cycle is executed. When the 
-	compression cycle finishes the twave channel 2 voltage is set to 50 then another 
-	compression cycle is executed followed by 2 normal cycles.
-		c200v30O5Cv50CN2
-	This final example shows how the looping capability works. In this example the 
-	commands enclosed by the […] are repeated the number of times defined by the number 
-	that follows the ], in this case 10. 
-		C[NCCN]10N
+Both of the following tables show 2 compression cycles followed by 2 normal
+cycles. Note that the repeat or count parameter follows the command and its
+assumed to be 1 if not defined.
+        CCNN
+        C2N2
+The following table shows changing parameters before defining twave states.
+In this case the compression time is set to 200mS, the twave channel 2 pulse
+voltage it set to 30 volts and the order is set to 5 then a compression cycle is
+executed. When the compression cycle finishes the twave channel 2 voltage
+is set to 50 then another compression cycle is executed followed by 2 normal
+cycles.
+        c200v30O5Cv50CN2
+This final example shows how the looping capability works. In this example
+the commands enclosed by the […] are repeated the number of times defined
+by the number that follows the ], in this case 10.
+        C[NCCN]10N
 

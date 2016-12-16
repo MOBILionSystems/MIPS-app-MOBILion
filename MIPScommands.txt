@@ -42,12 +42,21 @@ DC bias module
   GDCMAX,ch				Return maximum voltage, ch=channel
   SDCPWR,val			Set DC power supply state, val=ON or OFF
   GDCPWR				Return DC power supply state, ON or OFF
+  SDCBALL,ch1,...      Sets all the DC bias output channels, all channels must be defined
   GDCBALL				Report all DC value setpoints
   GDCBALLV				Report all actual DC channel values
   SDCBDELTA,val			Applies an offset to all DC bias channels, val=voltage delta
   SDCBCHNS,bd,val		Set number of channel on board, bd=board,val=num channels
   SDCBONEOFF,val		Use one DC offset for two DC bias modules, val=TRUE or FALSE
   DCBOFFRBENA,val		Enable offset readback, val=TRUE or FALSE
+  SDCBOFFENA,ch,val		Set the offsetable flag for a given channel, val = TRUE or FALSE
+  SDCBPRO,nm,ch1,...   Set profile nm, must provide all channel values
+  GDCBPRO,nm           Returns profile number nm, 1 through 10
+  ADCBPRO,nm           Apply a profile
+  CDCBPRO,nm           Set profile with current values
+  TDCBPRO,p1,p1,dwell  Toggle between profile p1 and p2, dwell at each profile
+                       for dwell millisec
+  TDCBSTP              Stops the toggling
 
 RF driver module
   SRFFRQ,ch,val			Set RF frequency, ch=channel,val=frequency in Hz
@@ -134,6 +143,15 @@ Twave module
   STWCSW,val			Set switch state, val=Open or Close
   STWCCLK,val			Set Twave to common clock mode, val=TRUE or FALSE
   STWCMP,val			Set Twave compressor mode, val=TRUE or FALSE
+  STWSSTRT,ch,frq      Sets start freq for sweep function
+  GTWSSTRT,ch          Returns start frequency for sweep function
+  STWSSTP,ch,frq       Sets stop freq for sweep function
+  GTWSSTP,ch           Returns stop freq for sweep function
+  STWSTM,ch,tm         Sets sweep time in seconds
+  GTWSTM,ch            Returns the weep time in seconds
+  STWSGO,ch            Starts the sweep on channel 1 or 2, or 3 for both
+  STWSHLT,ch           Stops the sweep on channel 1 or 2, or 3 for both
+  GTWSTA,ch            Returns selected channel scan status, running or stopped
 
 FAIMS module
   SRFHPCAL,m,b			Set FAIMS output monitor Vpos readback calibration parameters. m=slope,b=offset

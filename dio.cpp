@@ -6,6 +6,7 @@ DIO::DIO(Ui::MIPS *w, Comms *c)
     comms = c;
 
     QObjectList widgetList = dui->gbDigitalOut->children();
+    widgetList += dui->gbDigitalIn->children();
     foreach(QObject *w, widgetList)
     {
        if(w->objectName().contains("chk"))
@@ -17,6 +18,9 @@ DIO::DIO(Ui::MIPS *w, Comms *c)
     connect(dui->pbTrigHigh,SIGNAL(pressed()),this,SLOT(TrigHigh()));
     connect(dui->pbTrigLow,SIGNAL(pressed()),this,SLOT(TrigLow()));
     connect(dui->pbTrigPulse,SIGNAL(pressed()),this,SLOT(TrigPulse()));
+    connect(dui->pbRFgenerate,SIGNAL(pressed()),this,SLOT(RFgenerate()));
+    connect(dui->leSFREQ,SIGNAL(editingFinished()),this,SLOT(SetFreq()));
+    connect(dui->leSWIDTH,SIGNAL(editingFinished()),this,SLOT(SetWidth()));
 }
 
 void DIO::Update(void)
@@ -26,6 +30,7 @@ void DIO::Update(void)
     dui->tabMIPS->setEnabled(false);
     dui->statusBar->showMessage(tr("Updating Digital IO controls..."));
     QObjectList widgetList = dui->gbDigitalOut->children();
+    widgetList += dui->gbFreqGen->children();
     foreach(QObject *w, widgetList)
     {
        if(w->objectName().contains("chk"))
@@ -33,6 +38,11 @@ void DIO::Update(void)
             res = "G" + w->objectName().mid(4).replace("_",",") + "\n";
             if(comms->SendMessage(res).toInt()==1) ((QCheckBox *)w)->setChecked(true);
             else ((QCheckBox *)w)->setChecked(false);
+       }
+       if(w->objectName().contains("le"))
+       {
+            res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
+            ((QLineEdit *)w)->setText(comms->SendMessage(res));
        }
     }
     widgetList = dui->gbDigitalIn->children();
@@ -83,6 +93,36 @@ void DIO::TrigPulse(void)
 {
     comms->SendCommand("TRIGOUT,PULSE\n");
 }
+
+// Slot for RF generate pushbutton
+void DIO::RFgenerate(void)
+{
+    QString res;
+
+    res = "BURST," + dui->Burst->text() + "\n";
+    comms->SendCommand(res.toStdString().c_str());
+}
+
+void DIO::SetFreq(void)
+{
+    QString res;
+
+    if(!(dui->leSFREQ->isModified())) return;
+    res = dui->leSFREQ->objectName().mid(2).replace("_",",") + "," + dui->leSFREQ->text() + "\n";
+    comms->SendCommand(res.toStdString().c_str());
+    dui->leSFREQ->setModified(false);
+}
+
+void DIO::SetWidth(void)
+{
+    QString res;
+
+    if(!(dui->leSWIDTH->isModified())) return;
+    res = dui->leSWIDTH->objectName().mid(2).replace("_",",") + "," + dui->leSWIDTH->text() + "\n";
+    comms->SendCommand(res.toStdString().c_str());
+    dui->leSWIDTH->setModified(false);
+}
+
 
 void DIO::Save(QString Filename)
 {

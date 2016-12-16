@@ -40,6 +40,16 @@
 //      1.) Started refactoring the code. Created the comms class and moved all communications to this class.
 //      2.) Add the Twave class and tab.
 //      3.) Still to do, create classes for each module and finish refactoring.
+//  1.7, Sept 16, 2016
+//      1.) Updated the help files
+//      2.) Added new clock modes to PSG
+//      3.) Added tool tip popup text
+//  1.8, Oct 16, 2016
+//      1.) Added fwr/rev to twave options
+//      2.) Added Sweep functions to Twave tab
+//      3.) Updated the MIPS commands help function
+//      4.) Updated the Twave help data
+//      5.) Add frequency control to DIO page
 //
 //  To do list:
 //  1.) Refactor the code, here are some to dos:
@@ -62,6 +72,7 @@
 #include "PSG.h"
 #include "Program.h"
 #include "Help.h"
+#include "ARB.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
@@ -107,6 +118,7 @@ MIPS::MIPS(QWidget *parent) :
     SeqGen = new PSG(ui,comms);
     pgm = new Program(ui, comms, console);
     help = new Help();
+    arb = new ARB(ui, comms);
 
     ui->actionClear->setEnabled(true);
     ui->actionOpen->setEnabled(true);
@@ -167,6 +179,8 @@ void MIPS::GeneralHelp(void)
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
     {
+        help->SetTitle("Pulse Sequence Generation Help");
+        help->LoadHelpText(":/PSGhelp.txt");
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Twave")
     {
@@ -192,22 +206,22 @@ void MIPS::loadSettings(void)
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
     {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Data from File"),"",tr("Files (*.settings)"));
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Data from File"),"",tr("Settings (*.settings);;All files (*.*)"));
         console->Load(fileName);
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Digital IO")
     {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Files (*.settings)"));
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
         dio->Load(fileName);
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "DCbias")
     {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Files (*.settings)"));
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
         dcbias->Load(fileName);
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "RFdriver")
     {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Files (*.settings)"));
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
         rfdriver->Load(fileName);
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
@@ -216,8 +230,13 @@ void MIPS::loadSettings(void)
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Twave")
     {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Files (*.settings)"));
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
         twave->Load(fileName);
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "ARB")
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
+        arb->Load(fileName);
     }
     return;
 }
@@ -229,22 +248,22 @@ void MIPS::saveSettings(void)
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
     {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Data File"),"",tr("Files (*.settings)"));
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Data File"),"",tr("Settings (*.settings);;All files (*.*)"));
         console->Save(fileName);
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Digital IO")
     {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Files (*.settings)"));
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
         dio->Save(fileName);
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "DCbias")
     {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Files (*.settings)"));
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
         dcbias->Save(fileName);
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "RFdriver")
     {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Files (*.settings)"));
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
         rfdriver->Save(fileName);
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
@@ -253,8 +272,13 @@ void MIPS::saveSettings(void)
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Twave")
     {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Files (*.settings)"));
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
         twave->Save(fileName);
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "ARB")
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
+        arb->Save(fileName);
     }
     return;
 }
@@ -395,6 +419,10 @@ void MIPS::tabSelected()
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Twave")
     {
         twave->Update();
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "ARB")
+    {
+        arb->Update();
     }
 }
 

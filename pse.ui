@@ -34,6 +34,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>Defines the name of this time point.</string>
+    </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
@@ -83,6 +86,9 @@
       <height>21</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string/>
+    </property>
    </widget>
    <widget class="QLineEdit" name="leTime">
     <property name="geometry">
@@ -92,6 +98,9 @@
       <width>113</width>
       <height>21</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>Not currently used</string>
     </property>
    </widget>
   </widget>
@@ -706,6 +715,9 @@
      <height>32</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Advance to next time point</string>
+   </property>
    <property name="text">
     <string>Next</string>
    </property>
@@ -721,6 +733,9 @@
      <width>91</width>
      <height>32</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Inset a time point after this one</string>
    </property>
    <property name="text">
     <string>Insert</string>
@@ -738,6 +753,9 @@
      <height>32</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Delete this time point</string>
+   </property>
    <property name="text">
     <string>Delete</string>
    </property>
@@ -754,6 +772,9 @@
      <height>32</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Go back to previous time point</string>
+   </property>
    <property name="text">
     <string>Previous</string>
    </property>
@@ -769,6 +790,9 @@
      <width>106</width>
      <height>26</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Check this to cause this time point to loop back to the labeled point</string>
    </property>
    <property name="text">
     <string>Loop to</string>
@@ -796,6 +820,9 @@
      <height>21</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Number of times to loop</string>
+   </property>
   </widget>
   <widget class="QComboBox" name="comboLoop">
    <property name="geometry">
@@ -805,6 +832,9 @@
      <width>106</width>
      <height>26</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Point to loop back to</string>
    </property>
   </widget>
  </widget>

@@ -183,8 +183,9 @@ void pseDialog::on_pbPrevious_pressed()
 void pseDialog::on_pbInsert_pressed()
 {
     psgPoint *point = new psgPoint;
+    psgPoint *nextPoint = NULL;
     QList<psgPoint*>::iterator it;
-    int i;
+    int i,deltaT;
 
     *point = *activePoint;
     // Generate the new time point's name. If the previous timepoint name ends with a
@@ -206,10 +207,14 @@ void pseDialog::on_pbInsert_pressed()
         break;
     }
     for(it = p->begin(); it != p->end(); ++it) if(*it == activePoint) break;
+    int ctime = point->TimePoint;
+    if(CurrentIndex >= p->size() - 1) deltaT = 100;
+    else deltaT = ((*p)[CurrentIndex+1]->TimePoint - point->TimePoint)/2;
     it++;
     p->insert(it, point);
     CurrentIndex++;
     activePoint = point;
+    point->TimePoint = ctime + deltaT;
     UpdateDialog(activePoint);
     ui->gbCurrentPoint->setTitle("Current time point: " + QString::number(CurrentIndex+1) + " of " + QString::number(p->size()));
 }

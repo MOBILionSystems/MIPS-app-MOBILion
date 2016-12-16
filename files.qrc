@@ -6,5 +6,6 @@
         <file>MIPScommands.txt</file>
         <file>MIPShelp.txt</file>
         <file>TWAVEhelp.txt</file>
+        <file>PSGhelp.txt</file>
     </qresource>
 </RCC>

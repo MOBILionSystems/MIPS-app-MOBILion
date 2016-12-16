@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     rfdriver.cpp \
     psg.cpp \
     program.cpp \
-    help.cpp
+    help.cpp \
+    arb.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -43,7 +44,8 @@ HEADERS  += mips.h \
     rfdriver.h \
     psg.h \
     program.h \
-    help.h
+    help.h \
+    arb.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \
@@ -54,4 +56,6 @@ RESOURCES += \
     files.qrc
 
 QMAKE_LFLAGS_WINDOWS = /SUBSYSTEM:WINDOWS,5.01
+QMAKE_MAC_SDK = macosx10.12
+
 

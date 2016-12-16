@@ -36,6 +36,12 @@ private slots:
     void rbSwitchOpen(void);
     void pbUpdate(void);
     void pbForceTrigger(void);
+    void rbTW1fwd(void);
+    void rbTW1rev(void);
+    void rbTW2fwd(void);
+    void rbTW2rev(void);
+    void pbTWsweepStart(void);
+    void pbTWsweepStop(void);
 };
 
 #endif // TWAVE

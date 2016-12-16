@@ -11,6 +11,8 @@ PSG::PSG(Ui::MIPS *w, Comms *c)
 // Setup controls
    pui->comboClock->clear();
    pui->comboClock->addItem("Ext");
+   pui->comboClock->addItem("ExtN");
+   pui->comboClock->addItem("ExtS");
    pui->comboClock->addItem("42000000");
    pui->comboClock->addItem("10500000");
    pui->comboClock->addItem("2625000");
