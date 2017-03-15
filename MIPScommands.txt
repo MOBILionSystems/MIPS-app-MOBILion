@@ -5,6 +5,8 @@ General Commands
   GERR					Returns integer error code
   GNAME					Returns user assigned name string
   SNAME,name			Sets the system name to user entered string
+  ABOUT                Returns details about system modules installed
+  SMREV,b,m,r	     	Defines the rev level of a module,  b=board, m=module address, r=rev level desired
   RESET					Reboots the MIPS system
   SAVE					Save general parameters to SD memory card
   GCHAN,module			Returns the number of channels for the selected module, RF,DCB,ESI,TWAVE,FAIMS,FIL
@@ -19,11 +21,15 @@ General Commands
   STHRDENA,nm,val 		Thread control, nm=name, val = TRUE or FALSE
   SDEVADD,b,ad      	ADC address setup, b = board 0 or 1, ad = address, base 10
   RDEV,ch           	ADC read, ch = channel 0 - 7
+  RDEV2,ch	        	AD7994 ADC read, ch = channel 0 - 3
   TBLTSKENA,val     	Enable IO in table mode, val = TRUE or FALSE
   ADC,ch            	Read DUE ADC channel, ch = channel 0 - 3
   LEDOVRD,val       	Override button LED, val = TRUE or FALSE
   LED,val           	LED color, val = bit mask. 0=Red,1=Blue,2=green,3=blink
   DSPOFF,val        	Turns off display, val = TRUE or FALSE
+  CHKIMAGE,file	       	Checks status of bmp file on SD card
+  LOADIMAGE,file		Displays bmp file that is saved on SD card
+  BIMAGE,file       	Set an image file to be displayed on power up
 
 Clock generation
   GWIDTH				Returns clock pulse width in uS
@@ -31,6 +37,18 @@ Clock generation
   GFREQ					Return clock frequency in Hz
   SFREQ,val				Defines clock frequency, val = frequency in Hz
   BURST,val				Defines clock burst, val = number of cycles, -1 = forever
+
+Delay trigger
+  SDTRIGINP,inp,lev 	Define trigger channel and level. inp = Q-X, lex = POS or NEG
+  SDTRIGDLY,time     	Trigger delay, time = microseconds
+  GDTRIGDLY           	Reports trigger delay
+  SDTRIGPRD,time      	Trigger period. time = microseconds
+  GDTRIGPRD           	Reports trigger period
+  SDTRIGRPT,count    	Trigger repeat count. Count = number of times to trigger
+  GDTRIGRPT         	Returns the repeat count
+  SDTRIGMOD,mod     	Defines the module to trigger, mod = ARB
+  SDTRIGENA,val      	Enables the delay trigger module if TRUE
+  GDTRIGENA         	Reports the delay trigger status
 
 DC bias module
   SDCB,ch,val			Set DC value, ch=channel, val=value in volts
@@ -69,6 +87,8 @@ RF driver module
   GRFVLT,ch				Return output Vp-p setpoint, ch=channel
   GRFPWR,ch				Return channel power in watts, ch=channel
   GRFALL				Return all RF parameters
+  TUNERFCH,ch        	Performs automatic tuning of selected channel
+  RETUNERFCH,ch      	Retunes the selected channel
 
 DIO module
   SDIO,ch,val			Set digital output,ch=A-P,val=0 or 1
@@ -77,11 +97,16 @@ DIO module
   MIRROR,in,out			Mirror input to output, in=Q-X,out=A-P
 
 ESI module
-  SHV,ch,val			Set channel voltage,ch=channel,val=voltage
-  GHV,ch				Return channel voltage setpoint,ch=channel
-  GHVV,ch				Return output voltage,ch=channel
-  GHVI,ch				Return channel current in mA,ch=channel
-  GHVMAX,ch				Return channel max voltage, ch=channel
+  SHV,ch,val        	Set channel voltage,ch=channel,val=voltage
+  GHV,ch            	Return channel voltage setpoint,ch=channel
+  GHVV,ch           	Return output voltage,ch=channel
+  GHVI,ch           	Return channel current in mA,ch=channel
+  GHVMAX,ch         	Return channel max voltage, ch=channel
+  GHVMIN,ch         	Return channel min voltage, ch=channel
+  SHVENA,ch         	Enables the selected channel (ch)
+  SHVDIS,ch         	Disables the selected channel (ch)
+  SHVPSUP,m,val     	Defines a modules (m) positive supply voltage (val), setup command
+  SHVNSUP,m,val     	Defines a modules (m) negative supply voltage (val), setup command
 
 Pulse sequence generator commands
   STBLDAT,val			Define signal table,val=table
@@ -154,8 +179,25 @@ Twave module
   GTWSTA,ch            Returns selected channel scan status, running or stopped
 
 FAIMS module
+  SFMENA,val			Enables FAIMS is val = TRUE, disables if FALSE
+  GFMENA				Returns enable status, TRUE or FALSE
+  SFMDRV,val			Sets FAIMS drive percentage to val, 0 to 100
+  GFMDRV				Returns the FAIMS drive level
+  GFMPWR				Returns the FAIMS power in watts
+  GFMPV					Returns FAIMS positive peak voltage in KV
+  GFMNV					Returns FAIMS negative peak voltage in KV
+  SFMCV,val				Sets FAIMS CV voltage in volts
+  GFMCV					Returns FAIMS CV setpoint in volts
+  GFMCVA				Returns FAIMS CV actual in volts
+  SFMBIAS,val			Set FAIMS BIAS voltage in volts
+  GFMBIAS				Returns FAIMS BIAS setpoint in volts
+  GFMBIASA				Returns FAIMS BIAS actual in volts
+  SFMOFF,val			Set FAIMS offset voltage in volts
+  GFMOFF				Returns FAIMS offset setpoint in volts
+  GFMOFFA				Returns FAIMS offset actial in volts
   SRFHPCAL,m,b			Set FAIMS output monitor Vpos readback calibration parameters. m=slope,b=offset
   SRFHNCAL,m,b 			Set FAIMS output monitor Vneg readback calibration parameters. m=slope,b=offset
+  SARCDIS,val			Disables the arc detector is val = TRUE, enables if FALSE
 
 Filament module
   GFLENA,ch				Report enable status, ON or OFF, ch=chanel
@@ -181,6 +223,7 @@ Filament module
   RFLPARMS,ch,val		Report to host the actual filament current, ch=channel, val=time in seconds between reports, 0 = off
   SFLSRES,val			Sets the emission current sense resistor value
   GFLECUR				Returns the emission current in uA
+  SFLSWD,val			If val = TRUE enables comms watch dog, FALSE disables
 
 WiFi module
   GHOST					Reports host name
@@ -190,6 +233,7 @@ WiFi module
   SSSID,val				Sets SSID, val = SSID
   SPSWD,val				Sets password, val = password
   SWIFIENA,val			Enables the WiFi interface, val = TRUE or FALSE
+  SWIFISP,ch         	Sets the serial port used for WiFi, 0 or 1
 
 Eithernet module
   GEIP					Reports MIPS IP address
@@ -200,22 +244,52 @@ Eithernet module
   SEGATE,val			Sets gateway IP address
 
 ARB module
-  SARBMODE,val			Sets mode, TWAVE or ARB
-  GARBMODE				Reports mode
-  SWFREQ,val			Sets frequency in Hz
-  GWFREQ				Reports frequency
-  SWFVRNG,val			Set output voltage range, Vp-p
-  GWFVRNG				Reports output voltage range
-  SWFVOFF,val			Sets offset voltage, -50 to 50V
-  GWFVOFF				Reports offset voltage
-  SWFVAUX,val			Sets auxiliary output voltage, -50 to 50V
-  GWFVAUX				Reports auxiliary output voltage
-  SWFDIS				Disables or stop the ARB
-  SWFENA				Enables or starts the ARB
-  SARBBUF,val			Sets buffer length in samples
-  GARBBUF				Reports the buffer length
-  SARBNUM,val			Sets number of buffer repeats
-  GARBNUM				Reports number of buffer repeats
-  SARBCHS,val			Sets all channels to val
-  SARBCH,ch,val			Sets selected channel to val
-  SACHRNG,ch,st,sp,val	Sets selected channel range to val
+  SARBMODE,mn,val		Sets mode, mn = module, val = TWAVE or ARB
+  GARBMODE,mn			Reports mode, mn = module number
+  SWFREQ,mn,val			Sets frequency in Hz, mn = module, val = frequency
+  GWFREQ,mn				Reports frequency, mn = module
+  SWFVRNG,mn,val		Set output voltage range, Vp-p, mn = module, val = Vp-p
+  GWFVRNG,mn			Reports output voltage range, mn = module
+  SWFVOFF,mn,val		Sets offset voltage, -50 to 50V, mn = module, val = voltage
+  GWFVOFF,mn			Reports offset voltage, mn = module
+  SWFVAUX,mn,val		Sets auxiliary output voltage, -50 to 50V, mn = module, val = voltage
+  GWFVAUX,mn			Reports auxiliary output voltage, mn = module
+  SWFDIS,mn				Disables or stop the ARB, mn = module
+  SWFENA,mn				Enables or starts the ARB, mn = module
+  SWFDIR,mn,val	Set 	Twave direction, mn=module, val=FWD or REV
+  GWFDIR,mn	Return 		Twave direction, FWD or REV, mn=module
+  SWFARB,mn,v1,v1…		Sets an arbitrary waveform, mn=module, v1,v2,… are 32 values that define the waveform.
+  GWFARB,mn				Returns the 32 values that define an arbitrary waveform, mn=module
+  SWFTYP,mn.typ			Sets the waveform type, mn=module, type = SIN,RAMP,TRI,PULSE, or ARB
+  GWFTYP,mn				Returns the waveform type, mn=module
+  SARBBUF,mn,val		Sets buffer length in samples, mn = module, val = buffer length
+  GARBBUF,mn			Reports the buffer length, mn = module
+  SARBNUM,mn,val		Sets number of buffer repeats, mn = module, val = repeat count
+  GARBNUM,mn			Reports number of buffer repeats, mn = module
+  SARBCHS,mn,val		Sets all channels to val, mn = module
+  SARBCH,mn,ch,val		Sets selected channel to val, mn = module
+  SACHRNG,mn,ch,st,sp,vl Sets selected channel range to val
+
+ARB module compressor commands
+  SARBCTBL,val			Set Twave multi-pass control table, val=ascii table
+  GARBCTBL 				Return Twave multi-pass table string
+  GARBCMODE 			Return Compressor mode, Normal or Compress
+  SARBCMODE,val			Set Compressor mode, val=Normal or Compress
+  GARBCORDER 			Return Compressor order, 0 - 255
+  SARBCORDER,val		Set Compressor order, val=0 - 255
+  GARBCTD 				Return Compressor trigger delay in mS
+  SARBCTD,tm			Set Compressor trigger delay, tm=delay in mS
+  GARBCTC 				Return compression time in mS
+  SARBCTC,tm			Set compression time, tm=time in mS
+  GARBCTN 				Return normal time in mS
+  SARBCTN,tm			Set normal time, tm=time in mS
+  GARBCTNC 				Return non-compress time in mS
+  SARBCTNC,tm			Set non-Compress time, tm=time in mS
+  TARBTRG 				Force a multi-pass trigger
+  GARBCSW 				Return switch state, Open or Close
+  SARBCSW 				Set switch state, val=Open or Close
+
+ARM module configuration commands
+  SARBCCLK,val			Set Twave to common clock mode, val=TRUE or FALSE
+  SARBCMP,val			Set Twave compressor mode, val=TRUE or FALSE
+  SARBCOFF,val			If val = TRUE enables common offset, FALSE disables

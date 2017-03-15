@@ -27,11 +27,14 @@ public:
     Ui::MIPS *dui;
     Comms *comms;
     int NumChannels;
+    QLineEdit *selectedLineEdit;
 
 private slots:
     void DCbiasUpdated(void);
     void DCbiasPower(void);
     void UpdateDCbias(void);
+    void DCbiasdial(void);
+    void CHselected(void);
 };
 
 #endif // DCBIAS

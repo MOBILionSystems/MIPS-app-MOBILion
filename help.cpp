@@ -64,7 +64,7 @@ void Help::LoadHelpText(QString FileName)
         } while(!line.isNull());
         file.close();
     }
-//    ui->plainTextEdit->setVerticalScrollBar(sb);
+    ui->plainTextEdit->moveCursor (QTextCursor::Start);
 }
 
 void Help::resizeEvent(QResizeEvent* event)

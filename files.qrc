@@ -7,5 +7,6 @@
         <file>MIPShelp.txt</file>
         <file>TWAVEhelp.txt</file>
         <file>PSGhelp.txt</file>
+        <file>FAIMShelp.txt</file>
     </qresource>
 </RCC>

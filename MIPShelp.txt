@@ -65,6 +65,20 @@ Twave
   context sensitive help so if you select help when this tab is displayed you will
   see instructions on how to define the compression parameters and how to
   use the multi-pass compression table.
+FAIMS
+  The FAIMS tab allows you to enable and disable FAIMS and monitor the output
+  voltages. All the FAIMS tuning and setup is performed using the FAIMS controller's
+  user interface. The FAIMS tab allows you to monitor and control the CV and BIAS
+  voltages as well as the offset value. The offset value allows you to define the range
+  for CV and BIAS. Changing offset will not change the output voltage, just the range.
+  With offset set at 0 the CV and BIAS channels have a range of -250 to 250V. The offset
+  will allow you to center this range about any value from -250 to 250V. For example
+  if you set the offset to 100V then the range will be -150 to 350V.
+  The FAIMS tab also supports the CV parking feature that is used with a LC
+  separation. You can define a list of retention times and windows with their associated
+  CV and BIAS values. The system will automatically adjust the CV and BIAS values
+  as the LC separation progresses. Please see the context sensitive help in the FAIMS
+  tab for more detail.
 Pulse sequence generation
   One of the most powerful features of MIPS is its ability to define complex
   pulse sequences. You can define pulse sequences that change digital outputs

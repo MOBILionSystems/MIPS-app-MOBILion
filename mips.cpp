@@ -50,6 +50,10 @@
 //      3.) Updated the MIPS commands help function
 //      4.) Updated the Twave help data
 //      5.) Add frequency control to DIO page
+// 1.9, March 7, 2017
+//      1.) Added the FAIMS tab and the CV parking capability
+//      2.) Updated help text
+//      3.) Updated MIPS command summary
 //
 //  To do list:
 //  1.) Refactor the code, here are some to dos:
@@ -73,6 +77,7 @@
 #include "Program.h"
 #include "Help.h"
 #include "ARB.h"
+#include "FAIMS.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
@@ -119,6 +124,7 @@ MIPS::MIPS(QWidget *parent) :
     pgm = new Program(ui, comms, console);
     help = new Help();
     arb = new ARB(ui, comms);
+    faims = new FAIMS(ui, comms);
 
     ui->actionClear->setEnabled(true);
     ui->actionOpen->setEnabled(true);
@@ -177,6 +183,11 @@ void MIPS::GeneralHelp(void)
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "RFdriver")
     {
     }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "FAIMS")
+    {
+        help->SetTitle("FAIMS help");
+        help->LoadHelpText(":/FAIMShelp.txt");
+    }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
     {
         help->SetTitle("Pulse Sequence Generation Help");
@@ -224,6 +235,11 @@ void MIPS::loadSettings(void)
         QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
         rfdriver->Load(fileName);
     }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "FAIMS")
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
+        faims->Load(fileName);
+    }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
     {
         SeqGen->Load();
@@ -266,6 +282,11 @@ void MIPS::saveSettings(void)
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
         rfdriver->Save(fileName);
     }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "FAIMS")
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
+        faims->Save(fileName);
+    }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
     {
         SeqGen->Save();
@@ -307,6 +328,7 @@ void MIPS::pollLoop(void)
     {
         //UpdateRFdriver();
     }
+    faims->PollLoop();
 }
 
 void MIPS::mousePressEvent(QMouseEvent * event)
@@ -423,6 +445,10 @@ void MIPS::tabSelected()
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "ARB")
     {
         arb->Update();
+    }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "FAIMS")
+    {
+        faims->Update();
     }
 }
 

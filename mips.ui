@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MIPS, Version 1.8 Oct 16, 2016</string>
+   <string>MIPS, Version 1.9 March 7, 2017</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QTabWidget" name="tabMIPS">
@@ -1196,7 +1196,7 @@ Please note, the Program MIPS function will only work with a serial connection t
       </property>
       <property name="geometry">
        <rect>
-        <x>15</x>
+        <x>10</x>
         <y>30</y>
         <width>276</width>
         <height>426</height>
@@ -1496,9 +1496,9 @@ Please note, the Program MIPS function will only work with a serial connection t
       <widget class="QLabel" name="label_9">
        <property name="geometry">
         <rect>
-         <x>65</x>
+         <x>80</x>
          <y>30</y>
-         <width>96</width>
+         <width>71</width>
          <height>26</height>
         </rect>
        </property>
@@ -1611,8 +1611,8 @@ Please note, the Program MIPS function will only work with a serial connection t
      <widget class="QPushButton" name="pbDCbiasUpdate">
       <property name="geometry">
        <rect>
-        <x>620</x>
-        <y>360</y>
+        <x>630</x>
+        <y>170</y>
         <width>121</width>
         <height>32</height>
        </rect>
@@ -1627,7 +1627,7 @@ Please note, the Program MIPS function will only work with a serial connection t
       </property>
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>300</x>
         <y>30</y>
         <width>276</width>
         <height>426</height>
@@ -1929,7 +1929,7 @@ Please note, the Program MIPS function will only work with a serial connection t
         <rect>
          <x>70</x>
          <y>30</y>
-         <width>96</width>
+         <width>71</width>
          <height>26</height>
         </rect>
        </property>
@@ -2043,7 +2043,7 @@ Please note, the Program MIPS function will only work with a serial connection t
       <property name="geometry">
        <rect>
         <x>690</x>
-        <y>85</y>
+        <y>80</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -2075,7 +2075,7 @@ Please note, the Program MIPS function will only work with a serial connection t
       <property name="geometry">
        <rect>
         <x>615</x>
-        <y>120</y>
+        <y>100</y>
         <width>161</width>
         <height>51</height>
        </rect>
@@ -2085,8 +2085,44 @@ Please note, the Program MIPS function will only work with a serial connection t
 enabled</string>
       </property>
      </widget>
+     <widget class="QDial" name="dialDCbias">
+      <property name="geometry">
+       <rect>
+        <x>580</x>
+        <y>260</y>
+        <width>211</width>
+        <height>191</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboDialCH">
+      <property name="geometry">
+       <rect>
+        <x>700</x>
+        <y>240</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_162">
+      <property name="geometry">
+       <rect>
+        <x>580</x>
+        <y>240</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Selected channel</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="ARB">
      <attribute name="title">
       <string>ARB</string>
      </attribute>
@@ -5046,6 +5082,519 @@ enabled</string>
       <property name="text">
        <string>Update</string>
       </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="FAIMS">
+     <attribute name="title">
+      <string>FAIMS</string>
+     </attribute>
+     <widget class="QGroupBox" name="gpCVparking">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>10</y>
+        <width>331</width>
+        <height>536</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>CV parking</string>
+      </property>
+      <widget class="QTextEdit" name="textCVparkList">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>60</y>
+         <width>251</width>
+         <height>191</height>
+        </rect>
+       </property>
+       <property name="lineWrapMode">
+        <enum>QTextEdit::NoWrap</enum>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_138">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>20</y>
+         <width>251</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>List of compounds, RT, RT window, CV, and Bias.</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_139">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>290</y>
+         <width>111</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Enternal trigger</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboFMtrig">
+       <property name="geometry">
+        <rect>
+         <x>180</x>
+         <y>290</y>
+         <width>121</width>
+         <height>26</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pbFMstart">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>320</y>
+         <width>201</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Start</string>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="gbCurrentValues">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>345</y>
+         <width>281</width>
+         <height>181</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Current values</string>
+       </property>
+       <widget class="QLabel" name="label_140">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>30</y>
+          <width>59</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Status</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_141">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>60</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Elasped mins</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_151">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>120</y>
+          <width>71</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>CV, volts</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_152">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>150</y>
+          <width>71</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Bias, volts</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="leFMstatus">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>30</y>
+          <width>151</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="leFMelasped">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>60</y>
+          <width>151</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="leFMcvVolts">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>120</y>
+          <width>151</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="leFMbiasVolts">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>150</y>
+          <width>151</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_163">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>90</y>
+          <width>71</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Compound</string>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="leFMcompound">
+        <property name="geometry">
+         <rect>
+          <x>110</x>
+          <y>90</y>
+          <width>151</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QPushButton" name="pbFMloadCSV">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>250</y>
+         <width>201</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Load csv file</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="gbFAIMS_RF">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>50</y>
+        <width>331</width>
+        <height>221</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>FAIMS RF</string>
+      </property>
+      <widget class="QCheckBox" name="chkFMenable">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>40</y>
+         <width>161</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Enable RF generation</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leSFMDRV">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>80</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_153">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>80</y>
+         <width>161</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Drive level, %</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_154">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>110</y>
+         <width>171</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Total power, watts</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_155">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>140</y>
+         <width>171</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Positive peak output, KV</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_156">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>170</y>
+         <width>171</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Negative peak output, KV</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGFMPWR">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>110</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGFMPV">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>140</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGFMNV">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>170</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="gbFAIMS_DC">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>330</y>
+        <width>331</width>
+        <height>141</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>DC voltage control</string>
+      </property>
+      <widget class="QLineEdit" name="leSFMBIAS">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>40</y>
+         <width>80</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_157">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>40</y>
+         <width>59</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>DC bias</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_158">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>70</y>
+         <width>59</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>DC CV</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_159">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>100</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>DC Offset</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGFMBIASA">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>40</y>
+         <width>80</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_160">
+       <property name="geometry">
+        <rect>
+         <x>130</x>
+         <y>20</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Setpoint</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_161">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>20</y>
+         <width>51</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Actual</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGFMCVA">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>70</y>
+         <width>80</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leSFMCV">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>70</y>
+         <width>80</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGFMOFFA">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>100</y>
+         <width>80</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leSFMOFF">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>100</y>
+         <width>80</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="PSG">

@@ -11,26 +11,24 @@ DCbias::DCbias(Ui::MIPS *w, Comms *c)
 
     SetNumberOfChannels(8);
     // DCbias page setup
+    dui->dialDCbias->setMinimum(-250);
+    dui->dialDCbias->setMaximum(250);
+    dui->dialDCbias->setValue(0);
+    selectedLineEdit = NULL;
     QObjectList widgetList = dui->gbDCbias1->children();
+    widgetList += dui->gbDCbias2->children();
     foreach(QObject *w, widgetList)
     {
        if(w->objectName().contains("leSDCB"))
        {
             ((QLineEdit *)w)->setValidator(new QDoubleValidator);
-            connect(((QLineEdit *)w),SIGNAL(editingFinished()),this,SLOT(DCbiasUpdated()));
-       }
-    }
-    widgetList = dui->gbDCbias2->children();
-    foreach(QObject *w, widgetList)
-    {
-       if(w->objectName().contains("leSDCB"))
-       {
-            ((QLineEdit *)w)->setValidator(new QDoubleValidator);
-            connect(((QLineEdit *)w),SIGNAL(editingFinished()),this,SLOT(DCbiasUpdated()));
+           connect(((QLineEdit *)w),SIGNAL(editingFinished()),this,SLOT(DCbiasUpdated()));
        }
     }
     connect(dui->pbDCbiasUpdate,SIGNAL(pressed()),this,SLOT(UpdateDCbias()));
     connect(dui->chkPowerEnable,SIGNAL(toggled(bool)),this,SLOT(DCbiasPower()));
+    connect(dui->dialDCbias,SIGNAL(valueChanged(int)),this,SLOT(DCbiasdial()));
+    connect(dui->comboDialCH,SIGNAL(currentIndexChanged(int)),this,SLOT(CHselected()));
 }
 
 void DCbias::SetNumberOfChannels(int num)
@@ -40,6 +38,12 @@ void DCbias::SetNumberOfChannels(int num)
     dui->gbDCbias2->setEnabled(false);
     if(NumChannels >= 8) dui->gbDCbias1->setEnabled(true);
     if(NumChannels > 8) dui->gbDCbias2->setEnabled(true);
+    dui->comboDialCH->clear();
+    dui->comboDialCH->addItem("None");
+    for(int i=0;i<NumChannels;i++)
+    {
+        dui->comboDialCH->addItem("CH " + QString::number(i+1));
+    }
 }
 
 void DCbias::DCbiasUpdated(void)
@@ -51,6 +55,58 @@ void DCbias::DCbiasUpdated(void)
    res = obj->objectName().mid(2).replace("_",",") + "," + ((QLineEdit *)obj)->text() + "\n";
    comms->SendCommand(res.toStdString().c_str());
    ((QLineEdit *)obj)->setModified(false);
+}
+
+void DCbias::CHselected(void)
+{
+    if(dui->comboDialCH->currentText() == "None") selectedLineEdit = NULL;
+    if(dui->comboDialCH->currentText() == "CH 1") selectedLineEdit = dui->leSDCB_1;
+    if(dui->comboDialCH->currentText() == "CH 2") selectedLineEdit = dui->leSDCB_2;
+    if(dui->comboDialCH->currentText() == "CH 3") selectedLineEdit = dui->leSDCB_3;
+    if(dui->comboDialCH->currentText() == "CH 4") selectedLineEdit = dui->leSDCB_4;
+    if(dui->comboDialCH->currentText() == "CH 5") selectedLineEdit = dui->leSDCB_5;
+    if(dui->comboDialCH->currentText() == "CH 6") selectedLineEdit = dui->leSDCB_6;
+    if(dui->comboDialCH->currentText() == "CH 7") selectedLineEdit = dui->leSDCB_7;
+    if(dui->comboDialCH->currentText() == "CH 8") selectedLineEdit = dui->leSDCB_8;
+    if(dui->comboDialCH->currentText() == "CH 9") selectedLineEdit = dui->leSDCB_9;
+    if(dui->comboDialCH->currentText() == "CH 10") selectedLineEdit = dui->leSDCB_10;
+    if(dui->comboDialCH->currentText() == "CH 11") selectedLineEdit = dui->leSDCB_11;
+    if(dui->comboDialCH->currentText() == "CH 12") selectedLineEdit = dui->leSDCB_12;
+    if(dui->comboDialCH->currentText() == "CH 13") selectedLineEdit = dui->leSDCB_13;
+    if(dui->comboDialCH->currentText() == "CH 14") selectedLineEdit = dui->leSDCB_14;
+    if(dui->comboDialCH->currentText() == "CH 15") selectedLineEdit = dui->leSDCB_15;
+    if(dui->comboDialCH->currentText() == "CH 16") selectedLineEdit = dui->leSDCB_16;
+    if(selectedLineEdit != NULL)
+    {
+        if(dui->comboDialCH->currentText().mid(3).toInt() <= 8)
+        {
+            dui->dialDCbias->setMinimum((int)(dui->leGDCMIN_1->text().toFloat()));
+            dui->dialDCbias->setMaximum((int)(dui->leGDCMAX_1->text().toFloat()));
+        }
+        else
+        {
+            dui->dialDCbias->setMinimum((int)(dui->leGDCMIN_9->text().toFloat()));
+            dui->dialDCbias->setMaximum((int)(dui->leGDCMAX_9->text().toFloat()));
+        }
+        dui->dialDCbias->setValue((int)(selectedLineEdit->text().toFloat()));
+//        qDebug() << selectedLineEdit->text().toInt();
+    }
+}
+
+void DCbias::DCbiasdial(void)
+{
+   static bool inuse = false;
+
+   if(inuse) return;
+   if(selectedLineEdit == NULL) return;
+   if(QString::number(dui->dialDCbias->value()) == selectedLineEdit->text()) return;
+   inuse = true;
+//   qDebug() << QString::number(dui->dialDCbias->value());
+//   qDebug() << selectedLineEdit->text();
+   selectedLineEdit->setText(QString::number(dui->dialDCbias->value()));
+   comms->SendCommand("SDCB," + dui->comboDialCH->currentText().mid(3) + "," + selectedLineEdit->text() + "\n");
+//   qDebug() << "SDCB," + dui->comboDialCH->currentText().mid(3) + "," + selectedLineEdit->text();
+   inuse = false;
 }
 
 void DCbias::Update(void)

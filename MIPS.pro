@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     psg.cpp \
     program.cpp \
     help.cpp \
-    arb.cpp
+    arb.cpp \
+    faims.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -45,7 +46,8 @@ HEADERS  += mips.h \
     psg.h \
     program.h \
     help.h \
-    arb.h
+    arb.h \
+    faims.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \

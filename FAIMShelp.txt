@@ -1,0 +1,98 @@
+FAIMS control tab
+
+The FAIMS tab allows you to enable and disable FAIMS and monitor the output
+ voltages. All the FAIMS tuning and setup is performed using the FAIMS 
+ controller's user interface. The FAIMS tab allows you to monitor and 
+ control the CV and BIAS voltages as well as the offset value. The offset 
+ value allows you to define the range for CV and BIAS. Changing offset will 
+ not change the output voltage, just the range. With offset set at 0 the CV 
+ and BIAS channels have a range of -250 to 250V. The offset will allow you 
+ to center this range about any value from -250 to 250V. For example if you 
+ set the offset to 100V then the range will be -150 to 350V. The FAIMS tab 
+ also supports the CV parking feature that is used with a LC separation. 
+ You can define a list of retention times and windows with their associated 
+ CV and BIAS values. The system will automatically adjust the CV and BIAS 
+ values as the LC separation progresses. 
+
+You will find three frames or sections on the FAIMS tab, each is described below:
+
+FAIMS RF
+  This section allows you to enable and disable the RF generation of the 
+  FAIMS system and to define the drive level in percent, 0 to 100 %. 
+  The other boxes in this section are display only indicating the total 
+  power and output peak positive and negative voltages.
+
+  Before using these options it’s assumed that your system has been 
+  installed and tuned. These controls are to allow control of a fully 
+  configured system. The FAIMS controller user interface has a lot of 
+  additional controls to allow setup and tuning of the system and the 
+  FAIMS manual outlines the procedures.
+
+DC voltage control
+  This section allows you to define the DC bias and CV values as well 
+  as monitor their current values. Each of the parameters has a setpoint 
+  that you can control and an actual value that will show what the system 
+  is monitoring on the outputs. The setpoint and the actual should be 
+  very close. As described above the offset allows you to define the 
+  range of the DC bias and CV parameters.
+
+CV parking
+  This section allows you to define a list of targets and the system will 
+  automatically adjust the CV and DC bias values as the LC separation 
+  progresses. The first large text box labeled “List of compounds, RT, 
+  RT window, CV and Bias” contains the data the system needs to run a 
+  LC experiment and automatically adjust values. You can manually enter 
+  data into this window by just typing your values in or you can use the 
+  Load cvs file button to load this window from a file on your computer. 
+  Below is an example of the values that can appear in this window:
+
+    Compound 1, 12.3, 2, 150, 200
+    Compound 2, 15.5, 2, 175, 210
+
+  In this example we have a target list of two compounds. After the system 
+  starts it will wait for 11.3 minutes and then set the CV to 150 volts and 
+  the bias to 200 volts. The system will then stay at these settings for 2 
+  minutes before it looks for the next target. The important point to remember 
+  is the system reads the targets from this window so if nothing is in the 
+  window nothing will happen!
+
+  The best way to load this window is using the Load csv file button. 
+  Pressing this button will open a file selection box that will allow 
+  you to select a file on your computer. The file must be a comma separated 
+  variable file and the first record must contain a header that defines the 
+  column names. The system will search the header for the following names 
+  to identify the needed data:
+
+     Compound
+     Retention Time
+     RT Window
+     Compensation Voltage
+     Bias
+
+  The order of these parameters is not important but these records have to be 
+  present. Its ok if addition records are present in the header, they will be 
+  ignored. If the needed parameters are found the system will read the file, 
+  sort the data and then populate the window. This is the best way to setup 
+  the list of targets. Excel can be used to edit and update the cvs file as 
+  needed for your research.
+
+  With the list of targets defined you are ready to start an experiment. You 
+  will need to synchronize the start of the software with your LC separation. 
+  There are two ways to do this; you can manually press the Start button when 
+  your LC separation starts or externally trigger the system. The External 
+  trigger selection box will allow you to select manual (None) or one of the 
+  TTL inputs on the back of the FAIMS controller (Q through T). If you select 
+  one of the TTL inputs you will still need to press the start button but the 
+  system will display a message that it is waiting for a trigger. Your mass 
+  spectrometer will need to be setup to provide a TTL logic level high pulse 
+  when the LC separation starts.
+
+  When the system is running the status box will communicate the system state 
+  and the elapsed time box will show how long since the system started. 
+  The Compound, CV, and Bias boxes show the current system target.
+
+  This software version does not allow saving the settings on this tab or 
+  restoring them. This capability will be added in the future. You can however 
+  copy the contents of the target window to a text file using standard computer 
+  copy and paste operations. This will allow you to save any manual entries 
+  or edits you have made.

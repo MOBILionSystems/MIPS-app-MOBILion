@@ -27,6 +27,7 @@ class PSG;
 class Program;
 class Help;
 class ARB;
+class FAIMS;
 
 class MIPS : public QMainWindow
 {
@@ -67,6 +68,7 @@ private:
     SettingsDialog *settings;
     Help *help;
     ARB *arb;
+    FAIMS *faims;
     QTimer *pollTimer;
     QString  appPath;
 };
