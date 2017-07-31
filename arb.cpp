@@ -14,24 +14,23 @@ ARB::ARB(Ui::MIPS *w, Comms *c)
     comms = c;
 
     LogedData = new Help();
-
+//NumChannels = 32;
     Compressor = true;
-    aui->comboSWFTYP_1->clear();
-    aui->comboSWFTYP_1->addItem("SIN","SIN");
-    aui->comboSWFTYP_1->addItem("RAMP","RAMP");
-    aui->comboSWFTYP_1->addItem("TRI","TRI");
-    aui->comboSWFTYP_1->addItem("PULSE","PULSE");
-    aui->comboSWFTYP_1->addItem("ARB","ARB");
-    aui->comboSWFTYP_2->clear();
-    aui->comboSWFTYP_2->addItem("SIN","SIN");
-    aui->comboSWFTYP_2->addItem("RAMP","RAMP");
-    aui->comboSWFTYP_2->addItem("TRI","TRI");
-    aui->comboSWFTYP_2->addItem("PULSE","PULSE");
-    aui->comboSWFTYP_2->addItem("ARB","ARB");
+    // Setup the module selection combo box
+    aui->comboARBmodule->clear();
+    for(int i=0;i<4;i++)
+    {
+        if(((i+1) * 8) <= NumChannels) aui->comboARBmodule->addItem(QString::number(i+1));
+    }
+    // Setup the waveform type combo box
+    aui->comboSWFTYP->clear();
+    aui->comboSWFTYP->addItem("SIN","SIN");
+    aui->comboSWFTYP->addItem("RAMP","RAMP");
+    aui->comboSWFTYP->addItem("TRI","TRI");
+    aui->comboSWFTYP->addItem("PULSE","PULSE");
+    aui->comboSWFTYP->addItem("ARB","ARB");
     QObjectList widgetList = aui->gbARBmodule1->children();
     widgetList += aui->gbARBmodule2->children();
-    widgetList += aui->gbARBtwave1->children();
-    widgetList += aui->gbARBtwave2->children();
     widgetList += aui->gbARBcompressor->children();
     widgetList += aui->gbARBtiming->children();
     foreach(QObject *w, widgetList)
@@ -40,6 +39,16 @@ ARB::ARB(Ui::MIPS *w, Comms *c)
        {
             //((QLineEdit *)w)->setValidator(new QDoubleValidator);
             connect(((QLineEdit *)w),SIGNAL(editingFinished()),this,SLOT(ARBUpdated()));
+       }
+    }
+    widgetList = aui->gbARBtwaveParms->children();
+    widgetList += aui->gbDualOutput->children();
+    foreach(QObject *w, widgetList)
+    {
+       if(w->objectName().contains("leS"))
+       {
+            //((QLineEdit *)w)->setValidator(new QDoubleValidator);
+            connect(((QLineEdit *)w),SIGNAL(editingFinished()),this,SLOT(ARBUpdatedParms()));
        }
     }
     connect(aui->pbSetChannel,SIGNAL(pressed()),this,SLOT(SetARBchannel()));
@@ -53,18 +62,26 @@ ARB::ARB(Ui::MIPS *w, Comms *c)
     connect(aui->pbARBupdate,SIGNAL(pressed()),this,SLOT(ARBupdate()));
     connect(aui->pbARBtwaveUpdate,SIGNAL(pressed()),this,SLOT(ARBupdate()));
     connect(aui->tabARB,SIGNAL(currentChanged(int)),this,SLOT(ARBtabSelected()));
-    connect(aui->comboSWFTYP_1,SIGNAL(currentIndexChanged(int)),this,SLOT(ARBtypeSelected()));
-    connect(aui->rbSWFDIR_1_FWD,SIGNAL(clicked(bool)),this,SLOT(rbTW1fwd()));
-    connect(aui->rbSWFDIR_1_REV,SIGNAL(clicked(bool)),this,SLOT(rbTW1rev()));
-    connect(aui->comboSWFTYP_2,SIGNAL(currentIndexChanged(int)),this,SLOT(ARBtypeSelected2()));
-    connect(aui->rbSWFDIR_2_FWD,SIGNAL(clicked(bool)),this,SLOT(rbTW2fwd()));
-    connect(aui->rbSWFDIR_2_REV,SIGNAL(clicked(bool)),this,SLOT(rbTW2rev()));
+    connect(aui->comboSWFTYP,SIGNAL(currentIndexChanged(int)),this,SLOT(ARBtypeSelected()));
+    connect(aui->comboARBmodule,SIGNAL(currentIndexChanged(int)),this,SLOT(ARBmoduleSelected()));
+    connect(aui->rbSWFDIR_FWD,SIGNAL(clicked(bool)),this,SLOT(rbTWfwd()));
+    connect(aui->rbSWFDIR_REV,SIGNAL(clicked(bool)),this,SLOT(rbTWrev()));
     // Compressor controls
     connect(aui->rbSARBCMODE_COMPRESS,SIGNAL(clicked(bool)),this,SLOT(rbModeCompress()));
     connect(aui->rbSARBCMODE_NORMAL,SIGNAL(clicked(bool)),this,SLOT(rbModeNormal()));
     connect(aui->rbSARBCSW_CLOSE,SIGNAL(clicked(bool)),this,SLOT(rbSwitchClose()));
     connect(aui->rbSARBCSW_OPEN,SIGNAL(clicked(bool)),this,SLOT(rbSwitchOpen()));
     connect(aui->pbARBforceTrigger,SIGNAL(pressed()),this,SLOT(pbForceTrigger()));
+}
+
+void ARB::SetNumberOfChannels(int num)
+{
+    NumChannels = num;
+    aui->comboARBmodule->clear();
+    for(int i=0;i<4;i++)
+    {
+        if(((i+1) * 8) <= NumChannels) aui->comboARBmodule->addItem(QString::number(i+1));
+    }
 }
 
 void ARB::pbForceTrigger(void)
@@ -92,33 +109,19 @@ void ARB::rbSwitchOpen(void)
    comms->SendCommand("SARBCSW,Open\n");
 }
 
-void ARB::rbTW1fwd(void)
+void ARB::rbTWfwd(void)
 {
     comms->SendCommand("SWFDIR,1,FWD\n");
 }
 
-void ARB::rbTW1rev(void)
+void ARB::rbTWrev(void)
 {
     comms->SendCommand("SWFDIR,1,REV\n");
 }
 
 void ARB::ARBtypeSelected(void)
 {
-    comms->SendCommand("SWFTYP,1," + aui->comboSWFTYP_1->currentText() + "\n");
-}
-void ARB::rbTW2fwd(void)
-{
-    comms->SendCommand("SWFDIR,2,FWD\n");
-}
-
-void ARB::rbTW2rev(void)
-{
-    comms->SendCommand("SWFDIR,2,REV\n");
-}
-
-void ARB::ARBtypeSelected2(void)
-{
-    comms->SendCommand("SWFTYP,2," + aui->comboSWFTYP_2->currentText() + "\n");
+    comms->SendCommand("SWFTYP," + aui->comboARBmodule->currentText() + "," + aui->comboSWFTYP->currentText() + "\n");
 }
 
 void ARB::ARBtrigger(void)
@@ -199,6 +202,28 @@ void ARB::SetARBchannelRange_2(void)
     comms->SendCommand(res.toStdString().c_str());
 }
 
+void ARB::ARBmoduleSelected(void)
+{
+    QString res;
+
+    QObjectList widgetList = aui->gbARBtwaveParms->children();
+    QString chan = aui->comboARBmodule->currentText();
+    foreach(QObject *w, widgetList)
+    {
+       if(w->objectName().startsWith("le"))
+       {
+           res = "G" + w->objectName().mid(3) + "," + chan;
+           ((QLineEdit *)w)->setText(comms->SendMessage(res + "\n"));
+       }
+    }
+    res = comms->SendMessage("GWFDIR," + chan +"\n");
+    if(res == "FWD") aui->rbSWFDIR_FWD->setChecked(true);
+    if(res == "REV") aui->rbSWFDIR_REV->setChecked(true);
+    res = comms->SendMessage("GWFTYP," + chan + "\n");
+    int i = aui->comboSWFTYP->findData(res);
+    aui->comboSWFTYP->setCurrentIndex(i);
+}
+
 void ARB::ARBUpdated(void)
 {
    QObject* obj = sender();
@@ -212,6 +237,19 @@ void ARB::ARBUpdated(void)
    ((QLineEdit *)obj)->setModified(false);
 }
 
+void ARB::ARBUpdatedParms(void)
+{
+   QString chan = aui->comboARBmodule->currentText();
+   QObject* obj = sender();
+   QString res;
+
+   if(!((QLineEdit *)obj)->isModified()) return;
+   res = obj->objectName().mid(2);
+   res += "," + chan + "," + ((QLineEdit *)obj)->text() + "\n";
+   comms->SendCommand(res.toStdString().c_str());
+   ((QLineEdit *)obj)->setModified(false);
+}
+
 void ARB::ARBupdate(void)
 {
     Update();
@@ -220,8 +258,9 @@ void ARB::ARBupdate(void)
 void ARB::Update(void)
 {
     QString res;
+    QObjectList widgetList;
 
-    // Determine the number os ARB channels and exit if its zero
+    // Determine the number of ARB channels and exit if its zero
     res = comms->SendMessage("GCHAN,ARB\n");
     NumChannels = res.toInt();
     if(NumChannels == 0)
@@ -258,66 +297,60 @@ void ARB::Update(void)
     }
     if(aui->tabARB->tabText(aui->tabARB->currentIndex()) == "Twave mode")
     {
-        switch(NumChannels)
+        if(NumChannels >= 16)
         {
-           case 0:
-              aui->gbARBtwave1->setEnabled(false);
-              aui->gbARBtwave2->setEnabled(false);
-              aui->gbARBcompressor->setEnabled(false);
-              return;
-           case 8:
-              aui->gbARBtwave1->setEnabled(true);
-              aui->gbARBtwave2->setEnabled(false);
-              aui->tabCompressor->setEnabled(false);
-           case 16:
-              aui->gbARBtwave1->setEnabled(true);
-              aui->gbARBtwave2->setEnabled(true);
-              if(Compressor) aui->gbARBcompressor->setEnabled(true);
-           default:
-              break;
+            if(Compressor) aui->gbARBcompressor->setEnabled(true);
+            else aui->gbARBcompressor->setEnabled(false);
         }
-        QObjectList widgetList = aui->gbARBtwave1->children();
-        if(NumChannels > 8) widgetList += aui->gbARBtwave2->children();
+        else aui->gbARBcompressor->setEnabled(false);
         if(Compressor)
         {
-           widgetList += aui->gbARBcompressor->children();
+           widgetList = aui->gbARBcompressor->children();
            widgetList += aui->gbARBtiming->children();
+           foreach(QObject *w, widgetList)
+           {
+              if(w->objectName().contains("le"))
+              {
+                  res = "G" + w->objectName().mid(3).replace("_",",");
+                  if(res.right(1) == ",") res = res.left(res.length()-1);
+                  ((QLineEdit *)w)->setText(comms->SendMessage(res + "\n"));
+              }
+           }
         }
+        // Check for dual output boards and individual offset control
+        QString chan = aui->comboARBmodule->currentText();
+        if(comms->SendMessage("GARBOFFA," + chan + "\n").contains("?")) aui->gbDualOutput->setEnabled(false);
+        else aui->gbDualOutput->setEnabled(true);
+        widgetList = aui->gbARBtwaveParms->children();
+        if(aui->gbDualOutput->isEnabled()) widgetList += aui->gbDualOutput->children();
         foreach(QObject *w, widgetList)
         {
-           if(w->objectName().contains("le"))
+           if(w->objectName().startsWith("le"))
            {
-               res = "G" + w->objectName().mid(3).replace("_",",");
-               if(res.right(1) == ",") res = res.left(res.length()-1);
+               res = "G" + w->objectName().mid(3) + "," + chan;
                ((QLineEdit *)w)->setText(comms->SendMessage(res + "\n"));
            }
         }
-        res = comms->SendMessage("GWFDIR,1\n");
-        if(res == "FWD") aui->rbSWFDIR_1_FWD->setChecked(true);
-        if(res == "REV") aui->rbSWFDIR_1_FWD->setChecked(true);
-        res = comms->SendMessage("GWFTYP,1\n");
-        int i = aui->comboSWFTYP_1->findData(res);
-        aui->comboSWFTYP_1->setCurrentIndex(i);
-        if(NumChannels > 8)
-        {
-            res = comms->SendMessage("GWFDIR,2\n");
-            if(res == "FWD") aui->rbSWFDIR_2_FWD->setChecked(true);
-            if(res == "REV") aui->rbSWFDIR_2_FWD->setChecked(true);
-            res = comms->SendMessage("GWFTYP,2\n");
-            i = aui->comboSWFTYP_2->findData(res);
-            aui->comboSWFTYP_2->setCurrentIndex(i);
-        }
-        if(Compressor)
-        {
-            res = comms->SendMessage("GARBCMODE\n");
-            if(res == "Normal") aui->rbSARBCMODE_NORMAL->setChecked(true);
-            if(res == "Compress") aui->rbSARBCMODE_COMPRESS->setChecked(true);
-            res = comms->SendMessage("GARBCSW\n");
-            if(res == "Open") aui->rbSARBCSW_OPEN->setChecked(true);
-            if(res == "Close") aui->rbSARBCSW_CLOSE->setChecked(true);
-        }
-    }
+        res = comms->SendMessage("GWFDIR," + chan +"\n");
+        qDebug() << res;
+        if(res == "FWD") aui->rbSWFDIR_FWD->setChecked(true);
+        if(res == "REV") aui->rbSWFDIR_REV->setChecked(true);
+        res = comms->SendMessage("GWFTYP," + chan + "\n");
+        qDebug() << res;
+        int i = aui->comboSWFTYP->findData(res);
+        aui->comboSWFTYP->setCurrentIndex(i);
+     }
+     if(Compressor)
+     {
+         res = comms->SendMessage("GARBCMODE\n");
+         if(res == "Normal") aui->rbSARBCMODE_NORMAL->setChecked(true);
+         if(res == "Compress") aui->rbSARBCMODE_COMPRESS->setChecked(true);
+         res = comms->SendMessage("GARBCSW\n");
+         if(res == "Open") aui->rbSARBCSW_OPEN->setChecked(true);
+         if(res == "Close") aui->rbSARBCSW_CLOSE->setChecked(true);
+     }
 }
+
 
 void ARB::ARBclearLog(void)
 {
@@ -343,7 +376,29 @@ void ARB::Save(QString Filename)
         QTextStream stream(&file);
         QDateTime dateTime = QDateTime::currentDateTime();
         stream << "# ARB settings, " + dateTime.toString() + "\n";
-        QObjectList widgetList = aui->DCbias->children();
+        // Loop thru all the channels and save ARB parameters
+        QObjectList widgetList = aui->gbARBtwaveParms->children();
+        for(int i=0;i<aui->comboARBmodule->count();i++)
+        {
+            aui->comboARBmodule->setCurrentIndex(i);
+            // likely need to update the ARB parameters on the dialog here
+            QApplication::processEvents();
+            foreach(QObject *w, widgetList)
+            {
+                if(w->objectName().mid(0,3) == "leS")
+                {
+                    res = w->objectName().mid(2) + "," + aui->comboARBmodule->currentText() + "," + ((QLineEdit *)w)->text() + "\n";
+                    stream << res;
+                }
+            }
+            // Save the waveform direction and type
+            if(aui->rbSWFDIR_FWD->isChecked()) res = "SWFDIR," + aui->comboARBmodule->currentText() + ",FWD\n";
+            if(aui->rbSWFDIR_REV->isChecked()) res = "SWFDIR," + aui->comboARBmodule->currentText() + ",REV\n";
+            stream << res;
+            res = "SWFTYP," + aui->comboARBmodule->currentText() + "," + aui->comboSWFTYP->currentText() + "\n";
+            stream << res;
+        }
+        widgetList = aui->gbARBcompressor->children();
         widgetList += aui->gbARBmodule1->children();
         if(NumChannels >8) widgetList += aui->gbARBmodule2->children();
         foreach(QObject *w, widgetList)

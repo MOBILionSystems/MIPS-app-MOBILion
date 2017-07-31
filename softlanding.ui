@@ -1,0 +1,2069 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SoftLanding</class>
+ <widget class="QDialog" name="SoftLanding">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1020</width>
+    <height>772</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Soft-Landing IN-SITU IR Instrument Parameters</string>
+  </property>
+  <widget class="QFrame" name="frmSL">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1021</width>
+     <height>771</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QLineEdit" name="leSDCB_1">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>14</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 1</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="gbSLfunnel1">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>570</y>
+      <width>201</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Funnel 1</string>
+    </property>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>26</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Drive</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSRFDRV_1">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>22</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>48</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Freq</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_5">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>73</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RF+</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_6">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>96</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RF-</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSRFFRQ_1">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>46</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leGRFPPVP_1">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>70</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leGRFPPVN_1">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>94</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>159</x>
+       <y>25</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>%</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>159</x>
+       <y>48</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Hz</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_9">
+     <property name="geometry">
+      <rect>
+       <x>158</x>
+       <y>73</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Vp-p</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>158</x>
+       <y>96</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Vp-p</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pbTuneF1">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>147</y>
+       <width>81</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Tune</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pbRetuneF1">
+     <property name="geometry">
+      <rect>
+       <x>102</x>
+       <y>147</y>
+       <width>81</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Retune</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leGRFPWR_1">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>118</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_71">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Power</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_72">
+     <property name="geometry">
+      <rect>
+       <x>158</x>
+       <y>120</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>W</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>1</y>
+      <width>1021</width>
+      <height>771</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="files.qrc">:/Images/SoftLanding.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="gbSLfunnel2">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>570</y>
+      <width>201</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Funnel 2</string>
+    </property>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>25</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Drive</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSRFDRV_2">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>22</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>49</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Freq</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_13">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>73</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RF+</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_14">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>97</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RF-</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSRFFRQ_2">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>46</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leGRFPPVP_2">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>70</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leGRFPPVN_2">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>94</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>159</x>
+       <y>25</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>%</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_16">
+     <property name="geometry">
+      <rect>
+       <x>159</x>
+       <y>48</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Hz</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_17">
+     <property name="geometry">
+      <rect>
+       <x>158</x>
+       <y>72</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Vp-p</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_18">
+     <property name="geometry">
+      <rect>
+       <x>158</x>
+       <y>96</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Vp-p</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pbTuneF2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>147</y>
+       <width>81</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Tune</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pbRetuneF2">
+     <property name="geometry">
+      <rect>
+       <x>102</x>
+       <y>147</y>
+       <width>81</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Retune</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leGRFPWR_2">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>118</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_73">
+     <property name="geometry">
+      <rect>
+       <x>158</x>
+       <y>120</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>W</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_74">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Power</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="gbSLCQ">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>570</y>
+      <width>201</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Collisional quad</string>
+    </property>
+    <widget class="QLabel" name="label_27">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>25</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Drive</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSRFDRV_3">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>22</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_28">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>49</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Freq</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_29">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>73</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RF+</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_30">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
+       <y>97</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RF-</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSRFFRQ_3">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>46</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leGRFPPVP_3">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>70</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leGRFPPVN_3">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>94</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_31">
+     <property name="geometry">
+      <rect>
+       <x>159</x>
+       <y>25</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>%</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_32">
+     <property name="geometry">
+      <rect>
+       <x>159</x>
+       <y>49</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Hz</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_33">
+     <property name="geometry">
+      <rect>
+       <x>158</x>
+       <y>72</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Vp-p</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_34">
+     <property name="geometry">
+      <rect>
+       <x>158</x>
+       <y>96</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Vp-p</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pbTuneCQ">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>147</y>
+       <width>81</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Tune</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pbRetuneCQ">
+     <property name="geometry">
+      <rect>
+       <x>102</x>
+       <y>147</y>
+       <width>81</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Retune</string>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leGRFPWR_3">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>118</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_75">
+     <property name="geometry">
+      <rect>
+       <x>158</x>
+       <y>120</y>
+       <width>31</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>W</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_76">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>120</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Power</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_1">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>14</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="gbSLRQ">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>570</y>
+      <width>181</width>
+      <height>181</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Resolving quad (Extrel)</string>
+    </property>
+    <widget class="QLineEdit" name="leSDACV_CH1">
+     <property name="geometry">
+      <rect>
+       <x>72</x>
+       <y>58</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MIPS DAC module CH1</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pole bias</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_37">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>82</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Delta M</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_38">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>107</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Delta R</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_39">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>129</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RF out</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSDACV_CH2">
+     <property name="geometry">
+      <rect>
+       <x>72</x>
+       <y>81</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MIPS DAC module CH2</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSDACV_CH3">
+     <property name="geometry">
+      <rect>
+       <x>72</x>
+       <y>104</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MIPS DAC module CH3</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="RFOUT">
+     <property name="geometry">
+      <rect>
+       <x>72</x>
+       <y>127</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>RF level readback, MIPS ADC CH0</string>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_40">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>61</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>V</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_41">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>84</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>V</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_42">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>108</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>V</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_43">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>130</y>
+       <width>21</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>V</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="MassUnits">
+     <property name="geometry">
+      <rect>
+       <x>72</x>
+       <y>150</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MIPS DAC module CH8</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_68">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>150</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Mass unit</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbRFDC">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MIPS digital output A</string>
+     </property>
+     <property name="text">
+      <string>RF/DC</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbRFonly">
+     <property name="geometry">
+      <rect>
+       <x>95</x>
+       <y>30</y>
+       <width>71</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>MIPS digital output A</string>
+     </property>
+     <property name="text">
+      <string>RF only</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLabel" name="label_44">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>16</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Capillary/FF</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_13">
+    <property name="geometry">
+     <rect>
+      <x>830</x>
+      <y>70</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 13</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_45">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>73</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>EL 1/3</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_13">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>70</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_14">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>99</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_14">
+    <property name="geometry">
+     <rect>
+      <x>830</x>
+      <y>99</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 14</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_46">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>102</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>EL 1/2</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_15">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>128</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_47">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>131</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>EL 2/2</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_15">
+    <property name="geometry">
+     <rect>
+      <x>830</x>
+      <y>128</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 15</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_48">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>160</y>
+      <width>41</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>EL 3/2</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_16">
+    <property name="geometry">
+     <rect>
+      <x>830</x>
+      <y>157</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 16</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_16">
+    <property name="geometry">
+     <rect>
+      <x>890</x>
+      <y>157</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_49">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>160</y>
+      <width>61</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Postfilter</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_12">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>158</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_9">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>71</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_9">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>71</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 9</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_50">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>131</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Prefilter</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_11">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>129</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 11</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_10">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>100</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_51">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>73</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>CL</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_11">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>129</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_12">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>158</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 12</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_52">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>102</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>RQ entrance</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_10">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>100</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 10</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_2">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>37</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 2</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_2">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>37</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_3">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>60</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_3">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>60</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 3</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_4">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>83</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_4">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>83</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 4</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_6">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>129</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_6">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>129</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 6</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_5">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>106</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_7">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>152</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 7</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_7">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>152</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_5">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>106</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 5</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_53">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>39</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>F1 DC IN</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_54">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>62</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>F1 DC OUT</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_55">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>85</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>F1# DC IN</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_56">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>108</y>
+      <width>81</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>F1# DC OUT</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_57">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>131</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>F2 DC IN</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_58">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>154</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>F2 DC OUT</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chkESIenable">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>500</y>
+      <width>86</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Check to enable ESI HV</string>
+    </property>
+    <property name="text">
+     <string>ESI enable</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSHV_1">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>520</y>
+      <width>75</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGHVV_1">
+    <property name="geometry">
+     <rect>
+      <x>346</x>
+      <y>520</y>
+      <width>75</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_19">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>16</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_20">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>39</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_21">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>62</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_22">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>85</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_23">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>108</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_24">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>131</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_25">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>154</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_26">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>73</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_59">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>131</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_60">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>102</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_61">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>160</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_62">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>73</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_63">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>131</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_64">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>102</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_65">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>160</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_66">
+    <property name="geometry">
+     <rect>
+      <x>423</x>
+      <y>522</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leGDCBV_8">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>41</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_67">
+    <property name="geometry">
+     <rect>
+      <x>490</x>
+      <y>43</y>
+      <width>51</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>CQ bias</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCB_8">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>41</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>MIPS DC bias channel 8</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_35">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>43</y>
+      <width>21</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>V</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_36">
+    <property name="geometry">
+     <rect>
+      <x>852</x>
+      <y>40</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Einzel Lens</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_69">
+    <property name="geometry">
+     <rect>
+      <x>845</x>
+      <y>373</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>CH 1-8 offset</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCBOF_1">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>370</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Sets range for DC bias channels 1 thru 8</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSDCBOF_9">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>397</y>
+      <width>60</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Sets range for DC bias channels 9 thru 16</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_70">
+    <property name="geometry">
+     <rect>
+      <x>845</x>
+      <y>400</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>CH 9-16 offset</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="lblSLtime">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>10</y>
+      <width>291</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbShutdown">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>101</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Pressing this button will set all values to zero.</string>
+    </property>
+    <property name="text">
+     <string>Shutdown</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbResetPowerSupply">
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>425</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Reset power supply</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <zorder>label</zorder>
+   <zorder>leSDCB_1</zorder>
+   <zorder>gbSLfunnel1</zorder>
+   <zorder>gbSLfunnel2</zorder>
+   <zorder>gbSLCQ</zorder>
+   <zorder>leGDCBV_1</zorder>
+   <zorder>gbSLRQ</zorder>
+   <zorder>label_44</zorder>
+   <zorder>leSDCB_13</zorder>
+   <zorder>label_45</zorder>
+   <zorder>leGDCBV_13</zorder>
+   <zorder>leGDCBV_14</zorder>
+   <zorder>leSDCB_14</zorder>
+   <zorder>label_46</zorder>
+   <zorder>leGDCBV_15</zorder>
+   <zorder>label_47</zorder>
+   <zorder>leSDCB_15</zorder>
+   <zorder>label_48</zorder>
+   <zorder>leSDCB_16</zorder>
+   <zorder>leGDCBV_16</zorder>
+   <zorder>label_49</zorder>
+   <zorder>leGDCBV_12</zorder>
+   <zorder>leGDCBV_9</zorder>
+   <zorder>leSDCB_9</zorder>
+   <zorder>label_50</zorder>
+   <zorder>leSDCB_11</zorder>
+   <zorder>leGDCBV_10</zorder>
+   <zorder>label_51</zorder>
+   <zorder>leGDCBV_11</zorder>
+   <zorder>leSDCB_12</zorder>
+   <zorder>label_52</zorder>
+   <zorder>leSDCB_10</zorder>
+   <zorder>leSDCB_2</zorder>
+   <zorder>leGDCBV_2</zorder>
+   <zorder>leGDCBV_3</zorder>
+   <zorder>leSDCB_3</zorder>
+   <zorder>leGDCBV_4</zorder>
+   <zorder>leSDCB_4</zorder>
+   <zorder>leGDCBV_6</zorder>
+   <zorder>leSDCB_6</zorder>
+   <zorder>leGDCBV_5</zorder>
+   <zorder>leSDCB_7</zorder>
+   <zorder>leGDCBV_7</zorder>
+   <zorder>leSDCB_5</zorder>
+   <zorder>label_53</zorder>
+   <zorder>label_54</zorder>
+   <zorder>label_55</zorder>
+   <zorder>label_56</zorder>
+   <zorder>label_57</zorder>
+   <zorder>label_58</zorder>
+   <zorder>chkESIenable</zorder>
+   <zorder>leSHV_1</zorder>
+   <zorder>leGHVV_1</zorder>
+   <zorder>label_19</zorder>
+   <zorder>label_20</zorder>
+   <zorder>label_21</zorder>
+   <zorder>label_22</zorder>
+   <zorder>label_23</zorder>
+   <zorder>label_24</zorder>
+   <zorder>label_25</zorder>
+   <zorder>label_26</zorder>
+   <zorder>label_59</zorder>
+   <zorder>label_60</zorder>
+   <zorder>label_61</zorder>
+   <zorder>label_62</zorder>
+   <zorder>label_63</zorder>
+   <zorder>label_64</zorder>
+   <zorder>label_65</zorder>
+   <zorder>label_66</zorder>
+   <zorder>leGDCBV_8</zorder>
+   <zorder>label_67</zorder>
+   <zorder>leSDCB_8</zorder>
+   <zorder>label_35</zorder>
+   <zorder>label_36</zorder>
+   <zorder>label_69</zorder>
+   <zorder>leSDCBOF_1</zorder>
+   <zorder>leSDCBOF_9</zorder>
+   <zorder>label_70</zorder>
+   <zorder>lblSLtime</zorder>
+   <zorder>pbShutdown</zorder>
+   <zorder>pbResetPowerSupply</zorder>
+  </widget>
+ </widget>
+ <resources>
+  <include location="files.qrc"/>
+ </resources>
+ <connections/>
+</ui>

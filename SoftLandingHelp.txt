@@ -1,0 +1,108 @@
+                    Soft Landing Instrument Control Panel
+
+This graphical interface is design to allow control of all the RF and DC parameters
+used on Julia Laskin’s Soft Landing system. The interface requires connection to a
+MIPS system with the following modules:
+
+ 2 – RF drivers
+ 2 – 250V DC bias modules
+ 1 – ESI module (+- 4000V)
+ 1 – DAC module
+
+The connection details for these modules are provided later in this help file.
+
+To use this control panel you will first need to make a communications connection
+to your MIPS system. This is explained in the general help area. You can close
+the Soft Landing control panel and then select the system tab on the MIPS app,
+next select general help to read the connection details.
+
+Opening and closing this control panel will not change any of the parameters in
+MIPS. When the control panel loads to reads all the settings from MIPS and updates
+the control panel. Changes you make through the control panel are sent to MIPS and
+saved there as long as power is on. You can use the save and load menu options to
+save all you setting to a file or restore previously saved settings.
+
+To change a parameter, just click on the box and enter the value to desire. You
+must press enter to send this value to the MIPS system. You can also increase or
+decrease a value using the up and down arrow keys:
+ Up arrow		    increment by 0.1
+ Down arrow		    decrement by 0.1
+ Shift up arrow	    increment by 1
+ Shift down arrow	decrement by 1
+ Alt up arrow		increment by 10
+ Alt down arrow   	decrement by 10
+
+The two offset parameters allow output range control for the DC bias output channels.
+The offset can be set from -250 to 250 volts. Below are examples of how offset defines
+the output range:
+ Offset = 0         range = -250 to 250 volt.
+ Offset = 250       range = 0 to 500 volt.
+ Offset = -250      range = -500 to 0 volt.
+ Offset = 150       range = -100 to 400 volt.
+
+Each of the RF heads has an Auto Tune and Retune button. These buttons are used to
+reestablish the optimal operating frequency (resonance) for each RF head. Only one
+RF head can be tuned at a time.
+  Auto Tune
+      This function will set the RF head drive level to 10% and search from 500 KHz to
+      5 MHz for the resonate frequency. After the frequency is found the drive will
+      remain at 10%. This operation can take up to 3 minutes to complete.
+  Retune
+      This function does not change the current drive level and re establishes the optimal
+      frequency by make small changes relative to the current operating frequency. This
+      operation is faster and will take up to 1 minute. It is important that the system
+      is operating at or near the desired frequency and drive level.
+
+Parameters can be saved and restored using the Save and Load function found under
+the File menu selection.
+
+Parameters can be changed using the MIPS front panel and the changes will be read
+and displayed by this application. Please note that when you have a control box
+selected the application cannot update its contents so if you change a value on
+the MIPS box for a box that you have selected you will not see the change until
+you deselect the box.
+
+When you select the Soft Landing control panel from the MIPS app menu the main
+MIPS app System tab will be selected automatically. With the control panel running
+you can change the main MIPS app tab selection but it is recommended that you leave
+it on the System tab, you will see strange behavior depending on the tab you select
+with the Soft Landing control panel running.
+
+Configuration of system:
+
+DCbias channel connections:
+ 1		Capillary / FF
+ 2		F1 DC IN
+ 3		F1 DC OUT
+ 4		F1# DC IN
+ 5		F1# DC OUT
+ 6		F2 DC IN
+ 7		F2 DC OUT
+ 8		CQ bias
+ 9		CL
+ 10		RQ entrance
+ 11		Prefilter
+ 12		Postfilter
+ 13		EL 1/3
+ 14		EL 1/2
+ 15		EL 2/2
+ 16		EL 3/2
+
+RF driver channel assignment
+ 1		Low power head, funnel 1
+ 2		Low power head, funnel 2
+ 3		High power head, collisional quad
+ 4		Not used
+
+DAC module channels
+ 1      Pole bias, D15 pin 1
+ 2      Delta M, D15 pin 2
+ 3      Delta R, D15 pin 3
+ 4      RF out, D15 pin 4
+ 8      Mass unit, D15 pin 8 and 15, differential
+
+DAC channels 1 thru 4 are single ended and return are D15 pins 9 thru 14.
+
+Digital output A used to select RF only of RFDC mode on Extrel Quad.
+
+

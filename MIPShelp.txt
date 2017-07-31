@@ -8,7 +8,12 @@ you to define and edit pulse sequences.
 This help document also contains appendix A and B that discuss how to install this
 application and how to use this application to update firmware in your MIPS system.
 
-Below is a brief overview of each of the tab options on the main dialog box:
+When this MIPS application is connected to your MIPS system it will querey your
+system to determine the modules that have been installed. The MIPS application
+will then delete the tabs for modules not present in your system.
+
+Below is a brief overview of the tab options on the main dialog box, please note
+that where connected only the tabs for modules in your system will be shown:
 
 System
   This tab contains options for connection to MIPS. When the app starts it is
@@ -87,6 +92,37 @@ Pulse sequence generation
   the execution using a software command or an external hardware trigger.
   This tab allow defining downloaded and executing pulse sequences. This tab
   has context sensitive help that will define all the options in more detail.
+
+The MIPS application also contails a menu bar with a number of useful options
+described below:
+  Help
+    The Help menu heading has both a general help selection and a MIPS commands
+    option. The geneal help will display help for the specific tab selected or
+    for the control panel if one is displayed. The MIPS command help option will
+    list all MIPS commands and these can be entered using the Terminal interface
+    by selecting the the Terminal tab.
+  File
+    The File menu heading contains two options, Load and Save. These functions
+    allow you to load and save parameters to a file on your computer. These
+    functions will load and save parameters on the tab you have selected or if
+    you have one of the control panels displated the load and save will apply
+    to the control pannel. When you select load or save you will see a file
+    selection dialog allowing to to define the file of your choice.
+  Terminal
+    The Terminal heading contains only one option, Clear. Selecting clear will
+    clear all data in the terminal window.
+  Tools
+    The Tools menu heading contains functions that enable loading new firmware
+    into the MIPS controller as well as control panel options. Appendix B
+    outlines the steps to install new firmware in MIPS.
+    The control panels are a visual display of a system with MIPS controls
+    positioned at logic locations and labeled for there specific application.
+    At the time of this writting there are two control panels, one for a
+    single funnel system and one for Julia Laskin's soft landing system.
+    Control panels have specific MIPS configuration requirements and if your
+    connected to MIPS they will first check the configuration before loading.
+    If your not connected to MIPS you can load the control panel and use it to
+    define and save profiles.
 
 Appendix A: MIPS install details
 

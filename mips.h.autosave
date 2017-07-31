@@ -83,8 +83,6 @@ private slots:
     void UpdateSystem(void);
     void GetFileFromMIPS(void);
     void PutFiletoMIPS(void);
-    void ReadEEPROM(void);
-    void WriteEEPROM(void);
 
 private:
     Comms *comms;

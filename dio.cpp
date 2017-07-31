@@ -5,6 +5,10 @@ DIO::DIO(Ui::MIPS *w, Comms *c)
     dui = w;
     comms = c;
 
+    dui->pbUPsmall->setText(QChar(0xB4, 0x25));
+    dui->pbUPlarge->setText(QChar(0xB2, 0x25));
+    dui->pbDOWNsmall->setText(QChar(0xBE, 0x25));
+    dui->pbDOWNlarge->setText(QChar(0xBC, 0x25));
     QObjectList widgetList = dui->gbDigitalOut->children();
     widgetList += dui->gbDigitalIn->children();
     foreach(QObject *w, widgetList)
@@ -21,6 +25,12 @@ DIO::DIO(Ui::MIPS *w, Comms *c)
     connect(dui->pbRFgenerate,SIGNAL(pressed()),this,SLOT(RFgenerate()));
     connect(dui->leSFREQ,SIGNAL(editingFinished()),this,SLOT(SetFreq()));
     connect(dui->leSWIDTH,SIGNAL(editingFinished()),this,SLOT(SetWidth()));
+    connect(dui->chkRemoteNav,SIGNAL(stateChanged(int)),this,SLOT(RemoteNavigation()));
+    connect(dui->pbUPsmall,SIGNAL(pressed()),this,SLOT(RemoteNavSmallUP()));
+    connect(dui->pbUPlarge,SIGNAL(pressed()),this,SLOT(RemoteNavLargeUP()));
+    connect(dui->pbDOWNsmall,SIGNAL(pressed()),this,SLOT(RemoteNavSmallDown()));
+    connect(dui->pbDOWNlarge,SIGNAL(pressed()),this,SLOT(RemoteNavLargeDown()));
+    connect(dui->pbSelect,SIGNAL(pressed()),this,SLOT(RemoteNavSelect()));
 }
 
 void DIO::Update(void)
@@ -193,3 +203,69 @@ void DIO::Load(QString Filename)
     }
 }
 
+// Following slot function support remote navication of UI
+void DIO::RemoteNavigation(void)
+{
+   if(dui->chkRemoteNav->isChecked())
+   {
+       if(comms->SendCommand("SSERIALNAV,TRUE\n"))
+       {
+           dui->pbUPsmall->setEnabled(true);
+           dui->pbUPlarge->setEnabled(true);
+           dui->pbDOWNsmall->setEnabled(true);
+           dui->pbDOWNlarge->setEnabled(true);
+           dui->pbSelect->setEnabled(true);
+           return;
+       }
+   }
+   dui->pbUPsmall->setEnabled(false);
+   dui->pbUPlarge->setEnabled(false);
+   dui->pbDOWNsmall->setEnabled(false);
+   dui->pbDOWNlarge->setEnabled(false);
+   dui->pbSelect->setEnabled(false);
+}
+
+void DIO::RemoteNavSmallUP(void)
+{
+    char str[2];
+
+    str[0] = 30;
+    str[1] = 0;
+    comms->SendString(QString::fromStdString(str));
+}
+
+void DIO::RemoteNavLargeUP(void)
+{
+    char str[2];
+
+    str[0] = 31;
+    str[1] = 0;
+    comms->SendString(QString::fromStdString(str));
+}
+
+void DIO::RemoteNavSmallDown(void)
+{
+    char str[2];
+
+    str[0] = 28;
+    str[1] = 0;
+    comms->SendString(QString::fromStdString(str));
+}
+
+void DIO::RemoteNavLargeDown(void)
+{
+    char str[2];
+
+    str[0] = 29;
+    str[1] = 0;
+    comms->SendString(QString::fromStdString(str));
+}
+
+void DIO::RemoteNavSelect(void)
+{
+   char str[2];
+
+   str[0] = 9;
+   str[1] = 0;
+   comms->SendString(QString::fromStdString(str));
+}

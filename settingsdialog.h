@@ -72,7 +72,11 @@ public:
 
     explicit SettingsDialog(QWidget *parent = 0);
     ~SettingsDialog();
+    void showEvent( QShowEvent* event );
     void fillPortsInfo();
+    int numberOfPorts();
+    QString getPortName(int num);
+    void fillPortsParameters();
 
     Settings settings() const;
 
@@ -83,7 +87,6 @@ private slots:
     void checkCustomDevicePathPolicy(int idx);
 
 private:
-    void fillPortsParameters();
 //    void fillPortsInfo();
     void updateSettings();
 

@@ -45,7 +45,25 @@ Twave::Twave(Ui::MIPS *w, Comms *c)
    connect(tui->pbTWsweepCH1stop,SIGNAL(pressed()),this,SLOT(pbTWsweepStop()));
    connect(tui->pbTWsweepCH2stop,SIGNAL(pressed()),this,SLOT(pbTWsweepStop()));
    connect(tui->pbTWsweepStop,SIGNAL(pressed()),this,SLOT(pbTWsweepStop()));
+   connect(tui->chkSweepExtTrig,SIGNAL(clicked(bool)),this,SLOT(SweepExtTrigger()));
 
+}
+
+void Twave::SweepExtTrigger(void)
+{
+    if(tui->chkSweepExtTrig->isChecked())
+    {
+        comms->SendCommand("SDTRIGDLY,0\n");
+        comms->SendCommand("SDTRIGPRD,10000\n");
+        comms->SendCommand("SDTRIGRPT,1\n");
+        comms->SendCommand("SDTRIGMOD,SWEEP\n");
+        comms->SendCommand("SDTRIGINP,R,POS\n");
+        comms->SendCommand("SDTRIGENA,TRUE\n");
+    }
+    else
+    {
+        comms->SendCommand("SDTRIGENA,FALSE\n");
+    }
 }
 
 // This function saves all the setable parameters to data file.
@@ -198,7 +216,11 @@ void Twave::Update(void)
        if(w->objectName().contains("le"))
        {
             res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
+            qDebug() << res;
             ((QLineEdit *)w)->setText(comms->SendMessage(res));
+            qDebug() << ((QLineEdit *)w)->text();
+            comms->rb.waitforline(1);
+            res = comms->rb.getline();
        }
     }
     res = comms->SendMessage("GTWDIR,1\n");

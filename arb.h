@@ -25,10 +25,10 @@ public:
     void Update(void);
     void Save(QString Filename);
     void Load(QString Filename);
+    Comms *comms;
 
 private:
     Ui::MIPS *aui;
-    Comms *comms;
     int NumChannels;
     QString LogString;
     Help *LogedData;
@@ -36,6 +36,7 @@ private:
 
 private slots:
     void ARBUpdated(void);
+    void ARBUpdatedParms(void);
     void SetARBchannel(void);
     void SetARBchannelRange(void);
     void ARBtrigger(void);
@@ -47,11 +48,9 @@ private slots:
     void ARBupdate(void);
     void ARBtabSelected(void);
     void ARBtypeSelected(void);
-    void rbTW1fwd(void);
-    void rbTW1rev(void);
-    void ARBtypeSelected2(void);
-    void rbTW2fwd(void);
-    void rbTW2rev(void);
+    void rbTWfwd(void);
+    void rbTWrev(void);
+    void ARBmoduleSelected(void);
     // Compressor
     void rbModeCompress(void);
     void rbModeNormal(void);

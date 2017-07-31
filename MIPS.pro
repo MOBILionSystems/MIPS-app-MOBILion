@@ -9,6 +9,9 @@ QT       += gui
 QT       += serialport
 QT       += network
 
+win32:RC_ICONS += GAACElogo.ico
+ICON = GAACElogo.icns
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = MIPS
@@ -31,7 +34,11 @@ SOURCES += main.cpp\
     program.cpp \
     help.cpp \
     arb.cpp \
-    faims.cpp
+    faims.cpp \
+    singlefunnel.cpp \
+    filament.cpp \
+    softlanding.cpp \
+    grid.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -47,12 +54,19 @@ HEADERS  += mips.h \
     program.h \
     help.h \
     arb.h \
-    faims.h
+    faims.h \
+    singlefunnel.h \
+    filament.h \
+    softlanding.h \
+    grid.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \
     pse.ui \
-    help.ui
+    help.ui \
+    singlefunnel.ui \
+    softlanding.ui \
+    grid.ui
 
 RESOURCES += \
     files.qrc

@@ -9,6 +9,8 @@
 #include <QTime>
 #include <QApplication>
 #include <QtNetwork/QTcpSocket>
+#include <QFileInfo>
+#include <QFileDialog>
 
 #include "settingsdialog.h"
 #include "ringbuffer.h"
@@ -24,15 +26,27 @@ public:
     explicit Comms(SettingsDialog *settings, QString Host, QStatusBar *statusbar);
     bool ConnectToMIPS();
     void DisconnectFromMIPS();
-    void SendCommand(QString message);
+    bool SendCommand(QString name, QString message);
+    bool SendCommand(QString message);
+    QString SendMessage(QString name, QString message);
     QString SendMessage(QString message);
+    void SendString(QString name, QString message);
     void SendString(QString message);
     void writeData(const QByteArray &data);
     bool openSerialPort();
     void closeSerialPort();
     void waitforline(int timeout);
+    char getchar(void);
+    void GetMIPSfile(QString MIPSfile, QString LocalFile);
+    void PutMIPSfile(QString MIPSfile, QString LocalFile);
+    void GetEEPROM(QString FileName, QString Board, int Addr);
+    void PutEEPROM(QString FileName, QString Board, int Addr);
+    bool isConnected(void);
     QString getline(void);
+    int CalculateCRC(QByteArray fdata);
+    QString MIPSname;
     QByteArray readall(void);
+    bool isMIPS(QString port);
 
     QSerialPort *serial;
     QStatusBar *sb;

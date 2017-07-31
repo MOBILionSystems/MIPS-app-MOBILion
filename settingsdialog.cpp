@@ -38,6 +38,7 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QIntValidator>
 #include <QLineEdit>
+#include <QDebug>
 
 QT_USE_NAMESPACE
 
@@ -68,9 +69,26 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     updateSettings();
 }
 
+void SettingsDialog::showEvent( QShowEvent* event )
+{
+    QWidget::showEvent( event );
+    fillPortsParameters();
+    fillPortsInfo();
+}
+
 SettingsDialog::~SettingsDialog()
 {
     delete ui;
+}
+
+int SettingsDialog::numberOfPorts()
+{
+    return(ui->serialPortInfoListBox->count() - 1);
+}
+
+QString SettingsDialog::getPortName(int num)
+{
+   return(ui->serialPortInfoListBox->itemText(num));
 }
 
 SettingsDialog::Settings SettingsDialog::settings() const
@@ -119,30 +137,35 @@ void SettingsDialog::checkCustomDevicePathPolicy(int idx)
 
 void SettingsDialog::fillPortsParameters()
 {
+    ui->baudRateBox->clear();
     ui->baudRateBox->addItem(QStringLiteral("9600"), QSerialPort::Baud9600);
     ui->baudRateBox->addItem(QStringLiteral("19200"), QSerialPort::Baud19200);
     ui->baudRateBox->addItem(QStringLiteral("38400"), QSerialPort::Baud38400);
     ui->baudRateBox->addItem(QStringLiteral("115200"), QSerialPort::Baud115200);
     ui->baudRateBox->addItem(tr("Custom"));
 
+    ui->dataBitsBox->clear();
     ui->dataBitsBox->addItem(QStringLiteral("5"), QSerialPort::Data5);
     ui->dataBitsBox->addItem(QStringLiteral("6"), QSerialPort::Data6);
     ui->dataBitsBox->addItem(QStringLiteral("7"), QSerialPort::Data7);
     ui->dataBitsBox->addItem(QStringLiteral("8"), QSerialPort::Data8);
     ui->dataBitsBox->setCurrentIndex(3);
 
+    ui->parityBox->clear();
     ui->parityBox->addItem(tr("None"), QSerialPort::NoParity);
     ui->parityBox->addItem(tr("Even"), QSerialPort::EvenParity);
     ui->parityBox->addItem(tr("Odd"), QSerialPort::OddParity);
     ui->parityBox->addItem(tr("Mark"), QSerialPort::MarkParity);
     ui->parityBox->addItem(tr("Space"), QSerialPort::SpaceParity);
 
+    ui->stopBitsBox->clear();
     ui->stopBitsBox->addItem(QStringLiteral("1"), QSerialPort::OneStop);
 #ifdef Q_OS_WIN
     ui->stopBitsBox->addItem(tr("1.5"), QSerialPort::OneAndHalfStop);
 #endif
     ui->stopBitsBox->addItem(QStringLiteral("2"), QSerialPort::TwoStop);
 
+    ui->flowControlBox->clear();
     ui->flowControlBox->addItem(tr("None"), QSerialPort::NoFlowControl);
     ui->flowControlBox->addItem(tr("RTS/CTS"), QSerialPort::HardwareControl);
     ui->flowControlBox->addItem(tr("XON/XOFF"), QSerialPort::SoftwareControl);

@@ -1,0 +1,75 @@
+                  Single Funnel Instrument Control Panel
+
+This graphical interface is design to allow control of all the RF and DC parameters
+used on a typical single funnel system. The interface requires connection to a
+MIPS system with the following modules:
+
+ 1 – RF drivers
+ 1 – 250V DC bias modules
+ 1 – ESI module (+- 4000V)
+
+The connection details for these modules are provided later in this help file.
+
+To use this control panel you will first need to make a communications connection
+to your MIPS system. This is explained in the general help area. You can close
+the Single Funnel control panel and then select the system tab on the MIPS app,
+next select general help to read the connection details.
+
+Opening and closing this control panel will not change any of the parameters in
+MIPS. When the control panel loads to reads all the settings from MIPS and updates
+the control panel. Changes you make through the control panel are sent to MIPS and
+saved there as long as power is on. You can use the save and load menu options to
+save all you setting to a file or restore previously saved settings.
+
+To change a parameter, just click on the box and enter the value to desire. You
+must press enter to send this value to the MIPS system.
+
+The offset parameter allow output range control for the DC bias output channels.
+The offset can be set from -250 to 250 volts. Below are examples of how offset defines
+the output range:
+ Offset = 0         range = -250 to 250 volt.
+ Offset = 250       range = 0 to 500 volt.
+ Offset = -250      range = -500 to 0 volt.
+ Offset = 150       range = -100 to 400 volt.
+
+The RF head has an Auto Tune and Retune button. These buttons are used to
+reestablish the optimal operating frequency (resonance) for the RF head. Only one
+RF head can be tuned at a time.
+  Auto Tune
+      This function will set the RF head drive level to 10% and search from 500 KHz to
+      5 MHz for the resonate frequency. After the frequency is found the drive will
+      remain at 10%. This operation can take up to 3 minutes to complete.
+  Retune
+      This function does not change the current drive level and re establishes the optimal
+      frequency by make small changes relative to the current operating frequency. This
+      operation is faster and will take up to 1 minute. It is important that the system
+      is operating at or near the desired frequency and drive level.
+
+Parameters can be saved and restored using the Save and Load function found under
+the File menu selection.
+
+Parameters can be changed using the MIPS front panel and the changes will be read
+and displayed by this application. Please note that when you have a control box
+selected the application cannot update its contents so if you change a value on
+the MIPS box for a box that you have selected you will not see the change until
+you deselect the box.
+
+When you select the Single Funnel control panel from the MIPS app menu the main
+MIPS app System tab will be selected automatically. With the control panel running
+you can change the main MIPS app tab selection but it is recommended that you leave
+it on the System tab, you will see strange behavior depending on the tab you select
+with the Single Funnel control panel running.
+
+Configuration of system:
+
+DCbias channel connections:
+ 1		Funnel DC in
+ 2		Funnel DC out
+ 3		Conductance limit
+ 4		Heated inlet DC
+
+RF driver channel assignment
+ 1		Low power head, funnel 1
+
+
+

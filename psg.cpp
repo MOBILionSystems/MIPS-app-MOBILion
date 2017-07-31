@@ -17,6 +17,7 @@ PSG::PSG(Ui::MIPS *w, Comms *c)
    pui->comboClock->addItem("10500000");
    pui->comboClock->addItem("2625000");
    pui->comboClock->addItem("656250");
+   pui->comboClock->setCurrentIndex(6);
    pui->comboTrigger->clear();
    pui->comboTrigger->addItem("Software");
    pui->comboTrigger->addItem("Edge");

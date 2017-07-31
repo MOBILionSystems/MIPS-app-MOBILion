@@ -30,6 +30,19 @@ General Commands
   CHKIMAGE,file	       	Checks status of bmp file on SD card
   LOADIMAGE,file		Displays bmp file that is saved on SD card
   BIMAGE,file       	Set an image file to be displayed on power up
+  STATUS               Returns the reason for the last reboot and the trace buffer
+  SSERIALNAV,value     Enabled and disables the remote host navigation, TRUE or FALSE
+  TRACE                Issuing this command enables the trace buffer
+  DIR                  Displays a list of files on the root of the SD card
+  DEL,filename         Deletes the selected file from the SD card
+  GET,filename         Reads a file from SD card to host, issued only by MIPS app
+  PUT,filename size    Send a file from the host to SD card, issused only by MIPS app
+  SAVEALL              Saves all module EEPROM data to individual files on SD card
+  LOADALL              Loads all module EEPROM data from individual files on SD card
+  GETEEPROM,brd,add    Reads EEPROM module contents to host file, issued only by MIPS
+  PUTEEPROM,brd,add    Writes EEPROM module contents from host file, issued only by MIPS
+  SSPND,TRUE/FALSE     Suspendes all background tasks, will limit functionality
+  GSPND                Returns the suspend state
 
 Clock generation
   GWIDTH				Returns clock pulse width in uS
@@ -46,7 +59,7 @@ Delay trigger
   GDTRIGPRD           	Reports trigger period
   SDTRIGRPT,count    	Trigger repeat count. Count = number of times to trigger
   GDTRIGRPT         	Returns the repeat count
-  SDTRIGMOD,mod     	Defines the module to trigger, mod = ARB
+  SDTRIGMOD,mod     	Defines the module to trigger, mod = ARB | SWEEP
   SDTRIGENA,val      	Enables the delay trigger module if TRUE
   GDTRIGENA         	Reports the delay trigger status
 
@@ -68,6 +81,7 @@ DC bias module
   SDCBONEOFF,val		Use one DC offset for two DC bias modules, val=TRUE or FALSE
   DCBOFFRBENA,val		Enable offset readback, val=TRUE or FALSE
   SDCBOFFENA,ch,val		Set the offsetable flag for a given channel, val = TRUE or FALSE
+  SDCBTEST,TRUE/FALSE  Set to false to disable readback voltage testing
   SDCBPRO,nm,ch1,...   Set profile nm, must provide all channel values
   GDCBPRO,nm           Returns profile number nm, 1 through 10
   ADCBPRO,nm           Apply a profile
@@ -105,8 +119,11 @@ ESI module
   GHVMIN,ch         	Return channel min voltage, ch=channel
   SHVENA,ch         	Enables the selected channel (ch)
   SHVDIS,ch         	Disables the selected channel (ch)
+  GHVSTATUS,ch	        Returns the channel status, ON or OFF, ch=channel
   SHVPSUP,m,val     	Defines a modules (m) positive supply voltage (val), setup command
   SHVNSUP,m,val     	Defines a modules (m) negative supply voltage (val), setup command
+  SHVITST,TRUE/FALSE   Enables or disables the ESI current testing, FALSE disables
+  GHVITST              Returns the ESI current testing status
 
 Pulse sequence generator commands
   STBLDAT,val			Define signal table,val=table
@@ -128,6 +145,7 @@ Pulse sequence generator commands
   SOFTLDAC,val			Forces the software generation of LDAC is val=TRUE
   STBLREPLY,val			If val=TRUE enables table status reply
   GTBLREPLY				Returns table status reply state, TRUE or FALSE
+  TBLRPT               Reports the current table, for debug only
 
 Macro commands
   MRECORD,name			Record macro, name=macro name
@@ -149,6 +167,7 @@ Twave module
   STWSEQ,ch,seq			Set Twave sequence, ch=channel, seq = binary sequence
   GTWDIR,ch				Return Twave direction, FWD or REV, ch=channel
   STWDIR,ch,val			Set Twave direction, ch=channel, val=FWD or REV
+  STBLRBT,TRUE/FALSE   Enables the readback voltage testing
   STWCTBL,val			Set Twave multi-pass control table, val=ascii table
   GTWCTBL				Return Twave multi-pass table string
   GTWCMODE				Return Compressor mode, Normal or Compress
@@ -172,6 +191,10 @@ Twave module
   GTWSSTRT,ch          Returns start frequency for sweep function
   STWSSTP,ch,frq       Sets stop freq for sweep function
   GTWSSTP,ch           Returns stop freq for sweep function
+  STWSSTRTV,ch,val     Sets start voltage for sweep function
+  GTWSSTRTV,ch         Returns start voltage for sweep function
+  STWSSTPV,ch,val      Sets stop voltage for sweep function
+  GTWSSTPV,ch          Returns stop voltage for sweep function
   STWSTM,ch,tm         Sets sweep time in seconds
   GTWSTM,ch            Returns the weep time in seconds
   STWSGO,ch            Starts the sweep on channel 1 or 2, or 3 for both
@@ -212,6 +235,8 @@ Filament module
   GFLPWR,ch				Report filament power in watts, ch=channel
   GFLRT,ch				Report filament current ramp rate in amps per second, ch=channel
   SFLRT,ch,val			Set filament current ramp rate, ch=channel, val=amps/sec
+  SFLDIR,ch,val        Sets the filament current direction for selected channel, val = FWD or REV
+  GFLDIR,ch            Returns the filament currect direction for selected channel
   GFLP1,ch				Report filament cycling current point 1 in amps, ch=channel
   SFLP1,ch,val			Set filament cycling current point 1, ch=channel, val=amps
   GFLP2,ch				Report filament cycling current point 2 in amps, ch=channel
@@ -222,6 +247,7 @@ Filament module
   SFLENAR,ch,val		Set the cycle status, ch=chanel, val=ON or OFF
   RFLPARMS,ch,val		Report to host the actual filament current, ch=channel, val=time in seconds between reports, 0 = off
   SFLSRES,val			Sets the emission current sense resistor value
+  GFLSRES              Returns the emission current sense resistor value
   GFLECUR				Returns the emission current in uA
   SFLSWD,val			If val = TRUE enables comms watch dog, FALSE disables
 
@@ -262,6 +288,10 @@ ARB module
   GWFARB,mn				Returns the 32 values that define an arbitrary waveform, mn=module
   SWFTYP,mn.typ			Sets the waveform type, mn=module, type = SIN,RAMP,TRI,PULSE, or ARB
   GWFTYP,mn				Returns the waveform type, mn=module
+  SARBOFFA,mn,val      Sets module's output offset for board A, value = -10 to 10
+  GARBOFFA,mn          Returns module's output offset for board A
+  SARBOFFB,mn,val      Sets module's output offset for board B, value = -10 to 10
+  GARBOFFB,mn          Returns module's output offset for board B
   SARBBUF,mn,val		Sets buffer length in samples, mn = module, val = buffer length
   GARBBUF,mn			Reports the buffer length, mn = module
   SARBNUM,mn,val		Sets number of buffer repeats, mn = module, val = repeat count
@@ -289,7 +319,22 @@ ARB module compressor commands
   GARBCSW 				Return switch state, Open or Close
   SARBCSW 				Set switch state, val=Open or Close
 
-ARM module configuration commands
+ARB module configuration commands
   SARBCCLK,val			Set Twave to common clock mode, val=TRUE or FALSE
   SARBCMP,val			Set Twave compressor mode, val=TRUE or FALSE
   SARBCOFF,val			If val = TRUE enables common offset, FALSE disables
+  SARBADD,mn,val       Sets module's TWI address used to talk to ARB arduino, val = address base 10
+  SARBDBRD,mn,val      Enables module's dual output amplifier with independent offsets, valu = TRUE or FALSE
+
+DAC module commands
+  SDACV,ch,val			Set a channel’s value, ch = channel name, val = value
+  GDACV,ch				Returns a channel’s value, ch = channel name
+  SDACMAX,ch,val		Set a channel’s maximum value, ch = channel name, val = maximum value
+  GDACMAX,ch			Returns a channel’s maximum value, ch = channel name
+  SDACMIN,ch,val		Set a channel’s minimum value, ch = channel name, val = maximum value
+  GDACMIN,ch			Returns a channel’s minimum value, ch = channel name
+  SDACUN,ch,units		Sets a channel’s units, ch = channel name, units = string
+  GDACUN,ch				Returns a channel’s units, ch = channel name
+  SDACNM,mn,ch,nm		Sets a channel’s name, mn = module number 1 or 2, ch = channel number 1 through 8, nm = channel name string
+  GDACMN,mn,ch			Returns a channel’s name, mn = module number 1 or 2, ch = channel number 1 through 8
+

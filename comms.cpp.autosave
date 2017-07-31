@@ -12,11 +12,6 @@ Comms::Comms(SettingsDialog *settings, QString Host, QStatusBar *statusbar)
     connect(&client, SIGNAL(disconnected()),this, SLOT(disconnected()));
 }
 
-char Comms::getchar(void)
-{
-    return rb.getch();
-}
-
 int Comms::CalculateCRC(QByteArray fdata)
 {
     unsigned char generator = 0x1D;
@@ -43,33 +38,17 @@ int Comms::CalculateCRC(QByteArray fdata)
 void Comms::GetMIPSfile(QString MIPSfile, QString LocalFile)
 {
     bool ok = false;
-    QString FileData;
-    char c;
-    int len;
 
     // Send the command to MIPS to get the file
     if(SendCommand("GET," + MIPSfile + "\n"))
     {
        // Now process the data in the ring buffer
        // First read the length
-        waitforline(500);
+        waitforline(100);
         QString FileSize = getline();
         // Read the hex data stream
-        for(int i=0; i<FileSize.toInt(); i+=1024)
-        {
-            len = 1024;
-            if((FileSize.toInt() - i) < 1024) len = FileSize.toInt() - i;
-            // Read the block of data
-            for(int j=0; j<len*2; j++)
-            {
-              while((c = getchar()) == 0) QApplication::processEvents();
-              if(c == '\n') break;
-              FileData += QChar(c);
-            }
-            // Send "Next" block request
-            if((FileSize.toInt()-i) > 1024) SendString("Next\n");
-        }
-        while((c = getchar()) == 0) QApplication::processEvents();
+        waitforline(100);
+        QString FileData = getline();
         if(FileData.count() != 2 * FileSize.toInt())
         {
             // Here if file data block is not the proper size
@@ -77,7 +56,7 @@ void Comms::GetMIPSfile(QString MIPSfile, QString LocalFile)
             return;
         }
         // Read the CRC
-        waitforline(500);
+        waitforline(100);
         QString FileCRC = getline();
         // Convert data to byte array and callculate CRC
         QByteArray fdata;
@@ -92,134 +71,12 @@ void Comms::GetMIPSfile(QString MIPSfile, QString LocalFile)
             QFile file(LocalFile);
             file.open(QIODevice::WriteOnly);
             file.write(fdata);
-            file.close();
-            QMessageBox::information(this, tr("File saved"), "File from MIPS read and saved successfully!");
         }
         else
         {
             // Here with file CRC error, raise error message
             QMessageBox::critical(this, tr("File Error"), "CRC error!");
         }
-    }
-}
-
-void Comms::PutMIPSfile(QString MIPSfile, QString LocalFile)
-{
-    QByteArray fdata;
-    int fsize,len;
-    QString dblock,res;
-
-    // open the local file to send and read the data
-    QFile file(LocalFile);
-    file.open(QIODevice::ReadOnly);
-    fdata = file.readAll();
-    // Convert the data into a ascii hex string
-    for(int i=0; i<file.size(); i++)
-    {
-         dblock += QString().sprintf("%02x",(unsigned char)fdata[i]);
-    }
-    fsize = file.size();
-    file.close();
-    // Send the data to MIPS
-    if(SendCommand("PUT," + MIPSfile + "," + QString().number(fsize) + "\n"))
-    {
-        for(int i=0; i<dblock.count(); i+=1024)
-        {
-            len = 1024;
-            if((dblock.count() - i) < 1024) len = dblock.count() - i;
-            SendString(dblock.mid(i,len));
-            if(len == 1024)
-            {
-                waitforline(1000);
-                if((res = getline()) == "")
-                {
-                    // Here if we timed out, display error and exit
-                    QMessageBox::critical(this, tr("Data read error"), "Timedout waiting for data from MIPS!");
-                    return;
-                }
-            }
-            QApplication::processEvents();
-        }
-        SendString("\n");
-        SendString(QString().number(CalculateCRC(fdata)) + "\n");
-        QMessageBox::information(this, tr("File saved"), "File sent to MIPS!");
-    }
-}
-
-void Comms::GetEEPROM(QString FileName, QString Board, int Addr)
-{
-    bool ok = false;
-    QString FileData;
-
-    // Send the command to MIPS to get the file
-    if(SendCommand("GETEEPROM," + Board + "," + QString().sprintf(",%x\n",Addr)))
-    {
-       // Now process the data in the ring buffer
-       // First read the length
-        waitforline(500);
-        QString FileSize = getline();
-        // Read the hex data stream
-        waitforline(1000);
-        FileData = getline();
-        if(FileData.count() != 2 * FileSize.toInt())
-        {
-            // Here if file data block is not the proper size
-            QMessageBox::critical(this, tr("File Error"), "Data block size not correct!");
-            return;
-        }
-        // Read the CRC
-        waitforline(500);
-        QString FileCRC = getline();
-        // Convert data to byte array and callculate CRC
-        QByteArray fdata;
-        fdata.resize(FileSize.toInt());
-        for(int i=0; i<FileSize.toInt(); i++)
-        {
-            fdata[i] = FileData.mid(i*2,2).toUInt(&ok,16);
-        }
-        if(CalculateCRC(fdata) == FileCRC.toInt())
-        {
-            // Now save the data to the user selected file
-            QFile file(FileName);
-            file.open(QIODevice::WriteOnly);
-            file.write(fdata);
-            file.close();
-            QMessageBox::information(this, tr("File saved"), "EEPROM from MIPS read and saved successfully!");
-        }
-        else
-        {
-            // Here with file CRC error, raise error message
-            QMessageBox::critical(this, tr("File Error"), "CRC error!");
-        }
-    }
-}
-
-void Comms::PutEEPROM(QString FileName, QString Board, int Addr)
-{
-    bool ok = false;
-    QString FileData;
-    QString dblock;
-    QByteArray fdata;
-
-    // Send the command to MIPS to get the file
-    if(SendCommand("PUTEEPROM," + Board + QString().sprintf(",%x\n",Addr)))
-    {
-        // open the local file to send and read the data
-        QFile file(FileName);
-        file.open(QIODevice::ReadOnly);
-        fdata = file.readAll();
-        // Convert the data into a ascii hex string
-        for(int i=0; i<file.size(); i++)
-        {
-             dblock += QString().sprintf("%02x",(unsigned char)fdata[i]);
-        }
-        //SendCommand("\n");
-        SendString(QString().number(file.size()) + "\n");
-        file.close();
-        // Send the data to MIPS
-        SendString(dblock + "\n");
-        SendString(QString().number(CalculateCRC(fdata)) + "\n");
-        QMessageBox::information(this, tr("EEPROM write"), "MIPS module's EEPROM Written!");
     }
 }
 
@@ -325,7 +182,7 @@ bool Comms::ConnectToMIPS()
        client.connectToHost(host, 2015);
        sb->showMessage(tr("Connecting..."));
        timer.start();
-       while(timer.elapsed() < 30000)
+       while(timer.elapsed() < 10000)
        {
            QApplication::processEvents();
            if(client_connected)

@@ -1,6 +1,9 @@
 <RCC>
     <qresource prefix="/Images">
         <file>MIPS.jpg</file>
+        <file>SingleFunnel.jpg</file>
+        <file>SoftLanding.jpg</file>
+        <file>SoftLanding.png</file>
     </qresource>
     <qresource prefix="/">
         <file>MIPScommands.txt</file>
@@ -8,5 +11,9 @@
         <file>TWAVEhelp.txt</file>
         <file>PSGhelp.txt</file>
         <file>FAIMShelp.txt</file>
+        <file>GAACElogo.ico</file>
+        <file>SoftLandingHelp.txt</file>
+        <file>SingleFunnelHelp.txt</file>
+        <file>ARBhelp.txt</file>
     </qresource>
 </RCC>

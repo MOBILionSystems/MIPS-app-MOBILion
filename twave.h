@@ -42,6 +42,7 @@ private slots:
     void rbTW2rev(void);
     void pbTWsweepStart(void);
     void pbTWsweepStop(void);
+    void SweepExtTrigger(void);
 };
 
 #endif // TWAVE

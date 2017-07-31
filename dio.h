@@ -35,6 +35,13 @@ private slots:
     void RFgenerate(void);
     void SetFreq(void);
     void SetWidth(void);
+    // Following are for remote navication of UI
+    void RemoteNavigation(void);
+    void RemoteNavSmallUP(void);
+    void RemoteNavLargeUP(void);
+    void RemoteNavSmallDown(void);
+    void RemoteNavLargeDown(void);
+    void RemoteNavSelect(void);
 };
 
 #endif // DIO_H

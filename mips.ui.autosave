@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MIPS, Version 1.14 July 24, 2017</string>
+   <string>MIPS, Version 1.12 May 9, 2017</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QTabWidget" name="tabMIPS">
@@ -27,7 +27,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="System">
      <attribute name="title">
@@ -129,27 +129,39 @@
        <string>Disconnect</string>
       </property>
      </widget>
+     <widget class="QLineEdit" name="leMIPSnetName">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>245</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Network name or IP address of MIPS host, leave blank to use serial port.</string>
+      </property>
+     </widget>
      <widget class="QLabel" name="lblMIPSconfigTitle_2">
       <property name="geometry">
        <rect>
-        <x>65</x>
-        <y>205</y>
-        <width>176</width>
+        <x>10</x>
+        <y>210</y>
+        <width>241</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
-       <string>MIPS host name, for
-network connected systems.</string>
+       <string>MIPS host name</string>
       </property>
      </widget>
      <widget class="QLabel" name="lblMIPSconnectionNotes">
       <property name="geometry">
        <rect>
         <x>320</x>
-        <y>55</y>
+        <y>70</y>
         <width>431</width>
-        <height>486</height>
+        <height>386</height>
        </rect>
       </property>
       <property name="font">
@@ -164,82 +176,13 @@ network connected systems.</string>
        <number>0</number>
       </property>
       <property name="text">
-       <string>MIPS is currently not connected to this application. Establish a connection using one of the following options:
+       <string>MIPS is currently not connected to this application. To connect; select a serial port using the Configure port button provided or enter a network connected MIPS host name. If using the serial port connection make sure the MIPS host name box is empty. If a name is entered in the MIPS host name box this application assumes you wish to make a network connection.
 
-1.) Manually select a MIPS system by selecting a serial port using the Configure port button to select port and parameters and then pressing the Connect to MIPS button. If a name is entered into the MIPS host name box then this displayed name will be used to make a network connection, leave this box blank to make a USB serial port connection.
-
-2.) Press the Find MIPS and Connect button and this application will search for all connected MIPS systems and establish connections. If more that one system is found you will see a selection box that will allow you to toggle between MIPS systems. Additionally you can enter multiple network names for connected MIPS system and this application will connect to all the systems if found. Make sure the host name box is empty to use the USB serial ports.
-
-Please note, the Program MIPS function will only work with a single serial connection to a MIPS system.
-
+Please note, the Program MIPS function will only work with a serial connection to a MIPS system.
 </string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pbSearchandConnect">
-      <property name="geometry">
-       <rect>
-        <x>60</x>
-        <y>315</y>
-        <width>181</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Press this button to search for all USB connected MIPS systems and connect.</string>
-      </property>
-      <property name="text">
-       <string>Find MIPS and Connect</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboSystems">
-      <property name="geometry">
-       <rect>
-        <x>65</x>
-        <y>445</y>
-        <width>171</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Communicate with the selected MIPS system</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lblSystems">
-      <property name="geometry">
-       <rect>
-        <x>70</x>
-        <y>390</y>
-        <width>191</width>
-        <height>46</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Multiple MIPS systems found and connected. Select desired system.</string>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="comboMIPSnetNames">
-      <property name="geometry">
-       <rect>
-        <x>65</x>
-        <y>245</y>
-        <width>171</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="editable">
-       <bool>true</bool>
-      </property>
-      <property name="insertPolicy">
-       <enum>QComboBox::InsertAtTop</enum>
-      </property>
-      <property name="modelColumn">
-       <number>0</number>
       </property>
      </widget>
      <zorder>lblMIPSconfigTitle_2</zorder>
@@ -249,11 +192,8 @@ Please note, the Program MIPS function will only work with a single serial conne
      <zorder>pbConnect</zorder>
      <zorder>pbConfigure</zorder>
      <zorder>pbDisconnect</zorder>
+     <zorder>leMIPSnetName</zorder>
      <zorder>lblMIPSconnectionNotes</zorder>
-     <zorder>pbSearchandConnect</zorder>
-     <zorder>comboSystems</zorder>
-     <zorder>lblSystems</zorder>
-     <zorder>comboMIPSnetNames</zorder>
     </widget>
     <widget class="QWidget" name="Terminal">
      <attribute name="title">
@@ -1073,7 +1013,7 @@ Please note, the Program MIPS function will only work with a single serial conne
       <property name="geometry">
        <rect>
         <x>520</x>
-        <y>15</y>
+        <y>20</y>
         <width>221</width>
         <height>32</height>
        </rect>
@@ -1099,8 +1039,8 @@ Please note, the Program MIPS function will only work with a single serial conne
       <property name="geometry">
        <rect>
         <x>520</x>
-        <y>85</y>
-        <width>221</width>
+        <y>80</y>
+        <width>216</width>
         <height>32</height>
        </rect>
       </property>
@@ -1112,7 +1052,7 @@ Please note, the Program MIPS function will only work with a single serial conne
       <property name="geometry">
        <rect>
         <x>520</x>
-        <y>285</y>
+        <y>270</y>
         <width>216</width>
         <height>32</height>
        </rect>
@@ -1127,7 +1067,7 @@ Please note, the Program MIPS function will only work with a single serial conne
         <x>35</x>
         <y>325</y>
         <width>701</width>
-        <height>106</height>
+        <height>96</height>
        </rect>
       </property>
       <property name="title">
@@ -1254,7 +1194,7 @@ Please note, the Program MIPS function will only work with a single serial conne
         <x>520</x>
         <y>120</y>
         <width>221</width>
-        <height>161</height>
+        <height>141</height>
        </rect>
       </property>
       <property name="title">
@@ -1267,9 +1207,9 @@ Please note, the Program MIPS function will only work with a single serial conne
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>45</y>
-         <width>50</width>
-         <height>26</height>
+         <y>40</y>
+         <width>51</width>
+         <height>32</height>
         </rect>
        </property>
        <property name="text">
@@ -1285,7 +1225,7 @@ Please note, the Program MIPS function will only work with a single serial conne
          <x>140</x>
          <y>20</y>
          <width>50</width>
-         <height>26</height>
+         <height>32</height>
         </rect>
        </property>
        <property name="text">
@@ -1299,9 +1239,9 @@ Please note, the Program MIPS function will only work with a single serial conne
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>105</y>
-         <width>50</width>
-         <height>26</height>
+         <y>90</y>
+         <width>51</width>
+         <height>32</height>
         </rect>
        </property>
        <property name="text">
@@ -1315,9 +1255,9 @@ Please note, the Program MIPS function will only work with a single serial conne
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>130</y>
-         <width>50</width>
-         <height>26</height>
+         <y>110</y>
+         <width>51</width>
+         <height>32</height>
         </rect>
        </property>
        <property name="text">
@@ -1331,9 +1271,9 @@ Please note, the Program MIPS function will only work with a single serial conne
        <property name="geometry">
         <rect>
          <x>130</x>
-         <y>75</y>
+         <y>65</y>
          <width>71</width>
-         <height>26</height>
+         <height>32</height>
         </rect>
        </property>
        <property name="text">
@@ -1785,7 +1725,7 @@ navigation</string>
         <x>595</x>
         <y>5</y>
         <width>121</width>
-        <height>26</height>
+        <height>32</height>
        </rect>
       </property>
       <property name="text">
@@ -2713,7 +2653,7 @@ enabled</string>
          <rect>
           <x>50</x>
           <y>-5</y>
-          <width>496</width>
+          <width>271</width>
           <height>221</height>
          </rect>
         </property>
@@ -2935,103 +2875,6 @@ enabled</string>
            <height>26</height>
           </rect>
          </property>
-        </widget>
-        <widget class="QGroupBox" name="gbDualOutput">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>275</x>
-           <y>50</y>
-           <width>206</width>
-           <height>126</height>
-          </rect>
-         </property>
-         <property name="toolTip">
-          <string>Enabled by the system when the ARB channel has two output boards attached</string>
-         </property>
-         <property name="title">
-          <string>Dual output board offset</string>
-         </property>
-         <widget class="QLabel" name="label_190">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>45</y>
-            <width>51</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Board A</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="leSARBOFFA">
-          <property name="geometry">
-           <rect>
-            <x>65</x>
-            <y>45</y>
-            <width>113</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="toolTip">
-           <string>Voltage offset for board A, -10 to 10 volts</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_191">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>80</y>
-            <width>51</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>Board B</string>
-          </property>
-         </widget>
-         <widget class="QLineEdit" name="leSARBOFFB">
-          <property name="geometry">
-           <rect>
-            <x>65</x>
-            <y>80</y>
-            <width>113</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="toolTip">
-           <string>Voltage offset for board B, -10 to 10 volts</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_192">
-          <property name="geometry">
-           <rect>
-            <x>185</x>
-            <y>50</y>
-            <width>16</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>V</string>
-          </property>
-         </widget>
-         <widget class="QLabel" name="label_193">
-          <property name="geometry">
-           <rect>
-            <x>185</x>
-            <y>80</y>
-            <width>16</width>
-            <height>16</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>V</string>
-          </property>
-         </widget>
         </widget>
        </widget>
        <widget class="QGroupBox" name="gbARBcompressor">
@@ -3344,8 +3187,8 @@ enabled</string>
        <widget class="QPushButton" name="pbARBtwaveUpdate">
         <property name="geometry">
          <rect>
-          <x>575</x>
-          <y>160</y>
+          <x>380</x>
+          <y>185</y>
           <width>131</width>
           <height>32</height>
          </rect>
@@ -5422,19 +5265,6 @@ enabled</string>
          <string>Stop both channels</string>
         </property>
        </widget>
-       <widget class="QCheckBox" name="chkSweepExtTrig">
-        <property name="geometry">
-         <rect>
-          <x>25</x>
-          <y>250</y>
-          <width>236</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Start with external trigger, R input</string>
-        </property>
-       </widget>
       </widget>
      </widget>
     </widget>
@@ -7003,12 +6833,6 @@ number on each trigger</string>
     </property>
     <addaction name="actionClear"/>
     <addaction name="actionMessage_repeat"/>
-    <addaction name="separator"/>
-    <addaction name="actionGet_file_from_MIPS"/>
-    <addaction name="actionSend_file_to_MIPS"/>
-    <addaction name="separator"/>
-    <addaction name="actionRead_EEPROM"/>
-    <addaction name="actionWrite_EEPROM"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -7108,26 +6932,6 @@ number on each trigger</string>
     <string>Message repeat</string>
    </property>
   </action>
-  <action name="actionGet_file_from_MIPS">
-   <property name="text">
-    <string>Get file from MIPS</string>
-   </property>
-  </action>
-  <action name="actionSend_file_to_MIPS">
-   <property name="text">
-    <string>Send file to MIPS</string>
-   </property>
-  </action>
-  <action name="actionRead_EEPROM">
-   <property name="text">
-    <string>Read EEPROM</string>
-   </property>
-  </action>
-  <action name="actionWrite_EEPROM">
-   <property name="text">
-    <string>Write EEPROM</string>
-   </property>
-  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
@@ -7208,6 +7012,7 @@ number on each trigger</string>
   <tabstop>leSDCB_1</tabstop>
   <tabstop>chkPowerEnable</tabstop>
   <tabstop>leSDCB_2</tabstop>
+  <tabstop>leMIPSnetName</tabstop>
   <tabstop>tabARB</tabstop>
   <tabstop>leSWFREQ</tabstop>
   <tabstop>leSWFVRNG</tabstop>

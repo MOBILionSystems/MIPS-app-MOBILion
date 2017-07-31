@@ -35,6 +35,7 @@ void RFdriver::Update(void)
     rui->leSRFDRV->setText(comms->SendMessage("GRFDRV," + rui->comboRFchan->currentText() + "\n"));
     rui->leGRFPPVP->setText(comms->SendMessage("GRFPPVP," + rui->comboRFchan->currentText() + "\n"));
     rui->leGRFPPVN->setText(comms->SendMessage("GRFPPVN," + rui->comboRFchan->currentText() + "\n"));
+    rui->leGRFPWR->setText(comms->SendMessage("GRFPWR," + rui->comboRFchan->currentText() + "\n"));
     rui->tabMIPS->setEnabled(true);
     rui->statusBar->showMessage(tr(""));
 }

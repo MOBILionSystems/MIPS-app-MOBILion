@@ -71,9 +71,6 @@
 //          panels that communicate to multiple MIPS systems.
 //      2.) Updated the serial port scanning
 //      3.) Changed the disconnection procedure
-// 1.14, July 24, 2017
-//      1.) Added a number of host interface commands to allow sending and receiving files
-//          to SD card as well as sending and receiving EEPROM module configureation data.
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -177,9 +174,6 @@ MIPS::MIPS(QWidget *parent) :
     ui->actionMessage_repeat->setEnabled(true);
     ui->actionGet_file_from_MIPS->setEnabled(true);
     ui->actionSend_file_to_MIPS->setEnabled(true);
-    ui->actionRead_EEPROM->setEnabled(true);
-    ui->actionWrite_EEPROM->setEnabled(true);
-    ui->menuTerminal->setEnabled(false);
 
   //   connect(app, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(setWidgets(QWidget*, QWidget*)));    connect(ui->actionClear, SIGNAL(triggered()), console, SLOT(clear()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(loadSettings()));
@@ -200,8 +194,6 @@ MIPS::MIPS(QWidget *parent) :
     connect(ui->actionMessage_repeat, SIGNAL(triggered()), this, SLOT(GetRepeatMessage()));
     connect(ui->actionGet_file_from_MIPS, SIGNAL(triggered()), this, SLOT(GetFileFromMIPS()));
     connect(ui->actionSend_file_to_MIPS, SIGNAL(triggered()), this, SLOT(PutFiletoMIPS()));
-    connect(ui->actionRead_EEPROM, SIGNAL(triggered()), this, SLOT(ReadEEPROM()));
-    connect(ui->actionWrite_EEPROM, SIGNAL(triggered()), this, SLOT(WriteEEPROM()));
 
     ui->comboMIPSnetNames->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
     // Sets the polling loop interval and starts the timer
@@ -312,11 +304,6 @@ void MIPS::GeneralHelp(void)
     {
         help->SetTitle("Pulse Sequence Generation Help");
         help->LoadHelpText(":/PSGhelp.txt");
-    }
-    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "ARB")
-    {
-        help->SetTitle("ARB Help");
-        help->LoadHelpText(":/ARBhelp.txt");
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Twave")
     {
@@ -612,7 +599,7 @@ void MIPS::MIPSsetup(void)
 void MIPS::MIPSconnect(void)
 {
     comms->p = settings->settings();
-    comms->host = ui->comboMIPSnetNames->currentText();
+    comms->host = ui->comboSystems->currentText();
     if(comms->ConnectToMIPS())
     {
        console->setEnabled(true);
@@ -769,7 +756,6 @@ void MIPS::tabSelected()
 
     disconnect(comms, SIGNAL(DataReady()),0,0);
     disconnect(console, SIGNAL(getData(QByteArray)),0,0);
-    ui->menuTerminal->setEnabled(false);
     if(LastTab == "Pulse Sequence Generation")
     {
         // Abort when exiting this tab
@@ -784,7 +770,6 @@ void MIPS::tabSelected()
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
     {
-        ui->menuTerminal->setEnabled(true);
         LastTab = "Terminal";
         connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
         connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
@@ -793,7 +778,6 @@ void MIPS::tabSelected()
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Digital IO")
     {
-        ui->chkRemoteNav->setChecked(false);
         dio->comms = comms;
         LastTab = "Digital IO";
         dio->Update();
@@ -951,105 +935,11 @@ void MIPS::GetFileFromMIPS(void)
     {
         // Let user pick detination location and file name
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save to File"),"",tr("All files (*.*)"));
-        if(fileName != "")
-        {
-            // If on terminal tab then turn off the slot for received chars
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-            comms->GetMIPSfile(text,fileName);
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-            {
-                connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-                readData2Console();
-            }
-        }
-     }
+        return;
+    }
 }
 
 void MIPS::PutFiletoMIPS(void)
 {
-    bool ok;
-
-    // Let user pick source location and file name
-    QString fileName = QFileDialog::getOpenFileName(this, tr("File to MIPS"),tr("All files (*)", 0));
-    if(fileName == "") return;
-    // If on terminal tab then turn off the slot for received chars
-    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-    // Get file name from user
-    QString text = QInputDialog::getText(0, "MIPS", "File name to copy to MIPS SD card:", QLineEdit::Normal,"", &ok );
-    if ( ok && !text.isEmpty() )
-    {
-        comms->PutMIPSfile(text,fileName);
-    }
-    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-    {
-        connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-        readData2Console();
-    }
+    
 }
-
-void MIPS::ReadEEPROM(void)
-{
-    bool ok;
-
-    QMessageBox msgbox;
-    msgbox.setText("MIPS Module EEPROM read function");
-    msgbox.setInformativeText("Select the module A or B:");
-    msgbox.addButton(tr("B"), QMessageBox::NoRole);
-    msgbox.addButton(tr("A"), QMessageBox::NoRole);
-    msgbox.addButton(tr("Cancel"), QMessageBox::NoRole);
-    int brd = msgbox.exec();
-    if(brd == 2) return;
-    QString Address = QInputDialog::getText(this, "Read MIPS EEPROM", "Enter EEPROM address in hex:", QLineEdit::Normal,QString::null, &ok);
-    if(ok && !Address.isEmpty())
-    {
-        // Here with the EEPROM module address and physical address
-        // Selet a file to save the EEPROM contents
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to File"),"",tr("All files (*.*)"));
-        if(fileName != "")
-        {
-            // Read the data from MIPS
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-            if(brd == 1) comms->GetEEPROM(fileName,"A",Address.toInt(0,16));
-            else comms->GetEEPROM(fileName,"B",Address.toInt(0,16));
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-            {
-                connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-                readData2Console();
-            }
-        }
-    }
-}
-
-void MIPS::WriteEEPROM(void)
-{
-    bool ok;
-
-    QMessageBox msgbox;
-    msgbox.setText("MIPS Module EEPROM write function. This function will allow you to reprogram the configuration memory of the selected module. Proceed with caution, you can render your system inoperable by entering invalid information.");
-    msgbox.setInformativeText("Select the module A or B or cancel:");
-    msgbox.addButton(tr("B"), QMessageBox::NoRole);
-    msgbox.addButton(tr("A"), QMessageBox::NoRole);
-    msgbox.addButton(tr("Cancel"), QMessageBox::NoRole);
-    int brd = msgbox.exec();
-    if(brd == 2) return;
-    QString Address = QInputDialog::getText(this, "Write MIPS EEPROM", "Enter EEPROM address in hex:", QLineEdit::Normal,QString::null, &ok);
-    if(ok && !Address.isEmpty())
-    {
-        // Here with the EEPROM module address and physical address
-        // Selet a file to write to the EEPROM
-        QString fileName = QFileDialog::getOpenFileName(this, tr("File to MIPS"),tr("All files (*)", 0));
-        if(fileName != "")
-        {
-            // Read the data from MIPS
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-            if(brd == 1) comms->PutEEPROM(fileName,"A",Address.toInt(0,16));
-            else comms->PutEEPROM(fileName,"B",Address.toInt(0,16));
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-            {
-                connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-                readData2Console();
-            }
-        }
-    }
-}
-
