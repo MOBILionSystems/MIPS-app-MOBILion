@@ -1,5 +1,5 @@
-#ifndef COMMS
-#define COMMS
+#ifndef COMMS_H
+#define COMMS_H
 
 #include <QtCore/QtGlobal>
 #include <QtSerialPort/QSerialPort>
@@ -15,12 +15,23 @@
 #include "settingsdialog.h"
 #include "ringbuffer.h"
 
+enum ADCreadStates
+  {
+     ADCdone,
+     WaitingForHeader,
+     ReadingHeader,
+     ReadingData,
+     ReadingTrailer
+  };
+
 class Comms : public QDialog
 {
      Q_OBJECT
 
 signals:
     void DataReady(void);
+    void ADCrecordingDone(void);
+    void ADCvectorReady(void);
 
 public:
     explicit Comms(SettingsDialog *settings, QString Host, QStatusBar *statusbar);
@@ -30,6 +41,8 @@ public:
     bool SendCommand(QString message);
     QString SendMessage(QString name, QString message);
     QString SendMessage(QString message);
+    QString SendMess(QString name, QString message);
+    QString SendMess(QString message);
     void SendString(QString name, QString message);
     void SendString(QString message);
     void writeData(const QByteArray &data);
@@ -37,10 +50,14 @@ public:
     void closeSerialPort();
     void waitforline(int timeout);
     char getchar(void);
+    void GetADCbuffer(quint16 *ADCbuffer, int NumSamples);
+    void ADCrelease(void);
     void GetMIPSfile(QString MIPSfile, QString LocalFile);
     void PutMIPSfile(QString MIPSfile, QString LocalFile);
     void GetEEPROM(QString FileName, QString Board, int Addr);
     void PutEEPROM(QString FileName, QString Board, int Addr);
+    void GetARBFLASH(QString FileName);
+    void PutARBFLASH(QString FileName);
     bool isConnected(void);
     QString getline(void);
     int CalculateCRC(QByteArray fdata);
@@ -56,9 +73,15 @@ public:
     QString host;
     RingBuffer rb;
 
+    // ADC buffer processing
+    ADCreadStates ADCstate;
+    quint16 *ADCbuf;
+    int ADClen;
+
 private slots:
     void handleError(QSerialPort::SerialPortError error);
     void readData2RingBuffer(void);
+    void readData2ADCBuffer(void);
     void connected(void);
     void disconnected(void);
 };

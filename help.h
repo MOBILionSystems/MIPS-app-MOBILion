@@ -26,7 +26,7 @@ public:
     ~Help();
     virtual void resizeEvent(QResizeEvent* event);
     void LoadHelpText(QString FileName);
-    void LoadString(QString DisplayText);
+    void LoadStr(QString DisplayText);
     void SetTitle(QString title);
 
 private:

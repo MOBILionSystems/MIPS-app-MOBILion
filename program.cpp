@@ -41,7 +41,7 @@ void Program::executeProgrammerCommand(QString cmd)
     }
     // Enable MIPS's bootloader
     console->putData("MIPS bootloader enabled!\n");
-    qDebug() << "Bootloader enabled";
+    // qDebug() << "Bootloader enabled";
     comms->closeSerialPort();
     QThread::sleep(1);
     while(comms->serial->isOpen()) QApplication::processEvents();

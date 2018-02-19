@@ -61,6 +61,7 @@ ARB::ARB(Ui::MIPS *w, Comms *c)
     connect(aui->pbARBclearLog,SIGNAL(pressed()),this,SLOT(ARBclearLog()));
     connect(aui->pbARBupdate,SIGNAL(pressed()),this,SLOT(ARBupdate()));
     connect(aui->pbARBtwaveUpdate,SIGNAL(pressed()),this,SLOT(ARBupdate()));
+    connect(aui->pbEditARBwf,SIGNAL(pressed()),this,SLOT(EditARBwaveform()));
     connect(aui->tabARB,SIGNAL(currentChanged(int)),this,SLOT(ARBtabSelected()));
     connect(aui->comboSWFTYP,SIGNAL(currentIndexChanged(int)),this,SLOT(ARBtypeSelected()));
     connect(aui->comboARBmodule,SIGNAL(currentIndexChanged(int)),this,SLOT(ARBmoduleSelected()));
@@ -213,13 +214,13 @@ void ARB::ARBmoduleSelected(void)
        if(w->objectName().startsWith("le"))
        {
            res = "G" + w->objectName().mid(3) + "," + chan;
-           ((QLineEdit *)w)->setText(comms->SendMessage(res + "\n"));
+           ((QLineEdit *)w)->setText(comms->SendMess(res + "\n"));
        }
     }
-    res = comms->SendMessage("GWFDIR," + chan +"\n");
+    res = comms->SendMess("GWFDIR," + chan +"\n");
     if(res == "FWD") aui->rbSWFDIR_FWD->setChecked(true);
     if(res == "REV") aui->rbSWFDIR_REV->setChecked(true);
-    res = comms->SendMessage("GWFTYP," + chan + "\n");
+    res = comms->SendMess("GWFTYP," + chan + "\n");
     int i = aui->comboSWFTYP->findData(res);
     aui->comboSWFTYP->setCurrentIndex(i);
 }
@@ -261,7 +262,7 @@ void ARB::Update(void)
     QObjectList widgetList;
 
     // Determine the number of ARB channels and exit if its zero
-    res = comms->SendMessage("GCHAN,ARB\n");
+    res = comms->SendMess("GCHAN,ARB\n");
     NumChannels = res.toInt();
     if(NumChannels == 0)
     {
@@ -273,7 +274,7 @@ void ARB::Update(void)
     if(NumChannels > 8) aui->gbARBmodule2->setEnabled(true);
     // Get the first modules's mode and set the tab to that mode and
     // if there are two modules set second to match first
-    res = comms->SendMessage("GARBMODE,1\n");
+    res = comms->SendMess("GARBMODE,1\n");
     if(res == "ARB")
     {
         aui->tabARB->setCurrentIndex(1);
@@ -291,7 +292,7 @@ void ARB::Update(void)
            if(w->objectName().contains("le"))
            {
                res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-               ((QLineEdit *)w)->setText(comms->SendMessage(res));
+               ((QLineEdit *)w)->setText(comms->SendMess(res));
            }
         }
     }
@@ -313,13 +314,13 @@ void ARB::Update(void)
               {
                   res = "G" + w->objectName().mid(3).replace("_",",");
                   if(res.right(1) == ",") res = res.left(res.length()-1);
-                  ((QLineEdit *)w)->setText(comms->SendMessage(res + "\n"));
+                  ((QLineEdit *)w)->setText(comms->SendMess(res + "\n"));
               }
            }
         }
         // Check for dual output boards and individual offset control
         QString chan = aui->comboARBmodule->currentText();
-        if(comms->SendMessage("GARBOFFA," + chan + "\n").contains("?")) aui->gbDualOutput->setEnabled(false);
+        if(comms->SendMess("GARBOFFA," + chan + "\n").contains("?")) aui->gbDualOutput->setEnabled(false);
         else aui->gbDualOutput->setEnabled(true);
         widgetList = aui->gbARBtwaveParms->children();
         if(aui->gbDualOutput->isEnabled()) widgetList += aui->gbDualOutput->children();
@@ -328,24 +329,22 @@ void ARB::Update(void)
            if(w->objectName().startsWith("le"))
            {
                res = "G" + w->objectName().mid(3) + "," + chan;
-               ((QLineEdit *)w)->setText(comms->SendMessage(res + "\n"));
+               ((QLineEdit *)w)->setText(comms->SendMess(res + "\n"));
            }
         }
-        res = comms->SendMessage("GWFDIR," + chan +"\n");
-        qDebug() << res;
+        res = comms->SendMess("GWFDIR," + chan +"\n");
         if(res == "FWD") aui->rbSWFDIR_FWD->setChecked(true);
         if(res == "REV") aui->rbSWFDIR_REV->setChecked(true);
-        res = comms->SendMessage("GWFTYP," + chan + "\n");
-        qDebug() << res;
+        res = comms->SendMess("GWFTYP," + chan + "\n");
         int i = aui->comboSWFTYP->findData(res);
         aui->comboSWFTYP->setCurrentIndex(i);
      }
      if(Compressor)
      {
-         res = comms->SendMessage("GARBCMODE\n");
+         res = comms->SendMess("GARBCMODE\n");
          if(res == "Normal") aui->rbSARBCMODE_NORMAL->setChecked(true);
          if(res == "Compress") aui->rbSARBCMODE_COMPRESS->setChecked(true);
-         res = comms->SendMessage("GARBCSW\n");
+         res = comms->SendMess("GARBCSW\n");
          if(res == "Open") aui->rbSARBCSW_OPEN->setChecked(true);
          if(res == "Close") aui->rbSARBCSW_CLOSE->setChecked(true);
      }
@@ -360,7 +359,7 @@ void ARB::ARBclearLog(void)
 void ARB::ARBviewLog(void)
 {
     LogedData->SetTitle("Log of commands sent to MIPS");
-    LogedData->LoadString(LogString);
+    LogedData->LoadStr(LogString);
     LogedData->show();
 }
 
@@ -438,4 +437,48 @@ void ARB::Load(QString Filename)
         Update();
         aui->statusBar->showMessage("Settings loaded from " + Filename,2000);
     }
+}
+
+void ARB::ReadWaveform(void)
+{
+    int Waveform[32];
+    QString cmd;
+    int i;
+
+    // Read waveform
+    ARBwfEdit->GetWaveform(Waveform);
+    // Send waveform to MIPS
+    cmd = "SWFARB,"  + aui->comboARBmodule->currentText();
+    for(i=0; i<32; i++) cmd += "," + QString::number(Waveform[i]);
+    cmd += "\n";
+    if(!comms->SendCommand(cmd))
+    {
+        aui->statusBar->showMessage("Error sending waveform to MIPS",2000);
+    }
+}
+
+void ARB::EditARBwaveform(void)
+{
+   int Waveform[32];
+   int i;
+
+   for(i=0; i<32; i++) Waveform[i] = i*4 - 64;
+   // Read the ARB waveform from MIPS
+   QString res = comms->SendMess("GWFARB," + aui->comboARBmodule->currentText() + "\n");
+   if(res.contains("?"))
+   {
+       // Here if the message was NAKed
+       aui->statusBar->showMessage("Error reading waveform from MIPS",2000);
+       return;
+   }
+   QStringList Vals = res.split(",");
+   for(i=0; i<32; i++)
+   {
+       if(i < Vals.count()) Waveform[i] = Vals[i].toInt();
+       else Waveform[i] = 0;
+   }
+   ARBwfEdit = new ARBwaveformEdit;
+   connect(ARBwfEdit, SIGNAL(WaveformReady()), this, SLOT(ReadWaveform()));
+   ARBwfEdit->SetWaveform(Waveform);
+   ARBwfEdit->show();
 }

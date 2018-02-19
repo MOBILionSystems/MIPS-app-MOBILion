@@ -76,7 +76,6 @@ pseDialog::pseDialog(QList<psgPoint *> *psg, QWidget *parent) :
     // Make the dialog fixed size.
     this->setFixedSize(this->size());
 
-    qDebug() << psg->size();
     p = psg;
     activePoint = (*psg)[0];
     CurrentIndex = 0;
@@ -100,6 +99,10 @@ pseDialog::pseDialog(QList<psgPoint *> *psg, QWidget *parent) :
            connect(((QLineEdit *)w),SIGNAL(textEdited(QString)),this,SLOT(on_DCBIAS_edited()));
        }
     }
+    connect(ui->pbInsertPulse, SIGNAL(pressed()), this, SLOT(InsertPulse()));
+    connect(ui->pbInsertRamp, SIGNAL(pressed()), this, SLOT(MakeRamp()));
+    connect(ui->pbInsertCancel, SIGNAL(pressed()), this, SLOT(RampCancel()));
+    ui->gbInsertPulse->setVisible(false);
 }
 
 pseDialog::~pseDialog()
@@ -158,7 +161,9 @@ void pseDialog::UpdateDialog(psgPoint *point)
       if(w->objectName().contains("leDCB"))
       {
           Index = w->objectName().mid(5).toInt() - 1;
-          ((QLineEdit *)w)->setText(QString::number(point->DCbias[Index]));
+          QString textV;
+          textV.sprintf("%.2f", point->DCbias[Index]);
+          ((QLineEdit *)w)->setText(textV);
       }
    }
 }
@@ -215,6 +220,9 @@ void pseDialog::on_pbInsert_pressed()
     CurrentIndex++;
     activePoint = point;
     point->TimePoint = ctime + deltaT;
+    point->Loop = false;
+    point->LoopCount = 0;
+    point->LoopName = "";
     UpdateDialog(activePoint);
     ui->gbCurrentPoint->setTitle("Current time point: " + QString::number(CurrentIndex+1) + " of " + QString::number(p->size()));
 }
@@ -266,4 +274,93 @@ void pseDialog::on_chkLoop_clicked(bool checked)
 void pseDialog::on_comboLoop_currentIndexChanged(const QString &arg1)
 {
     activePoint->LoopName = arg1;
+}
+
+void pseDialog::InsertPulse(void)
+{
+    ui->gbInsertPulse->setVisible(true);
+    ui->frmLoop->setVisible(false);
+    ui->gbDigitalOut->setVisible(false);
+    ui->gbDCbias->setVisible(false);
+}
+
+void pseDialog::MakeRamp(void)
+{
+    float restingV, pulseV;
+    int   channel,width;
+
+    channel = ui->lePulseChannel->text().toInt() - 1;
+    if((channel<0)||(channel>15))
+    {
+        QMessageBox::information(NULL, "Error!", "Invalid channel number!");
+        return;
+    }
+    // if the ramp up number of steps is 1 or less its a step function
+    restingV = activePoint->DCbias[channel];
+    pulseV = ui->lePulseVoltage->text().toFloat();
+    width = ui->lePulseWidth->text().toInt();
+    // Subtract half the rise time from the pulse width
+    if(ui->leRampUp->text().toInt() > 1) width -= (ui->leRampStepSize->text().toInt() * ui->leRampUp->text().toInt())/2;
+    //  Subtract half the fall time from the pulse width
+    if(ui->leRampDwn->text().toInt() > 1) width -= (ui->leRampStepSize->text().toInt() * ui->leRampDwn->text().toInt())/2;
+    if(width < 10)
+    {
+        QMessageBox::information(NULL, "Error!", "For the defined rise and fall times pulse width must be at least " + QString::number(ui->lePulseWidth->text().toInt()-width+10));
+        return;
+    }
+    if(ui->leRampUp->text().toInt() <= 1)
+    {
+        activePoint->DCbias[channel] = pulseV;
+        on_pbInsert_pressed();
+        activePoint->TimePoint -= 100;
+    }
+    else
+    {
+        // Create the ramp
+        for(int i=0; i<ui->leRampUp->text().toInt(); i++)
+        {
+            activePoint->DCbias[channel] += ((pulseV - restingV)/(ui->leRampUp->text().toInt()));
+            activePoint->TimePoint += ui->leRampStepSize->text().toInt();
+            UpdateDialog(activePoint);
+            on_pbInsert_pressed();
+            activePoint->TimePoint -= 100;
+        }
+    }
+    // Now we are at the requested voltage so hold for the pulse width
+    // time
+    activePoint->TimePoint += width - 100;
+    // Now ramp down
+    if(ui->leRampDwn->text().toInt() <= 1)
+    {
+        activePoint->DCbias[ui->lePulseChannel->text().toInt()] = restingV;
+        on_pbInsert_pressed();
+    }
+    else
+    {
+        // Create the ramp
+        for(int i=0; i<ui->leRampDwn->text().toInt(); i++)
+        {
+            activePoint->DCbias[channel] -= ((pulseV - restingV)/(ui->leRampDwn->text().toInt()));
+            activePoint->TimePoint += ui->leRampStepSize->text().toInt();
+            UpdateDialog(activePoint);
+            on_pbInsert_pressed();
+            activePoint->TimePoint -= 100;
+        }
+        activePoint->TimePoint += 100;
+    }
+    activePoint->DCbias[channel] = restingV;
+    UpdateDialog(activePoint);
+    ui->gbInsertPulse->setVisible(false);
+    ui->frmLoop->setVisible(true);
+    ui->gbDigitalOut->setVisible(true);
+    ui->gbDCbias->setVisible(true);
+}
+
+void pseDialog::RampCancel(void)
+{
+    UpdateDialog(activePoint);
+    ui->gbInsertPulse->setVisible(false);
+    ui->frmLoop->setVisible(true);
+    ui->gbDigitalOut->setVisible(true);
+    ui->gbDCbias->setVisible(true);
 }

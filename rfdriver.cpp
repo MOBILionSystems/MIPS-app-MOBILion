@@ -9,6 +9,8 @@ RFdriver::RFdriver(Ui::MIPS *w, Comms *c)
     connect(rui->pbUpdateRF,SIGNAL(pressed()),this,SLOT(UpdateRFdriver()));
     connect(rui->leSRFFRQ,SIGNAL(editingFinished()),this,SLOT(leSRFFRQ_editingFinished()));
     connect(rui->leSRFDRV,SIGNAL(editingFinished()),this,SLOT(leSRFDRV_editingFinished()));
+    connect(rui->pbAutoTune,SIGNAL(pressed()),this,SLOT(AutoTune()));
+    connect(rui->pbAutoRetune,SIGNAL(pressed()),this,SLOT(AutoRetune()));
     rui->leSRFFRQ->setValidator(new QIntValidator);
     rui->leSRFDRV->setValidator(new QDoubleValidator);
 }
@@ -31,11 +33,11 @@ void RFdriver::Update(void)
 
     rui->tabMIPS->setEnabled(false);
     rui->statusBar->showMessage(tr("Updating RF driver controls..."));
-    rui->leSRFFRQ->setText(comms->SendMessage("GRFFRQ," + rui->comboRFchan->currentText() + "\n"));
-    rui->leSRFDRV->setText(comms->SendMessage("GRFDRV," + rui->comboRFchan->currentText() + "\n"));
-    rui->leGRFPPVP->setText(comms->SendMessage("GRFPPVP," + rui->comboRFchan->currentText() + "\n"));
-    rui->leGRFPPVN->setText(comms->SendMessage("GRFPPVN," + rui->comboRFchan->currentText() + "\n"));
-    rui->leGRFPWR->setText(comms->SendMessage("GRFPWR," + rui->comboRFchan->currentText() + "\n"));
+    rui->leSRFFRQ->setText(comms->SendMess("GRFFRQ," + rui->comboRFchan->currentText() + "\n"));
+    rui->leSRFDRV->setText(comms->SendMess("GRFDRV," + rui->comboRFchan->currentText() + "\n"));
+    rui->leGRFPPVP->setText(comms->SendMess("GRFPPVP," + rui->comboRFchan->currentText() + "\n"));
+    rui->leGRFPPVN->setText(comms->SendMess("GRFPPVN," + rui->comboRFchan->currentText() + "\n"));
+    rui->leGRFPWR->setText(comms->SendMess("GRFPWR," + rui->comboRFchan->currentText() + "\n"));
     rui->tabMIPS->setEnabled(true);
     rui->statusBar->showMessage(tr(""));
 }
@@ -138,4 +140,55 @@ void RFdriver::leSRFDRV_editingFinished()
     if(!rui->leSRFDRV->isModified()) return;
     comms->SendCommand("SRFDRV," + rui->comboRFchan->currentText() + "," + rui->leSRFDRV->text() + "\n");
     rui->leSRFDRV->setModified(false);
+}
+
+void RFdriver::AutoTune(void)
+{
+    QMessageBox msgBox;
+
+    rui->pbAutoTune->setDown(false);
+    QString msg = "This function will tune the RF head attached to channel " + rui->comboRFchan->currentText() + ". ";
+    msg += "Make sure the RF head is attached and connected to your system as needed. ";
+    msg += "This process can take up to 3 minutes.\n";
+    msgBox.setText(msg);
+    msgBox.setInformativeText("Are you sure you want to continue?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+    if(ret == QMessageBox::No) return;
+    if(!comms->SendCommand("TUNERFCH," + rui->comboRFchan->currentText() + "\n"))
+    {
+        QString msg = "Request failed!, could be a tune in process, only one channel ";
+        msg += "can be tuned or retuned at a time. ";
+        msgBox.setText(msg);
+        msgBox.setInformativeText("");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+    }
+
+}
+
+void RFdriver::AutoRetune(void)
+{
+    QMessageBox msgBox;
+
+    rui->pbAutoRetune->setDown(false);
+    QString msg = "This function will retune the RF head attached to channel "  + rui->comboRFchan->currentText() + ". ";
+    msg += "Make sure the RF head is attached and connected to your system as needed. ";
+    msg += "This process can take up to 1 minute.\n";
+    msgBox.setText(msg);
+    msgBox.setInformativeText("Are you sure you want to continue?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+    if(ret == QMessageBox::No) return;
+    if(!comms->SendCommand("RETUNERFCH," + rui->comboRFchan->currentText() + "\n"))
+    {
+        QString msg = "Request failed!, could be a tune in process, only one channel ";
+        msg += "can be tuned or retuned at a time. ";
+        msgBox.setText(msg);
+        msgBox.setInformativeText("");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+    }
 }

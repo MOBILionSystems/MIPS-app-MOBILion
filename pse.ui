@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>461</width>
+    <width>460</width>
     <height>610</height>
    </rect>
   </property>
@@ -709,9 +709,9 @@
   <widget class="QPushButton" name="pbNext">
    <property name="geometry">
     <rect>
-     <x>5</x>
-     <y>135</y>
-     <width>91</width>
+     <x>0</x>
+     <y>130</y>
+     <width>90</width>
      <height>32</height>
     </rect>
    </property>
@@ -728,14 +728,14 @@
   <widget class="QPushButton" name="pbInsert">
    <property name="geometry">
     <rect>
-     <x>120</x>
-     <y>135</y>
-     <width>91</width>
+     <x>90</x>
+     <y>130</y>
+     <width>90</width>
      <height>32</height>
     </rect>
    </property>
    <property name="toolTip">
-    <string>Inset a time point after this one</string>
+    <string>Insert a time point after this one</string>
    </property>
    <property name="text">
     <string>Insert</string>
@@ -747,9 +747,9 @@
   <widget class="QPushButton" name="pbDelete">
    <property name="geometry">
     <rect>
-     <x>235</x>
-     <y>135</y>
-     <width>91</width>
+     <x>360</x>
+     <y>130</y>
+     <width>90</width>
      <height>32</height>
     </rect>
    </property>
@@ -766,9 +766,9 @@
   <widget class="QPushButton" name="pbPrevious">
    <property name="geometry">
     <rect>
-     <x>355</x>
-     <y>135</y>
-     <width>91</width>
+     <x>273</x>
+     <y>130</y>
+     <width>90</width>
      <height>32</height>
     </rect>
    </property>
@@ -782,61 +782,392 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QCheckBox" name="chkLoop">
+  <widget class="QFrame" name="frmLoop">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>190</y>
-     <width>106</width>
-     <height>26</height>
+     <y>174</y>
+     <width>441</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">border: 0</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="lineWidth">
+    <number>0</number>
+   </property>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>11</y>
+      <width>171</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Number of cycles</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leCycles">
+    <property name="geometry">
+     <rect>
+      <x>381</x>
+      <y>15</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Number of times to loop</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboLoop">
+    <property name="geometry">
+     <rect>
+      <x>105</x>
+      <y>12</y>
+      <width>106</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Point to loop back to</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="chkLoop">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>11</y>
+      <width>106</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Check this to cause this time point to loop back to the labeled point</string>
+    </property>
+    <property name="text">
+     <string>Loop to</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPushButton" name="pbInsertPulse">
+   <property name="geometry">
+    <rect>
+     <x>173</x>
+     <y>130</y>
+     <width>105</width>
+     <height>32</height>
     </rect>
    </property>
    <property name="toolTip">
-    <string>Check this to cause this time point to loop back to the labeled point</string>
+    <string>Insert a time point after this one</string>
    </property>
    <property name="text">
-    <string>Loop to</string>
+    <string>Insert pulse</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="label_4">
+  <widget class="QGroupBox" name="gbInsertPulse">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>190</y>
-     <width>171</width>
-     <height>26</height>
+     <x>8</x>
+     <y>162</y>
+     <width>441</width>
+     <height>431</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Number of cycles</string>
+   <property name="title">
+    <string>Insert pulse parameters</string>
    </property>
+   <widget class="QLabel" name="label_21">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>225</y>
+      <width>86</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pulse width</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_22">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>250</y>
+      <width>111</width>
+      <height>36</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ramp up number of steps</string>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_23">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>295</y>
+      <width>111</width>
+      <height>36</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ramp down number of steps</string>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_24">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>335</y>
+      <width>111</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ramp step size</string>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lePulseWidth">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>225</y>
+      <width>113</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1000</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leRampUp">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>260</y>
+      <width>113</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>10</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leRampDwn">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>305</y>
+      <width>113</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>10</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leRampStepSize">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>340</y>
+      <width>113</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>10</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_25">
+    <property name="geometry">
+     <rect>
+      <x>315</x>
+      <y>230</y>
+      <width>86</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clock cycles</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_26">
+    <property name="geometry">
+     <rect>
+      <x>315</x>
+      <y>340</y>
+      <width>86</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clock cycles</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbInsertRamp">
+    <property name="geometry">
+     <rect>
+      <x>297</x>
+      <y>385</y>
+      <width>131</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Generate pulse</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_27">
+    <property name="geometry">
+     <rect>
+      <x>25</x>
+      <y>25</y>
+      <width>396</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>This function will generate the time points needed to make a voltage pulse on the DC bias channel number selected. If you are inserting this between existing time points in a sequence then there must be adequate space or an error will be reported.</string>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_28">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>120</y>
+      <width>106</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>DC bias channel </string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_29">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>145</y>
+      <width>141</width>
+      <height>66</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pulse voltage, note the currrect time point value will define the resting voltage</string>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lePulseChannel">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>120</y>
+      <width>113</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>1</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lePulseVoltage">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>165</y>
+      <width>113</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>100</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_30">
+    <property name="geometry">
+     <rect>
+      <x>315</x>
+      <y>170</y>
+      <width>86</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Volts</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbInsertCancel">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>386</y>
+      <width>131</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Cancel</string>
+    </property>
+   </widget>
+   <zorder>label_21</zorder>
+   <zorder>label_22</zorder>
+   <zorder>label_23</zorder>
+   <zorder>label_24</zorder>
+   <zorder>lePulseWidth</zorder>
+   <zorder>leRampUp</zorder>
+   <zorder>leRampDwn</zorder>
+   <zorder>leRampStepSize</zorder>
+   <zorder>label_25</zorder>
+   <zorder>label_26</zorder>
+   <zorder>pbInsertRamp</zorder>
+   <zorder>label_28</zorder>
+   <zorder>label_29</zorder>
+   <zorder>lePulseChannel</zorder>
+   <zorder>lePulseVoltage</zorder>
+   <zorder>label_30</zorder>
+   <zorder>label_27</zorder>
+   <zorder>pbInsertCancel</zorder>
   </widget>
-  <widget class="QLineEdit" name="leCycles">
-   <property name="geometry">
-    <rect>
-     <x>400</x>
-     <y>195</y>
-     <width>51</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>Number of times to loop</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="comboLoop">
-   <property name="geometry">
-    <rect>
-     <x>115</x>
-     <y>190</y>
-     <width>106</width>
-     <height>26</height>
-    </rect>
-   </property>
-   <property name="toolTip">
-    <string>Point to loop back to</string>
-   </property>
-  </widget>
+  <zorder>gbDigitalOut</zorder>
+  <zorder>gbDCbias</zorder>
+  <zorder>gbCurrentPoint</zorder>
+  <zorder>pbNext</zorder>
+  <zorder>pbInsert</zorder>
+  <zorder>pbDelete</zorder>
+  <zorder>pbPrevious</zorder>
+  <zorder>frmLoop</zorder>
+  <zorder>pbInsertPulse</zorder>
+  <zorder>gbInsertPulse</zorder>
  </widget>
  <resources/>
  <connections/>

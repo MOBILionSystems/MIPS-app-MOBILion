@@ -21,9 +21,11 @@ public:
     ~Grid();
     virtual void reject();
 //    bool ConfigurationCheck(void);
-//    void Save(QString Filename);
-//    void Load(QString Filename);
+    void Save(QString Filename);
+    void Load(QString Filename);
     void Update(void);
+    void PulseSeqVarUpdate(void);
+    QString GenerateTable(void);
 
 private:
     Ui::Grid *ui;
@@ -31,6 +33,16 @@ private:
     Comms *comms;
     bool Updating;
     bool UpdateOff;
+    QTime time;
+    // Pulse sequence variables
+    float Tp;
+    float Ts1;
+    float Ts2;
+    int   n;
+    float Tdn[20];
+    int   Repeat[20];
+    int   SeqRepeat;
+    QString Table;
 
 private slots:
     void Updated(void);
@@ -39,7 +51,17 @@ private slots:
     void Shutdown(void);
     void AutoTune(void);
     void AutoRetune(void);
-
+    void SetYmax(void);
+    void SetYmin(void);
+    void ResetPlot(void);
+    void YautoScale(void);
+    void ModeChange(void);
+    // Pluse sequence slots
+    void PulseSeqVarChange(void);
+    void PulseSeqNselect(void);
+    void Download(void);
+    void ShowTable(void);
+    void StartTable(void);
 };
 
 #endif // GRID_H

@@ -2,6 +2,7 @@
 
 class pseDialog;
 class psgPoint;
+class psviewer;
 
 PSG::PSG(Ui::MIPS *w, Comms *c)
 {
@@ -39,6 +40,7 @@ PSG::PSG(Ui::MIPS *w, Comms *c)
    connect(pui->pbWrite, SIGNAL(pressed()), this, SLOT(on_pbWrite_pressed()));
    connect(pui->leSequenceNumber, SIGNAL(editingFinished()), this, SLOT(on_leSequenceNumber_textEdited()));
    connect(pui->chkAutoAdvance, SIGNAL(clicked()), this, SLOT(on_chkAutoAdvance_clicked()));
+   connect(pui->pbVisPulseSequence, SIGNAL(pressed()), this, SLOT(on_pbVisPulseSequence_pressed()));
 }
 
 void PSG::Load(void)
@@ -69,7 +71,7 @@ QString PSG::BuildTableCommand(QList<psgPoint*> P)
 {
     QString sTable;
     QString TableName;
-    int i,j,Count;
+    int i,j,Count,TimePointOffset=0;
     bool NoChange;
 
     sTable = "";
@@ -86,10 +88,10 @@ QString PSG::BuildTableCommand(QList<psgPoint*> P)
             {
                 // Here if this time point is referenced so set it up
                 sTable += "0:[" + TableName;
-                sTable += ":" + QString::number(Count) + "," + QString::number(P[i]->TimePoint);
-                TableName = QString::number((int)TableName.mid(1,1).toStdString().c_str()[0] + 1);
+                sTable += ":" + QString::number(Count) + "," + QString::number(P[i]->TimePoint - TimePointOffset);
+                TableName = TableName[0].unicode() + 1;
             }
-            else sTable += QString::number(P[i]->TimePoint);
+            else sTable += QString::number(P[i]->TimePoint - TimePointOffset);
             for(j = 0; j < 16; j++)
             {
                 if(P[0]->DCbias[j] != 0)
@@ -121,36 +123,43 @@ QString PSG::BuildTableCommand(QList<psgPoint*> P)
             if (Count >= 0)
             {
                 // Here if this time point is referenced so set it up
-                sTable += "," + QString::number(P[i]->TimePoint) + ":[" + TableName + ":";
+                sTable += "," + QString::number(P[i]->TimePoint - TimePointOffset) + ":[" + TableName + ":";
                 sTable += QString::number(Count) + ",0";
-                TableName = QString::number((int)TableName.mid(1,1).toStdString().c_str()[0] + 1);
+                TableName = TableName[0].unicode() + 1;
+                TimePointOffset = P[i]->TimePoint;
             }
-                else sTable += "," + QString::number(P[i]->TimePoint);
-                for(j = 0; j < 16; j++)
+            else sTable += "," + QString::number(P[i]->TimePoint - TimePointOffset);
+            for(j = 0; j < 16; j++)
+            {
+                if(P[i]->DCbias[j] != P[i - 1]->DCbias[j])
                 {
-                    if(P[i]->DCbias[j] != P[i - 1]->DCbias[j])
-                    {
-                        sTable += ":" + QString::number(j + 1) + ":" + QString::number(P[i]->DCbias[j]);
-                        NoChange = false;
-                    }
-                }
-                for(j = 0; j < 16; j++)
-                {
-                    if(P[i]->DigitalO[j] != P[i - 1]->DigitalO[j])
-                    {
-                        if (P[i]->DigitalO[j]) sTable += ":" + QString((int)'A' + j) + ":1";
-                        else sTable += ":" + QString((int)'A' + j) + ":0";
-                    }
+                    QString textV;
+                    textV.sprintf("%.3f", P[i]->DCbias[j]);
+                    sTable += ":" + QString::number(j + 1) + ":" + textV;
                     NoChange = false;
                 }
-                // If nothing changed then update DO A, something has to be defined at this time point
-                if(NoChange)
-                {
-                    if(P[i]->DigitalO[0]) sTable += ":A:1";
-                    else sTable += ":A:0";
-                }
-                if(P[i]->Loop) sTable += "]";
             }
+            for(j = 0; j < 16; j++)
+            {
+                if(P[i]->DigitalO[j] != P[i - 1]->DigitalO[j])
+                {
+                    if (P[i]->DigitalO[j]) sTable += ":" + QString((int)'A' + j) + ":1";
+                    else sTable += ":" + QString((int)'A' + j) + ":0";
+                    NoChange = false;
+                }
+            }
+            // If nothing changed then update DO A, something has to be defined at this time point
+            if(NoChange)
+            {
+                if(P[i]->DigitalO[0]) sTable += ":A:1";
+                else sTable += ":A:0";
+            }
+            if(P[i]->Loop)
+            {
+                sTable += "]";
+                if(i > 0) TimePointOffset = P[i]->TimePoint;
+            }
+        }
     }
     sTable = "STBLDAT;" + sTable + ";";
     return sTable;
@@ -161,9 +170,9 @@ void PSG::Update(void)
     pui->tabMIPS->setEnabled(false);
     pui->statusBar->showMessage(tr("Updating Pulse Sequence Generation controls..."));
 
-    if(comms->SendMessage("GTBLADV\n").contains("ON")) pui->chkAutoAdvance->setChecked(true);
+    if(comms->SendMess("GTBLADV\n").contains("ON")) pui->chkAutoAdvance->setChecked(true);
     else pui->chkAutoAdvance->setChecked(false);
-    pui->leSequenceNumber->setText(comms->SendMessage("GTBLNUM\n"));
+    pui->leSequenceNumber->setText(comms->SendMess("GTBLNUM\n"));
 
     pui->tabMIPS->setEnabled(true);
     pui->statusBar->showMessage(tr(""));
@@ -200,7 +209,7 @@ void PSG::on_pbDownload_pressed(void)
 
 void PSG::on_pbViewTable_pressed()
 {
-    QString table;
+    QString table,dtable;
     QList<psgPoint> P;
 
     pui->pbViewTable->setDown(false);
@@ -213,6 +222,16 @@ void PSG::on_pbViewTable_pressed()
     }
 
     table = BuildTableCommand(psg);
+    if(table.count()>60)
+    {
+        dtable = "";
+        for(int i=0; i<table.count(); i+= 60)
+        {
+            dtable += table.mid(i,60);
+            dtable += "\n";
+        }
+        table = dtable;
+    }
     QMessageBox msgBox;
     msgBox.setText(table);
     msgBox.exec();
@@ -322,10 +341,25 @@ void PSG::on_pbTrigger_pressed()
 
 void PSG::on_pbRead_pressed()
 {
-    pui->leValue->setText(comms->SendMessage("GTBLVLT," + pui->leTimePoint->text() + "," + pui->leChannel->text() + "\n"));
+    pui->leValue->setText(comms->SendMess("GTBLVLT," + pui->leTimePoint->text() + "," + pui->leChannel->text() + "\n"));
 }
 
 void PSG::on_pbWrite_pressed()
 {
     comms->SendCommand("STBLVLT," + pui->leTimePoint->text() + "," + pui->leChannel->text() + "," + pui->leValue->text() + "\n");
 }
+
+void PSG::on_pbVisPulseSequence_pressed()
+{
+    pui->pbVisPulseSequence->setDown(false);
+    if(psg.size() == 0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("There is no Pulse Sequence to visualize!");
+        msgBox.exec();
+        return;
+    }
+    psv = new psviewer(&psg);
+    psv->show();
+}
+

@@ -57,7 +57,7 @@ void DCbias::Update(void)
 //    dui->statusBar->showMessage(tr("Updating DC bias controls..."));
      // Read the number of channels and enable the proper controls
     dui->leGCHAN_DCB->setText(QString::number(NumChannels));
-    res = comms->SendMessage("GDCPWR\n");
+    res = comms->SendMess("GDCPWR\n");
     if(res == "ON") dui->chkPowerEnable->setChecked(true);
     else  dui->chkPowerEnable->setChecked(false);
     QObjectList widgetList = dui->gbDCbias1->children();
@@ -68,7 +68,7 @@ void DCbias::Update(void)
             if(!((QLineEdit *)w)->hasFocus())
             {
                res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-               ((QLineEdit *)w)->setText(comms->SendMessage(res));
+               ((QLineEdit *)w)->setText(comms->SendMess(res));
             }
        }
     }
@@ -85,7 +85,7 @@ void DCbias::Update(void)
                if(!((QLineEdit *)w)->hasFocus())
                {
                   res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-                  ((QLineEdit *)w)->setText(comms->SendMessage(res));
+                  ((QLineEdit *)w)->setText(comms->SendMess(res));
                }
            }
         }
@@ -103,7 +103,7 @@ void DCbias::Update(void)
                if(!((QLineEdit *)w)->hasFocus())
                {
                   res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-                  ((QLineEdit *)w)->setText(comms->SendMessage(res));
+                  ((QLineEdit *)w)->setText(comms->SendMess(res));
                }
            }
         }

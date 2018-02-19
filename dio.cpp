@@ -46,13 +46,13 @@ void DIO::Update(void)
        if(w->objectName().contains("chk"))
        {
             res = "G" + w->objectName().mid(4).replace("_",",") + "\n";
-            if(comms->SendMessage(res).toInt()==1) ((QCheckBox *)w)->setChecked(true);
+            if(comms->SendMess(res).toInt()==1) ((QCheckBox *)w)->setChecked(true);
             else ((QCheckBox *)w)->setChecked(false);
        }
        if(w->objectName().contains("le"))
        {
             res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-            ((QLineEdit *)w)->setText(comms->SendMessage(res));
+            ((QLineEdit *)w)->setText(comms->SendMess(res));
        }
     }
     widgetList = dui->gbDigitalIn->children();
@@ -61,7 +61,7 @@ void DIO::Update(void)
        if(w->objectName().contains("chk"))
        {
             res = "G" + w->objectName().mid(4).replace("_",",") + "\n";
-            if(comms->SendMessage(res).toInt()==1) ((QCheckBox *)w)->setChecked(true);
+            if(comms->SendMess(res).toInt()==1) ((QCheckBox *)w)->setChecked(true);
             else ((QCheckBox *)w)->setChecked(false);
        }
     }

@@ -74,6 +74,27 @@
 // 1.14, July 24, 2017
 //      1.) Added a number of host interface commands to allow sending and receiving files
 //          to SD card as well as sending and receiving EEPROM module configureation data.
+// 1.15, August 22, 2017
+//      1.) Added the ramp up and down pulse generation to the sequence generator
+//      2.) Fixed a few minor bugs
+//      3.) Fixed bug in loop timepoint calcualtation for sequence generator
+// 1.16, November 21, 2017
+//      1.) Updated the grid fragmentor and added the plotting capability
+//      2.) Added the softlanding control panel
+// 1.17, November 25, 2017
+//      1.) Added the pulse sequence generator to the gid control panel
+// 1.18, December 12, 2017
+//      1.) Added ADC tab and data collection capability
+//      2.) Updated grid pse
+// 1.19, December 27, 2017
+//      1.) Updated the pulse sequence generator in the Grid control panel as follows:
+//             - Enabled Ts1 set to zero to stop the pulse
+//             - When pulses are stopped the outputs are now driven high
+// 1.20, January 1, 2018
+//      1.) Inverted the shutter signals in the Grid pulse sequence generator
+//      2.) Added the Ts1=Ts2 and Ts2=Ts1 check boxes
+// 1.21, February 18, 2018
+//      1.) Added scripting capability to Purdue softlanding control panel
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -94,7 +115,10 @@
 #include "Filament.h"
 #include "singlefunnel.h"
 #include "softlanding.h"
+#include "softlanding2.h"
 #include "grid.h"
+#include "arbwaveformedit.h"
+#include "adc.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
@@ -139,10 +163,14 @@ MIPS::MIPS(QWidget *parent) :
     ui->lblMIPSconnectionNotes->setFont(font);
     #endif
 
+    // qDebug() << QT_VERSION_STR;
+
     sf = NULL;
     sf_deleteRequest = false;
     sl = NULL;
     sl_deleteRequest = false;
+    sl2 = NULL;
+    sl2_deleteRequest = false;
     grid = NULL;
     grid_deleteRequest = false;
     appPath = QApplication::applicationDirPath();
@@ -161,6 +189,7 @@ MIPS::MIPS(QWidget *parent) :
     arb = new ARB(ui, comms);
     faims = new FAIMS(ui, comms);
     filament = new Filament(ui, comms);
+    adc = new ADC(ui, comms);
 
     RepeatMessage = "";
     ui->actionClear->setEnabled(true);
@@ -173,12 +202,15 @@ MIPS::MIPS(QWidget *parent) :
     ui->actionSet_bootloader_boot_flag->setEnabled(true);
     ui->actionSingle_Funnel->setEnabled(true);
     ui->actionSoft_landing->setEnabled(true);
+    ui->actionSoft_landing_Purdue->setEnabled(true);
     ui->actionGrid->setEnabled(true);
     ui->actionMessage_repeat->setEnabled(true);
     ui->actionGet_file_from_MIPS->setEnabled(true);
     ui->actionSend_file_to_MIPS->setEnabled(true);
     ui->actionRead_EEPROM->setEnabled(true);
     ui->actionWrite_EEPROM->setEnabled(true);
+    ui->actionRead_ARB_FLASH->setEnabled(true);
+    ui->actionWrite_ARB_FLASH->setEnabled(true);
     ui->menuTerminal->setEnabled(false);
 
   //   connect(app, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(setWidgets(QWidget*, QWidget*)));    connect(ui->actionClear, SIGNAL(triggered()), console, SLOT(clear()));
@@ -196,12 +228,15 @@ MIPS::MIPS(QWidget *parent) :
     connect(ui->actionClear, SIGNAL(triggered()), this, SLOT(clearConsole()));
     connect(ui->actionSingle_Funnel, SIGNAL(triggered()), this, SLOT(Single_Funnel()));
     connect(ui->actionSoft_landing, SIGNAL(triggered()), this, SLOT(Soft_Landing()));
+    connect(ui->actionSoft_landing_Purdue, SIGNAL(triggered()), this, SLOT(Soft_Landing_Purdue()));
     connect(ui->actionGrid, SIGNAL(triggered()), this, SLOT(Grid_system()));
     connect(ui->actionMessage_repeat, SIGNAL(triggered()), this, SLOT(GetRepeatMessage()));
     connect(ui->actionGet_file_from_MIPS, SIGNAL(triggered()), this, SLOT(GetFileFromMIPS()));
     connect(ui->actionSend_file_to_MIPS, SIGNAL(triggered()), this, SLOT(PutFiletoMIPS()));
     connect(ui->actionRead_EEPROM, SIGNAL(triggered()), this, SLOT(ReadEEPROM()));
     connect(ui->actionWrite_EEPROM, SIGNAL(triggered()), this, SLOT(WriteEEPROM()));
+    connect(ui->actionRead_ARB_FLASH, SIGNAL(triggered()), this, SLOT(ReadARBFLASH()));
+    connect(ui->actionWrite_ARB_FLASH, SIGNAL(triggered()), this, SLOT(WriteARBFLASH()));
 
     ui->comboMIPSnetNames->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
     // Sets the polling loop interval and starts the timer
@@ -219,6 +254,7 @@ MIPS::~MIPS()
 void MIPS::closeEvent(QCloseEvent *event)
 {
     if(sl != NULL) delete sl;
+    if(sl2 != NULL) delete sl2;
     if(sf != NULL) delete sf;
     if(grid != NULL) delete grid;
     delete settings;
@@ -328,6 +364,11 @@ void MIPS::GeneralHelp(void)
         help->SetTitle("Soft Landing Help");
         help->LoadHelpText(":/SoftLandingHelp.txt");
     }
+    if(sl2 != NULL)
+    {
+        help->SetTitle("Soft Landing Help");
+        help->LoadHelpText(":/SoftLandingHelp2.txt");
+    }
     if(sf != NULL)
     {
         help->SetTitle("Single Funnel Help");
@@ -353,10 +394,22 @@ void MIPS::loadSettings(void)
         sl->Load(fileName);
         return;
     }
+    if(sl2 != NULL)
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
+        sl2->Load(fileName);
+        return;
+    }
     if(sf != NULL)
     {
         QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
         sf->Load(fileName);
+        return;
+    }
+    if(grid != NULL)
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
+        grid->Load(fileName);
         return;
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "System")
@@ -412,10 +465,22 @@ void MIPS::saveSettings(void)
         sl->Save(fileName);
         return;
     }
+    if(sl2 != NULL)
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
+        sl2->Save(fileName);
+        return;
+    }
     if(sf != NULL)
     {
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
-        sl->Save(fileName);
+        sf->Save(fileName);
+        return;
+    }
+    if(grid != NULL)
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
+        grid->Save(fileName);
         return;
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "System")
@@ -517,6 +582,14 @@ void MIPS::pollLoop(void)
     }
     if(sl != NULL) if(comms->isConnected()) sl->Update();
 
+    if(sl2_deleteRequest)
+    {
+      delete sl2;
+      sl2 = NULL;
+      sl2_deleteRequest = false;
+    }
+    if(sl2 != NULL) if(comms->isConnected()) sl2->Update();
+
     if(grid_deleteRequest)
     {
       delete grid;
@@ -552,20 +625,19 @@ void MIPS::MIPSsetup(void)
     QString res;
 
     pgm->comms = comms;
-    qDebug() << comms->MIPSname;
     ui->lblMIPSconfig->setText("MIPS: ");
-    res = comms->SendMessage("GVER\n");
+    res = comms->SendMess("GVER\n");
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + res);
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\nModules present:");
 
-    res = comms->SendMessage("GCHAN,RF\n");
+    res = comms->SendMess("GCHAN,RF\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 RF driver\n");
     if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 RF drivers\n");
     rfdriver->SetNumberOfChannels(res.toInt());
     if(res.contains("0")) RemoveTab("RFdriver");
     else AddTab("RFdriver");
 
-    res = comms->SendMessage("GCHAN,DCB\n");
+    res = comms->SendMess("GCHAN,DCB\n");
     if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 DC bias (8 output channels)\n");
     if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 DC bias (16 output channels)\n");
     if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 DC bias (16 output channels)\n");
@@ -574,13 +646,13 @@ void MIPS::MIPSsetup(void)
     if(res.contains("0")) RemoveTab("DCbias");
     else AddTab("DCbias");
 
-    res = comms->SendMessage("GCHAN,TWAVE\n");
+    res = comms->SendMess("GCHAN,TWAVE\n");
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 TWAVE module\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 TWAVE modules\n");
     if(res.contains("0")) RemoveTab("Twave");
     else AddTab("Twave");
 
-    res = comms->SendMessage("GCHAN,ARB\n");
+    res = comms->SendMess("GCHAN,ARB\n");
     if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() +  "\n   1 ARB module\n");
     if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ARB modules\n");
     if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 ARB modules\n");
@@ -589,17 +661,17 @@ void MIPS::MIPSsetup(void)
     else AddTab("ARB");
     arb->SetNumberOfChannels(res.toInt());
 
-    res = comms->SendMessage("GCHAN,FAIMS\n");
+    res = comms->SendMess("GCHAN,FAIMS\n");
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   FAIMS module\n");
     if(res.contains("0")) RemoveTab("FAIMS");
     else AddTab("FAIMS");
 
-    res = comms->SendMessage("GCHAN,ESI\n");
+    res = comms->SendMess("GCHAN,ESI\n");
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI module, rev 3\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI module\n");
     if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ESI modules\n");
 
-    res = comms->SendMessage("GCHAN,FIL\n");
+    res = comms->SendMess("GCHAN,FIL\n");
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 Filament module\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 Filament modules\n");
     if(res.contains("0")) RemoveTab("Filament");
@@ -659,8 +731,8 @@ void MIPS::FindAllMIPSsystems(void)
         {
             QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
             cp = new Comms(settings,"",ui->statusBar);
-            if(cp->isMIPS(settings->getPortName(j)))
             cp->host = ui->comboMIPSnetNames->itemText(j);
+            if(cp->isMIPS(settings->getPortName(j)))
             if(cp->ConnectToMIPS())
             {
                Systems << (cp);
@@ -691,7 +763,6 @@ void MIPS::FindAllMIPSsystems(void)
     for(int j=0;j<Systems.count();j++)
     {
         ui->comboSystems->addItem(Systems.at(j)->MIPSname);
-        qDebug() << Systems.at(j)->MIPSname;
     }
     if(ui->comboSystems->count() > 1)
     {
@@ -782,6 +853,11 @@ void MIPS::tabSelected()
         LastTab = "System";
         settings->fillPortsInfo();
     }
+    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "ADC")
+    {
+        LastTab = "ADC";
+        adc->Update(true);
+    }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
     {
         ui->menuTerminal->setEnabled(true);
@@ -864,6 +940,7 @@ void MIPS::Single_Funnel(void)
 {
    if(sf != NULL) return;
    if(sl != NULL) return;
+   if(sl2 != NULL) return;
    if(grid != NULL) return;
    ui->tabMIPS->setCurrentIndex(0);
    sf = new SingleFunnel(0,comms,ui->statusBar);
@@ -887,6 +964,7 @@ void MIPS::Soft_Landing(void)
 {
     if(sf != NULL) return;
     if(sl != NULL) return;
+    if(sl2 != NULL) return;
     if(grid != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
     sl = new SoftLanding(0,comms,ui->statusBar);
@@ -901,6 +979,30 @@ void MIPS::Soft_Landing(void)
     sl->Update();
 }
 
+void MIPS::CloseSoftLanding2(void)
+{
+   sl2_deleteRequest = true;
+}
+
+void MIPS::Soft_Landing_Purdue(void)
+{
+    if(sf != NULL) return;
+    if(sl != NULL) return;
+    if(sl2 != NULL) return;
+    if(grid != NULL) return;
+    ui->tabMIPS->setCurrentIndex(0);
+    sl2 = new SoftLanding2(0,comms,ui->statusBar);
+    if(!sl2->ConfigurationCheck())
+    {
+        delete sl2;
+        sl2 = NULL;
+        return;
+    }
+    sl2->show();
+    connect(sl2, SIGNAL(DialogClosed()), this, SLOT(CloseSoftLanding2()));
+    sl2->Update();
+}
+
 void MIPS::CloseGridSystem(void)
 {
    grid_deleteRequest = true;
@@ -910,6 +1012,7 @@ void MIPS::Grid_system(void)
 {
     if(sf != NULL) return;
     if(sl != NULL) return;
+    if(sl2 != NULL) return;
     if(grid != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
     grid = new Grid(0,comms,ui->statusBar);
@@ -1049,6 +1152,38 @@ void MIPS::WriteEEPROM(void)
                 connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
                 readData2Console();
             }
+        }
+    }
+}
+
+void MIPS::ReadARBFLASH(void)
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save to File"),"",tr("All files (*.*)"));
+    if(fileName != "")
+    {
+        // Read the data from MIPS
+        if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
+        comms->GetARBFLASH(fileName);
+        if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
+        {
+            connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
+            readData2Console();
+        }
+    }
+}
+
+void MIPS::WriteARBFLASH(void)
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("File to MIPS"),tr("All files (*)", 0));
+    if(fileName != "")
+    {
+        // Read the data from MIPS
+        if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
+        comms->PutARBFLASH(fileName);
+        if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
+        {
+            connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
+            readData2Console();
         }
     }
 }

@@ -11,14 +11,14 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MIPS, Version 1.14 July 24, 2017</string>
+   <string>MIPS, Version 1.21 February 18, 2018</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QTabWidget" name="tabMIPS">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>10</y>
+      <y>0</y>
       <width>796</width>
       <height>586</height>
      </rect>
@@ -259,6 +259,191 @@ Please note, the Program MIPS function will only work with a single serial conne
      <attribute name="title">
       <string>Terminal</string>
      </attribute>
+    </widget>
+    <widget class="QWidget" name="ADC">
+     <attribute name="title">
+      <string>ADC</string>
+     </attribute>
+     <widget class="QCustomPlot" name="ADCdata" native="true">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>30</y>
+        <width>551</width>
+        <height>386</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="gbADCdigitizer">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>211</width>
+        <height>231</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>ADC digitizer</string>
+      </property>
+      <widget class="QLabel" name="label_194">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>61</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Channel</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leSADCCHAN">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>40</y>
+         <width>101</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leSADCRATE">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>70</y>
+         <width>101</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_195">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>100</y>
+         <width>61</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Samples</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_196">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>130</y>
+         <width>61</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Vectors</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_197">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>61</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Rate</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leSADCSAMPS">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>100</y>
+         <width>101</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leSADCVECTS">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>130</y>
+         <width>101</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pbADCinit">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>160</y>
+         <width>101</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>ADC setup</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pbADCtrigger">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>160</y>
+         <width>101</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>ADC trigger</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pbADCabort">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>190</y>
+         <width>201</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>ADC abort</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QCheckBox" name="chkADCzoomX">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>360</y>
+        <width>161</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Zoom and drag X axis</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="chkADCzoomY">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>330</y>
+        <width>161</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Zoom and drag Y axis</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="DigitalIO">
      <attribute name="title">
@@ -2943,7 +3128,7 @@ enabled</string>
          <property name="geometry">
           <rect>
            <x>275</x>
-           <y>50</y>
+           <y>35</y>
            <width>206</width>
            <height>126</height>
           </rect>
@@ -3032,6 +3217,19 @@ enabled</string>
            <string>V</string>
           </property>
          </widget>
+        </widget>
+        <widget class="QPushButton" name="pbEditARBwf">
+         <property name="geometry">
+          <rect>
+           <x>300</x>
+           <y>180</y>
+           <width>146</width>
+           <height>32</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Edit ARB Waveform</string>
+         </property>
         </widget>
        </widget>
        <widget class="QGroupBox" name="gbARBcompressor">
@@ -5471,7 +5669,7 @@ enabled</string>
         <x>190</x>
         <y>95</y>
         <width>411</width>
-        <height>256</height>
+        <height>311</height>
        </rect>
       </property>
       <property name="title">
@@ -5481,7 +5679,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>65</x>
-         <y>65</y>
+         <y>45</y>
          <width>151</width>
          <height>26</height>
         </rect>
@@ -5494,7 +5692,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>65</x>
-         <y>100</y>
+         <y>80</y>
          <width>126</width>
          <height>26</height>
         </rect>
@@ -5507,7 +5705,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>65</x>
-         <y>135</y>
+         <y>115</y>
          <width>176</width>
          <height>26</height>
         </rect>
@@ -5520,7 +5718,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>65</x>
-         <y>170</y>
+         <y>150</y>
          <width>171</width>
          <height>26</height>
         </rect>
@@ -5533,7 +5731,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>240</x>
-         <y>70</y>
+         <y>50</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -5543,7 +5741,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>240</x>
-         <y>105</y>
+         <y>85</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -5553,7 +5751,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>240</x>
-         <y>140</y>
+         <y>120</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -5566,7 +5764,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>240</x>
-         <y>175</y>
+         <y>155</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -5579,7 +5777,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>240</x>
-         <y>210</y>
+         <y>190</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -5592,13 +5790,39 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>65</x>
-         <y>205</y>
+         <y>185</y>
          <width>171</width>
          <height>26</height>
         </rect>
        </property>
        <property name="text">
         <string>Power, watts</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pbAutoTune">
+       <property name="geometry">
+        <rect>
+         <x>45</x>
+         <y>250</y>
+         <width>113</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Auto Tune</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pbAutoRetune">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>250</y>
+         <width>113</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Auto Re-tune</string>
        </property>
       </widget>
      </widget>
@@ -6770,7 +6994,7 @@ enabled</string>
        <rect>
         <x>15</x>
         <y>410</y>
-        <width>200</width>
+        <width>161</width>
         <height>32</height>
        </rect>
       </property>
@@ -6784,9 +7008,9 @@ enabled</string>
      <widget class="QPushButton" name="pbViewTable">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>190</x>
         <y>410</y>
-        <width>211</width>
+        <width>191</width>
         <height>32</height>
        </rect>
       </property>
@@ -6797,9 +7021,9 @@ enabled</string>
      <widget class="QPushButton" name="pbTrigger">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>609</x>
         <y>410</y>
-        <width>200</width>
+        <width>161</width>
         <height>32</height>
        </rect>
       </property>
@@ -6976,6 +7200,19 @@ number on each trigger</string>
        </property>
       </widget>
      </widget>
+     <widget class="QPushButton" name="pbVisPulseSequence">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>410</y>
+        <width>191</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Visualize pulse sequence</string>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
@@ -7009,6 +7246,9 @@ number on each trigger</string>
     <addaction name="separator"/>
     <addaction name="actionRead_EEPROM"/>
     <addaction name="actionWrite_EEPROM"/>
+    <addaction name="separator"/>
+    <addaction name="actionRead_ARB_FLASH"/>
+    <addaction name="actionWrite_ARB_FLASH"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -7028,6 +7268,7 @@ number on each trigger</string>
     <addaction name="actionSingle_Funnel"/>
     <addaction name="actionSoft_landing"/>
     <addaction name="actionGrid"/>
+    <addaction name="actionSoft_landing_Purdue"/>
    </widget>
    <addaction name="menuAbout"/>
    <addaction name="menuFile"/>
@@ -7095,7 +7336,7 @@ number on each trigger</string>
   </action>
   <action name="actionSoft_landing">
    <property name="text">
-    <string>Soft landing</string>
+    <string>Soft landing PNNL</string>
    </property>
   </action>
   <action name="actionGrid">
@@ -7128,8 +7369,31 @@ number on each trigger</string>
     <string>Write EEPROM</string>
    </property>
   </action>
+  <action name="actionSoft_landing_Purdue">
+   <property name="text">
+    <string>Soft landing Purdue</string>
+   </property>
+  </action>
+  <action name="actionRead_ARB_FLASH">
+   <property name="text">
+    <string>Read ARB FLASH</string>
+   </property>
+  </action>
+  <action name="actionWrite_ARB_FLASH">
+   <property name="text">
+    <string>Write ARB FLASH</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header location="global">qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>pbConfigure</tabstop>
   <tabstop>pbDisconnect</tabstop>

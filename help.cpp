@@ -32,7 +32,7 @@ void Help::SetTitle(QString title)
     QWidget::setWindowTitle (title);
 }
 
-void Help::LoadString(QString DisplayText)
+void Help::LoadStr(QString DisplayText)
 {
     ui->plainTextEdit->setPlainText(DisplayText);
 }

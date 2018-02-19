@@ -216,25 +216,23 @@ void Twave::Update(void)
        if(w->objectName().contains("le"))
        {
             res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-            qDebug() << res;
-            ((QLineEdit *)w)->setText(comms->SendMessage(res));
-            qDebug() << ((QLineEdit *)w)->text();
+            ((QLineEdit *)w)->setText(comms->SendMess(res));
             comms->rb.waitforline(1);
             res = comms->rb.getline();
        }
     }
-    res = comms->SendMessage("GTWDIR,1\n");
+    res = comms->SendMess("GTWDIR,1\n");
     if(res == "FWD") tui->rbSTWDIR_1_FWD->setChecked(true);
     if(res == "REV") tui->rbSTWDIR_1_REV->setChecked(true);
-    res = comms->SendMessage("GTWDIR,2\n");
+    res = comms->SendMess("GTWDIR,2\n");
     if(res == "FWD") tui->rbSTWDIR_2_FWD->setChecked(true);
     if(res == "REV") tui->rbSTWDIR_2_REV->setChecked(true);
     if(Compressor)
     {
-        res = comms->SendMessage("GTWCMODE\n");
+        res = comms->SendMess("GTWCMODE\n");
         if(res == "Normal") tui->rbSTWCMODE_NORMAL->setChecked(true);
         if(res == "Compress") tui->rbSTWCMODE_COMPRESS->setChecked(true);
-        res = comms->SendMessage("GTWCSW\n");
+        res = comms->SendMess("GTWCSW\n");
         if(res == "Open") tui->rbSTWCSW_OPEN->setChecked(true);
         if(res == "Close") tui->rbSTWCSW_CLOSE->setChecked(true);
     }

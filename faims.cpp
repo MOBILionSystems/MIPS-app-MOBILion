@@ -56,7 +56,7 @@ void FAIMS::Update(void)
             if(!((QLineEdit *)w)->hasFocus())
             {
                res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-               ((QLineEdit *)w)->setText(comms->SendMessage(res));
+               ((QLineEdit *)w)->setText(comms->SendMess(res));
             }
        }
     }

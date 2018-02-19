@@ -31,8 +31,11 @@ class ARB;
 class FAIMS;
 class SingleFunnel;
 class SoftLanding;
+class SoftLanding2;
 class Filament;
 class Grid;
+class ARBwaveformEdit;
+class ADC;
 
 class DeleteHighlightedItemWhenShiftDelPressedEventFilter : public QObject
 {
@@ -76,7 +79,9 @@ private slots:
     void Single_Funnel(void);
     void CloseSingleFunnel(void);
     void Soft_Landing(void);
+    void Soft_Landing_Purdue(void);
     void CloseSoftLanding(void);
+    void CloseSoftLanding2(void);
     void Grid_system(void);
     void CloseGridSystem(void);
     void GetRepeatMessage(void);
@@ -85,6 +90,8 @@ private slots:
     void PutFiletoMIPS(void);
     void ReadEEPROM(void);
     void WriteEEPROM(void);
+    void ReadARBFLASH(void);
+    void WriteARBFLASH(void);
 
 private:
     Comms *comms;
@@ -103,9 +110,12 @@ private:
     SingleFunnel *sf;
     bool sf_deleteRequest;
     SoftLanding *sl;
+    SoftLanding2 *sl2;
     bool sl_deleteRequest;
+    bool sl2_deleteRequest;
     Grid *grid;
     bool grid_deleteRequest;
+    ADC *adc;
     QTimer *pollTimer;
     QString  appPath;
     QString RepeatMessage;

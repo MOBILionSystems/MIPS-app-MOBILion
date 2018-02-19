@@ -56,7 +56,7 @@ char RingBuffer::getch(void)
 
     if(count == 0) return(0);
     c = buffer[tail++];
-    if(tail >= SIZE) tail = 0;
+    if(tail >= rbSIZE) tail = 0;
     count--;
     if(c == '\n')
     {
@@ -70,13 +70,13 @@ int RingBuffer::putch(char c)
     if(c == 0x06) return(count);
     if(c == 0x15) return(count);
     if(c == '\r') return(count);        // ignore \r
-    if(count >= SIZE) return(-1);
+    if(count >= rbSIZE) return(-1);
     if(c == '\n')
     {
         lines++;
     }
     buffer[head++] = c;
-    if(head >= SIZE) head = 0;
+    if(head >= rbSIZE) head = 0;
     count++;
     return(count);
 }

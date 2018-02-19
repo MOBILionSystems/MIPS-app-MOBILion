@@ -64,6 +64,9 @@ private slots:
     void on_leCycles_textChanged(const QString &arg1);
     void on_chkLoop_clicked(bool checked);
     void on_comboLoop_currentIndexChanged(const QString &arg1);
+    void InsertPulse(void);
+    void MakeRamp(void);
+    void RampCancel(void);
 
 private:
     Ui::pseDialog *ui;

@@ -1,3 +1,5 @@
+#include <QTime>
+
 #include "comms.h"
 
 Comms::Comms(SettingsDialog *settings, QString Host, QStatusBar *statusbar)
@@ -39,6 +41,118 @@ int Comms::CalculateCRC(QByteArray fdata)
     }
     return crc;
 }
+
+// Reads an ADC vector from MIPS. This function will setup for data from the
+// serial port and then fill the buffer passed by reference if valid. This
+// function does not block. After a vector is received a signal is sent and
+// then the system is reset for the next vector. After all vectors are read
+// the comms are reset to normal command processing
+void Comms::GetADCbuffer(quint16 *ADCbuffer, int NumSamples)
+{
+    if(ADCbuffer == NULL) return;
+    // Save the pointer and maximum length parameters
+    ADCbuf = ADCbuffer;
+    ADClen = NumSamples;
+    ADCstate = WaitingForHeader;
+    // Redirect the input data processing to ADC buffer processing
+    disconnect(&client, SIGNAL(readyRead()), 0, 0);
+    disconnect(serial, SIGNAL(readyRead()), 0, 0);
+    connect(&client, SIGNAL(readyRead()), this, SLOT(readData2ADCBuffer()));
+    connect(serial, SIGNAL(readyRead()), this, SLOT(readData2ADCBuffer()));
+}
+
+// Release the ADC buffer collection mode and return the processing routine
+// for incoming data to the ringbuffers
+void Comms::ADCrelease(void)
+{
+    // Connect the data read signal back to the ring buffers
+    disconnect(&client, SIGNAL(readyRead()), 0, 0);
+    disconnect(serial, SIGNAL(readyRead()), 0, 0);
+    connect(&client, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
+    connect(serial, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
+    ADCbuf = NULL;
+}
+
+void Comms::readData2ADCBuffer(void)
+{
+    int i;
+    QByteArray data;
+    static quint8 last = 0, *b;
+    static int DataPtr;
+    static int Vlength=0,Vnum=0;
+    static bool Vlast;
+
+    if(ADCbuf == NULL) return;
+    if(client.isOpen()) data = client.readAll();
+    if(serial->isOpen()) data = serial->readAll();
+    for(i=0;i<data.size();i++)
+    {
+        switch(ADCstate)
+        {
+           case WaitingForHeader:
+            // look for 0x55, 0xAA. This flags start of data
+            if((last == 0x55) && ((quint8)data[i] == 0xAA))
+            {
+                ADCstate = ReadingHeader;
+                DataPtr =0;
+                b = (quint8 *)&Vlength;
+                continue;
+            }
+            break;
+          case ReadingHeader:
+            // Read, 24 bit length, 16 bit vector num, 8 bit last vector flag 0xFF if last
+            if(DataPtr == 0) b[0] = data[i];
+            if(DataPtr == 1) b[1] = data[i];
+            if(DataPtr == 2) { b[2] = data[i]; b = (quint8 *)&Vnum; }
+            if(DataPtr == 3) b[0] = data[i];
+            if(DataPtr == 4) b[1] = data[i];
+            if(DataPtr == 5)
+            {
+                if((unsigned char)data[i] == 0xFF) Vlast =  true;
+                else Vlast = false;
+            }
+            DataPtr++;
+            if(DataPtr > 5)
+            {
+                DataPtr = 0;
+                ADCstate = ReadingData;
+                b = (quint8 *)ADCbuf;
+                continue;
+            }
+            break;
+          case ReadingData:
+            // Read the data block
+            b[DataPtr++] = data[i];
+            if(DataPtr >= (Vlength * 2))
+            {
+                ADCstate = ReadingTrailer;
+            }
+            break;
+          case ReadingTrailer:
+            // look for 0xAE, 0xEA. This flags end of message
+            if((last == 0xAE) && ((quint8)data[i] == 0xEA))
+            {
+                emit ADCvectorReady();
+                if(Vlast)
+                {
+                    ADCstate = ADCdone;
+                }
+                else ADCstate = WaitingForHeader;
+                if(ADCstate == WaitingForHeader) continue;
+            }
+            if(ADCstate != ADCdone) break;
+          case ADCdone:
+            // ADC done so send signal
+            emit ADCrecordingDone();
+            return;
+          default:
+            last = data[i];
+            break;
+        }
+        last = data[i];
+    }
+}
+
 
 void Comms::GetMIPSfile(QString MIPSfile, QString LocalFile)
 {
@@ -194,9 +308,81 @@ void Comms::GetEEPROM(QString FileName, QString Board, int Addr)
     }
 }
 
-void Comms::PutEEPROM(QString FileName, QString Board, int Addr)
+void Comms::GetARBFLASH(QString FileName)
 {
     bool ok = false;
+    QString FileData;
+
+    if(SendCommand("GETFLASH\n"))
+    {
+       // Now process the data in the ring buffer
+       // First read the length
+        waitforline(500);
+        QString FileSize = getline();
+        // Read the hex data stream
+        waitforline(1000);
+        FileData = getline();
+        if(FileData.count() != 2 * FileSize.toInt())
+        {
+            // Here if file data block is not the proper size
+            QMessageBox::critical(this, tr("File Error"), "Data block size not correct!");
+            return;
+        }
+        // Read the CRC
+        waitforline(500);
+        QString FileCRC = getline();
+        // Convert data to byte array and callculate CRC
+        QByteArray fdata;
+        fdata.resize(FileSize.toInt());
+        for(int i=0; i<FileSize.toInt(); i++)
+        {
+            fdata[i] = FileData.mid(i*2,2).toUInt(&ok,16);
+        }
+        if(CalculateCRC(fdata) == FileCRC.toInt())
+        {
+            // Now save the data to the user selected file
+            QFile file(FileName);
+            file.open(QIODevice::WriteOnly);
+            file.write(fdata);
+            file.close();
+            QMessageBox::information(this, tr("File saved"), "FLASH from ARB read and saved successfully!");
+        }
+        else
+        {
+            // Here with file CRC error, raise error message
+            QMessageBox::critical(this, tr("File Error"), "CRC error!");
+        }
+    }
+}
+
+void Comms::PutARBFLASH(QString FileName)
+{
+    QString FileData;
+    QString dblock;
+    QByteArray fdata;
+
+    if(SendCommand("PUTFLASH\n"))
+    {
+        // open the local file to send and read the data
+        QFile file(FileName);
+        file.open(QIODevice::ReadOnly);
+        fdata = file.readAll();
+        // Convert the data into a ascii hex string
+        for(int i=0; i<file.size(); i++)
+        {
+             dblock += QString().sprintf("%02x",(unsigned char)fdata[i]);
+        }
+        SendString(QString().number(file.size()) + "\n");
+        file.close();
+        // Send the data to ARB
+        SendString(dblock + "\n");
+        SendString(QString().number(CalculateCRC(fdata)) + "\n");
+        QMessageBox::information(this, tr("FLASH write"), "ARB module FLASH Written!");
+    }
+}
+
+void Comms::PutEEPROM(QString FileName, QString Board, int Addr)
+{
     QString FileData;
     QString dblock;
     QByteArray fdata;
@@ -283,6 +469,12 @@ QString Comms::SendMessage(QString name, QString message)
     return "";
 }
 
+QString Comms::SendMess(QString name, QString message)
+{
+    if((name == MIPSname) || (name == "")) return SendMessage(message);
+    return "";
+}
+
 QString Comms::SendMessage(QString message)
 {
     QString res;
@@ -308,6 +500,11 @@ QString Comms::SendMessage(QString message)
     sb->showMessage(res.toStdString().c_str(),2000);
     res = "";
     return res;
+}
+
+QString Comms::SendMess(QString message)
+{
+    return SendMessage(message);
 }
 
 // Open connection to MIPS and read its name.

@@ -32,6 +32,8 @@ private slots:
     void UpdateRFdriver(void);
     void leSRFFRQ_editingFinished();
     void leSRFDRV_editingFinished();
+    void AutoTune(void);
+    void AutoRetune(void);
 };
 
 #endif // RFDRIVER_H

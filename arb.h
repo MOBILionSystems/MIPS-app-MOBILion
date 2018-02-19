@@ -4,6 +4,7 @@
 #include "ui_mips.h"
 #include "mips.h"
 #include "comms.h"
+#include "arbwaveformedit.h"
 
 #include <QtCore/QtGlobal>
 #include <QtSerialPort/QSerialPort>
@@ -14,6 +15,7 @@
 #include <QFileInfo>
 
 class Help;
+class ARBwaveformEdit;
 
 class ARB : public QDialog
 {
@@ -32,6 +34,7 @@ private:
     int NumChannels;
     QString LogString;
     Help *LogedData;
+    ARBwaveformEdit *ARBwfEdit;
     bool Compressor;
 
 private slots:
@@ -51,6 +54,8 @@ private slots:
     void rbTWfwd(void);
     void rbTWrev(void);
     void ARBmoduleSelected(void);
+    void EditARBwaveform(void);
+    void ReadWaveform(void);
     // Compressor
     void rbModeCompress(void);
     void rbModeNormal(void);

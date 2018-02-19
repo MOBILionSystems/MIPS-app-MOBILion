@@ -6,7 +6,7 @@
 #include <QTime>
 #include <QApplication>
 
-#define SIZE 10000
+#define rbSIZE 10000
 
 class RingBuffer : public QObject
 {
@@ -25,7 +25,7 @@ public:
 protected:
 
 private:
-    int     buffer[SIZE];
+    int     buffer[rbSIZE];
     int     head;
     int     tail;
     int     count;

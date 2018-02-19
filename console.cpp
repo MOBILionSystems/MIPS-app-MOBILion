@@ -127,7 +127,7 @@ void Console::Save(QString Filename)
         QDateTime dateTime = QDateTime::currentDateTime();
         stream << "# Terminal data, " + dateTime.toString() + "\n";
         stream <<  document()->toPlainText();
-        qDebug() <<  document()->toPlainText();
+        //qDebug() <<  document()->toPlainText();
     }
     file.close();
     cui->statusBar->showMessage("Data saved to " + Filename,2000);
@@ -151,7 +151,7 @@ void Console::Load(QString Filename)
             QTextCodec *codec = QTextCodec::codecForName("Windows-1251");
             QByteArray encodedString = codec->fromUnicode(line + "\n");
             putData(encodedString);
-            if(line.trimmed().mid(0,1) != "#") comms->SendString(line + "\n");
+            if(line.trimmed().mid(0,1) != "#") emit getData(encodedString);
             QApplication::processEvents();
         } while(!line.isNull());
         file.close();

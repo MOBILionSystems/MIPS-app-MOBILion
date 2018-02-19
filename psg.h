@@ -5,6 +5,7 @@
 #include "mips.h"
 #include "comms.h"
 #include "pse.h"
+#include "psviewer.h"
 
 #include <QtCore/QtGlobal>
 #include <QtSerialPort/QSerialPort>
@@ -30,6 +31,7 @@ public:
     Ui::MIPS *pui;
     Comms *comms;
     pseDialog *pse;
+    psviewer *psv;
     QList<psgPoint*> psg;
 
 private slots:
@@ -44,6 +46,7 @@ private slots:
     void on_pbTrigger_pressed();
     void on_pbRead_pressed();
     void on_pbWrite_pressed();
+    void on_pbVisPulseSequence_pressed();
 };
 
 #endif // PSG_H

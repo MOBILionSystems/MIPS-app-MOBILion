@@ -8,6 +8,7 @@ QT       += core
 QT       += gui
 QT       += serialport
 QT       += network
+QT       += widgets printsupport
 
 win32:RC_ICONS += GAACElogo.ico
 ICON = GAACElogo.icns
@@ -38,7 +39,12 @@ SOURCES += main.cpp\
     singlefunnel.cpp \
     filament.cpp \
     softlanding.cpp \
-    grid.cpp
+    grid.cpp \
+    arbwaveformedit.cpp \
+    qcustomplot.cpp \
+    psviewer.cpp \
+    softlanding2.cpp \
+    adc.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -58,7 +64,12 @@ HEADERS  += mips.h \
     singlefunnel.h \
     filament.h \
     softlanding.h \
-    grid.h
+    grid.h \
+    arbwaveformedit.h \
+    qcustomplot.h \
+    psviewer.h \
+    softlanding2.h \
+    adc.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \
@@ -66,7 +77,10 @@ FORMS    += mips.ui \
     help.ui \
     singlefunnel.ui \
     softlanding.ui \
-    grid.ui
+    grid.ui \
+    arbwaveformedit.ui \
+    psviewer.ui \
+    softlanding2.ui
 
 RESOURCES += \
     files.qrc
