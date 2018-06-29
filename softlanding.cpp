@@ -15,7 +15,7 @@ SoftLanding::SoftLanding(QWidget *parent, Comms *c, QStatusBar *statusbar) :
     UpdateOff = false;
     this->setFixedSize(1020,772);
 
-    qApp->installEventFilter(this);//in Dialog constructor
+    qApp->installEventFilter(this);  //in Dialog constructor
     QObjectList widgetList = ui->frmSL->children();
     widgetList += ui->gbSLfunnel1->children();
     widgetList += ui->gbSLfunnel2->children();

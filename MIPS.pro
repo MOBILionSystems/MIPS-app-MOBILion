@@ -44,7 +44,11 @@ SOURCES += main.cpp\
     qcustomplot.cpp \
     psviewer.cpp \
     softlanding2.cpp \
-    adc.cpp
+    adc.cpp \
+    controlpanel.cpp \
+    mipscomms.cpp \
+    cmdlineapp.cpp \
+    script.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -69,7 +73,11 @@ HEADERS  += mips.h \
     qcustomplot.h \
     psviewer.h \
     softlanding2.h \
-    adc.h
+    adc.h \
+    controlpanel.h \
+    mipscomms.h \
+    cmdlineapp.h \
+    script.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \
@@ -80,7 +88,11 @@ FORMS    += mips.ui \
     grid.ui \
     arbwaveformedit.ui \
     psviewer.ui \
-    softlanding2.ui
+    softlanding2.ui \
+    controlpanel.ui \
+    mipscomms.ui \
+    cmdlineapp.ui \
+    script.ui
 
 RESOURCES += \
     files.qrc

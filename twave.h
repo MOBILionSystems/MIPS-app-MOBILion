@@ -22,11 +22,16 @@ public:
     void Update(void);
     void Save(QString Filename);
     void Load(QString Filename);
+    bool myEventFilter(QObject *obj, QEvent *event);
 
     Ui::MIPS *tui;
     Comms *comms;
     int NumChannels;
     bool Compressor;
+
+private:
+    bool Updating;
+    bool UpdateOff;
 
 private slots:
     void Changed(void);

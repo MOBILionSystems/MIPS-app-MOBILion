@@ -9,6 +9,8 @@ DCbias::DCbias(Ui::MIPS *w, Comms *c)
     dui = w;
     comms = c;
 
+    Updating = false;
+    UpdateOff = false;
     SetNumberOfChannels(8);
     // DCbias page setup
     selectedLineEdit = NULL;
@@ -27,6 +29,50 @@ DCbias::DCbias(Ui::MIPS *w, Comms *c)
     connect(dui->chkPowerEnable,SIGNAL(toggled(bool)),this,SLOT(DCbiasPower()));
 }
 
+bool DCbias::myEventFilter(QObject *obj, QEvent *event)
+{
+    QLineEdit *le;
+    QString res;
+    float delta = 0;
+
+   if (obj->objectName().startsWith("leSDCB_") && (event->type() == QEvent::KeyPress))
+   {
+       if(Updating) return true;
+       UpdateOff = true;
+       le = (QLineEdit *)obj;
+       QKeyEvent *key = static_cast<QKeyEvent *>(event);
+       if(key->key() == 16777235) delta = 0.1;
+       if(key->key() == 16777237) delta = -0.1;
+       if((QApplication::queryKeyboardModifiers() & 0xA000000) != 0) delta *= 0.1;
+       if((QApplication::queryKeyboardModifiers() & 0x2000000) != 0) delta *= 10;
+       if((QApplication::queryKeyboardModifiers() & 0x8000000) != 0) delta *= 100;
+       // Get range for this channel
+       int ch = obj->objectName().mid(7).toInt();
+       if(ch>24) ch = 25;
+       else if(ch>16) ch = 17;
+       else if(ch>8) ch = 9;
+       else ch = 1;
+       QLineEdit *lemin = dui->centralWidget->findChild<QLineEdit *>("leGDCMIN_" + QString::number(ch), Qt::FindChildrenRecursively);
+       QLineEdit *lemax = dui->centralWidget->findChild<QLineEdit *>("leGDCMAX_" + QString::number(ch), Qt::FindChildrenRecursively);
+       float min = lemin->text().toFloat();
+       float max = lemax->text().toFloat();
+       if((max-min) > 150) delta *= 10;
+       if(delta != 0)
+       {
+          QString myString;
+          myString.sprintf("%3.2f", le->text().toFloat() + delta);
+          if(((le->text().toFloat() + delta) >= min) && ((le->text().toFloat() + delta) <= max))
+          {
+             le->setText(myString);
+             le->setModified(true);
+             le->editingFinished();
+             return true;
+          }
+       }
+   }
+   return QObject::eventFilter(obj, event);
+}
+
 void DCbias::SetNumberOfChannels(int num)
 {
     NumChannels = num;
@@ -38,21 +84,88 @@ void DCbias::SetNumberOfChannels(int num)
     if(NumChannels > 16) dui->gbDCbias3->setEnabled(true);
 }
 
+// This function will search for all matching groups and apply
+// the change to all channels in the same group.
+void DCbias::ApplyDelta(QString GrpName, float change)
+{
+    QString  res;
+
+   // Look through all the groups for matches
+    for(int i=1;i<=24;i++)
+    {
+        res = "leGRP" + QString::number(i);
+        QLineEdit *leGR = dui->gbDCbias1->findChild<QLineEdit *>(res);
+        if(leGR != NULL)
+        {
+            if(leGR->text() == GrpName)
+            {
+                // Here if the name matches, now build the line edit box name
+                res = "leSDCB_" + QString::number(i);
+                QLineEdit *leDCB = dui->gbDCbias1->findChild<QLineEdit *>(res);
+                if(leDCB != NULL)
+                {
+                    if(!leDCB->hasFocus())
+                    {
+                        // Read its value and change
+                        leDCB->setText(QString::number(leDCB->text().toFloat() - change));
+                        leDCB->setModified(true);
+                        leDCB->editingFinished();
+                    }
+                }
+            }
+        }
+    }
+}
+
+// This function is called when a DCbias value is changed. This function will send the command to
+// MIPS to apply the new voltage.
 void DCbias::DCbiasUpdated(void)
 {
-   QObject* obj = sender();
-   QString res;
+   QObject*    obj = sender();
+   QString     res,ans;
+   QStringList resList;
 
+   if(Updating) return;
    if(!((QLineEdit *)obj)->isModified()) return;
+   // If this channel is part of a group then first read the current value to calculate the
+   // change. Apply the change to all channels in this group.
+   // When we get here the change has alreay been made so we need to read the
+   // current value from MIPS and calculate the difference.
+   if((obj->objectName().startsWith("leSDCB_")) & (((QLineEdit *)obj)->hasFocus()))
+   {
+       resList = obj->objectName().split("_");
+       res = "leGRP" + resList[1];
+       QLineEdit *leGR = dui->gbDCbias1->findChild<QLineEdit *>(res);
+       if(leGR->text() != "")
+       {
+           // Here if this channel has a group label so we need to read the current
+           // MIPS channel value to calculate the change
+           res = "G" + obj->objectName().mid(3).replace("_",",") + "\n";
+           qDebug() << res;
+           ans = comms->SendMess(res);
+           qDebug() << ans;
+           // if(ans == "") ans="100";  // For testing
+           if(ans != "")
+           {
+               float oldvalue =ans.toFloat();
+               float change = oldvalue - ((QLineEdit *)obj)->text().toFloat();
+               // Now change all the values with the same group name
+               ApplyDelta(leGR->text(),change);
+           }
+       }
+   }
    res = obj->objectName().mid(2).replace("_",",") + "," + ((QLineEdit *)obj)->text() + "\n";
    comms->SendCommand(res.toStdString().c_str());
    ((QLineEdit *)obj)->setModified(false);
+   UpdateOff = false;
 }
 
 void DCbias::Update(void)
 {
     QString res;
 
+    if(UpdateOff) return;
+    Updating = true;
 //    dui->tabMIPS->setEnabled(false);
 //    dui->statusBar->showMessage(tr("Updating DC bias controls..."));
      // Read the number of channels and enable the proper controls
@@ -63,7 +176,7 @@ void DCbias::Update(void)
     QObjectList widgetList = dui->gbDCbias1->children();
     foreach(QObject *w, widgetList)
     {
-       if(w->objectName().contains("le"))
+       if((w->objectName().contains("le")) & (!w->objectName().contains("leGRP")))
        {
             if(!((QLineEdit *)w)->hasFocus())
             {
@@ -80,7 +193,7 @@ void DCbias::Update(void)
         QObjectList widgetList = dui->gbDCbias2->children();
         foreach(QObject *w, widgetList)
         {
-           if(w->objectName().contains("le"))
+           if((w->objectName().contains("le")) & (!w->objectName().contains("leGRP")))
            {
                if(!((QLineEdit *)w)->hasFocus())
                {
@@ -113,6 +226,7 @@ void DCbias::Update(void)
     }
 //    dui->tabMIPS->setEnabled(true);
 //    dui->statusBar->showMessage(tr(""));
+    Updating = false;
 }
 
 void DCbias::DCbiasPower(void)

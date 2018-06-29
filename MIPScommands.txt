@@ -5,6 +5,7 @@ General Commands
   GERR					Returns integer error code
   GNAME					Returns user assigned name string
   SNAME,name			Sets the system name to user entered string
+  UUID                 Reports the microcontrollers unique ID, 128 bits, hex format
   ABOUT                Returns details about system modules installed
   SMREV,b,m,r	     	Defines the rev level of a module,  b=board, m=module address, r=rev level desired
   RESET					Reboots the MIPS system
@@ -23,7 +24,6 @@ General Commands
   RDEV,ch           	ADC read, ch = channel 0 - 7
   RDEV2,ch	        	AD7994 ADC read, ch = channel 0 - 3
   TBLTSKENA,val     	Enable IO in table mode, val = TRUE or FALSE
-  ADC,ch            	Read DUE ADC channel, ch = channel 0 - 3
   LEDOVRD,val       	Override button LED, val = TRUE or FALSE
   LED,val           	LED color, val = bit mask. 0=Red,1=Blue,2=green,3=blink
   DSPOFF,val        	Turns off display, val = TRUE or FALSE
@@ -43,6 +43,28 @@ General Commands
   PUTEEPROM,brd,add    Writes EEPROM module contents from host file, issued only by MIPS
   SSPND,TRUE/FALSE     Suspendes all background tasks, will limit functionality
   GSPND                Returns the suspend state
+  CPUTEMP
+  TWITALK,brd,add      Redirect the serial communications through a board and TWI address passed
+                       brd and add are base 10
+  SSER1ENA,val         Set the Serial1 port enable, TRUE = general use, FALSE for ethernet use or wifi
+  GSER1ENA             Get the Serial1 port enable status
+  SETADDRESS,add       Set memory address to read or write, hex
+  WRITE,type,val       Write to memory, type = BYTE,WORD,DWORD,INT,FLOAT
+  READ,type            Read from memory, BYTE,WORD,DWORD,INT,FLOAT
+
+ADC functions
+  ADC,ch            	Read DUE ADC channel, ch = channel 0 - 3
+  ADCINIT              ADC vector recording setup
+  ADCTRIG              ADC vector recording software trigger
+  ADCABORT             ADC system abort
+  SADCCHAN,ch          Set ADC channel number
+  GADCCHAN             Get ADC channel number
+  SADCSAMPS,num        Set ADC number of samples
+  GADCSAMPS            Get ADC number of samples
+  SADCVECTS,num        Set ADC number of vectors
+  GADCVECTS            Get ADC number of vectors
+  SADCRATE,num         Set ADC sample rate in Hz
+  GADCRATE             Get ADC sample rate in Hz
 
 Clock generation
   GWIDTH				Returns clock pulse width in uS
@@ -59,7 +81,7 @@ Delay trigger
   GDTRIGPRD           	Reports trigger period
   SDTRIGRPT,count    	Trigger repeat count. Count = number of times to trigger
   GDTRIGRPT         	Returns the repeat count
-  SDTRIGMOD,mod     	Defines the module to trigger, mod = ARB | SWEEP
+  SDTRIGMOD,mod     	Defines the module to trigger, mod = ARB | SWEEP | ADC | AUXTRIG
   SDTRIGENA,val      	Enables the delay trigger module if TRUE
   GDTRIGENA         	Reports the delay trigger status
 
@@ -82,6 +104,14 @@ DC bias module
   DCBOFFRBENA,val		Enable offset readback, val=TRUE or FALSE
   SDCBOFFENA,ch,val		Set the offsetable flag for a given channel, val = TRUE or FALSE
   SDCBTEST,TRUE/FALSE  Set to false to disable readback voltage testing
+  SDCBADCADD,m,add     Set a modules ADC TWI address, radix 10
+  SDCBDACADD,m,add     Set a modules DAC TWI address, radix 10
+  SDCBARST,val         Set to TRUE to enable power supply auto reset
+  SDCBRNG,brd,rng      Set the range for the DC bias board
+  SDCBEXT,brd          Set the DCbias board for extended addressing, factory command
+  RDCBSPLY,brd         Report the DCbias board supply voltages, if supported
+
+DC bias module profile commands
   SDCBPRO,nm,ch1,...   Set profile nm, must provide all channel values
   GDCBPRO,nm           Returns profile number nm, 1 through 10
   ADCBPRO,nm           Apply a profile
@@ -89,6 +119,20 @@ DC bias module
   TDCBPRO,p1,p1,dwell  Toggle between profile p1 and p2, dwell at each profile
                        for dwell millisec
   TDCBSTP              Stops the toggling
+
+DC bias channel pulse command
+  SDCBPCH,ch           Set DC bias pulse channel
+  GDCBPCH              Get DC bias pulse channel
+  SDCBPV,val           Set DC bias pulse voltage, in volts
+  GDCBPV               Get DC bias pulse voltage, in volts
+  SDCBPD,val           Set DC bias pulse delay, in uS
+  GDCBPD               Get DC bias pulse delay, in uS
+  SDCBPW               Set DC bias pulse width, in uS
+  GDCBPW,val           Get DC bias pulse width, in uS
+  SDCBPT,ch            Set DC bias pulse trigger source, Q-X or t
+  GDCBPT               Get DC bias pulse trigger source, Q-X or t
+  SDCBPENA,val         Set DC bias pulse enable, TRUE or FALSE
+  GDCBPENA             Get DC bias pulse enable, TRUE or FALSE
 
 RF driver module
   SRFFRQ,ch,val			Set RF frequency, ch=channel,val=frequency in Hz
@@ -103,6 +147,7 @@ RF driver module
   GRFALL				Return all RF parameters
   TUNERFCH,ch        	Performs automatic tuning of selected channel
   RETUNERFCH,ch      	Retunes the selected channel
+  SRFCAL,ch,m,b        Sets the RF calibration parameters, channel,slope,intercept
 
 DIO module
   SDIO,ch,val			Set digital output,ch=A-P,val=0 or 1
@@ -119,7 +164,7 @@ ESI module
   GHVMIN,ch         	Return channel min voltage, ch=channel
   SHVENA,ch         	Enables the selected channel (ch)
   SHVDIS,ch         	Disables the selected channel (ch)
-  GHVSTATUS,ch	        Returns the channel status, ON or OFF, ch=channel
+  GHVSTATUS,ch	      	Returns the channel status, ON or OFF, ch=channel
   SHVPSUP,m,val     	Defines a modules (m) positive supply voltage (val), setup command
   SHVNSUP,m,val     	Defines a modules (m) negative supply voltage (val), setup command
   SHVITST,TRUE/FALSE   Enables or disables the ESI current testing, FALSE disables
@@ -264,6 +309,8 @@ WiFi module
 Eithernet module
   GEIP					Reports MIPS IP address
   SEIP,val				Sets MIPS IP address
+  GESNIP               Report the ethernet adapter Subnet IP address
+  SESNIP,val           Set the ethernet adapter Subnet IP address
   GEPORT				Reports MIPS port number
   SEPORT,val			Sets MIPS port number
   GEGATE				Reports gateway IP address

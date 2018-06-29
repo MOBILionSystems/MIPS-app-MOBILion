@@ -16,9 +16,26 @@ FAIMS::FAIMS(Ui::MIPS *w, Comms *c)
     fui->comboFMtrig->addItem("R");
     fui->comboFMtrig->addItem("S");
     fui->comboFMtrig->addItem("T");
+    fui->comboFMlinearTrig->clear();
+    fui->comboFMlinearTrig->addItem("None");
+    fui->comboFMlinearTrig->addItem("Q");
+    fui->comboFMlinearTrig->addItem("R");
+    fui->comboFMlinearTrig->addItem("S");
+    fui->comboFMlinearTrig->addItem("T");
+    fui->comboFMstepTrig->clear();
+    fui->comboFMstepTrig->addItem("None");
+    fui->comboFMstepTrig->addItem("Q");
+    fui->comboFMstepTrig->addItem("R");
+    fui->comboFMstepTrig->addItem("S");
+    fui->comboFMstepTrig->addItem("T");
     CVparkingTriggered = false;
+    WaitingForLinearScanTrig = false;
+    WaitingForStepScanTrig = false;
+    LogFileName = "";
     QObjectList widgetList = fui->gbFAIMS_DC->children();
     widgetList += fui->gbFAIMS_RF->children();
+    widgetList += fui->gbLinearScan->children();
+    widgetList += fui->gbStepScan->children();
     foreach(QObject *w, widgetList)
     {
        if(w->objectName().startsWith("leS"))
@@ -30,6 +47,13 @@ FAIMS::FAIMS(Ui::MIPS *w, Comms *c)
     connect(fui->chkFMenable,SIGNAL(toggled(bool)),this,SLOT(FAIMSenable()));
     connect(fui->pbFMstart,SIGNAL(pressed()),this,SLOT(FAIMSscan()));
     connect(fui->pbFMloadCSV,SIGNAL(pressed()),this,SLOT(FAIMSloadCSV()));
+    connect(fui->pbFMstartLinear,SIGNAL(pressed()),this,SLOT(FAIMSstartLinearScan()));
+    connect(fui->pbFMabortLinear,SIGNAL(pressed()),this,SLOT(FAIMSabortLinearScan()));
+    connect(fui->pbFMstartStep,SIGNAL(pressed()),this,SLOT(FAIMSstartStepScan()));
+    connect(fui->pbFMabortStep,SIGNAL(pressed()),this,SLOT(FAIMSabortStepScan()));
+    connect(fui->rbSFMLOCK_FALSE,SIGNAL(clicked(bool)),this,SLOT(FAIMSlockOff()));
+    connect(fui->rbSFMLOCK_TRUE,SIGNAL(clicked(bool)),this,SLOT(FAIMSlockOn()));
+    connect(fui->pbSelectLogFile,SIGNAL(pressed()),this,SLOT(FAIMSselectLogFile()));
     eTimer.start();
 }
 
@@ -49,16 +73,65 @@ void FAIMS::Update(void)
 
     QObjectList widgetList = fui->gbFAIMS_RF->children();
     widgetList += fui->gbFAIMS_DC->children();
+    if(fui->tabScanMode->tabText(fui->tabScanMode->currentIndex()) == "Linear scan") widgetList += fui->gbLinearScan->children();
+    if(fui->tabScanMode->tabText(fui->tabScanMode->currentIndex()) == "Step scan") widgetList += fui->gbStepScan->children();
     foreach(QObject *w, widgetList)
     {
        if(w->objectName().startsWith("le"))
        {
             if(!((QLineEdit *)w)->hasFocus())
             {
-               res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
+               res = "G" + w->objectName().mid(3).replace("_",",");
+               if(res.endsWith(",")) res = res.left(res.length()-1);
+               res += "\n";
                ((QLineEdit *)w)->setText(comms->SendMess(res));
             }
        }
+    }
+    res = comms->SendMess("GFMENA\n");
+    if(res == "TRUE") fui->chkFMenable->setChecked(true);
+    if(res == "FALSE") fui->chkFMenable->setChecked(false);
+    // Read the lock mode and update the UI
+    res = comms->SendMess("GFMLOCK\n");
+    if(res == "TRUE")
+    {
+        fui->rbSFMLOCK_TRUE->setChecked(true);
+        fui->leSFMSP->setEnabled(true);
+        fui->leSFMDRV->setEnabled(false);
+    }
+    else if(res == "FALSE")
+    {
+        fui->rbSFMLOCK_FALSE->setChecked(true);
+        fui->leSFMSP->setEnabled(false);
+        fui->leSFMDRV->setEnabled(true);
+    }
+    if(fui->tabScanMode->tabText(fui->tabScanMode->currentIndex()) == "Linear scan")
+    {
+        res = comms->SendMess("GFMSTRTLIN\n");
+        if(res == "TRUE")
+        {
+            fui->pbFMabortLinear->setEnabled(true);
+            fui->pbFMstartLinear->setEnabled(false);
+        }
+        else if(res == "FALSE")
+        {
+            fui->pbFMabortLinear->setEnabled(false);
+            fui->pbFMstartLinear->setEnabled(true);
+        }
+    }
+    if(fui->tabScanMode->tabText(fui->tabScanMode->currentIndex()) == "Step scan")
+    {
+        res = comms->SendMess("GFMSTRTSTP\n");
+        if(res == "TRUE")
+        {
+            fui->pbFMabortStep->setEnabled(true);
+            fui->pbFMstartStep->setEnabled(false);
+        }
+        else if(res == "FALSE")
+        {
+            fui->pbFMabortStep->setEnabled(false);
+            fui->pbFMstartStep->setEnabled(true);
+        }
     }
 }
 
@@ -68,7 +141,9 @@ void FAIMS::FAIMSUpdated(void)
    QString res;
 
    if(!((QLineEdit *)obj)->isModified()) return;
-   res = obj->objectName().mid(2).replace("_",",") + "," + ((QLineEdit *)obj)->text() + "\n";
+   res = obj->objectName().mid(2).replace("_",",");
+   if(res.endsWith(",")) res = res.left(res.length()-1);
+   res += "," + ((QLineEdit *)obj)->text() + "\n";
    comms->SendCommand(res.toStdString().c_str());
    ((QLineEdit *)obj)->setModified(false);
 }
@@ -238,62 +313,272 @@ void FAIMS::PollLoop(void)
    QString res;
    QStringList reslist;
 
-   if(fui->leFMstatus->text() == "Waiting for trigger")
+   if(fui->tabScanMode->tabText(fui->tabScanMode->currentIndex()) == "CV parking")
    {
-       // If we received a trigger report then change status to running and
-       // set the triggered flag
-       // Looking for "DIC,x,RISING,time. where x is the input trigger
-       // selected.
-       res = comms->getline();
-       if(res.startsWith("DIC,"))
+       if(fui->leFMstatus->text() == "Waiting for trigger")
        {
-           reslist = res.split(",");
-           if(reslist.count() == 4)
+           // If we received a trigger report then change status to running and
+           // set the triggered flag
+           // Looking for "DIC,x,RISING,time. where x is the input trigger
+           // selected.
+           res = comms->getline();
+           if(res.startsWith("DIC,"))
            {
-               if((reslist.at(2) == "RISING") && (reslist.at(1) == fui->comboFMtrig->currentText()))
+               reslist = res.split(",");
+               if(reslist.count() == 4)
                {
-                   CVparkingTriggered = true;
-                   fui->leFMstatus->setText("Triggered");
-                   eTimer.restart();
+                   if((reslist.at(2) == "RISING") && (reslist.at(1) == fui->comboFMtrig->currentText()))
+                   {
+                       CVparkingTriggered = true;
+                       fui->leFMstatus->setText("Triggered");
+                       eTimer.restart();
+                   }
                }
            }
+           return;
        }
-       return;
+       if(!CVparkingTriggered) return;
+       CurrentMin = (float)eTimer.elapsed()/(float)60000;
+       fui->leFMelasped->setText(QString::number(CurrentMin, 'f', 1));
+       switch(State)
+       {
+          case WAITING:
+           if(CurrentMin >= TargetRT - TargetWindow/2)
+           {
+               fui->leFMcompound->setText(TargetCompound);
+               fui->leFMcvVolts->setText(QString::number(TargetCV));
+               fui->leFMbiasVolts->setText(QString::number(TargetBias));
+               comms->SendCommand("SFMCV," + QString::number(TargetCV) + "\n");
+               comms->SendCommand("SFMBIAS," + QString::number(TargetBias) + "\n");
+               State = SCANNING;
+           }
+           break;
+          case SCANNING:
+           if(CurrentMin >= TargetRT + TargetWindow/2)
+           {
+               if(!GetNextTarget(CurrentMin))
+               {
+                   CVparkingTriggered = false;
+                   fui->pbFMstart->setText("Start");
+                   fui->leFMstatus->setText("Finished");
+               }
+               if(CurrentMin < TargetRT - TargetWindow/2) fui->leFMcompound->setText("");
+           }
+           break;
+          default:
+            break;
+       }
+   }
+   if(fui->tabScanMode->tabText(fui->tabScanMode->currentIndex()) == "Linear scan")
+   {
+        if(WaitingForLinearScanTrig)
+        {
+            res = comms->getline();
+            if(res.startsWith("DIC,"))
+            {
+                reslist = res.split(",");
+                if(reslist.count() == 4)
+                {
+                    if((reslist.at(2) == "RISING") && (reslist.at(1) == fui->comboFMlinearTrig->currentText()))
+                    {
+                        WaitingForLinearScanTrig = false;
+                        fui->statusBar->showMessage(tr("Scan triggered!"));
+                        comms->SendCommand("SFMSTRTLIN,TRUE\n");
+                        Log("Linear scan triggered!");
+                    }
+                }
+            }
+            return;
+        }
+   }
+   if(fui->tabScanMode->tabText(fui->tabScanMode->currentIndex()) == "Step scan")
+   {
+        if(WaitingForStepScanTrig)
+        {
+            res = comms->getline();
+            if(res.startsWith("DIC,"))
+            {
+                reslist = res.split(",");
+                if(reslist.count() == 4)
+                {
+                    if((reslist.at(2) == "RISING") && (reslist.at(1) == fui->comboFMstepTrig->currentText()))
+                    {
+                        WaitingForStepScanTrig = false;
+                        fui->statusBar->showMessage(tr("Scan triggered!"));
+                        comms->SendCommand("SFMSTRTSTP,TRUE\n");
+                        Log("Step scan triggered!");
+                    }
+                }
+            }
+            return;
+        }
    }
    // If this FAIMS tab is displayed then update the parameters
    if( fui->tabMIPS->tabText(fui->tabMIPS->currentIndex()) == "FAIMS")
    {
       Update();
-   }
-   if(!CVparkingTriggered) return;
-   CurrentMin = (float)eTimer.elapsed()/(float)60000;
-   fui->leFMelasped->setText(QString::number(CurrentMin, 'f', 1));
-   switch(State)
-   {
-      case WAITING:
-       if(CurrentMin >= TargetRT - TargetWindow/2)
-       {
-           fui->leFMcompound->setText(TargetCompound);
-           fui->leFMcvVolts->setText(QString::number(TargetCV));
-           fui->leFMbiasVolts->setText(QString::number(TargetBias));
-           comms->SendCommand("SFMCV," + QString::number(TargetCV) + "\n");
-           comms->SendCommand("SFMBIAS," + QString::number(TargetBias) + "\n");
-           State = SCANNING;
-       }
-       break;
-      case SCANNING:
-       if(CurrentMin >= TargetRT + TargetWindow/2)
-       {
-           if(!GetNextTarget(CurrentMin))
-           {
-               CVparkingTriggered = false;
-               fui->pbFMstart->setText("Start");
-               fui->leFMstatus->setText("Finished");
-           }
-           if(CurrentMin < TargetRT - TargetWindow/2) fui->leFMcompound->setText("");
-       }
-       break;
-      default:
-        break;
+      Log("");
    }
 }
+
+void FAIMS::FAIMSstartLinearScan(void)
+{
+    // If external trigger is requested then set flag indicating
+    // we are waiting for a tigger and display message. If no external
+    // trigger start as soon as the button is pressed.
+
+    // Turn off all trigger reporting, just in case it was on
+    comms->SendCommand("RPT,Q,OFF\n");
+    comms->SendCommand("RPT,R,OFF\n");
+    comms->SendCommand("RPT,S,OFF\n");
+    comms->SendCommand("RPT,T,OFF\n");
+    if(fui->comboFMlinearTrig->currentText() == "None")
+    {
+        fui->statusBar->showMessage(tr("Scan triggered!"));
+        comms->SendCommand("SFMSTRTLIN,TRUE\n");
+        Log("Linear scan started,CV start = " + fui->leSFMCVSTART->text() +
+                               ",CV end = " + fui->leSFMCVEND->text() +
+                               ",Duration, S = " + fui->leSFMDUR->text() +
+                               ",Loops = " + fui->leSFMLOOPS->text());
+    }
+    else
+    {
+        // Issue the report command to MIPS for the selected channel
+        // and set status to waiting for trigger
+        comms->SendCommand("RPT," + fui->comboFMlinearTrig->currentText() + ",RISING\n");
+        fui->statusBar->showMessage(tr("Waiting for scan trigger!"));
+        WaitingForLinearScanTrig = true;
+        Log("Linear scan armed,CV start = " + fui->leSFMCVSTART->text() +
+                             ",CV end = " + fui->leSFMCVEND->text() +
+                             ",Duration, S = " + fui->leSFMDUR->text() +
+                             ",Loops = " + fui->leSFMLOOPS->text());
+    }
+    fui->pbFMstartLinear->setEnabled(false);
+    fui->pbFMabortLinear->setEnabled(true);
+}
+
+void FAIMS::FAIMSabortLinearScan(void)
+{
+    // Abort scan
+    WaitingForLinearScanTrig = false;
+    fui->statusBar->showMessage(tr("Scan aborted!"));
+    comms->SendCommand("SFMSTRTLIN,FALSE\n");
+    fui->pbFMstartLinear->setEnabled(true);
+    fui->pbFMabortLinear->setEnabled(false);
+    Log("Linear scan aborted!");
+}
+
+void FAIMS::FAIMSstartStepScan(void)
+{
+    // If external trigger is requested then set flag indicating
+    // we are waiting for a tigger and display message. If no external
+    // trigger start as soon as the button is pressed.
+
+    // Turn off all trigger reporting, just in case it was on
+    comms->SendCommand("RPT,Q,OFF\n");
+    comms->SendCommand("RPT,R,OFF\n");
+    comms->SendCommand("RPT,S,OFF\n");
+    comms->SendCommand("RPT,T,OFF\n");
+    if(fui->comboFMstepTrig->currentText() == "None")
+    {
+        fui->statusBar->showMessage(tr("Scan triggered!"));
+        comms->SendCommand("SFMSTRTSTP,TRUE\n");
+        Log("Step scan started,CV start = " + fui->leSFMCVSTART_->text() +
+                             ",CV end = " + fui->leSFMCVEND_->text() +
+                             ",Step time mS = " + fui->leSFMSTPTM->text() +
+                             ",Steps = " + fui->leSFMSTEPS->text() +
+                             ",Loops = " + fui->leSFMLOOPS_->text());
+    }
+    else
+    {
+        // Issue the report command to MIPS for the selected channel
+        // and set status to waiting for trigger
+        comms->SendCommand("RPT," + fui->comboFMstepTrig->currentText() + ",RISING\n");
+        fui->statusBar->showMessage(tr("Waiting for scan trigger!"));
+        WaitingForStepScanTrig = true;
+        Log("Step scan armed,CV start = " + fui->leSFMCVSTART_->text() +
+                           ",CV end = " + fui->leSFMCVEND_->text() +
+                           ",Step time mS = " + fui->leSFMSTPTM->text() +
+                           ",Steps = " + fui->leSFMSTEPS->text() +
+                           ",Loops = " + fui->leSFMLOOPS_->text());
+    }
+    fui->pbFMstartLinear->setEnabled(false);
+    fui->pbFMabortLinear->setEnabled(true);
+}
+
+void FAIMS::FAIMSabortStepScan(void)
+{
+    // Abort scan
+    WaitingForStepScanTrig = false;
+    fui->statusBar->showMessage(tr("Scan aborted!"));
+    comms->SendCommand("SFMSTRTSTP,FALSE\n");
+    fui->pbFMstartStep->setEnabled(true);
+    fui->pbFMabortStep->setEnabled(false);
+    Log("Step scan aborted!");
+}
+
+void FAIMS::FAIMSlockOff(void)
+{
+   comms->SendCommand("SFMLOCK,FALSE\n");
+   Log("Output lock mode disabled requested.");
+}
+
+void FAIMS::FAIMSlockOn(void)
+{
+   comms->SendCommand("SFMLOCK,TRUE\n");
+   Log("Output lock mode enable requested.");
+}
+
+void FAIMS::Log(QString Message)
+{
+    if(LogFileName == "") return;
+
+    QFile file(LogFileName);
+    if(file.open(QIODevice::Append | QIODevice::Text))
+    {
+        QTextStream stream(&file);
+        if(Message == "")
+        {
+            // Log the base set of opeating parameters
+            QString LogString;
+            LogString  = QDateTime::currentDateTime().toString() + ",";
+            if(fui->chkFMenable->isChecked()) LogString += "Enabled,";
+            else LogString += "Disabled,";
+            LogString += fui->leSFMDRV->text() + ",";
+            if(fui->rbSFMLOCK_FALSE->isChecked()) LogString += "Manual,";
+            if(fui->rbSFMLOCK_TRUE->isChecked()) LogString += "Lock,";
+            LogString += fui->leSFMSP->text() + ",";
+            LogString += fui->leGFMPWR->text() + ",";
+            LogString += fui->leGFMPV->text() + ",";
+            LogString += fui->leGFMNV->text() + ",";
+            LogString += fui->leGFMBIASA->text() + ",";
+            LogString += fui->leGFMCVA->text() + ",";
+            LogString += fui->leGFMOFFA->text() + "\n";
+            stream << LogString;
+        }
+        else
+        {
+           stream << QDateTime::currentDateTime().toString() + ",";
+           stream << Message + "\n";
+        }
+        file.close();
+    }
+}
+
+void FAIMS::FAIMSselectLogFile(void)
+{
+    LogFileName = QFileDialog::getSaveFileName(this, tr("Log File"),"",tr("Settings (*.log);;All files (*.*)"));
+    fui->LogFile->setText(LogFileName);
+    QFile file(LogFileName);
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        // We're going to streaming text to the file
+        QTextStream stream(&file);
+        QDateTime dateTime = QDateTime::currentDateTime();
+        stream << "# FAIMS log file, " + dateTime.toString() + "\n";
+        stream << "Time,Enable,Drive,Mode,Voltage SP,Power,Pos KV,Neg KV,DC bias,DC CV,DC offset\n";
+        file.close();
+    }
+}
+
+

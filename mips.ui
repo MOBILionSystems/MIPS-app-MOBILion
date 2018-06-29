@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MIPS, Version 1.21 February 18, 2018</string>
+   <string>MIPS, Version 1.24 May 12, 2018</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QTabWidget" name="tabMIPS">
@@ -1564,7 +1564,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_1">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>90</x>
          <y>60</y>
          <width>71</width>
          <height>21</height>
@@ -1574,7 +1574,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_2">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>90</x>
          <y>90</y>
          <width>71</width>
          <height>21</height>
@@ -1584,7 +1584,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_3">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>90</x>
          <y>120</y>
          <width>71</width>
          <height>21</height>
@@ -1594,7 +1594,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_4">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>90</x>
          <y>150</y>
          <width>71</width>
          <height>21</height>
@@ -1604,7 +1604,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_5">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>90</x>
          <y>180</y>
          <width>71</width>
          <height>21</height>
@@ -1614,7 +1614,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_6">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>90</x>
          <y>210</y>
          <width>71</width>
          <height>21</height>
@@ -1624,7 +1624,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_7">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>90</x>
          <y>240</y>
          <width>71</width>
          <height>21</height>
@@ -1634,7 +1634,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_8">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>90</x>
          <y>270</y>
          <width>71</width>
          <height>21</height>
@@ -1644,7 +1644,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_1">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>165</x>
          <y>60</y>
          <width>71</width>
          <height>21</height>
@@ -1657,7 +1657,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_2">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>165</x>
          <y>90</y>
          <width>71</width>
          <height>21</height>
@@ -1670,7 +1670,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_3">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>165</x>
          <y>120</y>
          <width>71</width>
          <height>21</height>
@@ -1683,7 +1683,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_4">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>165</x>
          <y>150</y>
          <width>71</width>
          <height>21</height>
@@ -1696,7 +1696,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_5">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>165</x>
          <y>180</y>
          <width>71</width>
          <height>21</height>
@@ -1709,7 +1709,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_6">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>165</x>
          <y>210</y>
          <width>71</width>
          <height>21</height>
@@ -1722,7 +1722,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_7">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>165</x>
          <y>240</y>
          <width>71</width>
          <height>21</height>
@@ -1735,7 +1735,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_8">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>165</x>
          <y>270</y>
          <width>71</width>
          <height>21</height>
@@ -1852,9 +1852,9 @@ navigation</string>
       <widget class="QLabel" name="label_9">
        <property name="geometry">
         <rect>
-         <x>80</x>
+         <x>95</x>
          <y>30</y>
-         <width>71</width>
+         <width>61</width>
          <height>26</height>
         </rect>
        </property>
@@ -1865,9 +1865,9 @@ navigation</string>
       <widget class="QLabel" name="label_10">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>165</x>
          <y>30</y>
-         <width>106</width>
+         <width>76</width>
          <height>26</height>
         </rect>
        </property>
@@ -1963,6 +1963,99 @@ navigation</string>
         <string>Offset</string>
        </property>
       </widget>
+      <widget class="QLineEdit" name="leGRP1">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>60</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_198">
+       <property name="geometry">
+        <rect>
+         <x>45</x>
+         <y>30</y>
+         <width>41</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Group</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP2">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>90</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP3">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>120</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP4">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>150</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP5">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>180</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP6">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>210</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP7">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>240</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP8">
+       <property name="geometry">
+        <rect>
+         <x>60</x>
+         <y>270</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
      <widget class="QPushButton" name="pbDCbiasUpdate">
       <property name="geometry">
@@ -1995,7 +2088,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_9">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>85</x>
          <y>60</y>
          <width>71</width>
          <height>21</height>
@@ -2005,7 +2098,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_10">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>85</x>
          <y>90</y>
          <width>71</width>
          <height>21</height>
@@ -2015,7 +2108,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_11">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>85</x>
          <y>120</y>
          <width>71</width>
          <height>21</height>
@@ -2025,7 +2118,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_12">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>85</x>
          <y>150</y>
          <width>71</width>
          <height>21</height>
@@ -2035,7 +2128,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_13">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>85</x>
          <y>180</y>
          <width>71</width>
          <height>21</height>
@@ -2045,7 +2138,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_14">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>85</x>
          <y>210</y>
          <width>71</width>
          <height>21</height>
@@ -2055,7 +2148,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_15">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>85</x>
          <y>240</y>
          <width>71</width>
          <height>21</height>
@@ -2065,7 +2158,7 @@ navigation</string>
       <widget class="QLineEdit" name="leSDCB_16">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>85</x>
          <y>270</y>
          <width>71</width>
          <height>21</height>
@@ -2075,7 +2168,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_9">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>60</y>
          <width>71</width>
          <height>21</height>
@@ -2088,7 +2181,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_10">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>90</y>
          <width>71</width>
          <height>21</height>
@@ -2101,7 +2194,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_11">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>120</y>
          <width>71</width>
          <height>21</height>
@@ -2114,7 +2207,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_12">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>150</y>
          <width>71</width>
          <height>21</height>
@@ -2127,7 +2220,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_13">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>180</y>
          <width>71</width>
          <height>21</height>
@@ -2140,7 +2233,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_14">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>210</y>
          <width>71</width>
          <height>21</height>
@@ -2153,7 +2246,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_15">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>240</y>
          <width>71</width>
          <height>21</height>
@@ -2166,7 +2259,7 @@ navigation</string>
       <widget class="QLineEdit" name="leGDCBV_16">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>270</y>
          <width>71</width>
          <height>21</height>
@@ -2283,7 +2376,7 @@ navigation</string>
       <widget class="QLabel" name="label_23">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>95</x>
          <y>30</y>
          <width>71</width>
          <height>26</height>
@@ -2296,7 +2389,7 @@ navigation</string>
       <widget class="QLabel" name="label_24">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>30</y>
          <width>101</width>
          <height>26</height>
@@ -2394,6 +2487,99 @@ navigation</string>
         <string>Offset</string>
        </property>
       </widget>
+      <widget class="QLineEdit" name="leGRP16">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>270</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP11">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>120</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP15">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>240</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP12">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>150</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP13">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>180</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_199">
+       <property name="geometry">
+        <rect>
+         <x>40</x>
+         <y>30</y>
+         <width>41</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Group</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP14">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>210</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP9">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>60</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP10">
+       <property name="geometry">
+        <rect>
+         <x>55</x>
+         <y>90</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
      <widget class="QLineEdit" name="leGCHAN_DCB">
       <property name="geometry">
@@ -2472,7 +2658,7 @@ enabled</string>
       <widget class="QLineEdit" name="leSDCB_17">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>80</x>
          <y>60</y>
          <width>71</width>
          <height>21</height>
@@ -2482,7 +2668,7 @@ enabled</string>
       <widget class="QLineEdit" name="leSDCB_18">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>80</x>
          <y>90</y>
          <width>71</width>
          <height>21</height>
@@ -2492,7 +2678,7 @@ enabled</string>
       <widget class="QLineEdit" name="leSDCB_19">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>80</x>
          <y>120</y>
          <width>71</width>
          <height>21</height>
@@ -2502,7 +2688,7 @@ enabled</string>
       <widget class="QLineEdit" name="leSDCB_20">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>80</x>
          <y>150</y>
          <width>71</width>
          <height>21</height>
@@ -2512,7 +2698,7 @@ enabled</string>
       <widget class="QLineEdit" name="leSDCB_21">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>80</x>
          <y>180</y>
          <width>71</width>
          <height>21</height>
@@ -2522,7 +2708,7 @@ enabled</string>
       <widget class="QLineEdit" name="leSDCB_22">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>80</x>
          <y>210</y>
          <width>71</width>
          <height>21</height>
@@ -2532,7 +2718,7 @@ enabled</string>
       <widget class="QLineEdit" name="leSDCB_23">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>80</x>
          <y>240</y>
          <width>71</width>
          <height>21</height>
@@ -2542,7 +2728,7 @@ enabled</string>
       <widget class="QLineEdit" name="leSDCB_24">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>80</x>
          <y>270</y>
          <width>71</width>
          <height>21</height>
@@ -2552,7 +2738,7 @@ enabled</string>
       <widget class="QLineEdit" name="leGDCBV_17">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>60</y>
          <width>71</width>
          <height>21</height>
@@ -2565,7 +2751,7 @@ enabled</string>
       <widget class="QLineEdit" name="leGDCBV_18">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>90</y>
          <width>71</width>
          <height>21</height>
@@ -2578,7 +2764,7 @@ enabled</string>
       <widget class="QLineEdit" name="leGDCBV_19">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>120</y>
          <width>71</width>
          <height>21</height>
@@ -2591,7 +2777,7 @@ enabled</string>
       <widget class="QLineEdit" name="leGDCBV_20">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>150</y>
          <width>71</width>
          <height>21</height>
@@ -2604,7 +2790,7 @@ enabled</string>
       <widget class="QLineEdit" name="leGDCBV_21">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>180</y>
          <width>71</width>
          <height>21</height>
@@ -2617,7 +2803,7 @@ enabled</string>
       <widget class="QLineEdit" name="leGDCBV_22">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>210</y>
          <width>71</width>
          <height>21</height>
@@ -2630,7 +2816,7 @@ enabled</string>
       <widget class="QLineEdit" name="leGDCBV_23">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>240</y>
          <width>71</width>
          <height>21</height>
@@ -2643,7 +2829,7 @@ enabled</string>
       <widget class="QLineEdit" name="leGDCBV_24">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>270</y>
          <width>71</width>
          <height>21</height>
@@ -2760,7 +2946,7 @@ enabled</string>
       <widget class="QLabel" name="label_132">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>85</x>
          <y>30</y>
          <width>71</width>
          <height>26</height>
@@ -2773,7 +2959,7 @@ enabled</string>
       <widget class="QLabel" name="label_162">
        <property name="geometry">
         <rect>
-         <x>155</x>
+         <x>160</x>
          <y>30</y>
          <width>101</width>
          <height>26</height>
@@ -2869,6 +3055,99 @@ enabled</string>
        </property>
        <property name="text">
         <string>Offset</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_200">
+       <property name="geometry">
+        <rect>
+         <x>35</x>
+         <y>30</y>
+         <width>41</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Group</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP18">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>90</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP19">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>120</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP22">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>210</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP21">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>180</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP20">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>150</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP17">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>60</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP23">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>240</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="leGRP24">
+       <property name="geometry">
+        <rect>
+         <x>50</x>
+         <y>270</y>
+         <width>21</width>
+         <height>21</height>
+        </rect>
        </property>
       </widget>
      </widget>
@@ -5844,247 +6123,13 @@ enabled</string>
      <attribute name="title">
       <string>FAIMS</string>
      </attribute>
-     <widget class="QGroupBox" name="gpCVparking">
-      <property name="geometry">
-       <rect>
-        <x>430</x>
-        <y>10</y>
-        <width>331</width>
-        <height>536</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>CV parking</string>
-      </property>
-      <widget class="QTextEdit" name="textCVparkList">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>60</y>
-         <width>251</width>
-         <height>191</height>
-        </rect>
-       </property>
-       <property name="lineWrapMode">
-        <enum>QTextEdit::NoWrap</enum>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_138">
-       <property name="geometry">
-        <rect>
-         <x>50</x>
-         <y>20</y>
-         <width>251</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>List of compounds, RT, RT window, CV, and Bias.</string>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_139">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>290</y>
-         <width>111</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Enternal trigger</string>
-       </property>
-      </widget>
-      <widget class="QComboBox" name="comboFMtrig">
-       <property name="geometry">
-        <rect>
-         <x>180</x>
-         <y>290</y>
-         <width>121</width>
-         <height>26</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pbFMstart">
-       <property name="geometry">
-        <rect>
-         <x>70</x>
-         <y>320</y>
-         <width>201</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Start</string>
-       </property>
-      </widget>
-      <widget class="QGroupBox" name="gbCurrentValues">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>345</y>
-         <width>281</width>
-         <height>181</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Current values</string>
-       </property>
-       <widget class="QLabel" name="label_140">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>30</y>
-          <width>59</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Status</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_141">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>60</y>
-          <width>81</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Elasped mins</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_151">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>120</y>
-          <width>71</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>CV, volts</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_152">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>150</y>
-          <width>71</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Bias, volts</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="leFMstatus">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>30</y>
-          <width>151</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="leFMelasped">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>60</y>
-          <width>151</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="leFMcvVolts">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>120</y>
-          <width>151</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="leFMbiasVolts">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>150</y>
-          <width>151</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_163">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>90</y>
-          <width>71</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Compound</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="leFMcompound">
-        <property name="geometry">
-         <rect>
-          <x>110</x>
-          <y>90</y>
-          <width>151</width>
-          <height>21</height>
-         </rect>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QPushButton" name="pbFMloadCSV">
-       <property name="geometry">
-        <rect>
-         <x>70</x>
-         <y>250</y>
-         <width>201</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Load csv file</string>
-       </property>
-      </widget>
-     </widget>
      <widget class="QGroupBox" name="gbFAIMS_RF">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>50</y>
+        <x>50</x>
+        <y>20</y>
         <width>331</width>
-        <height>221</height>
+        <height>241</height>
        </rect>
       </property>
       <property name="title">
@@ -6094,7 +6139,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>40</y>
+         <y>30</y>
          <width>161</width>
          <height>20</height>
         </rect>
@@ -6107,7 +6152,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>80</y>
+         <y>60</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -6117,7 +6162,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>80</y>
+         <y>60</y>
          <width>161</width>
          <height>16</height>
         </rect>
@@ -6130,7 +6175,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>110</y>
+         <y>150</y>
          <width>171</width>
          <height>16</height>
         </rect>
@@ -6143,7 +6188,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>140</y>
+         <y>180</y>
          <width>171</width>
          <height>16</height>
         </rect>
@@ -6156,7 +6201,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>170</y>
+         <y>210</y>
          <width>171</width>
          <height>16</height>
         </rect>
@@ -6169,7 +6214,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>110</y>
+         <y>150</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -6182,7 +6227,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>140</y>
+         <y>180</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -6195,7 +6240,7 @@ enabled</string>
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>170</y>
+         <y>210</y>
          <width>113</width>
          <height>21</height>
         </rect>
@@ -6204,12 +6249,61 @@ enabled</string>
         <bool>true</bool>
        </property>
       </widget>
+      <widget class="QLineEdit" name="leSFMSP">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>120</y>
+         <width>113</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_214">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>120</y>
+         <width>161</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Voltage setpoint, KV</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="rbSFMLOCK_FALSE">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>90</y>
+         <width>100</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Manual</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="rbSFMLOCK_TRUE">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>90</y>
+         <width>100</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Lock</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="gbFAIMS_DC">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>330</y>
+        <x>50</x>
+        <y>300</y>
         <width>331</width>
         <height>141</height>
        </rect>
@@ -6351,6 +6445,711 @@ enabled</string>
         </rect>
        </property>
       </widget>
+     </widget>
+     <widget class="QTabWidget" name="tabScanMode">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>5</y>
+        <width>321</width>
+        <height>546</height>
+       </rect>
+      </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="CVparking">
+       <attribute name="title">
+        <string>CV parking</string>
+       </attribute>
+       <widget class="QFrame" name="frmCVparking">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>311</width>
+          <height>506</height>
+         </rect>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <widget class="QGroupBox" name="gbCurrentValues">
+         <property name="geometry">
+          <rect>
+           <x>15</x>
+           <y>310</y>
+           <width>281</width>
+           <height>181</height>
+          </rect>
+         </property>
+         <property name="title">
+          <string>Current values</string>
+         </property>
+         <widget class="QLabel" name="label_140">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>30</y>
+            <width>59</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Status</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_141">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>60</y>
+            <width>81</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Elasped mins</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_151">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>120</y>
+            <width>71</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>CV, volts</string>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_152">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>150</y>
+            <width>71</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Bias, volts</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="leFMstatus">
+          <property name="geometry">
+           <rect>
+            <x>110</x>
+            <y>30</y>
+            <width>151</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="leFMelasped">
+          <property name="geometry">
+           <rect>
+            <x>110</x>
+            <y>60</y>
+            <width>151</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="leFMcvVolts">
+          <property name="geometry">
+           <rect>
+            <x>110</x>
+            <y>120</y>
+            <width>151</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="leFMbiasVolts">
+          <property name="geometry">
+           <rect>
+            <x>110</x>
+            <y>150</y>
+            <width>151</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+         <widget class="QLabel" name="label_163">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>90</y>
+            <width>71</width>
+            <height>16</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Compound</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="leFMcompound">
+          <property name="geometry">
+           <rect>
+            <x>110</x>
+            <y>90</y>
+            <width>151</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QLabel" name="label_139">
+         <property name="geometry">
+          <rect>
+           <x>45</x>
+           <y>260</y>
+           <width>111</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Enternal trigger</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pbFMloadCSV">
+         <property name="geometry">
+          <rect>
+           <x>55</x>
+           <y>230</y>
+           <width>201</width>
+           <height>32</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Load csv file</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="pbFMstart">
+         <property name="geometry">
+          <rect>
+           <x>55</x>
+           <y>285</y>
+           <width>201</width>
+           <height>32</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Start</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="comboFMtrig">
+         <property name="geometry">
+          <rect>
+           <x>165</x>
+           <y>260</y>
+           <width>121</width>
+           <height>26</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QTextEdit" name="textCVparkList">
+         <property name="geometry">
+          <rect>
+           <x>35</x>
+           <y>50</y>
+           <width>251</width>
+           <height>181</height>
+          </rect>
+         </property>
+         <property name="lineWrapMode">
+          <enum>QTextEdit::NoWrap</enum>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_138">
+         <property name="geometry">
+          <rect>
+           <x>35</x>
+           <y>10</y>
+           <width>251</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>List of compounds, RT, RT window, CV, and Bias.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="LinearScan">
+       <attribute name="title">
+        <string>Linear scan</string>
+       </attribute>
+       <widget class="QGroupBox" name="gbLinearScan">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>185</y>
+          <width>276</width>
+          <height>141</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Scan parameters</string>
+        </property>
+        <widget class="QLineEdit" name="leSFMCVSTART">
+         <property name="geometry">
+          <rect>
+           <x>145</x>
+           <y>30</y>
+           <width>113</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_201">
+         <property name="geometry">
+          <rect>
+           <x>15</x>
+           <y>30</y>
+           <width>60</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>CV start</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_202">
+         <property name="geometry">
+          <rect>
+           <x>15</x>
+           <y>55</y>
+           <width>60</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>CV end</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_203">
+         <property name="geometry">
+          <rect>
+           <x>15</x>
+           <y>80</y>
+           <width>106</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Duration in sec</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_204">
+         <property name="geometry">
+          <rect>
+           <x>15</x>
+           <y>105</y>
+           <width>111</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Number of loops</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="leSFMCVEND">
+         <property name="geometry">
+          <rect>
+           <x>145</x>
+           <y>55</y>
+           <width>113</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="leSFMDUR">
+         <property name="geometry">
+          <rect>
+           <x>145</x>
+           <y>80</y>
+           <width>113</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="leSFMLOOPS">
+         <property name="geometry">
+          <rect>
+           <x>145</x>
+           <y>105</y>
+           <width>113</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QLabel" name="label_205">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>435</y>
+          <width>111</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Enternal trigger</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pbFMstartLinear">
+        <property name="geometry">
+         <rect>
+          <x>55</x>
+          <y>460</y>
+          <width>201</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="comboFMlinearTrig">
+        <property name="geometry">
+         <rect>
+          <x>150</x>
+          <y>435</y>
+          <width>121</width>
+          <height>26</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_212">
+        <property name="geometry">
+         <rect>
+          <x>15</x>
+          <y>5</y>
+          <width>291</width>
+          <height>186</height>
+         </rect>
+        </property>
+        <property name="midLineWidth">
+         <number>0</number>
+        </property>
+        <property name="text">
+         <string>This is the linear scan configuration dialog. This function allows you to define a starting and ending CV voltage and duration in seconds for the scan. When the scan starts the MIPS FAIMS system will automatically scan the CV from the starting voltage to the ending voltage in a linear fashion. Additionally the defined scan can be repeated the number of times defined in loop. The scan can be started manually or via an external trigger defined below.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pbFMabortLinear">
+        <property name="geometry">
+         <rect>
+          <x>55</x>
+          <y>485</y>
+          <width>201</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Abort</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_213">
+        <property name="geometry">
+         <rect>
+          <x>15</x>
+          <y>335</y>
+          <width>286</width>
+          <height>76</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Select an external trigger input on MIPS or none to manually start the scan. When start is pressed the system will start scanning or wait for the trigger you selected before starting.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="StepScan">
+       <attribute name="title">
+        <string>Step scan</string>
+       </attribute>
+       <widget class="QGroupBox" name="gbStepScan">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>185</y>
+          <width>276</width>
+          <height>161</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Scan parameters</string>
+        </property>
+        <widget class="QLineEdit" name="leSFMCVSTART_">
+         <property name="geometry">
+          <rect>
+           <x>155</x>
+           <y>30</y>
+           <width>113</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_206">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>35</y>
+           <width>60</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>CV start</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_207">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>55</y>
+           <width>60</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>CV end</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_208">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>80</y>
+           <width>141</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Step duration in mSec</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_209">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>105</y>
+           <width>141</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Total number of steps</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="leSFMCVEND_">
+         <property name="geometry">
+          <rect>
+           <x>155</x>
+           <y>55</y>
+           <width>113</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="leSFMSTPTM">
+         <property name="geometry">
+          <rect>
+           <x>155</x>
+           <y>80</y>
+           <width>113</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="leSFMSTEPS">
+         <property name="geometry">
+          <rect>
+           <x>155</x>
+           <y>105</y>
+           <width>113</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="leSFMLOOPS_">
+         <property name="geometry">
+          <rect>
+           <x>155</x>
+           <y>130</y>
+           <width>113</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_211">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>130</y>
+           <width>141</width>
+           <height>16</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Loops</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QLabel" name="label_210">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>435</y>
+          <width>111</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Enternal trigger</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pbFMstartStep">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>460</y>
+          <width>201</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Start</string>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="comboFMstepTrig">
+        <property name="geometry">
+         <rect>
+          <x>160</x>
+          <y>435</y>
+          <width>121</width>
+          <height>26</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pbFMabortStep">
+        <property name="geometry">
+         <rect>
+          <x>50</x>
+          <y>485</y>
+          <width>201</width>
+          <height>32</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Abort</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_215">
+        <property name="geometry">
+         <rect>
+          <x>15</x>
+          <y>0</y>
+          <width>291</width>
+          <height>186</height>
+         </rect>
+        </property>
+        <property name="midLineWidth">
+         <number>0</number>
+        </property>
+        <property name="text">
+         <string>This is the step scan configuration dialog. This function allows you to define a starting and ending CV voltage, number of steps, and step duration for the scan. When the scan starts the MIPS FAIMS system will automatically scan the CV from the starting voltage to the ending voltage in a step wise fashion. Additionally the defined scan can be repeated the number of times defined in loop. The scan can be started manually or via an external trigger defined below.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_216">
+        <property name="geometry">
+         <rect>
+          <x>15</x>
+          <y>355</y>
+          <width>286</width>
+          <height>76</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Select an external trigger input on MIPS or none to manually start the scan. When start is pressed the system will start scanning or wait for the trigger you selected before starting.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+     <widget class="QLineEdit" name="LogFile">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>500</y>
+        <width>331</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_217">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>500</y>
+        <width>59</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Log file</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pbSelectLogFile">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>460</y>
+        <width>161</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Select log file name</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="Filament">
@@ -7249,6 +8048,7 @@ number on each trigger</string>
     <addaction name="separator"/>
     <addaction name="actionRead_ARB_FLASH"/>
     <addaction name="actionWrite_ARB_FLASH"/>
+    <addaction name="actionARB_upload"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -7269,6 +8069,7 @@ number on each trigger</string>
     <addaction name="actionSoft_landing"/>
     <addaction name="actionGrid"/>
     <addaction name="actionSoft_landing_Purdue"/>
+    <addaction name="actionSelect"/>
    </widget>
    <addaction name="menuAbout"/>
    <addaction name="menuFile"/>
@@ -7384,13 +8185,23 @@ number on each trigger</string>
     <string>Write ARB FLASH</string>
    </property>
   </action>
+  <action name="actionARB_upload">
+   <property name="text">
+    <string>ARB upload</string>
+   </property>
+  </action>
+  <action name="actionSelect">
+   <property name="text">
+    <string>Select...</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
    <class>QCustomPlot</class>
    <extends>QWidget</extends>
-   <header location="global">qcustomplot.h</header>
+   <header>qcustomplot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

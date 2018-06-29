@@ -36,6 +36,7 @@ class Filament;
 class Grid;
 class ARBwaveformEdit;
 class ADC;
+class ControlPanel;
 
 class DeleteHighlightedItemWhenShiftDelPressedEventFilter : public QObject
 {
@@ -55,6 +56,7 @@ public:
     virtual void resizeEvent(QResizeEvent* event);
     virtual void mousePressEvent(QMouseEvent * event);
     Ui::MIPS *ui;
+    QString SelectedTab;
     void RemoveTab(QString TabName);
     void AddTab(QString TabName);
     void FindMIPSandConnect(void);
@@ -92,6 +94,9 @@ private slots:
     void WriteEEPROM(void);
     void ReadARBFLASH(void);
     void WriteARBFLASH(void);
+    void ARBupload(void);
+    void SelectCP(void);
+    void CloseControlPanel(void);
 
 private:
     Comms *comms;
@@ -110,16 +115,21 @@ private:
     SingleFunnel *sf;
     bool sf_deleteRequest;
     SoftLanding *sl;
-    SoftLanding2 *sl2;
     bool sl_deleteRequest;
+    SoftLanding2 *sl2;
     bool sl2_deleteRequest;
     Grid *grid;
     bool grid_deleteRequest;
+    ControlPanel *cp;
+    bool cp_deleteRequest;
     ADC *adc;
     QTimer *pollTimer;
     QString  appPath;
     QString RepeatMessage;
     QList<Comms*> Systems;
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
 };
 
 #endif // MIPS_H

@@ -31,10 +31,14 @@ public:
     void Load(QString Filename);
     int getHeaderIndex(QString Name);
     QString getCSVtoken(QString Name, int index);
+    void Log(QString Message);
+    QString LogFileName;
 
     Ui::MIPS *fui;
     Comms *comms;
     bool CVparkingTriggered;
+    bool WaitingForLinearScanTrig;
+    bool WaitingForStepScanTrig;
     QStringList Parks;
     int   CurrentPoint;
     QString TargetCompound;
@@ -52,6 +56,13 @@ private slots:
     void FAIMSenable(void);
     void FAIMSscan(void);
     void FAIMSloadCSV(void);
+    void FAIMSstartLinearScan(void);
+    void FAIMSabortLinearScan(void);
+    void FAIMSstartStepScan(void);
+    void FAIMSabortStepScan(void);
+    void FAIMSlockOff(void);
+    void FAIMSlockOn(void);
+    void FAIMSselectLogFile(void);
 };
 
 #endif // FAIMS_H

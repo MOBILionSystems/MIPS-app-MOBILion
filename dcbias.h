@@ -23,11 +23,17 @@ public:
     void Update(void);
     void Save(QString Filename);
     void Load(QString Filename);
+    bool myEventFilter(QObject *obj, QEvent *event);
+    void ApplyDelta(QString GrpName, float change);
 
     Ui::MIPS *dui;
     Comms *comms;
     int NumChannels;
     QLineEdit *selectedLineEdit;
+
+private:
+    bool Updating;
+    bool UpdateOff;
 
 private slots:
     void DCbiasUpdated(void);

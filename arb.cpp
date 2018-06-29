@@ -207,7 +207,8 @@ void ARB::ARBmoduleSelected(void)
 {
     QString res;
 
-    QObjectList widgetList = aui->gbARBtwaveParms->children();
+    if( aui->tabMIPS->tabText(aui->tabMIPS->currentIndex()) != "ARB") return;
+     QObjectList widgetList = aui->gbARBtwaveParms->children();
     QString chan = aui->comboARBmodule->currentText();
     foreach(QObject *w, widgetList)
     {
@@ -261,6 +262,8 @@ void ARB::Update(void)
     QString res;
     QObjectList widgetList;
 
+    // Exit if not selected
+    if( aui->tabMIPS->tabText(aui->tabMIPS->currentIndex()) != "ARB") return;
     // Determine the number of ARB channels and exit if its zero
     res = comms->SendMess("GCHAN,ARB\n");
     NumChannels = res.toInt();

@@ -94,7 +94,7 @@ void ARBwaveformEdit::GenerateSine(void)
    ui->txtData->clear();
    for(i=0; i<32; i++)
    {
-       Waveform[i] = qSin(qDegreesToRadians((360.0 * i)/32) + qDegreesToRadians(ui->lePhase->text().toFloat())) * 100.0;
+       Waveform[i] = qSin(qDegreesToRadians((ui->leCycles->text().toFloat() * 360.0 * i)/32) + qDegreesToRadians(ui->lePhase->text().toFloat())) * 100.0;
        ui->txtData->appendPlainText(QString::number(Waveform[i]));
    }
    ui->txtData->moveCursor (QTextCursor::Start);

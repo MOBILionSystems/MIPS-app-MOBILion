@@ -242,5 +242,10 @@ If something goes wrong:
       need to set the bootloader flag when programming a new version or reading
       the current version, these functions automatically set the flag when finished.
 
+Apendix C: ARB setup and calibration procudures.
+
+  This section describes how to configure the ARB modules and how to perform the
+  calibration procedures. This is not intended to be used by the end user. These
+  details are documented here for factory setup.
 
 

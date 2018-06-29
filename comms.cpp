@@ -409,6 +409,49 @@ void Comms::PutEEPROM(QString FileName, QString Board, int Addr)
     }
 }
 
+void Comms::ARBupload(QString Faddress, QString FileName)
+{
+    QByteArray fdata;
+    int fsize,len;
+    QString dblock,res;
+
+    // open the local file to send and read the data
+    QFile file(FileName);
+    file.open(QIODevice::ReadOnly);
+    fdata = file.readAll();
+    // Convert the data into a ascii hex string
+    for(int i=0; i<file.size(); i++)
+    {
+         dblock += QString().sprintf("%02x",(unsigned char)fdata[i]);
+    }
+    fsize = file.size();
+    file.close();
+    // Send the data to ARB
+    if(SendCommand("ARBPGM," + Faddress + "," + QString().number(fsize) + "\n" ))
+    {
+        for(int i=0; i<dblock.count(); i+=512)
+        {
+            len = 512;
+            if((dblock.count() - i) < 512) len = dblock.count() - i;
+            SendString(dblock.mid(i,len));
+            if(len == 512)
+            {
+                waitforline(2000);
+                if((res = getline()) == "")
+                {
+                    // Here if we timed out, display error and exit
+                    QMessageBox::critical(this, tr("Data read error"), "Timedout waiting for data from ARB!");
+                    return;
+                }
+            }
+            QApplication::processEvents();
+        }
+        SendString("\n");
+        SendString(QString().number(CalculateCRC(fdata)) + "\n");
+        QMessageBox::information(this, tr("File saved"), "File uploaded to ARB FLASH!");
+    }
+}
+
 void Comms::SendString(QString name, QString message)
 {
     if((name == MIPSname) || (name == "")) SendString(message);

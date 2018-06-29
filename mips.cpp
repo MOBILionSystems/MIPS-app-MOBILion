@@ -95,6 +95,16 @@
 //      2.) Added the Ts1=Ts2 and Ts2=Ts1 check boxes
 // 1.21, February 18, 2018
 //      1.) Added scripting capability to Purdue softlanding control panel
+// 1.22, March 11, 2018
+//      1.) Added the support for programming the Flash on the ARB
+//      2.) Added up and down arrow control of values for the DB bias
+//          and Twave values. Also added limits for the Twave values
+//          specifically the pulse voltage
+// 1.23, March 12, 2018
+//      1.) Added shift+alt arrow to decrease increment by 10x.
+//      2.) Fixed limit bug in Twave freq in arrow keys
+// 1.24, May 12, 2018
+//      1.) Added the group capability for DC bias voltages
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -119,6 +129,7 @@
 #include "grid.h"
 #include "arbwaveformedit.h"
 #include "adc.h"
+#include "controlpanel.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
@@ -144,15 +155,8 @@ MIPS::MIPS(QWidget *parent) :
     ui->setupUi(this);
     ui->tabMIPS->setElideMode(Qt::ElideNone);
     ui->tabMIPS->setUsesScrollButtons(true);
-//    ui->tabMIPS->setTabEnabled(5,false);
-//    QWidget* pWidget= ui->tabMIPS->widget(5);
-//    ui->tabMIPS->removeTab(5);
-//    ui->tabMIPS->addTab(pWidget,"back");
-
     // Make the dialog fixed size.
     this->setFixedSize(this->size());
-
-//  MIPS::setProperty("font", QFont("Times New Roman", 16));
 
     ui->comboSystems->setVisible(false);
     ui->lblSystems->setVisible(false);
@@ -163,7 +167,7 @@ MIPS::MIPS(QWidget *parent) :
     ui->lblMIPSconnectionNotes->setFont(font);
     #endif
 
-    // qDebug() << QT_VERSION_STR;
+    qApp->installEventFilter(this);
 
     sf = NULL;
     sf_deleteRequest = false;
@@ -173,6 +177,8 @@ MIPS::MIPS(QWidget *parent) :
     sl2_deleteRequest = false;
     grid = NULL;
     grid_deleteRequest = false;
+    cp = NULL;
+    cp_deleteRequest = false;
     appPath = QApplication::applicationDirPath();
     pollTimer = new QTimer;
     settings = new SettingsDialog;
@@ -211,9 +217,10 @@ MIPS::MIPS(QWidget *parent) :
     ui->actionWrite_EEPROM->setEnabled(true);
     ui->actionRead_ARB_FLASH->setEnabled(true);
     ui->actionWrite_ARB_FLASH->setEnabled(true);
+    ui->actionARB_upload->setEnabled(true);
+    ui->actionSelect->setEnabled(true);
     ui->menuTerminal->setEnabled(false);
 
-  //   connect(app, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(setWidgets(QWidget*, QWidget*)));    connect(ui->actionClear, SIGNAL(triggered()), console, SLOT(clear()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(loadSettings()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveSettings()));
     connect(ui->pbConfigure, SIGNAL(pressed()), settings, SLOT(show()));
@@ -237,6 +244,8 @@ MIPS::MIPS(QWidget *parent) :
     connect(ui->actionWrite_EEPROM, SIGNAL(triggered()), this, SLOT(WriteEEPROM()));
     connect(ui->actionRead_ARB_FLASH, SIGNAL(triggered()), this, SLOT(ReadARBFLASH()));
     connect(ui->actionWrite_ARB_FLASH, SIGNAL(triggered()), this, SLOT(WriteARBFLASH()));
+    connect(ui->actionARB_upload, SIGNAL(triggered()), this, SLOT(ARBupload()));
+    connect(ui->actionSelect, SIGNAL(triggered()), this, SLOT(SelectCP()));
 
     ui->comboMIPSnetNames->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
     // Sets the polling loop interval and starts the timer
@@ -257,9 +266,17 @@ void MIPS::closeEvent(QCloseEvent *event)
     if(sl2 != NULL) delete sl2;
     if(sf != NULL) delete sf;
     if(grid != NULL) delete grid;
+    if(cp != NULL) delete cp;
     delete settings;
     delete help;
     delete ui;
+}
+
+bool MIPS::eventFilter(QObject *obj, QEvent *event)
+{
+    if(SelectedTab == "DCbias") return dcbias->myEventFilter(obj, event);
+    if(SelectedTab == "Twave") return twave->myEventFilter(obj, event);
+  return QObject::eventFilter(obj, event);
 }
 
 bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *obj, QEvent *event)
@@ -483,6 +500,12 @@ void MIPS::saveSettings(void)
         grid->Save(fileName);
         return;
     }
+    if(cp != NULL)
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
+        cp->Save(fileName);
+        return;
+    }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "System")
     {
     }
@@ -532,7 +555,6 @@ void MIPS::pollLoop(void)
 {
     QString res ="";
     //char c;
-
 
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
     {
@@ -598,6 +620,15 @@ void MIPS::pollLoop(void)
     }
     if(grid != NULL) if(comms->isConnected()) grid->Update();
 
+    if(cp_deleteRequest)
+    {
+      delete cp;
+      cp = NULL;
+      cp_deleteRequest = false;
+    }
+    //if(cp != NULL) if(comms->isConnected()) cp->Update();
+    if(cp != NULL) cp->Update();
+
 }
 
 void MIPS::mousePressEvent(QMouseEvent * event)
@@ -626,7 +657,11 @@ void MIPS::MIPSsetup(void)
 
     pgm->comms = comms;
     ui->lblMIPSconfig->setText("MIPS: ");
+    // Turn ECHO off
+    comms->SendString("\n");
+    comms->SendString("ECHO,FALSE\n");
     res = comms->SendMess("GVER\n");
+    if(res=="") return;  // Exit if we timeout, no MIPS comms
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + res);
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\nModules present:");
 
@@ -751,6 +786,7 @@ void MIPS::FindAllMIPSsystems(void)
           {
             delay();
             cp->host = "";
+            cp->SendString("ECHO,FALSE\n");
             if(cp->ConnectToMIPS())
             {
                Systems << (cp);
@@ -916,6 +952,7 @@ void MIPS::tabSelected()
         LastTab = "Filament";
         filament->Update();
     }
+    SelectedTab = LastTab;
 }
 
 void MIPS::writeData(const QByteArray &data)
@@ -942,6 +979,7 @@ void MIPS::Single_Funnel(void)
    if(sl != NULL) return;
    if(sl2 != NULL) return;
    if(grid != NULL) return;
+   if(cp != NULL) return;
    ui->tabMIPS->setCurrentIndex(0);
    sf = new SingleFunnel(0,comms,ui->statusBar);
    if(!sf->ConfigurationCheck())
@@ -966,6 +1004,7 @@ void MIPS::Soft_Landing(void)
     if(sl != NULL) return;
     if(sl2 != NULL) return;
     if(grid != NULL) return;
+    if(cp != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
     sl = new SoftLanding(0,comms,ui->statusBar);
     if(!sl->ConfigurationCheck())
@@ -990,6 +1029,7 @@ void MIPS::Soft_Landing_Purdue(void)
     if(sl != NULL) return;
     if(sl2 != NULL) return;
     if(grid != NULL) return;
+    if(cp != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
     sl2 = new SoftLanding2(0,comms,ui->statusBar);
     if(!sl2->ConfigurationCheck())
@@ -1014,6 +1054,7 @@ void MIPS::Grid_system(void)
     if(sl != NULL) return;
     if(sl2 != NULL) return;
     if(grid != NULL) return;
+    if(cp != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
     grid = new Grid(0,comms,ui->statusBar);
     grid->show();
@@ -1188,3 +1229,44 @@ void MIPS::WriteARBFLASH(void)
     }
 }
 
+void MIPS::ARBupload(void)
+{
+    bool ok;
+
+    QString Faddress = QInputDialog::getText(0, "ARB upload", "ARB Module FLASH write function. This function will allow\nyou to upload a file and place it in FLASH at the address\nyou select. Proceed with caution, you can render your\nsystem inoperable by entering invalid information.\n\nEnter FLASH address in hex or cancel:\nmover.bin at c0000\narb.bin at d0000", QLineEdit::Normal,"", &ok );
+    if(ok)
+    {
+        QString fileName = QFileDialog::getOpenFileName(this, tr("File to upload to ARB FLASH"),tr("All files (*)", 0));
+        if(fileName != "")
+        {
+            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
+            comms->ARBupload(Faddress, fileName);
+            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
+            {
+                connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
+                readData2Console();
+            }
+        }
+    }
+}
+
+void MIPS::CloseControlPanel(void)
+{
+    cp_deleteRequest = true;
+    this->setWindowState(Qt::WindowMaximized);
+}
+
+void MIPS::SelectCP(void)
+{
+    if(sf != NULL) return;
+    if(sl != NULL) return;
+    if(sl2 != NULL) return;
+    if(grid != NULL) return;
+    if(cp != NULL) return;
+    ui->tabMIPS->setCurrentIndex(0);
+    cp = new ControlPanel(0,Systems);
+    cp->show();
+    connect(cp, SIGNAL(DialogClosed()), this, SLOT(CloseControlPanel()));
+    cp->Update();
+    this->setWindowState(Qt::WindowMinimized);
+}

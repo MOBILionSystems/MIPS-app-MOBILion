@@ -1218,6 +1218,19 @@
        <string>Set Ts1 to 0 to disable</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="chkSwapAD">
+      <property name="geometry">
+       <rect>
+        <x>195</x>
+        <y>355</y>
+        <width>161</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Swap outputs A and D</string>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
@@ -1226,7 +1239,7 @@
   <customwidget>
    <class>QCustomPlot</class>
    <extends>QWidget</extends>
-   <header location="global">qcustomplot.h</header>
+   <header>qcustomplot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

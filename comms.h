@@ -58,6 +58,7 @@ public:
     void PutEEPROM(QString FileName, QString Board, int Addr);
     void GetARBFLASH(QString FileName);
     void PutARBFLASH(QString FileName);
+    void ARBupload(QString Faddress, QString FileName);
     bool isConnected(void);
     QString getline(void);
     int CalculateCRC(QByteArray fdata);

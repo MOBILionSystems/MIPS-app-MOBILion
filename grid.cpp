@@ -376,7 +376,7 @@ void Grid::Download(void)
     sb->showMessage(comms->getline());
 }
 
-// MIPS digital outputs assinments:
+// MIPS digital outputs assignments:
 //  A = Sync output
 //  B = A, ADC trigger
 //  C = Shutter 1
@@ -387,31 +387,39 @@ void Grid::Download(void)
 QString Grid::GenerateTable(void)
 {
    QString TableName;
+   bool    SwapAD = false;
 
+   if(ui->chkSwapAD->isChecked()) SwapAD = true;
    TableName = "A";
    // Initial table with sync pulse
-   Table = "STBLDAT;0:[L:" + QString::number((int)(SeqRepeat)) + "," + QString::number((int)(50 * ClockFreq / 1000000)) + ":A:1";
-   if(Ts1 == 0) Table += ":C:0";    // Open shutter if not used
-   if(Ts2 == 0) Table += ":D:0";    // Open shutter if not used
+   if(!SwapAD) Table = "STBLDAT;0:[L:" + QString::number((int)(SeqRepeat)) + "," + QString::number((int)(50 * ClockFreq / 1000000)) + ":A:1";
+   else Table = "STBLDAT;0:[L:" + QString::number((int)(SeqRepeat)) + "," + QString::number((int)(50 * ClockFreq / 1000000)) + ":D:1";
+   if(Ts1 == 0) Table                += ":C:0";    // Open shutter if not used
+   if((Ts2 == 0) && (!SwapAD)) Table += ":D:0";    // Open shutter if not used
+   if((Ts2 == 0) && (SwapAD))  Table += ":A:0";    // Open shutter if not used
    Table += ",";
-   Table += QString::number((int)(100 * ClockFreq / 1000000))  + ":A:0:";
+   if(!SwapAD) Table += QString::number((int)(100 * ClockFreq / 1000000))  + ":A:0:";
+   else Table += QString::number((int)(100 * ClockFreq / 1000000))  + ":D:0:";
    // Add each sequence to the table
    for(int i=0; i<n; i++)
    {
        if(i > 0) Table += ",0:";
        Table += "[" + TableName + ":" + QString::number(Repeat[i]) + ",0:B:1";
        if(Ts1 > 0) Table += ":C:0";
-       if((ui->chkTs2eTs1->isChecked()) && (Ts1 > 0)) Table += ":D:0";
+       if((ui->chkTs2eTs1->isChecked()) && (Ts1 > 0) && (!SwapAD)) Table += ":D:0";
+       if((ui->chkTs2eTs1->isChecked()) && (Ts1 > 0) && (SwapAD))  Table += ":A:0";
        Table += ",";
        if(Ts1 == 0) Table += QString::number((int)(50 * ClockFreq / 1000000)) + ":B:0";
        else Table += QString::number((int)(Ts1 * ClockFreq / 1000000)) + ":B:0";
        if(Ts1 > 0) Table += ":C:1";
        if((ui->chkTs2eTs1->isChecked()) && (Ts1 > 0)) Table += ":D:1";
        Table += ",";
-       if(Ts2 > 0) Table += QString::number((int)(Tdn[i] * ClockFreq / 1000)) + ":D:0";
+       if((Ts2 > 0) && (!SwapAD)) Table += QString::number((int)(Tdn[i] * ClockFreq / 1000)) + ":D:0";
+       if((Ts2 > 0) && (SwapAD))  Table += QString::number((int)(Tdn[i] * ClockFreq / 1000)) + ":A:0";
        if((ui->chkTs1eTs2->isChecked()) && (Ts2 > 0)) Table += ":C:0";
        if(Ts2 > 0) Table += ",";
-       if(Ts2 > 0) Table += QString::number((int)((Tdn[i] * ClockFreq / 1000) + Ts2 * ClockFreq / 1000000)) + ":D:1";
+       if((Ts2 > 0) && (!SwapAD)) Table += QString::number((int)((Tdn[i] * ClockFreq / 1000) + Ts2 * ClockFreq / 1000000)) + ":D:1";
+       if((Ts2 > 0) && (SwapAD))  Table += QString::number((int)((Tdn[i] * ClockFreq / 1000) + Ts2 * ClockFreq / 1000000)) + ":A:1";
        if((ui->chkTs1eTs2->isChecked()) && (Ts2 > 0)) Table += ":C:1";
        if(Ts2 > 0) Table += ",";
        Table += QString::number((int)(Tp * ClockFreq / 1000)) + ":]";

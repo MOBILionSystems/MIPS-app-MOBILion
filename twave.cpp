@@ -12,6 +12,8 @@ Twave::Twave(Ui::MIPS *w, Comms *c)
    tui = w;
    comms = c;
 
+   Updating = false;
+   UpdateOff = false;
    NumChannels = 2;
    Compressor = true;
    QObjectList widgetList = tui->gbTwaveCH1->children();
@@ -47,6 +49,42 @@ Twave::Twave(Ui::MIPS *w, Comms *c)
    connect(tui->pbTWsweepStop,SIGNAL(pressed()),this,SLOT(pbTWsweepStop()));
    connect(tui->chkSweepExtTrig,SIGNAL(clicked(bool)),this,SLOT(SweepExtTrigger()));
 
+}
+
+bool Twave::myEventFilter(QObject *obj, QEvent *event)
+{
+    QLineEdit *le;
+    QString res;
+    float delta = 0;
+
+   if (obj->objectName().startsWith("leSTW") && (event->type() == QEvent::KeyPress))
+   {
+       if(obj->objectName().startsWith("leSTWSEQ")) return QObject::eventFilter(obj, event);
+       if(Updating) return true;
+       UpdateOff = true;
+       le = (QLineEdit *)obj;
+       QKeyEvent *key = static_cast<QKeyEvent *>(event);
+       if(key->key() == 16777235) delta = 0.1;
+       if(key->key() == 16777237) delta = -0.1;
+//       qDebug() << "pressed"<< key->key();
+//       qDebug() << QApplication::queryKeyboardModifiers();
+       if((QApplication::queryKeyboardModifiers() & 0xA000000) != 0) delta *= 0.1;
+       else if((QApplication::queryKeyboardModifiers() & 0x2000000) != 0) delta *= 10;
+       else if((QApplication::queryKeyboardModifiers() & 0x8000000) != 0) delta *= 100;
+       if(obj->objectName().startsWith("leSTWF")) delta *= 10000;
+       else delta *= 10;
+       if(delta != 0)
+       {
+          QString myString;
+          if((obj->objectName().startsWith("leSTWPV")) || (obj->objectName().startsWith("leSTWG"))) myString.sprintf("%3.2f", le->text().toFloat() + delta);
+          else myString.sprintf("%1.0f", le->text().toFloat() + delta);
+          le->setText(myString);
+          le->setModified(true);
+          le->editingFinished();
+          return true;
+       }
+   }
+   return QObject::eventFilter(obj, event);
 }
 
 void Twave::SweepExtTrigger(void)
@@ -179,6 +217,8 @@ void Twave::Update(void)
 {
     QString res;
 
+    if(UpdateOff) return;
+    Updating = true;
     switch(NumChannels)
     {
        case 0:
@@ -238,6 +278,7 @@ void Twave::Update(void)
     }
     tui->tabMIPS->setEnabled(true);
     tui->statusBar->showMessage(tr(""));
+    Updating = false;
 }
 
 void Twave::Changed(void)
@@ -245,10 +286,36 @@ void Twave::Changed(void)
     QObject* obj = sender();
     QString res;
 
+    if(Updating) return;
     if(!((QLineEdit *)obj)->isModified()) return;
+    // Range test pulse voltage, 7 to 100
+    if(obj->objectName().startsWith("leSTWPV"))
+    {
+        if(((QLineEdit *)obj)->text().toFloat() < 7)  ((QLineEdit *)obj)->setText("7");
+        if(((QLineEdit *)obj)->text().toFloat() > 100)  ((QLineEdit *)obj)->setText("100");
+    }
+    // Range test the guard voltage, 0 to 100
+    if(obj->objectName().startsWith("leSTWG"))
+    {
+        if(((QLineEdit *)obj)->text().toFloat() < 0)  ((QLineEdit *)obj)->setText("0");
+        if(((QLineEdit *)obj)->text().toFloat() > 100)  ((QLineEdit *)obj)->setText("100");
+    }
+    // Range test the frequency, 5000 to 2000000
+    if(obj->objectName().startsWith("leSTWF"))
+    {
+        if(((QLineEdit *)obj)->text().toFloat() < 5000)  ((QLineEdit *)obj)->setText("5000");
+        if(((QLineEdit *)obj)->text().toFloat() > 2000000)  ((QLineEdit *)obj)->setText("2000000");
+    }
+    // Range test order
+    if(obj->objectName().startsWith("leSTWCORDER"))
+    {
+        if(((QLineEdit *)obj)->text().toFloat() < 0)  ((QLineEdit *)obj)->setText("0");
+        if(((QLineEdit *)obj)->text().toFloat() > 255)  ((QLineEdit *)obj)->setText("255");
+    }
     res = obj->objectName().mid(2).replace("_",",") + "," + ((QLineEdit *)obj)->text() + "\n";
     comms->SendCommand(res.toStdString().c_str());
     ((QLineEdit *)obj)->setModified(false);
+    UpdateOff = false;
 }
 
 void Twave::rbModeCompress(void)

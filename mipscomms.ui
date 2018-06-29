@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MIPScomms</class>
+ <widget class="QDialog" name="MIPScomms">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>776</width>
+    <height>544</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MIPS communications</string>
+  </property>
+  <widget class="QComboBox" name="comboTermMIPS">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>30</y>
+     <width>146</width>
+     <height>26</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>25</x>
+     <y>10</y>
+     <width>126</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Select MIPS system</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboTermCMD">
+   <property name="geometry">
+    <rect>
+     <x>215</x>
+     <y>30</y>
+     <width>531</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="editable">
+    <bool>true</bool>
+   </property>
+   <property name="insertPolicy">
+    <enum>QComboBox::InsertAtTop</enum>
+   </property>
+   <property name="duplicatesEnabled">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="txtTerm">
+   <property name="geometry">
+    <rect>
+     <x>14</x>
+     <y>60</y>
+     <width>751</width>
+     <height>471</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>10</y>
+     <width>256</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Enter command to send to selected MIPS</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

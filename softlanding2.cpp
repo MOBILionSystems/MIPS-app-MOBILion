@@ -439,7 +439,7 @@ void SoftLanding2::LoadScriptFile(void)
                 {
                     ui->pteScriptStatus->appendPlainText(QDateTime::currentDateTime().toString());
                     ui->pteScriptStatus->appendPlainText("Delaying for " + resList[1] + " mins");
-                    QTime dieTime= QTime::currentTime().addSecs(resList[1].toInt() * 60);
+                    QTime dieTime= QTime::currentTime().addSecs(resList[1].toFloat() * 60);
                     while (QTime::currentTime() < dieTime)
                     {
                         if(AbortRequest) break;

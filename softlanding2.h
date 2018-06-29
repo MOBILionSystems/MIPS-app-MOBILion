@@ -33,7 +33,6 @@ private:
     bool UpdateOff;
     bool AbortRequest;
 
-
 private slots:
     void ESIenablePos(void);
     void ESIenableNeg(void);
