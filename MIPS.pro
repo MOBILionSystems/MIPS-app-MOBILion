@@ -48,7 +48,8 @@ SOURCES += main.cpp\
     controlpanel.cpp \
     mipscomms.cpp \
     cmdlineapp.cpp \
-    script.cpp
+    script.cpp \
+    cdirselectiondlg.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -77,7 +78,8 @@ HEADERS  += mips.h \
     controlpanel.h \
     mipscomms.h \
     cmdlineapp.h \
-    script.h
+    script.h \
+    cdirselectiondlg.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \

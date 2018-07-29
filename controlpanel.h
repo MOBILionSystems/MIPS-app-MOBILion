@@ -323,6 +323,8 @@ private slots:
 class IFTtiming : public QWidget
 {
     Q_OBJECT
+signals:
+    void dataAcquired(QString filePath);
 public:
     IFTtiming(QWidget *parent, QString name, QString MIPSname, int x, int y);
     void Show(void);
@@ -334,6 +336,7 @@ public:
     QString Acquire;
     int     X,Y;
     QString MIPSnm;
+    QString filePath;
     Comms   *comms;
     QString Enable;
     QStatusBar  *statusBar;
@@ -383,6 +386,7 @@ public:
     void Update(void);
     QString Save(QString Filename);
     QString Load(QString Filename);
+    void InitMIPSsystems(QString initFilename);
     QList<Comms*> Systems;
     QStatusBar  *statusBar;
     DCBchannel  *FindDCBchannel(QString name);
@@ -412,6 +416,7 @@ private:
     bool        UpdateStop;
     bool        ShutdownFlag;
     bool        RestoreFlag;
+    bool        SystemIsShutdown;
     bool        StartMIPScomms;
     Script      *script;
     Shutdown    *SD;
@@ -430,6 +435,7 @@ private slots:
     void scriptLoad(QString Filename);
     void DCBgroupDisable(void);
     void DCBgroupEnable(void);
+    void slotDataAcquired(QString filepath);
 };
 
 #endif // CONTROLPANEL_H

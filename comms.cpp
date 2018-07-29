@@ -620,14 +620,15 @@ bool Comms::isMIPS(QString port)
     if (serial->open(QIODevice::ReadWrite))
     {
         serial->setDataTerminalReady(true);  // Required on PC but not on a MAC
-        QApplication::processEvents();
+        QApplication::processEvents(QEventLoop::AllEvents, 100);
         res = SendMessage("GVER\n");
+        QApplication::processEvents(QEventLoop::AllEvents, 100);
         serial->close();
         serial->close();
         serial->close();
         serial->close();
         serial->clearError();
-        QApplication::processEvents();
+        QApplication::processEvents(QEventLoop::AllEvents, 100);
         rb.clear();
         if(res.contains("Version")) return true;
     }

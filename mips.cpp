@@ -778,13 +778,16 @@ void MIPS::FindAllMIPSsystems(void)
     else
     {
         int i = settings->numberOfPorts();
+        settings->fillPortsInfo();
         for(int j=0;j<i;j++)
         {
+          ui->statusBar->showMessage("Trying: " + settings->getPortName(j));
           QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
           cp = new Comms(settings,"",ui->statusBar);
           if(cp->isMIPS(settings->getPortName(j)))
           {
             delay();
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
             cp->host = "";
             cp->SendString("ECHO,FALSE\n");
             if(cp->ConnectToMIPS())

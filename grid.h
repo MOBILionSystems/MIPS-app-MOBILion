@@ -43,6 +43,7 @@ private:
     int   Repeat[20];
     int   SeqRepeat;
     QString Table;
+    const QClipboard *clipboard;
 
 private slots:
     void Updated(void);
@@ -62,6 +63,7 @@ private slots:
     void Download(void);
     void ShowTable(void);
     void StartTable(void);
+    void slotDataChanged(void);
 };
 
 #endif // GRID_H

@@ -33,16 +33,22 @@ public:
     void reject();
     QProcess process;
     QString  appPath;
+    QString  fileName;
     QString  ReadyMessage;
+    QString  InputRequest;
     void Execute(void);
 
 private:
     Ui::cmdlineapp *ui;
+    void setupPlot(QString mess);
+    void plotDataPoint(QString mess);
+    QTimer   *responseTimer;
 
 private slots:
     void readProcessOutput(void);
     void readMessage(void);
     void AppFinished(void);
+    void sendNO(void);
 };
 
 #endif // CMDLINEAPP_H

@@ -924,7 +924,7 @@
         <x>570</x>
         <y>110</y>
         <width>231</width>
-        <height>111</height>
+        <height>141</height>
        </rect>
       </property>
       <property name="title">
@@ -1014,12 +1014,31 @@
         <string>5</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="pbPaste">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>105</y>
+         <width>206</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <property name="toolTip">
+        <string>Paste sequence data from the clipboard, must be text, you can not paste from excel. Copy from excel to a text file and then copy from the text file and paste here.</string>
+       </property>
+       <property name="text">
+        <string>Paste text from clipboard</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
      </widget>
      <widget class="QPushButton" name="pbDownload">
       <property name="geometry">
        <rect>
         <x>420</x>
-        <y>280</y>
+        <y>290</y>
         <width>211</width>
         <height>32</height>
        </rect>
@@ -1035,7 +1054,7 @@
       <property name="geometry">
        <rect>
         <x>800</x>
-        <y>280</y>
+        <y>290</y>
         <width>113</width>
         <height>32</height>
        </rect>
@@ -1051,7 +1070,7 @@
       <property name="geometry">
        <rect>
         <x>540</x>
-        <y>240</y>
+        <y>260</y>
         <width>181</width>
         <height>16</height>
        </rect>
@@ -1064,7 +1083,7 @@
       <property name="geometry">
        <rect>
         <x>700</x>
-        <y>240</y>
+        <y>260</y>
         <width>113</width>
         <height>21</height>
        </rect>
@@ -1077,7 +1096,7 @@
       <property name="geometry">
        <rect>
         <x>630</x>
-        <y>280</y>
+        <y>290</y>
         <width>171</width>
         <height>32</height>
        </rect>

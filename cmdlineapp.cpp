@@ -6,7 +6,13 @@ cmdlineapp::cmdlineapp(QWidget *parent) :
     ui(new Ui::cmdlineapp)
 {
     ui->setupUi(this);
+    ui->plot->hide();
     ReadyMessage = "";
+    InputRequest = "";
+    fileName = "";
+    responseTimer = new QTimer;
+
+    connect(responseTimer, SIGNAL(timeout()), this, SLOT(sendNO()));
 }
 
 cmdlineapp::~cmdlineapp()
@@ -16,6 +22,7 @@ cmdlineapp::~cmdlineapp()
 
 void cmdlineapp::reject()
 {
+    process.close();
     emit DialogClosed();
     delete this;
 }
@@ -38,12 +45,80 @@ void cmdlineapp::Execute(void)
     connect(ui->leCommand,SIGNAL(editingFinished()),this,SLOT(readMessage()));
 }
 
+void cmdlineapp::setupPlot(QString mess)
+{
+    QStringList reslist = mess.split(",");
+    if(reslist.count() != 5) return;
+    // Setup the plot used to display the waaveform
+    ui->plot->addGraph();
+    ui->plot->plotLayout()->insertRow(0);
+    ui->plot->plotLayout()->addElement(0, 0, new QCPTextElement(ui->plot, reslist[1], QFont("sans", 12, QFont::Bold)));
+    // give the axes some labels:
+    ui->plot->xAxis->setLabel(reslist[3]);
+    ui->plot->yAxis->setLabel(reslist[2]);
+    // set axes ranges, so we see all data:
+    ui->plot->xAxis->setRange(0, reslist[4].toInt());
+    ui->plot->yAxis->setRange(0, 100);
+    ui->plot->replot();
+    ui->plot->show();
+}
+
+void cmdlineapp::plotDataPoint(QString mess)
+{
+    QStringList reslist = mess.split(",");
+    if(ui->plot->isHidden()) return;
+    if(reslist.count()==2)
+    {
+        ui->plot->graph(0)->addData(reslist[0].toDouble(), reslist[1].toDouble());
+        ui->plot->yAxis->rescale(true);
+        ui->plot->replot();
+    }
+}
+
+void cmdlineapp::sendNO(void)
+{
+    process.write("N\n");
+    ui->txtTerm->moveCursor (QTextCursor::End);
+    ui->txtTerm->insertPlainText ("N\n");
+    ui->txtTerm->moveCursor (QTextCursor::End);
+    ui->leCommand->setText("");
+    responseTimer->stop();
+}
+
 void cmdlineapp::readProcessOutput(void)
 {
     QString mess;
+    static QString messline="";
+    static bool ploting = false;
 
     mess = process.readAllStandardOutput();
     if(ReadyMessage != "") if(mess.contains(ReadyMessage)) emit Ready();
+    if(InputRequest != "")
+    {
+        if(mess.contains(InputRequest))
+        {
+            // Start reply timer
+            responseTimer->start(5000);
+        }
+    }
+    messline += mess;
+    if(messline.contains("\n"))
+    {
+        QStringList messlinelist;
+        messlinelist = messline.split("\n");
+        messline = "";
+        for(int i=1;i<messlinelist.count();i++) messline += messlinelist[i];
+        if(messlinelist.count() > 0)
+        {
+            // Here with full lines of text
+            if(ploting) plotDataPoint(messlinelist[0]);
+            if(mess.contains("Plot,"))
+            {
+                setupPlot(messlinelist[0]);
+                ploting = true;
+            }
+        }
+    }
     ui->txtTerm->moveCursor (QTextCursor::End);
     ui->txtTerm->insertPlainText (mess);
     ui->txtTerm->moveCursor (QTextCursor::End);
@@ -54,6 +129,7 @@ void cmdlineapp::readProcessOutput(void)
 
 void cmdlineapp::readMessage(void)
 {
+    responseTimer->stop();
     process.write(ui->leCommand->text().toStdString().c_str());
     process.write("\n");
     ui->txtTerm->moveCursor (QTextCursor::End);
@@ -64,6 +140,21 @@ void cmdlineapp::readMessage(void)
 
 void cmdlineapp::AppFinished(void)
 {
+    // If filename has been defined save all the data
+    // in txtTerm to the file
+    if(fileName != "")
+    {
+        QFile file(fileName);
+        if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            // We're going to streaming text to the file
+            QTextStream stream(&file);
+            QDateTime dateTime = QDateTime::currentDateTime();
+            stream << ui->txtTerm->toPlainText();
+            file.close();
+        }
+    }
+    ui->plot->hide();
     ui->txtTerm->appendPlainText("App signaled its finished!");
     emit AppCompleted();
 }

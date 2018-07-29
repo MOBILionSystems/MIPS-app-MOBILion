@@ -19,10 +19,12 @@
 //
 #include "controlpanel.h"
 #include "ui_controlpanel.h"
+#include "CDirSelectionDlg.h"
 
 #include <QPixmap>
 #include <math.h>
 #include <QTextEdit>
+#include <QTreeView>
 
 ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     QDialog(parent),
@@ -49,6 +51,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     ShutdownFlag   = false;
     RestoreFlag    = false;
     StartMIPScomms = false;
+    SystemIsShutdown = false;
     // Allow user to select the configuration file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Configuration from File"),"",tr("cfg (*.cfg);;All files (*.*)"));
     QFile file(fileName);
@@ -236,6 +239,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 IFT->comms = FindCommPort(resList[2],Systems);
                 IFT->statusBar = statusBar;
                 IFT->Show();
+                connect(IFT,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
             }
             if((resList[0].toUpper() == "GRID1") && (resList.length()==2))
             {
@@ -317,6 +321,12 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 connect(DCBgroups,SIGNAL(disable()),this,SLOT(DCBgroupDisable()));
                 connect(DCBgroups,SIGNAL(enable()),this,SLOT(DCBgroupEnable()));
             }
+            if((resList[0].toUpper() == "INITPARMS") && (resList.length()==2))
+            {
+                // Load the file and apply the initialization MIPS commands
+                InitMIPSsystems(resList[1]);
+            }
+
         } while(!line.isNull());
     }
     file.close();
@@ -329,7 +339,41 @@ ControlPanel::~ControlPanel()
 
 void ControlPanel::reject()
 {
+    QMessageBox msgBox;
+
+    if(SystemIsShutdown)  // If it shutdown send warning
+    {
+        QString msg = "The system is currently shutdown, this means all volatges are disabled and ";
+        msg += "all RF drive levels are set to 0. Make sure you have saved all your settings ";
+        msg += "because when the control panel is restarted you will lose the shutdown recover data.\n";
+        msgBox.setText(msg);
+        msgBox.setInformativeText("Are you sure you want to exit?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        int ret = msgBox.exec();
+        if(ret == QMessageBox::No) return;
+    }
     emit DialogClosed();
+}
+
+void ControlPanel::InitMIPSsystems(QString initFilename)
+{
+    // Open the file and send commands to MIPS systems.
+    QFile file(initFilename);
+    if(file.open(QIODevice::ReadOnly|QIODevice::Text))
+    {
+        QTextStream stream(&file);
+        QString line;
+        do
+        {
+            line = stream.readLine();
+            if(line.trimmed().startsWith("#")) continue;
+            QStringList resList = line.split(",");
+            Comms *cp =  FindCommPort(resList[0],Systems);
+            if(cp!=NULL) cp->SendString(line.mid(line.indexOf(resList[0]) + resList[0].count() + 1) + "\n");
+        } while(!line.isNull());
+        file.close();
+    }
 }
 
 // Returns a pointer to the comm port for the MIPS system defined my its name.
@@ -366,7 +410,10 @@ void ControlPanel::Update(void)
    if(ShutdownFlag)
    {
        ShutdownFlag = false;
+       SystemIsShutdown = true;
        UpdateHoldOff = 3;
+       // Make sure all MIPS systems are in local mode
+       for(int i=0;i<Systems.count();i++) Systems[i]->SendString("SMOD,LOC\n");
        for(int i=0;i<numESIchannels;i++) ESIchans[i]->Shutdown();
        for(int i=0;i<numDCBenables;i++)  DCBenables[i]->Shutdown();
        for(int i=0;i<numRFchannels;i++)  RFchans[i]->Shutdown();
@@ -376,6 +423,7 @@ void ControlPanel::Update(void)
    if(RestoreFlag)
    {
        RestoreFlag = false;
+       SystemIsShutdown = false;
        UpdateHoldOff = 3;
        for(int i=0;i<numESIchannels;i++) ESIchans[i]->Restore();
        for(int i=0;i<numDCBenables;i++)  DCBenables[i]->Restore();
@@ -561,6 +609,15 @@ QString ControlPanel::Load(QString Filename)
         return "Settings loaded from " + Filename;
     }
     return "Can't open file!";
+}
+
+// Called after data collection, save method to the filepath passed
+void ControlPanel::slotDataAcquired(QString filepath)
+{
+    if(filepath != "")
+    {
+        Save(filepath + "/Method.settings");
+    }
 }
 
 // System shutdown
@@ -1853,7 +1910,7 @@ void IFTtiming::pbGenerate(void)
         msgBox.exec();
     }
     // Build the table
-    table =  "STBLDAT;0:[A:" + Accumulations->text() + ",";
+    table =  "STBLDAT;0:[A:" + QString::number(Accumulations->text().toInt() + 1) + ",";
     // Add fill time if grid 1 is defined and fill time is > 0
     if((Grid1 != NULL) && (leFillTime->text().toInt() > 0))
     {
@@ -1884,7 +1941,7 @@ void IFTtiming::pbDownload(void)
 {
    if(comms == NULL) return;
    comms->SendCommand("SMOD,LOC\n");        // Make sure the system is in local mode
-//   comms->SendCommand("TBLTSKENA,TRUE\n");  // enable tasks in table mode
+   comms->SendCommand("STBLREPLY,FALSE\n"); // Turn off any table messages from MIPS
    // Make sure a table has been generated
    if(Table->text() == "")
    {
@@ -1917,6 +1974,8 @@ void IFTtiming::pbDownload(void)
 
 void IFTtiming::slotAppFinished(void)
 {
+   // Send a signal that the data collection has finished.
+   emit dataAcquired(filePath);
    if(comms == NULL) return;
    comms->SendCommand("SMOD,LOC\n");
    if(statusBar != NULL) statusBar->showMessage("Acquire app finished, returning to local mode.", 5000);
@@ -1941,7 +2000,7 @@ void IFTtiming::pbTrigger(void)
     // - TOFscans, passes the total number of tof scans to acquire, this is
     //             the product of Frame size and accumulations
     // The acquire ap is expected to return "Ready" when ready to accept a trigger.
-
+    filePath = "";
     // Make sure the system is in table mode
     if(comms != NULL) if(comms->SendCommand("SMOD,TBL\n"))
     {
@@ -1961,21 +2020,49 @@ void IFTtiming::pbTrigger(void)
         for(int i=0;i<resList.count();i++)
         {
             if(i==0) cmd = resList[0];
-            if(resList[i].toUpper() == "FILENAME")
-            {
-                QString fileName = QFileDialog::getSaveFileName(this, tr("Save data to File"),"",tr("Settings (*.data);;All files (*.*)"));
-                if(fileName == "") return;
-                cmd += " " + fileName;
-            }
             if(resList[i].toUpper() == "TOFSCANS")
             {
-                cmd += " " + QString::number(FrameSize->text().toInt() * Accumulations->text().toInt());
+                cmd += " -S" + QString::number(FrameSize->text().toInt() * Accumulations->text().toInt());
+            }
+            if(resList[i].toUpper() == "FILENAME")
+            {
+                CDirSelectionDlg *cds = new CDirSelectionDlg(QDir::currentPath());
+                cds->setTitle("Select/enter folder to save data files");
+                while(true)
+                {
+                    if(cds->exec() != 0)
+                    {
+                        QString selectedPath = cds->selectedPath();
+                        qDebug() << selectedPath;
+                        // See if the directory is present
+                        if(QDir(selectedPath).exists())
+                        {
+                            QString msg = "Selected folder exists, please define a unique folder to save data files.";
+                            QMessageBox msgBox;
+                            msgBox.setText(msg);
+                            msgBox.setInformativeText("");
+                            msgBox.setStandardButtons(QMessageBox::Ok);
+                            msgBox.exec();
+                        }
+                        else
+                        {
+                            // Create the folder and define the data storage path and file
+                            QDir().mkdir(selectedPath);
+                            filePath = selectedPath;
+                            cmd += " " + filePath + "/" + "U1084A.data";
+                            break;
+                        }
+                    }
+                    else break;
+                }
             }
         }
         cla = new cmdlineapp();
         cla->appPath = cmd;
         cla->show();
         cla->ReadyMessage = "Ready";
+        cla->InputRequest = "? Y/N :";
+        if(filePath != "") cla->fileName = filePath + "/Acquire.data";
         connect(cla,SIGNAL(Ready()),this,SLOT(AppReady()));
         connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()));
         cla->Execute();

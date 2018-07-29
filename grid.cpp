@@ -87,7 +87,8 @@ Grid::Grid(QWidget *parent, Comms *c, QStatusBar *statusbar) :
     connect(ui->pbShow,SIGNAL(pressed()),this,SLOT(ShowTable()));
     connect(ui->pbStart,SIGNAL(pressed()),this,SLOT(StartTable()));
 
-    //
+    clipboard = QApplication::clipboard();
+    connect(ui->pbPaste,SIGNAL(pressed()),this,SLOT(slotDataChanged()));
 }
 
 Grid::~Grid()
@@ -98,6 +99,37 @@ Grid::~Grid()
 void Grid::reject()
 {
     emit DialogClosed();
+}
+
+void Grid::slotDataChanged(void)
+{
+    const QMimeData *mimeData = clipboard->mimeData();
+
+    if (mimeData->hasText())
+    {
+        // Text data
+        QString res = mimeData->text();
+        QStringList reslist = res.split(QRegExp("[\r\n\t ,]+"), QString::SkipEmptyParts);
+        // The count should be a multople of three
+        ui->leN->setText(QString::number((int)(reslist.count()/3)));
+        ui->leN->setModified(true);
+        ui->leN->editingFinished();
+        QApplication::processEvents();
+        for(int i=0;i<(int)(reslist.count());i+=3)
+        {
+           if(reslist[i].toInt() != i/3+1) break;
+           ui->comboSelectN->setCurrentIndex(i/3);
+           QApplication::processEvents();
+           ui->leTdn->setText(reslist[i+1]);
+           ui->leTdn->setModified(true);
+           ui->leTdn->editingFinished();
+           QApplication::processEvents();
+           ui->leM->setText(reslist[i+2]);
+           ui->leM->setModified(true);
+           ui->leM->editingFinished();
+           QApplication::processEvents();
+        }
+    }
 }
 
 void Grid::GRID1enable(void)
@@ -255,7 +287,6 @@ void Grid::Update(void)
     }
     // End of polot code
     Updating = false;
-
 }
 
 void Grid::SetYmax(void)
