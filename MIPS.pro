@@ -9,6 +9,7 @@ QT       += gui
 QT       += serialport
 QT       += network
 QT       += widgets printsupport
+QT       += script
 
 win32:RC_ICONS += GAACElogo.ico
 ICON = GAACElogo.icns
@@ -49,7 +50,8 @@ SOURCES += main.cpp\
     mipscomms.cpp \
     cmdlineapp.cpp \
     script.cpp \
-    cdirselectiondlg.cpp
+    cdirselectiondlg.cpp \
+    scriptingconsole.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -79,7 +81,8 @@ HEADERS  += mips.h \
     mipscomms.h \
     cmdlineapp.h \
     script.h \
-    cdirselectiondlg.h
+    cdirselectiondlg.h \
+    scriptingconsole.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \
@@ -94,7 +97,8 @@ FORMS    += mips.ui \
     controlpanel.ui \
     mipscomms.ui \
     cmdlineapp.ui \
-    script.ui
+    script.ui \
+    scriptingconsole.ui
 
 RESOURCES += \
     files.qrc

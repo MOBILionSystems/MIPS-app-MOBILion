@@ -31,6 +31,8 @@ namespace Ui {
 class ControlPanel;
 }
 
+class ScriptingConsole;
+
 class TextLabel : public QWidget
 {
     Q_OBJECT
@@ -331,6 +333,9 @@ public:
     void Update(void);
     QString Report(void);
     bool SetValues(QString strVals);
+    void AcquireData(QString path);
+    void Dismiss(void);
+    QString MakePathUnique(QString path);
     QWidget *p;
     QString Title;
     QString Acquire;
@@ -344,6 +349,9 @@ public:
     DCBchannel  *Grid2;
     DCBchannel  *Grid3;
     QProcess    process;
+    bool        TableDownloaded;
+    bool        Acquiring;
+
 private:
     QGroupBox    *gbIFT;
     QLineEdit    *leFillTime;
@@ -362,14 +370,15 @@ private:
     QPushButton  *Trigger;
     QPushButton  *Abort;
     QLabel       *labels[11];
-    cmdlineapp  *cla;
-private slots:
+    cmdlineapp   *cla;
+public slots:
     void pbGenerate(void);
     void pbDownload(void);
     void pbTrigger(void);
     void pbAbort(void);
     void AppReady(void);
     void slotAppFinished(void);
+    void tblObsolite(void);
 };
 
 class ControlPanel : public QDialog
@@ -384,12 +393,21 @@ public:
     ~ControlPanel();
     virtual void reject();
     void Update(void);
-    QString Save(QString Filename);
-    QString Load(QString Filename);
+    Q_INVOKABLE QString Save(QString Filename);
+    Q_INVOKABLE QString Load(QString Filename);
     void InitMIPSsystems(QString initFilename);
     QList<Comms*> Systems;
     QStatusBar  *statusBar;
     DCBchannel  *FindDCBchannel(QString name);
+    // The following functions are for the scripting system
+    Q_INVOKABLE bool SendCommand(QString MIPSname, QString message);
+    Q_INVOKABLE QString SendMess(QString MIPSname, QString message);
+    Q_INVOKABLE void SystemEnable(void);
+    Q_INVOKABLE void SystemShutdown(void);
+    Q_INVOKABLE void Acquire(QString filePath);
+    Q_INVOKABLE bool isAcquiring(void);
+    Q_INVOKABLE void DismissAcquire(void);
+    Q_INVOKABLE void msDelay(int ms);
 
 private:
     Comms            *FindCommPort(QString name, QList<Comms*> Systems);
@@ -424,7 +442,9 @@ private:
     MIPScomms   *mc;
     DCBiasGroups *DCBgroups;
     QPushButton *MIPScommsButton;
-private slots:
+    QPushButton *ScriptButton;
+    ScriptingConsole *scriptconsole;
+public slots:
     void pbSD(void);
     void pbSE(void);
     void pbSave(void);
@@ -436,6 +456,7 @@ private slots:
     void DCBgroupDisable(void);
     void DCBgroupEnable(void);
     void slotDataAcquired(QString filepath);
+    void pbScript(void);
 };
 
 #endif // CONTROLPANEL_H

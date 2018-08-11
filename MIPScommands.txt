@@ -1,7 +1,7 @@
 MIPS commands. This is a list of all commands for all the posible MIPS modules.
 
 General Commands
-  GVER
+  GVER					Returns the current version string
   GERR					Returns integer error code
   GNAME					Returns user assigned name string
   SNAME,name			Sets the system name to user entered string
@@ -27,6 +27,7 @@ General Commands
   LEDOVRD,val       	Override button LED, val = TRUE or FALSE
   LED,val           	LED color, val = bit mask. 0=Red,1=Blue,2=green,3=blink
   DSPOFF,val        	Turns off display, val = TRUE or FALSE
+  STRTDLY,val
   CHKIMAGE,file	       	Checks status of bmp file on SD card
   LOADIMAGE,file		Displays bmp file that is saved on SD card
   BIMAGE,file       	Set an image file to be displayed on power up
@@ -37,13 +38,15 @@ General Commands
   DEL,filename         Deletes the selected file from the SD card
   GET,filename         Reads a file from SD card to host, issued only by MIPS app
   PUT,filename size    Send a file from the host to SD card, issused only by MIPS app
+  SAVEMOD,file,b,a		Save EEPROM to SD file. file = file name, b = board address, a =address in hex
+  LOADMOD,file,b,a		Load EEPROM from SD file. file = file name, b = board address, a =address in hex
   SAVEALL              Saves all module EEPROM data to individual files on SD card
   LOADALL              Loads all module EEPROM data from individual files on SD card
   GETEEPROM,brd,add    Reads EEPROM module contents to host file, issued only by MIPS
   PUTEEPROM,brd,add    Writes EEPROM module contents from host file, issued only by MIPS
   SSPND,TRUE/FALSE     Suspendes all background tasks, will limit functionality
   GSPND                Returns the suspend state
-  CPUTEMP
+  CPUTEMP				Returns CPU temp in degrees C
   TWITALK,brd,add      Redirect the serial communications through a board and TWI address passed
                        brd and add are base 10
   SSER1ENA,val         Set the Serial1 port enable, TRUE = general use, FALSE for ethernet use or wifi
@@ -51,6 +54,17 @@ General Commands
   SETADDRESS,add       Set memory address to read or write, hex
   WRITE,type,val       Write to memory, type = BYTE,WORD,DWORD,INT,FLOAT
   READ,type            Read from memory, BYTE,WORD,DWORD,INT,FLOAT
+  FORMAT,brd,add,typ   Format the EEPROM, args example,A 0x50,RFdrvA R1
+  SAVEM                Save the defined module to EEPROM
+  TWIRESET             Resets the TWI interface
+  TWIERROR             Reports the numner of detected TWI failures
+  STWIHDW,val          If true then the TWI hardware interface is used for ADC read functions
+  GTWIHDW              Returns the current status.
+  STBLRETRIG,val       Set the table retriggerable flag, TRUE=retriggerable.
+  GTBLRETRIG           Returns the table retriggerable flag, TRUE=retriggerable.
+  SSETECHO,val         Set the SerialUSB to Serial1 echo, TRUE enables echo.
+  GSERECHO             Return the SerialUSB to Serial1 echo, TRUE enables echo.
+
 
 ADC functions
   ADC,ch            	Read DUE ADC channel, ch = channel 0 - 3
@@ -144,6 +158,8 @@ RF driver module
   GRFDRV,ch				Return output drive level %, ch=channel
   GRFVLT,ch				Return output Vp-p setpoint, ch=channel
   GRFPWR,ch				Return channel power in watts, ch=channel
+  GRFMODE,ch           Report RF mode (MANUAL | AUTO) for the selected channel
+  SRFMODE,cj,val       Sets the RF mode (MANUAL | AUTO) for the selected channel
   GRFALL				Return all RF parameters
   TUNERFCH,ch        	Performs automatic tuning of selected channel
   RETUNERFCH,ch      	Retunes the selected channel
@@ -213,6 +229,8 @@ Twave module
   GTWDIR,ch				Return Twave direction, FWD or REV, ch=channel
   STWDIR,ch,val			Set Twave direction, ch=channel, val=FWD or REV
   STBLRBT,TRUE/FALSE   Enables the readback voltage testing
+
+Twave compressor commands
   STWCTBL,val			Set Twave multi-pass control table, val=ascii table
   GTWCTBL				Return Twave multi-pass table string
   GTWCMODE				Return Compressor mode, Normal or Compress
@@ -230,8 +248,8 @@ Twave module
   TWCTRG				Force a multi-pass trigger
   GTWCSW				Return switch state, Open or Close
   STWCSW,val			Set switch state, val=Open or Close
-  STWCCLK,val			Set Twave to common clock mode, val=TRUE or FALSE
-  STWCMP,val			Set Twave compressor mode, val=TRUE or FALSE
+
+Twave and ARB frequency/voltage sweep commands
   STWSSTRT,ch,frq      Sets start freq for sweep function
   GTWSSTRT,ch          Returns start frequency for sweep function
   STWSSTP,ch,frq       Sets stop freq for sweep function
@@ -246,6 +264,10 @@ Twave module
   STWSHLT,ch           Stops the sweep on channel 1 or 2, or 3 for both
   GTWSTA,ch            Returns selected channel scan status, running or stopped
 
+Twave configuration commands
+  STWCCLK,val			Set Twave to common clock mode, val=TRUE or FALSE
+  STWCMP,val			Set Twave compressor mode, val=TRUE or FALSE
+
 FAIMS module
   SFMENA,val			Enables FAIMS is val = TRUE, disables if FALSE
   GFMENA				Returns enable status, TRUE or FALSE
@@ -254,6 +276,12 @@ FAIMS module
   GFMPWR				Returns the FAIMS power in watts
   GFMPV					Returns FAIMS positive peak voltage in KV
   GFMNV					Returns FAIMS negative peak voltage in KV
+  SFMLOCK,val          Sets FAIMS output level lock mode, TRUE = Lock mode
+  GFMLOCK              Returns FAIMS output level lock mode
+  SFMSP,val            Sets FAIMS output level lock setpoint, val = KV
+  GFMSP                Returns FAIMS output level lock setpoint
+
+FAIMS DC CV and Bias commands
   SFMCV,val				Sets FAIMS CV voltage in volts
   GFMCV					Returns FAIMS CV setpoint in volts
   GFMCVA				Returns FAIMS CV actual in volts
@@ -263,6 +291,26 @@ FAIMS module
   SFMOFF,val			Set FAIMS offset voltage in volts
   GFMOFF				Returns FAIMS offset setpoint in volts
   GFMOFFA				Returns FAIMS offset actial in volts
+
+FAIMS CV Scan commands
+  SFMCVSTART,val       Sets FAIMS DC CV scan start voltage
+  GFMCVSTART           Returns FAIMS DC CV scan start voltage
+  SFMCVEND,val         Sets FAIMS DC CV scan end voltage
+  GFMCVEND             Returns FAIMS DC CV scan end voltage
+  SFMDUR,val           Sets FAIMS DC CV scan duration in seconds
+  GFMDUR               Returns FAIMS DC CV scan duration in seconds
+  SFMLOOPS,val         Sets FAIMS DC CV scan loops
+  GFMLOOPS             Returns FAIMS DC CV scan loops
+  SFMSTRTLIN,val       Sets FAIMS DC CV linear scan flag, TRUE = scan
+  GFMSTRTLIN           Returns FAIMS DC CV linear scan flag
+  SFMSTPTM,val         Sets FAIMS DC CV scan step duration in mSec
+  GFMSTPTM             Returns FAIMS DC CV scan step duration
+  SFMSTEPS,val         Sets FAIMS DC CV step scan number of steps
+  GFMSTEPS             Returns FAIMS DC CV step scan number of steps
+  SFMSTRTSTP,val       Sets FAIMS DC CV step scan flag, TRUE = scan
+  GFMSTRTSTP           Returns FAIMS DC CV step scan flag
+
+FAIMS confuguration / calibration commands
   SRFHPCAL,m,b			Set FAIMS output monitor Vpos readback calibration parameters. m=slope,b=offset
   SRFHNCAL,m,b 			Set FAIMS output monitor Vneg readback calibration parameters. m=slope,b=offset
   SARCDIS,val			Disables the arc detector is val = TRUE, enables if FALSE
@@ -307,6 +355,7 @@ WiFi module
   SWIFISP,ch         	Sets the serial port used for WiFi, 0 or 1
 
 Eithernet module
+  ENTEST               Tests the eternet adapter connection
   GEIP					Reports MIPS IP address
   SEIP,val				Sets MIPS IP address
   GESNIP               Report the ethernet adapter Subnet IP address
@@ -339,6 +388,10 @@ ARB module
   GARBOFFA,mn          Returns module's output offset for board A
   SARBOFFB,mn,val      Sets module's output offset for board B, value = -10 to 10
   GARBOFFB,mn          Returns module's output offset for board B
+  ARBSYNC              Issues a software sync, note, the modules have to be configured for external sync
+
+
+ARB conventional ARB mode commands
   SARBBUF,mn,val		Sets buffer length in samples, mn = module, val = buffer length
   GARBBUF,mn			Reports the buffer length, mn = module
   SARBNUM,mn,val		Sets number of buffer repeats, mn = module, val = repeat count
@@ -367,7 +420,7 @@ ARB module compressor commands
   SARBCSW 				Set switch state, val=Open or Close
 
 ARB module configuration commands
-  SARBCCLK,val			Set Twave to common clock mode, val=TRUE or FALSE
+  SARBCCLK,mn,val		Set Twave to common clock mode, val=TRUE or FALSE
   SARBCMP,val			Set Twave compressor mode, val=TRUE or FALSE
   SARBCOFF,val			If val = TRUE enables common offset, FALSE disables
   SARBADD,mn,val       Sets module's TWI address used to talk to ARB arduino, val = address base 10

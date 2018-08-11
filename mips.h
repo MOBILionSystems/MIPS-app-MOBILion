@@ -37,6 +37,7 @@ class Grid;
 class ARBwaveformEdit;
 class ADC;
 class ControlPanel;
+class ScriptingConsole;
 
 class DeleteHighlightedItemWhenShiftDelPressedEventFilter : public QObject
 {
@@ -57,12 +58,15 @@ public:
     virtual void mousePressEvent(QMouseEvent * event);
     Ui::MIPS *ui;
     QString SelectedTab;
-    void RemoveTab(QString TabName);
-    void AddTab(QString TabName);
-    void FindMIPSandConnect(void);
-    void FindAllMIPSsystems(void);
+    Q_INVOKABLE void RemoveTab(QString TabName);
+    Q_INVOKABLE void AddTab(QString TabName);
+    Q_INVOKABLE void FindMIPSandConnect(void);
+    Q_INVOKABLE void FindAllMIPSsystems(void);
+    // The following functions are for the scripting system
+    Q_INVOKABLE bool SendCommand(QString message);
+    Q_INVOKABLE QString SendMess(QString message);
 
-private slots:
+public slots:
     void setWidgets(QWidget*, QWidget*);
     void MIPSconnect(void);
     void MIPSsearch(void);
@@ -97,6 +101,7 @@ private slots:
     void ARBupload(void);
     void SelectCP(void);
     void CloseControlPanel(void);
+    void slotScripting(void);
 
 private:
     Comms *comms;
@@ -127,6 +132,7 @@ private:
     QString  appPath;
     QString RepeatMessage;
     QList<Comms*> Systems;
+    ScriptingConsole *scriptconsole;
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

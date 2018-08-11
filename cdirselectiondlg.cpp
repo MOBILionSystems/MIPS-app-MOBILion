@@ -1,4 +1,5 @@
 #include "CDirSelectionDlg.h"
+#include "scriptingconsole.h"
 
 #include <QLabel>
 #include <QBoxLayout>
@@ -31,6 +32,7 @@ CDirSelectionDlg::CDirSelectionDlg(const QString initialPath, QWidget *parent) :
     connect(buttonBox, &QDialogButtonBox::accepted, this, &CDirSelectionDlg::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &CDirSelectionDlg::reject);
     m_OKbutton = buttonBox->button(QDialogButtonBox::Ok);
+    m_Cancelbutton = buttonBox->button(QDialogButtonBox::Cancel);
 
     auto label = new QLabel(tr("Folder:"));
     m_folderName = new QLineEdit(this);

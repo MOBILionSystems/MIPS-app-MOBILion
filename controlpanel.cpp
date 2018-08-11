@@ -20,6 +20,7 @@
 #include "controlpanel.h"
 #include "ui_controlpanel.h"
 #include "CDirSelectionDlg.h"
+#include "scriptingconsole.h"
 
 #include <QPixmap>
 #include <math.h>
@@ -46,12 +47,14 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     numDCBenables  = 0;
     numESIchannels = 0;
     numDIOchannels = 0;
+    numARBchannels = 0;
     UpdateHoldOff  = 0;
     UpdateStop     = false;
     ShutdownFlag   = false;
     RestoreFlag    = false;
     StartMIPScomms = false;
     SystemIsShutdown = false;
+    scriptconsole = NULL;
     // Allow user to select the configuration file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Configuration from File"),"",tr("cfg (*.cfg);;All files (*.*)"));
     QFile file(fileName);
@@ -305,6 +308,14 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
             }
             if((resList[0].toUpper() == "SCRIPT") && (resList.length()==3))
             {
+                // Use QTscrip and place a button at the defined location.
+                ScriptButton = new QPushButton("Scripting",ui->lblBackground);
+                ScriptButton->setGeometry(resList[1].toInt(),resList[2].toInt(),150,32);
+                ScriptButton->setAutoDefault(false);
+                ScriptButton->setToolTip("Press this button load or define a script");
+                connect(ScriptButton,SIGNAL(pressed()),this,SLOT(pbScript()));
+                scriptconsole = NULL;
+                /* old scripting code
                 QWidget *widget = new QWidget(this);
                 widget->setGeometry(resList[1].toInt(),resList[2].toInt(),350,210);
                 QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -313,6 +324,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 // Connect to the slots for loading and shutdown
                 connect(script,SIGNAL(Shutdown()),this,SLOT(scriptShutdown()));
                 connect(script,SIGNAL(Load(QString)),this,SLOT(scriptLoad(QString)));
+                */
             }
             if((resList[0].toUpper() == "DCBGROUPS") && (resList.length()==3))
             {
@@ -411,7 +423,7 @@ void ControlPanel::Update(void)
    {
        ShutdownFlag = false;
        SystemIsShutdown = true;
-       UpdateHoldOff = 3;
+       UpdateHoldOff = 2;
        // Make sure all MIPS systems are in local mode
        for(int i=0;i<Systems.count();i++) Systems[i]->SendString("SMOD,LOC\n");
        for(int i=0;i<numESIchannels;i++) ESIchans[i]->Shutdown();
@@ -424,7 +436,7 @@ void ControlPanel::Update(void)
    {
        RestoreFlag = false;
        SystemIsShutdown = false;
-       UpdateHoldOff = 3;
+       UpdateHoldOff = 2;
        for(int i=0;i<numESIchannels;i++) ESIchans[i]->Restore();
        for(int i=0;i<numDCBenables;i++)  DCBenables[i]->Restore();
        for(int i=0;i<numRFchannels;i++)  RFchans[i]->Restore();
@@ -697,6 +709,76 @@ void ControlPanel::DCBgroupEnable(void)
                DCBchans[j]->LinkEnable = true;
             }
         }
+    }
+}
+
+void ControlPanel::pbScript(void)
+{
+    if(!scriptconsole) scriptconsole = new ScriptingConsole(this);
+    scriptconsole->show();
+}
+
+// The following functions are for the scripting system
+bool ControlPanel::SendCommand(QString MIPSname, QString message)
+{
+   QApplication::processEvents();
+   Comms *cp =  FindCommPort(MIPSname,Systems);
+   if(cp==NULL) return false;
+   return cp->SendCommand(message);
+}
+
+QString ControlPanel::SendMess(QString MIPSname, QString message)
+{
+    QApplication::processEvents();
+    Comms *cp =  FindCommPort(MIPSname,Systems);
+    if(cp==NULL) return "MIPS not found!";
+    return cp->SendMess(message);
+}
+
+void ControlPanel::SystemEnable(void)
+{
+    QApplication::processEvents();
+    RestoreFlag = true;
+}
+
+void ControlPanel::SystemShutdown(void)
+{
+    QApplication::processEvents();
+    ShutdownFlag = true;
+}
+
+void ControlPanel::Acquire(QString filePath)
+{
+   QApplication::processEvents();
+   if(IFT != NULL)
+   {
+       IFT->AcquireData(filePath);
+   }
+}
+
+bool ControlPanel::isAcquiring(void)
+{
+  QApplication::processEvents();
+  if(IFT != NULL) return(IFT->Acquiring);
+  return(false);
+}
+
+void ControlPanel::DismissAcquire(void)
+{
+  QApplication::processEvents();
+  if(IFT != NULL)  IFT->Dismiss();
+  QApplication::processEvents();
+  QApplication::processEvents();
+}
+
+void ControlPanel::msDelay(int ms)
+{
+    QTime timer;
+
+    timer.start();
+    while(timer.elapsed() < ms)
+    {
+        QApplication::processEvents();
     }
 }
 
@@ -1811,6 +1893,7 @@ IFTtiming::IFTtiming(QWidget *parent, QString name, QString MIPSname, int x, int
     Acquire = "";
     Grid1 = Grid3 = Grid2 = NULL;
     statusBar = NULL;
+    Acquiring = false;
 }
 
 void IFTtiming::Show(void)
@@ -1865,6 +1948,15 @@ void IFTtiming::Show(void)
     connect(Download,SIGNAL(pressed()),this,SLOT(pbDownload()));
     connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()));
     connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()));
+    connect(leFillTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
+    connect(leTrapTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
+    connect(leReleaseTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
+    connect(leGrid1FillV,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
+    connect(leGrid2ReleaseV,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
+    connect(leGrid3ReleaseV,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
+    connect(FrameSize,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
+    connect(Accumulations,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
+    TableDownloaded = false;
     Table->raise();
 }
 
@@ -1959,23 +2051,25 @@ void IFTtiming::pbDownload(void)
    // Send table
    comms->SendCommand(Table->text());
    // Put system in table mode
-   if(comms->SendCommand("SMOD,TBL\n"))
-   {
-       if(statusBar != NULL) statusBar->showMessage("System mode changed to Table.", 5000);
+//   if(comms->SendCommand("SMOD,TBL\n"))
+//   {
+//       if(statusBar != NULL) statusBar->showMessage("System mode changed to Table.", 5000);
        // We should now receive a table ready for trigger command so wait for it
-       comms->waitforline(1000);
-       while(comms->rb.numLines() > 0)
-       {
-           if(statusBar != NULL) statusBar->showMessage(comms->getline(),5000);
-       }
-   }
-   else if(statusBar != NULL) statusBar->showMessage("System mode change to Table rejected!", 5000);
+//       comms->waitforline(1000);
+//       while(comms->rb.numLines() > 0)
+//       {
+//           if(statusBar != NULL) statusBar->showMessage(comms->getline(),5000);
+//       }
+//   }
+//   else if(statusBar != NULL) statusBar->showMessage("System mode change to Table rejected!", 5000);
+   TableDownloaded = true;
 }
 
 void IFTtiming::slotAppFinished(void)
 {
    // Send a signal that the data collection has finished.
    emit dataAcquired(filePath);
+   Acquiring = false;
    if(comms == NULL) return;
    comms->SendCommand("SMOD,LOC\n");
    if(statusBar != NULL) statusBar->showMessage("Acquire app finished, returning to local mode.", 5000);
@@ -1991,6 +2085,11 @@ void IFTtiming::AppReady(void)
 
 void IFTtiming::pbTrigger(void)
 {
+    AcquireData("");
+}
+
+void IFTtiming::AcquireData(QString path)
+{
     // If the Acquire string is defined then we call the program defined
     // by The Acquire string. The program is called with optional arguments
     // as follows:
@@ -2004,13 +2103,23 @@ void IFTtiming::pbTrigger(void)
     // Make sure the system is in table mode
     if(comms != NULL) if(comms->SendCommand("SMOD,TBL\n"))
     {
+        if(!TableDownloaded)
+        {
+            QString msg = "Pulse sequence table has not been downloaded to MIPS!";
+            QMessageBox msgBox;
+            msgBox.setText(msg);
+            msgBox.setInformativeText("");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.exec();
+            return;
+        }
         if(statusBar != NULL) statusBar->showMessage("System mode changed to Table.", 5000);
         // We should now receive a table ready for trigger command so wait for it
-        comms->waitforline(1000);
-        while(comms->rb.numLines() > 0)
-        {
-            if(statusBar != NULL) statusBar->showMessage(comms->getline(),5000);
-        }
+//        comms->waitforline(1000);
+//        while(comms->rb.numLines() > 0)
+//        {
+//            if(statusBar != NULL) statusBar->showMessage(comms->getline(),5000);
+//        }
     }
     if(Acquire != "")
     {
@@ -2028,12 +2137,11 @@ void IFTtiming::pbTrigger(void)
             {
                 CDirSelectionDlg *cds = new CDirSelectionDlg(QDir::currentPath());
                 cds->setTitle("Select/enter folder to save data files");
-                while(true)
+                while(path == "")
                 {
                     if(cds->exec() != 0)
                     {
                         QString selectedPath = cds->selectedPath();
-                        qDebug() << selectedPath;
                         // See if the directory is present
                         if(QDir(selectedPath).exists())
                         {
@@ -2046,15 +2154,24 @@ void IFTtiming::pbTrigger(void)
                         }
                         else
                         {
-                            // Create the folder and define the data storage path and file
-                            QDir().mkdir(selectedPath);
                             filePath = selectedPath;
-                            cmd += " " + filePath + "/" + "U1084A.data";
                             break;
                         }
                     }
-                    else break;
+                    else
+                    {
+                       if(comms != NULL) comms->SendCommand("SMOD,LOC\n"); // Return to local mode
+                       return;
+                    }
                 }
+                // Create the folder and define the data storage path and file
+                if(path != "")
+                {
+                    filePath = MakePathUnique(path);
+                }
+                QDir().mkdir(filePath);
+                QDir().setCurrent(filePath);
+                cmd += " " + filePath + "/" + "U1084A.data";
             }
         }
         cla = new cmdlineapp();
@@ -2066,6 +2183,7 @@ void IFTtiming::pbTrigger(void)
         connect(cla,SIGNAL(Ready()),this,SLOT(AppReady()));
         connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()));
         cla->Execute();
+        Acquiring = true;
     }
     else
     {
@@ -2074,6 +2192,32 @@ void IFTtiming::pbTrigger(void)
         if(comms->SendCommand("TBLSTRT\n")) if(statusBar != NULL) statusBar->showMessage("Table trigger command accepted!", 5000);
         else if(statusBar != NULL) statusBar->showMessage("Table trigger command rejected!", 5000);
     }
+}
+
+QString IFTtiming::MakePathUnique(QString path)
+{
+    int i, num;
+
+    // Check if path exists, if it does then see if it ends in a number, if
+    // it does then increment this number, if it does not append -0001 to the
+    // name
+    while(true)
+    {
+       if(QDir(path).exists())
+       {
+           for(i=0;i<path.length();i++) if(!path[path.length()-1-i].isDigit()) break;
+           if(i == 0) path += "-0001";
+           else
+           {
+               num = path.right(i).toInt();
+               num++;
+               path = path.left(path.length()-i) += QString("%1").arg(num,4,10,QLatin1Char('0'));
+           }
+       }
+       else break;
+    }
+    // At this point path is unique
+    return path;
 }
 
 // The function sends the table about command to MIPS. Returns ACK if ok, else returns NAK.
@@ -2125,5 +2269,18 @@ bool IFTtiming::SetValues(QString strVals)
     TriggerSource->setCurrentIndex(i);
     i = strVals.indexOf("STBLDAT");
     if(i > 0) Table->setText(strVals.mid(i));
+    pbDownload();
     return true;
+}
+
+void IFTtiming::tblObsolite(void)
+{
+    TableDownloaded = false;
+}
+
+void IFTtiming::Dismiss(void)
+{
+    if(cla == NULL) return;
+    cla->deleteLater();
+    cla = NULL;
 }

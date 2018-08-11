@@ -24,5 +24,6 @@ private:
     QFileSystemModel *m_model;
     QLineEdit *m_folderName;
     QPushButton *m_OKbutton;
+    QPushButton *m_Cancelbutton;
     QString m_initialPath;
 };

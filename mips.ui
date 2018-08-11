@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MIPS, Version 1.24 May 12, 2018</string>
+   <string>MIPS, Version 1.25 August 2, 2018</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QTabWidget" name="tabMIPS">
@@ -8070,6 +8070,8 @@ number on each trigger</string>
     <addaction name="actionGrid"/>
     <addaction name="actionSoft_landing_Purdue"/>
     <addaction name="actionSelect"/>
+    <addaction name="separator"/>
+    <addaction name="actionScripting"/>
    </widget>
    <addaction name="menuAbout"/>
    <addaction name="menuFile"/>
@@ -8193,6 +8195,11 @@ number on each trigger</string>
   <action name="actionSelect">
    <property name="text">
     <string>Select...</string>
+   </property>
+  </action>
+  <action name="actionScripting">
+   <property name="text">
+    <string>Scripting...</string>
    </property>
   </action>
  </widget>

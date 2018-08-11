@@ -105,6 +105,8 @@
 //      2.) Fixed limit bug in Twave freq in arrow keys
 // 1.24, May 12, 2018
 //      1.) Added the group capability for DC bias voltages
+// 1.25, August 2, 2018
+//      1.) Added the user definable control panels
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -130,6 +132,7 @@
 #include "arbwaveformedit.h"
 #include "adc.h"
 #include "controlpanel.h"
+#include "scriptingconsole.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
@@ -167,8 +170,8 @@ MIPS::MIPS(QWidget *parent) :
     ui->lblMIPSconnectionNotes->setFont(font);
     #endif
 
+    scriptconsole = NULL;
     qApp->installEventFilter(this);
-
     sf = NULL;
     sf_deleteRequest = false;
     sl = NULL;
@@ -220,6 +223,7 @@ MIPS::MIPS(QWidget *parent) :
     ui->actionARB_upload->setEnabled(true);
     ui->actionSelect->setEnabled(true);
     ui->menuTerminal->setEnabled(false);
+    ui->actionScripting->setEnabled(true);
 
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(loadSettings()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveSettings()));
@@ -246,6 +250,7 @@ MIPS::MIPS(QWidget *parent) :
     connect(ui->actionWrite_ARB_FLASH, SIGNAL(triggered()), this, SLOT(WriteARBFLASH()));
     connect(ui->actionARB_upload, SIGNAL(triggered()), this, SLOT(ARBupload()));
     connect(ui->actionSelect, SIGNAL(triggered()), this, SLOT(SelectCP()));
+    connect(ui->actionScripting, SIGNAL(triggered()), this, SLOT(slotScripting()));
 
     ui->comboMIPSnetNames->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
     // Sets the polling loop interval and starts the timer
@@ -628,8 +633,7 @@ void MIPS::pollLoop(void)
     }
     //if(cp != NULL) if(comms->isConnected()) cp->Update();
     if(cp != NULL) cp->Update();
-
-}
+ }
 
 void MIPS::mousePressEvent(QMouseEvent * event)
 {
@@ -666,6 +670,7 @@ void MIPS::MIPSsetup(void)
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\nModules present:");
 
     res = comms->SendMess("GCHAN,RF\n");
+    if(res=="") return;
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 RF driver\n");
     if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 RF drivers\n");
     rfdriver->SetNumberOfChannels(res.toInt());
@@ -673,6 +678,7 @@ void MIPS::MIPSsetup(void)
     else AddTab("RFdriver");
 
     res = comms->SendMess("GCHAN,DCB\n");
+    if(res=="") return;
     if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 DC bias (8 output channels)\n");
     if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 DC bias (16 output channels)\n");
     if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 DC bias (16 output channels)\n");
@@ -682,12 +688,14 @@ void MIPS::MIPSsetup(void)
     else AddTab("DCbias");
 
     res = comms->SendMess("GCHAN,TWAVE\n");
+    if(res=="") return;
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 TWAVE module\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 TWAVE modules\n");
     if(res.contains("0")) RemoveTab("Twave");
     else AddTab("Twave");
 
     res = comms->SendMess("GCHAN,ARB\n");
+    if(res=="") return;
     if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() +  "\n   1 ARB module\n");
     if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ARB modules\n");
     if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 ARB modules\n");
@@ -697,16 +705,19 @@ void MIPS::MIPSsetup(void)
     arb->SetNumberOfChannels(res.toInt());
 
     res = comms->SendMess("GCHAN,FAIMS\n");
+    if(res=="") return;
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   FAIMS module\n");
     if(res.contains("0")) RemoveTab("FAIMS");
     else AddTab("FAIMS");
 
     res = comms->SendMess("GCHAN,ESI\n");
+    if(res=="") return;
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI module, rev 3\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI module\n");
     if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ESI modules\n");
 
     res = comms->SendMess("GCHAN,FIL\n");
+    if(res=="") return;
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 Filament module\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 Filament modules\n");
     if(res.contains("0")) RemoveTab("Filament");
@@ -827,7 +838,6 @@ void MIPS::FindMIPSandConnect(void)
   }
   else ui->statusBar->showMessage(tr("Can't find MIPS system!"));
   return;
-
 
   int i = settings->numberOfPorts();
   for(int j=0;j<i;j++)
@@ -1261,15 +1271,32 @@ void MIPS::CloseControlPanel(void)
 
 void MIPS::SelectCP(void)
 {
-    if(sf != NULL) return;
-    if(sl != NULL) return;
-    if(sl2 != NULL) return;
+    if(sf   != NULL) return;
+    if(sl   != NULL) return;
+    if(sl2  != NULL) return;
     if(grid != NULL) return;
-    if(cp != NULL) return;
+    if(cp   != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
-    cp = new ControlPanel(0,Systems);
-    cp->show();
-    connect(cp, SIGNAL(DialogClosed()), this, SLOT(CloseControlPanel()));
-    cp->Update();
+    ControlPanel *c = new ControlPanel(0,Systems);
+    c->show();
+    connect(c, SIGNAL(DialogClosed()), this, SLOT(CloseControlPanel()));
+    c->Update();
     this->setWindowState(Qt::WindowMinimized);
+    cp = c;
+}
+
+void MIPS::slotScripting(void)
+{
+    if(!scriptconsole) scriptconsole = new ScriptingConsole(this);
+    scriptconsole->show();
+}
+
+bool MIPS::SendCommand(QString message)
+{
+   return comms->SendCommand(message);
+}
+
+QString MIPS::SendMess(QString message)
+{
+   return comms->SendMess(message);
 }
