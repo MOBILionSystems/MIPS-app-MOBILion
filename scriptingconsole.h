@@ -24,6 +24,7 @@ private slots:
     void on_pbEvaluate_clicked();
     void on_pbSave_clicked();
     void on_pbLoad_clicked();
+    void on_pbAbort_clicked();
 };
 
 #endif // SCRIPTINGCONSOLE_H

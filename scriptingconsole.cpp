@@ -70,3 +70,8 @@ void ScriptingConsole::on_pbLoad_clicked()
         file.close();
     }
 }
+
+void ScriptingConsole::on_pbAbort_clicked()
+{
+    engine->abortEvaluation();
+}

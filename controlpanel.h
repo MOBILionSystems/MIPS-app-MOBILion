@@ -408,6 +408,9 @@ public:
     Q_INVOKABLE bool isAcquiring(void);
     Q_INVOKABLE void DismissAcquire(void);
     Q_INVOKABLE void msDelay(int ms);
+    Q_INVOKABLE void statusMessage(QString message);
+    Q_INVOKABLE void popupMessage(QString message);
+    Q_INVOKABLE bool popupYesNoMessage(QString message);
 
 private:
     Comms            *FindCommPort(QString name, QList<Comms*> Systems);

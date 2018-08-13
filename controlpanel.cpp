@@ -776,11 +776,41 @@ void ControlPanel::msDelay(int ms)
     QTime timer;
 
     timer.start();
-    while(timer.elapsed() < ms)
-    {
-        QApplication::processEvents();
-    }
+    while(timer.elapsed() < ms) QApplication::processEvents();
 }
+
+void ControlPanel::statusMessage(QString message)
+{
+    QApplication::processEvents();
+    statusBar->showMessage(message);
+    QApplication::processEvents();
+}
+
+void ControlPanel::popupMessage(QString message)
+{
+    QMessageBox msgBox;
+
+    QApplication::processEvents();
+    msgBox.setText(message);
+    msgBox.setInformativeText("");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
+}
+
+bool ControlPanel::popupYesNoMessage(QString message)
+{
+    QMessageBox msgBox;
+
+    QApplication::processEvents();
+    msgBox.setText(message);
+    msgBox.setInformativeText("Are you sure?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+    if(ret == QMessageBox::No) return false;
+    return true;
+}
+
 
 // *************************************************************************************************
 // Text box  ***************************************************************************************
@@ -2281,6 +2311,7 @@ void IFTtiming::tblObsolite(void)
 void IFTtiming::Dismiss(void)
 {
     if(cla == NULL) return;
-    cla->deleteLater();
+//    cla->deleteLater();
+    delete cla;
     cla = NULL;
 }
