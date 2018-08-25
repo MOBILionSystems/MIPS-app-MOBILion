@@ -20,6 +20,7 @@
 #include <QProcess>
 #include <QKeyEvent>
 #include <QBoxLayout>
+#include <QUdpSocket>
 
 //
 // To dos:
@@ -447,6 +448,7 @@ private:
     QPushButton *MIPScommsButton;
     QPushButton *ScriptButton;
     ScriptingConsole *scriptconsole;
+    QUdpSocket *udpSocket;
 public slots:
     void pbSD(void);
     void pbSE(void);

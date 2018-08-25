@@ -17,6 +17,7 @@ ScriptingConsole::ScriptingConsole(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    this->setFixedSize(501,366);
     engine = new QScriptEngine(this);
 
    QScriptValue mips = engine->newQObject(parent);
@@ -43,6 +44,18 @@ void ScriptingConsole::on_pbEvaluate_clicked()
     ui->lblStatus->setText(markup);
 }
 
+void ScriptingConsole::UpdateStatus(void)
+{
+    if(engine->isEvaluating())
+    {
+        ui->pbEvaluate->setText("Script is running!");
+    }
+    else
+    {
+        ui->pbEvaluate->setText("Execute");
+    }
+}
+
 void ScriptingConsole::on_pbSave_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save script to file"),"",tr("scrpt (*.scrpt);;All files (*.*)"));
@@ -62,6 +75,7 @@ void ScriptingConsole::on_pbLoad_clicked()
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load script from File"),"",tr("scrpt (*.scrpt);;All files (*.*)"));
     if(fileName == "") return;
     QFile file(fileName);
+    ui->txtScript->clear();
     if(file.open(QIODevice::ReadOnly|QIODevice::Text))
     {
         QTextStream stream(&file);

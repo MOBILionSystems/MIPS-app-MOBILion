@@ -14,6 +14,7 @@ class ScriptingConsole : public QDialog
 
 public:
     explicit ScriptingConsole(QWidget *parent = 0);
+    void UpdateStatus(void);
     ~ScriptingConsole();
 
 private:

@@ -26,6 +26,7 @@
 #include <math.h>
 #include <QTextEdit>
 #include <QTreeView>
+#include <QUdpSocket>
 
 ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     QDialog(parent),
@@ -58,6 +59,9 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     // Allow user to select the configuration file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Configuration from File"),"",tr("cfg (*.cfg);;All files (*.*)"));
     QFile file(fileName);
+    // Open UDP socket to send commands to reader app
+    udpSocket = new QUdpSocket(this);
+    udpSocket->bind(QHostAddress::LocalHost, 7755);
     // Read the configuration file and create the form as
     // well as all the contorls.
     if(file.open(QIODevice::ReadOnly|QIODevice::Text))
@@ -403,6 +407,7 @@ void ControlPanel::Update(void)
 {
    int i;
 
+   if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
    if(UpdateStop) return;
    if(StartMIPScomms)
    {
@@ -629,6 +634,9 @@ void ControlPanel::slotDataAcquired(QString filepath)
     if(filepath != "")
     {
         Save(filepath + "/Method.settings");
+        // Send UDP message to allow reader to open the data file
+        QString mess = "Load,"+filepath+"/U1084A.data";
+        udpSocket->writeDatagram(mess.toLocal8Bit(),QHostAddress::LocalHost, 7755);
     }
 }
 
