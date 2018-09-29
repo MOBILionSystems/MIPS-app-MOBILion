@@ -1,0 +1,15 @@
+mips.popupMessage("Press OK to start demo");
+count = mips.popupUserInput("Setup","Enter number of dataset to record:");
+startV = mips.popupUserInput("Setup","Enter inital voltage:");
+stepV = mips.popupUserInput("Setup","Enter voltage step:");
+for(i=0;i<count;i++)
+{
+   voltage = startV + stepV * i;
+   mips.statusMessage(voltage);
+   mips.SendCommand("MIPS", "SDCB,1," + voltage + "\n");
+   mips.msDelay(100);
+   mips.Acquire("/Users/GAA/desktop/test.0001");
+   while(mips.isAcquiring()) mips.msDelay(1000);
+   mips.DismissAcquire();
+}
+status = "done";

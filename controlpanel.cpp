@@ -38,6 +38,8 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     Systems = S;
 
     // Init a number of variables
+    HelpFile.clear();
+    LoadedConfig = false;
     mc = NULL;
     DCBgroups = NULL;
     statusBar      = NULL;
@@ -56,14 +58,16 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     StartMIPScomms = false;
     SystemIsShutdown = false;
     scriptconsole = NULL;
+    help = new Help();
     // Allow user to select the configuration file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Configuration from File"),"",tr("cfg (*.cfg);;All files (*.*)"));
     QFile file(fileName);
+    if((fileName == "") || (fileName.isEmpty())) return;
     // Open UDP socket to send commands to reader app
     udpSocket = new QUdpSocket(this);
     udpSocket->bind(QHostAddress::LocalHost, 7755);
     // Read the configuration file and create the form as
-    // well as all the contorls.
+    // well as all the controls.
     if(file.open(QIODevice::ReadOnly|QIODevice::Text))
     {
         QTextStream stream(&file);
@@ -84,6 +88,9 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
             }
             if((resList[0].toUpper() == "IMAGE") && (resList.length()==2))
             {
+                #ifdef Q_OS_MAC
+                if(resList[1].startsWith("~")) resList[1] = QDir::homePath() + "/" + resList[1].mid(2);
+                #endif
                 QPixmap img(resList[1]);
                 ui->lblBackground->clear();
                 ui->lblBackground->setPixmap(img);
@@ -308,6 +315,9 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 if(IFT!=NULL)
                 {
                     IFT->Acquire = line.mid(line.indexOf(",")+1);
+                    #ifdef Q_OS_MAC
+                    if(IFT->Acquire.startsWith("~")) IFT->Acquire = QDir::homePath() + "/" + IFT->Acquire.mid(2);
+                    #endif
                 }
             }
             if((resList[0].toUpper() == "SCRIPT") && (resList.length()==3))
@@ -340,12 +350,36 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
             if((resList[0].toUpper() == "INITPARMS") && (resList.length()==2))
             {
                 // Load the file and apply the initialization MIPS commands
+                #ifdef Q_OS_MAC
+                if(resList[1].startsWith("~")) resList[1] = QDir::homePath() + "/" + resList[1].mid(2);
+                #endif
                 InitMIPSsystems(resList[1]);
+            }
+            if((resList[0].toUpper() == "HELP") && (resList.length()==2))
+            {
+                HelpFile = resList[1];
+                #ifdef Q_OS_MAC
+                if(HelpFile.startsWith("~")) HelpFile = QDir::homePath() + "/" + HelpFile.mid(2);
+                #endif
             }
 
         } while(!line.isNull());
     }
     file.close();
+    LoadedConfig = true;
+    connect(ui->lblBackground, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popupHelp(QPoint)));
+    // Popup help menu actions
+    GeneralHelp = new QAction("General help", this);
+    connect(GeneralHelp, SIGNAL(triggered()), this, SLOT(slotGeneralHelp()));
+    MIPScommands = new QAction("MIPS commands", this);
+    connect(MIPScommands, SIGNAL(triggered()), this, SLOT(slotMIPScommands()));
+    ScriptHelp  = new QAction("Script help", this);
+    connect(ScriptHelp, SIGNAL(triggered()), this, SLOT(slotScriptHelp()));
+    if(!HelpFile.isEmpty())
+    {
+        ThisHelp = new QAction("This control panel help", this);
+        connect(ThisHelp, SIGNAL(triggered()), this, SLOT(slotThisControlPanelHelp()));
+    }
 }
 
 ControlPanel::~ControlPanel()
@@ -370,6 +404,45 @@ void ControlPanel::reject()
         if(ret == QMessageBox::No) return;
     }
     emit DialogClosed();
+}
+
+void ControlPanel::popupHelp(QPoint qp)
+{
+    contextMenu2Dplot = new QMenu(tr("Help options"), this);
+    contextMenu2Dplot->addAction(GeneralHelp);
+    contextMenu2Dplot->addAction(MIPScommands);
+    contextMenu2Dplot->addAction(ScriptHelp);
+    if(!HelpFile.isEmpty()) contextMenu2Dplot->addAction(ThisHelp);
+    contextMenu2Dplot->exec(qp);
+}
+
+void ControlPanel::slotGeneralHelp(void)
+{
+    help->SetTitle("MIPS Help");
+    help->LoadHelpText(":/MIPShelp.txt");
+    help->show();
+}
+
+void ControlPanel::slotMIPScommands(void)
+{
+    help->SetTitle("MIPS Commands");
+    help->LoadHelpText(":/MIPScommands.txt");
+    help->show();
+}
+
+void ControlPanel::slotScriptHelp(void)
+{
+    help->SetTitle("Script help");
+    help->LoadHelpText(":/scripthelp.txt");
+    help->show();
+}
+
+void ControlPanel::slotThisControlPanelHelp(void)
+{
+    qDebug() << HelpFile;
+    help->SetTitle("This Control panel help");
+    help->LoadHelpText(HelpFile);
+    help->show();
 }
 
 void ControlPanel::InitMIPSsystems(QString initFilename)
@@ -461,6 +534,9 @@ QString ControlPanel::Save(QString Filename)
 {
     QString res;
 
+    #ifdef Q_OS_MAC
+    if(Filename.startsWith("~")) Filename = QDir::homePath() + "/" + Filename.mid(2);
+    #endif
     UpdateHoldOff = 1000;
     if(Filename == "") return "No file defined!";
     QFile file(Filename);
@@ -547,6 +623,9 @@ QString ControlPanel::Load(QString Filename)
 {
     QStringList resList;
 
+    #ifdef Q_OS_MAC
+    if(Filename.startsWith("~")) Filename = QDir::homePath() + "/" + Filename.mid(2);
+    #endif
     UpdateHoldOff = 1000;
     if(Filename == "") return "No file defined!";
     QFile file(Filename);
@@ -817,6 +896,17 @@ bool ControlPanel::popupYesNoMessage(QString message)
     int ret = msgBox.exec();
     if(ret == QMessageBox::No) return false;
     return true;
+}
+
+QString ControlPanel::popupUserInput(QString title, QString message)
+{
+    bool ok;
+
+    QApplication::processEvents();
+    QString text = QInputDialog::getText(this, title, message, QLineEdit::Normal,QString::null, &ok);
+    if(!ok) text="";
+    QApplication::processEvents();
+    return text;
 }
 
 

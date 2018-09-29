@@ -1,251 +1,455 @@
 MIPS application help
 
-This application is designed to communicate with a MIPS system and allow you to
-monitor and control parameters. This application has a number of tabs that support
-the most popular modules available in MIPS systems. This application also allows
-you to define and edit pulse sequences.
+The MIPS host application is designed to communicate with a MIPS controller or
+multiple MIPS controller’s. It allows you to monitor and control parameters in
+all the connected controllers. The MIPS host application supports two ways of
+interacting with your MIPS systems:
+   1)	When the MIPS application connects to your system(s) you will see a
+        series of tabs that allow you to control individual modules in your
+        system(s).  Much like the MIPS controller’s user interfaces it allows
+        you to control each module. This mode of operation allows you to select
+        a tab that represents a module and allows you to interact with the
+        modules parameters.
+   2)	The MIPS application under the Tools menu selection allows you to display
+        control panels. A control panel is an organization of MIPS controls that
+        make sense for your specific application. A number of control panels have
+        been included as examples. The user can define unique control panels
+        including the ability to define your own graphics background. The custom
+        control panel mode also supports multiple MIPS systems.
 
-This help document also contains appendix A and B that discuss how to install this
-application and how to use this application to update firmware in your MIPS system.
-
-When this MIPS application is connected to your MIPS system it will querey your
-system to determine the modules that have been installed. The MIPS application
-will then delete the tabs for modules not present in your system.
-
-Below is a brief overview of the tab options on the main dialog box, please note
-that where connected only the tabs for modules in your system will be shown:
+Below is a brief overview of the tab options on the main dialog box. Please note
+that when connected only the tabs for modules in your system will be shown:
 
 System
-  This tab contains options for connection to MIPS. When the app starts it is
-  not connected and you will see a message indicating how to connect. MIPS
-  can be connected to your host computer using a USB interface, WiFi, or an
-  Ethernet connection.  All MIPS system have a USB interface, WiFi and
-  Ethernet are options. If using a USB interface the host computer “sees” MIPS
-  through a virtual com port. You will need to have drivers install on PCs but
-  MACs will work without any additional setup. The appendix in this help file
-  give more details on setting up this app.
-  Use the configure port button to popup a settings dialog box that will allow
-  you to select a com port, select the port and set the baudrate at 115,200. Do
-  not change any other parameters. Press apply to accept the changes and the
-  dialog will close. You can now press connect and the MIPS app will try to
-  connect with MIPS and display the modules detected.
-  If connecting via WiFi or Ethernet you can enter a IP address or name into
-  the MIPS host name box. If this box is not blank then the app will attempt to
-  connect via TCP/IP.
-Terminal
-  The terminal window allows you to communicate with the MIPS system
-  using any of the commands defined in the manual and also define in the MIPS
-  commands option under the help menu section of the MIPS app.  Remember
-  the MIPS commands are case sensitive.
-  The Save menu option will allow you to save all the data in the terminal
-  window to a text file for documentation purposes.
-  The Load menu option will load a test file and display its contents on the
-  terminal window and also send the data to MIPS as well as displaying MIPS
-  response. This allows you to define a setup script that can be sent to MIPS to
-  simplify setup.
-Digital IO
-  This tab allows monitoring and control of the digital IO in a MIPS system. The
-  save and load menu options allow you to save the current state and load a
-  previously saved state. The MIPS app does not automatically scan the input
-  or output status, you will find an update button on this tab that will update
-  all the parameters shown. Note that this tab shows all the digital IO that is
-  possible on a MIPS system, your system likely has fewer digital IO option
-  available for connection.
-DCbias
-  This tab allows monitoring and control of the DC bias outputs of your MIPS
-  system. A total of two modules can be installed allowing up to 16 total
-  channels. Controls on this tab allow you to monitor all the channels and
-  control the output voltages. The MIPS app does not automatically scan the
-  output voltage status, you will find an update button on this tab that will
-  update all the parameters shown.
-RFdriver
-  The RFdriver tab allows you to set the RF drive frequencies and drive levels
-  for the number of modules in the system. You can also monitor the RF output
-  level. An update button is provided to refresh all the controls displayed on
-  this tab.
-Twave
-  This tab allows you to control all parameters for a dual channel Twave
-  system. Additionally all the compressor parameters are displayed and can be
-  controlled including the multi-pass compression table. The Twave tab has
-  context sensitive help so if you select help when this tab is displayed you will
-  see instructions on how to define the compression parameters and how to
-  use the multi-pass compression table.
-FAIMS
-  The FAIMS tab allows you to enable and disable FAIMS and monitor the output
-  voltages. All the FAIMS tuning and setup is performed using the FAIMS controller's
-  user interface. The FAIMS tab allows you to monitor and control the CV and BIAS
-  voltages as well as the offset value. The offset value allows you to define the range
-  for CV and BIAS. Changing offset will not change the output voltage, just the range.
-  With offset set at 0 the CV and BIAS channels have a range of -250 to 250V. The offset
-  will allow you to center this range about any value from -250 to 250V. For example
-  if you set the offset to 100V then the range will be -150 to 350V.
-  The FAIMS tab also supports the CV parking feature that is used with a LC
-  separation. You can define a list of retention times and windows with their associated
-  CV and BIAS values. The system will automatically adjust the CV and BIAS values
-  as the LC separation progresses. Please see the context sensitive help in the FAIMS
-  tab for more detail.
-Pulse sequence generation
-  One of the most powerful features of MIPS is its ability to define complex
-  pulse sequences. You can define pulse sequences that change digital outputs
-  and DCbias outputs at user defined times. You are able to define an internal
-  clock or use an external clock to control the pulse sequences and you trigger
-  the execution using a software command or an external hardware trigger.
-  This tab allow defining downloaded and executing pulse sequences. This tab
-  has context sensitive help that will define all the options in more detail.
+   This tab contains options for connecting to MIPS. When the app starts it is not
+   connected and you will see a message indicating how to connect. MIPS can be
+   connected to your host computer using a USB interface, WiFi, or an  Ethernet
+   connection.  All MIPS system have a USB interface, WiFi and Ethernet as options.
+   If using a USB interface the host computer “sees” MIPS through a virtual com
+   port. You will need to have drivers installed on PCs but MACs will work without
+   any additional setup. The appendix in the help file gives more details on setting
+   up this app.  Use the configure port button to popup a settings dialog box that
+   will allow you to select a com port, select the port and set the baudrate at
+   115,200. Do not change any other parameters. Press Apply to accept the changes
+   and the dialog will close. You can now press Connect and the MIPS app will try
+   to connect with MIPS and display the modules detected.   If connecting via WiFi
+   or Ethernet you can enter an IP address or name into the MIPS host name box.
+   If this box is not blank then the app will attempt to connect via TCP/IP.
 
-The MIPS application also contails a menu bar with a number of useful options
+   The MIPS application can connect to multiple systems. You can press the “Find
+   MIPS and Connect” button and then the application will scan all the com ports
+   looking for MIPS controllers. A selection box will appear if multiple systems
+   are found and then you can select the system you want to interact with. The
+   selection box will list the MIPS controllers found by name. If the MIPS host
+   name selection box has system IPs or names listed then this information will
+   be used to make the connections.
+ADC
+   The Arduino Due has several ADC channels that can be used for data collection.
+   If your system has an ADC BNC on the rear panel then this tab will allow you
+   to perform high-speed data collection from this input. The ADC input is 0 to
+   5 volts DC so if you have a signal with different range you will need to first
+   rescale it with hardware. This option allows you to read at high rates (up to
+   600 KHz) and record very long vectors.
+Terminal
+   The terminal window allows you to communicate with the MIPS system using any
+   of the commands defined in the manual. The MIPS commands can also be found by
+   selecting the “MIPS Commands” option under the Help menu. Remember the MIPS
+   commands are case sensitive. The Save menu option will allow you to save all
+   the data in the terminal window to a text file for documentation purposes.
+   The Load menu option will load a test file and display its contents on the
+   terminal window and also send the data to MIPS as well as displaying MIPS
+   response. This allows you to define a setup script that can be sent to MIPS
+   to simplify setup. You can paste commands from a text file into the terminal
+   window to send a batch of commands to MIPS.
+Digital IO
+   This tab allows monitoring and control of the digital IO in a MIPS system.
+   The save and load menu options allow you to save the current state and load
+   a previously saved state. The MIPS app does not automatically scan the input
+   or output status, you will find an update button on this tab that will update
+   all the parameters shown. Note that this tab shows all the digital IO that is
+   possible on a MIPS system, your system likely has fewer digital IO option
+   available for connection.
+
+   MIPS Trigger output can be used for a number of options including generation
+   of a clock. This tab allows control of the Trigger output options.
+
+   The MIPS user interface can be controlled remotely using options on the tab,
+   this is useful if you have a custom MIPS system with no control knob or you
+   have floated your system and need to interact through the controllers UI.
+DCbias
+   This tab allows monitoring and control of the DC bias outputs of your MIPS
+   system. A total of four modules can be installed allowing up to 32 total channels.
+   Controls on this tab allow you to monitor up to 24 of the channels and  control
+   the output voltages. This tab allows you to manually update the displayed
+   parameters or you can select an auto update option to the parameters to update
+   every few seconds.  The DC output voltages can be changed by typing in a new
+   value and pressing enter or by using the up and down arrow keys to change the
+   values. If you hold the shift and or control button down the size of the
+   voltage step will increase.
+
+   DC bias ground can be defined by entering a unique name the Group box for all
+   the channels you with to group together. When you change one member of a group
+   then all channels in the group will change by the same amount.
+RFdriver
+   The RFdriver tab allows you to set the RF drive frequencies and drive levels
+   for the number of modules in the system. You can also monitor the RF output
+   level. An update button is provided to refresh all the controls displayed on
+   this tab. Auto tune and Auto Re-tune buttons allow you to automatically tune
+   a RF head to its load.
+   Auto tune will set the drive level to 10% and tune the RF heading by scanning
+   the frequency range.
+   Auto retune will keep the current power setting and search around the current
+   setting to fine the optimal setting.
+Twave
+   This tab allows you to control all parameters for a dual channel Twave system.
+   Additionally, all the compressor parameters are displayed and can be controlled
+   including the multi-pass compression table. The Twave tab has context sensitive
+   help so if you select help when this tab is displayed you will see instructions
+   on how to define the compression parameters and how to use the multi-pass
+   compression table.
+ARB
+   This tab allows you to control all parameters for an up to your channel ARB
+   system. Additionally, all the compressor parameters are displayed and can be
+   controlled including the multi-pass compression table. The ARB tab has context
+   sensitive help so if you select help when this tab is displayed you will
+   see instructions on how to define the compression parameters and how to use
+   the multi-pass compression table.
+FAIMS
+   The FAIMS tab allows you to enable and disable FAIMS and monitor the output
+   voltages. All the FAIMS tuning and setup is performed using the FAIMS
+   controller's user interface. The FAIMS tab allows you to monitor and control
+   the CV and BIAS voltages as well as the offset value. The offset value allows
+   you to define the range for CV and BIAS. Changing offset will not change the
+   output voltage, just the range.   With offset set at 0 the CV and BIAS channels
+   have a range of -250 to 250V. The offset will allow you to center this range
+   about any value from -250 to 250V. For example if you set the offset to 100V
+   then the range will be -150 to 350V.
+   The FAIMS tab also supports three CV scanning option:
+      1)   CV parking feature that is coupled with a LC separation. You can define
+           a list of retention times and windows with their associated CV and BIAS
+           values. The system will automatically adjust the CV and BIAS values as
+           the LC separation progresses. Please see the context sensitive help in
+           the FAIMS tab for more detail.
+      2)   Linear scanning. This function allows you to define a starting and ending
+           CV voltage and duration in seconds for the scan. When the scan starts the
+           MIPS FAIMS system will automatically scan the CV from the starting
+           voltage to the ending voltage in a linear fashion. Additionally, the
+           defined scan can be repeated the number of times defined in loop. The
+           scan can be started manually or via an external.
+      3)   Step scanning. This function allows you to define a starting and ending
+           CV voltage, number of steps, and step duration for the scan. When the
+           scan starts the MIPS FAIMS system will automatically scan the CV from
+           the starting voltage to the ending voltage in a stepwise fashion.
+           Additionally the defined scan can be repeated the number of times
+           defined in loop. The scan can be started manually or via an external
+           trigger.
+Pulse Sequence Generation
+   One of the most powerful features of MIPS is its ability to define complex pulse
+   sequences. You can define pulse sequences that change digital outputs  and DCbias
+   outputs at user defined times. You are able to define an internal  clock or use
+   an external clock to control the pulse sequences and you trigger  the execution
+   using a software command or an external hardware trigger. This tab allows
+   defining downloading and executing pulse sequences. This tab  has context
+   sensitive help that will define all the options in more detail.
+
+The MIPS application also contains a menu bar with a number of useful options
 described below:
-  Help
-    The Help menu heading has both a general help selection and a MIPS commands
-    option. The geneal help will display help for the specific tab selected or
-    for the control panel if one is displayed. The MIPS command help option will
-    list all MIPS commands and these can be entered using the Terminal interface
-    by selecting the the Terminal tab.
-  File
-    The File menu heading contains two options, Load and Save. These functions
-    allow you to load and save parameters to a file on your computer. These
-    functions will load and save parameters on the tab you have selected or if
-    you have one of the control panels displated the load and save will apply
-    to the control pannel. When you select load or save you will see a file
-    selection dialog allowing to to define the file of your choice.
-  Terminal
-    The Terminal heading contains only one option, Clear. Selecting clear will
-    clear all data in the terminal window.
-  Tools
-    The Tools menu heading contains functions that enable loading new firmware
-    into the MIPS controller as well as control panel options. Appendix B
-    outlines the steps to install new firmware in MIPS.
-    The control panels are a visual display of a system with MIPS controls
-    positioned at logic locations and labeled for there specific application.
-    At the time of this writting there are two control panels, one for a
-    single funnel system and one for Julia Laskin's soft landing system.
-    Control panels have specific MIPS configuration requirements and if your
-    connected to MIPS they will first check the configuration before loading.
-    If your not connected to MIPS you can load the control panel and use it to
-    define and save profiles.
+Help
+   The Help menu heading has both a general help selection and a MIPS commands
+   option. The general help will display help for the specific tab selected or for
+   the control panel if one is displayed. The MIPS command help option will list
+   all MIPS commands and these can be entered using the Terminal interface by
+   selecting the Terminal tab.
+File
+   The File menu heading contains two options, Load and Save. These functions
+   allow you to load and save parameters to a file on your computer. These
+   functions will load and save parameters on the tab you have selected or if
+   you have one of the control panels displayed the load and save will apply to
+   the control panel. When you select load or save you will see a file selection
+   dialog allowing you to define the file of your choice.
+Terminal
+   When the terminal tab is select a number of options in the Terminal menu selection
+   will be available and described below:
+   Clear
+      Select this option to clear the Terminal screen, this will remove all displayed
+      text / message history.
+   Message repeat
+      Selecting this option will display a dialog box that allows you to define a
+      message to be sent every second to MIPS.
+   Get file from MIPS
+      The MIPS controller has a SD memory card to save configuration data. This
+      command allows you to read a file from the SD card to a location on your host
+      computer. You can use the DIR command to see all the file names saved on the
+      SD card.
+   Send file to MIPS
+      This command allows you to write a file to the SD card from a selected file
+      on your host computer. Note, this function will over write a file with no
+      warning!
+   Read EEPROM
+      Each module in your MIPS controller has an EEPROM used to save the modules
+      calibration and configuration parameters. This command allows you to select
+      a module and save the data to a file on your host computer.
+   Write EEPROM
+      Each module in your MIPS controller has an EEPROM used to save the modules
+      calibration and configuration parameters. This command allows you to write
+      data from a file on your host computer to the select module’s EEPROM.
+
+The following three options are designed to communicate with the Arduino; Due that
+is located on the ARB module. This can be done by connecting the MIPS application
+directly to the ARB Arduino board or by using the TWITALK command. The TWITALK
+command redirect communications traffic through the MIPS controller to the select
+ARB module. Note, these commands were designed for factory setup and test and you
+should not need to use them.
+   Read ARB Flash
+      ARB modules have an Arduino Due on each module. This Due stores its
+      configuration data in its Flash memory. This command allows you to read
+      and save the Flash contents to a file on you host computer.
+   Write ARB Flash
+      ARB modules have a Arduino Due on each module. This Due stores its
+      configuration data in its Flash memory. This command allows you to write
+      from a file on your host computer to the Flash on an ARB module.
+   ARB Upload
+      This command allows you to update the program on the ARB Due from a selected
+      file on the host computer.
+
+Tools
+   The Tools menu heading contains functions that enable loading new firmware into
+   the MIPS controller as well as control panel options. Appendix B outlines the
+   steps to install new firmware in MIPS. The control panels are a visual display
+   of a system with MIPS controls positioned at logic locations and labeled for
+   their specific application. At the time of this writing there are several
+   custom control control panels developed for various customers.  We will work
+   with you to develop a custom control panel (usually at no cost) or you can
+   use the user defined control panel option. The Select… menu option allows you
+   to select a user defined control panel that can be defined by a simple text file.
+   When you press this select option you will see a file selection dialog asking
+   you to select a .cp file. This file defines your custom control panel. Please
+   see Appendix C for more details on this file format.
 
 Appendix A: MIPS install details
 
-  There are two version of the MIPS application, one for use on a MAC and another for
-  use on a PC. The install files for both can be found on my google drive
-  (https://drive.google.com/open?id=0B3IchPRNYqYIcjZhdGFVMVR1VzQ) in the
-  MIPSapp directory. This application is a work in progress and it provides an
-  example how to communicate with the MIPS system. This application is written in
-  Qt and the source code can be found on my github account here:
-  https://github.com/GordonAnderson
+There are two version of the MIPS application, one for use on a MAC and another
+for use on a PC. The install files for both can be found on my google drive
+(https://drive.google.com/open?id=0B3IchPRNYqYIcjZhdGFVMVR1VzQ) in the MIPSapp
+directory. This application is a work in progress and it provides an example how
+to communicate with the MIPS system. This application is written in Qt and the
+source code can be found on my github account here:
+https://github.com/GordonAnderson
 
-Install instructions:
+Install instructions
 
 MAC:
-
-  It is very easy to install this application on a MAC, simply copy the MIPS.app file
-  found in the MAC directory to your application directory or wherever you would
-  like. Click on the MIPS.app file to start it up.
+It is very easy to install this application on a MAC, simply copy the MIPS.app file
+found in the MAC directory to your application directory or wherever you would like.
+Click on the MIPS.app file to start it up.  The MIPS.app file is a bundle and you can
+open it with Finder. You will find a folder called MIPS inside the bundel, copy this
+folder to your home folder on your MAC and then you will be able to run the example
+control panel and scripts.
 
 PC:
+Installation is a bit more complex on a PC running windows. Windows systems do not
+have the needed drivers to communicate with the MIPS system using the arduino due
+controller. To install the MIPS application perform the following steps:
+   1)   Copy the PC directory and all its contents including the sub directories
+        and there contents to your windows PC and name the directory MIPS.
+   2)   Run the program MIPS.exe. If you get the following error: “The Program
+        can't start because MSVCR110.dll is missing from your computer. Try
+        reinstalling the program to fix this problem.” then you need to run the
+        vcredist_x86.exe application to install the needed windows drivers.
+        After you install the drivers the MIPS.exe application should run.
+   3)   The next step is to make sure the proper USB drivers are installed, this
+        Arduino page outlines the install process:
+        https://www.arduino.cc/en/Guide/ArduinoDue#toc10
+   4)   You do not need to download the drivers because they are already in the
+        PC directory that you copied to you system in step 1. When instructed to
+        locate the driver’s directory use the one in the PC directory.
 
-  Installation is a bit more complex on a PC running windows. Windows systems
-  do not have the needed drivers to communicate with the MIPS system using the
-  arduino due controller. To install the MIPS application perform the following
-  steps:
-  1.) Copy all the PC directory and all its contents including the sub directories
-      and there contents to your windows PC and name the directory MIPS.
-  2.) Run the program MIPS.exe. If you get the following error: “The Program can't
-      start because MSVCR110.dll is missing from your computer. Try reinstalling
-      the program to fix this problem.” then you need to run the vcredist_x86.exe
-      application to install the needed windows drivers. After you install the
-      drivers the MIPS.exe application should run. ?
-  3.) The next step is to make sure the proper USB drivers are installed, this
-      Arduino page outlines the install process:
-      https://www.arduino.cc/en/Guide/ArduinoDue#toc10 ?
-  4.) You do not need to download the drivers because they are already in the PC
-      directory that you copied to you system in step 1. When instructed to locate
-      the drivers directory use the one in the PC directory. ?
+The MIPS host computer application allows you to upload new MIPS firmware as well
+as control most MIPS functions from your computer.
 
-  The MIPS host computer application allows you to upload new MIPS firmware as
-  well as control most MIPS functions from your computer.
 
-Appendix B: Instructions for updating the MIPS firmware.
+Appendix B: Instructions for Updating the MIPS Firmware.
 
-  These instructions define how to use the MIPS application to load new firmware to
-  your MIPS system. Before you attempt to load new firmware make sure you can
-  communicate with your MIPS system using the MIPS application. You will find two
-  versions of the application, one designed to run on a PC and one for a MAC. My
-  google drive
-  (https://drive.google.com/open?id=0B3IchPRNYqYIcjZhdGFVMVR1VzQ) has a
-  MIPSapp dir has all the install files for the two versions and instructions on how to
-  install the app. Test the MIPS app by using the Terminal tab to send commands to
-  the MIPS system, for example send GVER to return the version of the firmware. Note
-  the MIPS commands are case sensitive.
-
-  The current version of MIPS firmware is located on my google drive along with this
-  readme file. The firmware files always end in .bin.
-
-  Below are the instructions for updating your systems firmware:
-
-To save the current version:
-
-  1.) Connect to your MIPS system and make sure you press the connect button to
-      make the port connection. Pick a fast baud rate, 115,200.
-  2.) Disconnect the RF heads from the MIPS box. It is a good idea to disconnect all
-      signals from the MIPS box but the RF heads must be disconnected.
-  3.) Select the “Save current MIPS firmware” option and follow the prompts.
-  4.) In the end you should have a file holding the current version of your MIPS
-      system. Save this file.
+These instructions define how to use the MIPS application to load new firmware to
+your MIPS system. Before you attempt to load new firmware make sure you can
+communicate with your MIPS system using the MIPS application. You will find two
+versions of the application, one designed to run on a PC and one for a MAC. My
+google drive (https://drive.google.com/open?id=0B3IchPRNYqYIcjZhdGFVMVR1VzQ)
+has a MIPSapp dir has all the install files for the two versions and instructions
+on how to   install the app. Test the MIPS app by using the Terminal tab to send
+commands to   the MIPS system, for example send GVER to return the version of the
+firmware. Note   the MIPS commands are case sensitive. The current version of MIPS
+firmware is located on my Google drive along with this readme file. The firmware
+files always end in .bin.  Below are the instructions for updating your systems
+firmware:  To save the current version:
+   1)   Connect to your MIPS system and make sure you press the connect button to
+        make the port connection. Pick a fast baud rate, 115,200.
+   2)   Disconnect the RF heads from the MIPS box. It is a good idea to disconnect
+        all signals from the MIPS box but the RF heads must be disconnected.
+   3)   Select the “Save current MIPS firmware” option and follow the prompts.
+   4)   In the end you should have a file holding the current version of your MIPS
+        system. Save this file.
 
 To program the new version:
 
-  1.) Make sure you have a copy of the MIPS firmware file, it will be named
-      something like: MIPS_V1.26.bin. This is the file we will use to update your
-      systems.
-  2.) Exit the MIPS app and then restart it.
-  3.) Connect to your MIPS system and make sure you press the connect button to
-      make the port connection. Pick a fast baud rate, 115,200.
-  4.) Disconnect the RF heads from the MIPS box. It is a good idea to disconnect all
-      signals from the MIPS box but the RF heads must be disconnected.
-  5.) Select the “Program MIPS” option and follow the prompts.
-  6.) When the programming operation finishes you will see the MIPS box reboot.
+   1)   Make sure you have a copy of the MIPS firmware file, it will be named
+        something like: MIPS-V1.133.bin. This is the file we will use to update
+        your systems.
+   2)   Exit the MIPS app and then restart it.
+   3)   Connect to your MIPS system and make sure you press the connect button
+        to make the port connection. Pick a fast baud rate, 115,200.
+   4)   Disconnect the RF heads from the MIPS box. It is a good idea to disconnect
+        all signals from the MIPS box but the RF heads must be disconnected.
+   5)   Select the “Program MIPS” option and follow the prompts.
+   6)   When the programming operation finishes you will see the MIPS box reboot.
 
 If something goes wrong:
 
-  This process is not fool proof and its not uncommon for it to fail for one reason
-  or another. This section provides a little background on how the download
-  process works and how to recover from a failure.
+This process is not fool proof and it is not uncommon for it to fail for one reason
+or another. This section provides a little background on how the download process
+works and how to recover from a failure.
 
-  The first step in the download or reading of the firmware process is to signal the
-  ARM processor to remain in the boolloader on power up and not to run the
-  firmware. Next the ARM processor is rebooted. At this point the firmware is still
-  present in the ARM processor’s flash but will not run. Then the firmware can be
-  read and saved or erased and a new version uploaded. The bootloader function
-  is native to the ATMEL ARM processor and a program called bossac is called by
-  the MIPS app to do the programming and reading of firmware. The bossca app’s
-  output it then redirected to the terminal screen in the MIPS app.
+The first step in the download or reading of the firmware process is to signal the
+ARM processor to remain in the boolloader on power up and not to run the firmware.
+Next the ARM processor is rebooted. At this point the firmware is still present in
+the ARM processor’s flash but will not run. Then the firmware can be read and saved
+or erased and a new version uploaded. The bootloader function is native to the ATMEL
+ARM processor and a program called bossac is called by the MIPS app to do the
+programming and reading of firmware. The bossca app’s output it then redirected to
+the terminal screen in the MIPS app.
 
-  If the process fails most likely the bootloader flag is cleared so the ARM
-  processor stays in the boolloader mode and will not run the MIPS app. This
-  renders the MIPS system inoperable. If this happens you can recover by the
-  following procedure:
+If the process fails most likely the bootloader flag is cleared so the ARM processor
+stays in the boolloader mode and will not run the MIPS app. This renders the MIPS
+system inoperable. If this happens you can recover by the following procedure:
 
-  1.) Disconnect from MIPS by selecting the System tab and then press the
-      disconnect button.
-  2.) Exit the MIPS app and then restart the app.
-  3.) Configure the serial port and note that the com port has likely changed, that
-      is because the ARM processor’s bootloader is now running and not the MIPS
-      firmware.
-  4.) After you configure the serial port press the connect button. Note that the
-      system will generate error messages (timeouts) and show them in the status
-      bar at the bottom of the dialog box. This is ok, we are connecting only
-      because it is required by the MIPS app to do the firmware update.
-  5.) Select the terminal tab.
-  6.) Now you can use one of the options under tools to program new firmware,
-      read the current version or just set the bootloader flag. Note that you do not
-      need to set the bootloader flag when programming a new version or reading
-      the current version, these functions automatically set the flag when finished.
-
-Apendix C: ARB setup and calibration procudures.
-
-  This section describes how to configure the ARB modules and how to perform the
-  calibration procedures. This is not intended to be used by the end user. These
-  details are documented here for factory setup.
+   1)   Disconnect from MIPS by selecting the System tab and then press the
+        Disconnect button.
+   2)   Exit the MIPS app and then restart the app.
+   3)   Configure the serial port and note that the com port has likely changed,
+        that is because the ARM processor’s bootloader is now running and not the
+        MIPS firmware.
+   4)   After you configure the serial port press the Connect button. Note that
+        the system will generate error messages (timeouts) and show them in the
+        status bar at the bottom of the dialog box. This is ok; we are connecting
+        only because it is required by the MIPS app to do the firmware update.
+   5)   Select the Terminal tab.
+   6)   Now you can use one of the options under Tools to program new firmware,
+        read the current version or just set the bootloader flag. Note that you
+        do not need to set the bootloader flag when programming a new version or
+        reading the current version, these functions automatically set the flag
+        when finished.
 
 
+Appendix C: User Definable Control Panels
+
+User defined control panels are created by a text file that the user generates. This
+text file contains instructions that the MIPS application uses to create a control
+panel that describes your system and how the MIPS signals are used to control your
+instrument. MIPS control panels can be created using signals from multiple MIPS
+systems, this allows you to create very complex systems. Control panels display a
+single page or screen but you can create several control panels for a single system.
+
+To load a control plane select the “Select…” option under the Tools menu and then
+select your configuration file, extension .cfg is recommended. MIPS will then open
+this file and create the control panel.
+
+Make sure you have first connected to your MIPS systems using the “Find MIPS and
+Connect” button on the System tab. This will search your system and connect to your
+MIPS systems. This function will read the MIPS system names and these names will be
+used in defining the signals. So make sure you have defined unique names for each of
+your MIPS systems.
+
+After you have selected your control panel file the main MIPS dialog will switch to
+the System tab and minimize. You should not use the main dialog when running a
+control panel.
+
+You can create a control panel file using any text editor to enter configuration
+commands defined below. The MIPS app install files in an example called names
+example.cfg. This example cfg file illustrates most of the features and provides a
+framework you can use to build your own control panel. If you are using the MAC
+version of the MIPS application you will find the examples in the MIPS application
+bundle in the examples folder. We recommend you copy the examples from the app
+bundle to a folder on your MAC.
+
+Below are the commands that you can use in the control panel .cfg file:
+
+   •    Any line starting with a # character is considered a comment and ignored.
+   •    size,x,y defines the size of the control panel in pixels
+   •    image,filename.jpg defines a background image, make sure you include a full
+        path to the file. The image is stretched to fit the size of your control
+        panel.
+   •    Help,filename defines a full path and file name to a text file that contains
+        help information for the control panel you are creating. This help file can
+        be displayed by right clicking your mouse on the control panel and then
+        selecting the “This control panel help” option. You can use any text editor
+        to create the help file and include information specific to your application.
+   •    TextLabels,number defines the number of text label commands that will follow
+        this command.
+   •    TextLabel,this is a label,font,x,y This command will place a label at a user
+        defined location and use the font size defined.
+   •    Shutdown,button name,x,y This command will add a System shutdown button to
+        your control panel at the location defined. Pressing this button will turn
+        off all DC bias voltages and reduce all RF drive level to 0.
+   •    SaveLoad,save name, load name,x,y This command will add save and load buttons
+        to the control panel. This allows you to save and restore all your system
+        settings.
+   •    InitParms,filename.ini This command will open the filename and execute all
+        the MIPS commands found. This is intended to perform setup when the control
+        panel loads. The MIPS commands in the file must be formatted as follows:
+        MIPSname,command.
+   •    MIPScomms,x,y This command will add a button to your control panel that when
+        pressed will allow you to send commands to a select MIPS system.
+   •    DCBgroups,x,y This command places a DCbias groups box on the control panel.
+        This box allows you to define DC bias channels that are group together;
+        changing one member of a group will change them all by the same amount.
+   •    Script,x,y This command places a scripting box on your control panel. This
+        allows you to define a script to control your instrument.
+   •    RFchannels,number This command defines the number of RF channels that follow
+        this command.
+   •    RFchannel,name,MIPS name,chan,x,y This command defines a RF channel, its
+        name, the MIPS system name, the MIPS system RF channel number, and its x,y
+        location.
+   •    DCBchannels,number This command defines the number of DC bias channels that
+        follow this command.
+   •    DCBchannel,name, MIPS name, chan,x,y This command defines a DC bias channel,
+        its name, the MIPS system name, the MIPS system DC bias channel number, and
+        its x,y location.
+   •    DCBoffsets,number This command defines the number of DC bias offset that
+        follow this command.
+   •    DCBoffset,name,MIPS name,x,y This command defines a DC bias channel offset
+        control, its name, the MIPS system name, and its x,y location.
+   •    DIOchannels,number This command defines the number of DIO channels that
+        follow this command.
+   •    DIOchannel,name,MIPS name,chan,x,y This command defines a DIO channel,
+        its name, the MIPS system name, the MIPS system DIO channel number, and
+        its x,y location.
+   •    ESIchannels,number This command defines the number of ESI channels that
+        follow this command.
+   •    ESIchannel,name,MIPS name, chan,x,y This command defines a ESI channel,
+        its name, the MIPS system name, the MIPS ESI channel number, and its x,y
+        location.
+   •    ARBchannels,number This command defines the number of ARB channels that
+        follow this command.
+   •    ARBchannel,name,MIPS name,chan,x,y This command defines a ARB channel,
+        its name, the MIPS system name, the MIPS ARB channel number, and its x,y
+        location.
+   •    IFT,name,MIPS name,x,y This command display an IFT (Ion Trapping Funnel)
+        control box on your control panel. This allows you to generate the timing
+        needed to control a trapping funnel. You define the IFT name, the MIPS name
+        where the signals are generated, and its x,y location.
+   •    Grid1,name This command has to follow the IFT command. This command defines
+        the name of the signal used for Grid 1.
+   •    Grid2,name This command has to follow the IFT command. This command defines
+        the name of the signal used for Grid 2.
+   •    Grid3,name This command has to follow the IFT command. This command defines
+        the name of the signal used for Grid 3.
+   •    Enable,chan This command has to follow the IFT command. This command will
+        cause the IFT timing generation to include an enable signal to go active
+        during the acquire interval. The chan is the MIPS channel number, i.e. A
+   •    Acquire,program name,filename,tofscans This command is used to enable a
+        program to acquire data. The parameter “program name” defines the full path
+        and name of an external application that is called to acquire data. If the
+        parameter filename is defined then the user will be asked for a location
+        to save the date and the external program will be passed a filename. If
+        the parameter tofscans is present then the total number of tof scans to
+        acquire is calculated and passed to the external program.

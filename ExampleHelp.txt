@@ -1,0 +1,2 @@
+Example help file for
+this custom control panel.

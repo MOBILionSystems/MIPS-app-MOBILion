@@ -62,9 +62,17 @@ public:
     Q_INVOKABLE void AddTab(QString TabName);
     Q_INVOKABLE void FindMIPSandConnect(void);
     Q_INVOKABLE void FindAllMIPSsystems(void);
+    Comms* FindCommPort(QString name, QList<Comms*> Systems);
     // The following functions are for the scripting system
     Q_INVOKABLE bool SendCommand(QString message);
     Q_INVOKABLE QString SendMess(QString message);
+    Q_INVOKABLE bool SendCommand(QString MIPSname, QString message);
+    Q_INVOKABLE QString SendMess(QString MIPSname, QString message);
+    Q_INVOKABLE void msDelay(int ms);
+    Q_INVOKABLE void statusMessage(QString message);
+    Q_INVOKABLE void popupMessage(QString message);
+    Q_INVOKABLE bool popupYesNoMessage(QString message);
+    Q_INVOKABLE QString popupUserInput(QString title, QString message);
 
 public slots:
     void setWidgets(QWidget*, QWidget*);

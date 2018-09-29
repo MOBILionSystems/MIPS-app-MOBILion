@@ -17,5 +17,6 @@
         <file>SoftLandingHelp.txt</file>
         <file>SingleFunnelHelp.txt</file>
         <file>ARBhelp.txt</file>
+        <file>scripthelp.txt</file>
     </qresource>
 </RCC>

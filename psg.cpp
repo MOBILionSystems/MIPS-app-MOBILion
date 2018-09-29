@@ -36,6 +36,7 @@ PSG::PSG(Ui::MIPS *w, Comms *c)
    connect(pui->pbEditCurrent, SIGNAL(pressed()), this, SLOT(on_pbEditCurrent_pressed()));
    connect(pui->pbCreateNew, SIGNAL(pressed()), this, SLOT(on_pbCreateNew_pressed()));
    connect(pui->pbTrigger, SIGNAL(pressed()), this, SLOT(on_pbTrigger_pressed()));
+   connect(pui->pbExitTableMode, SIGNAL(pressed()), this, SLOT(on_pbExitTableMode_pressed()));
    connect(pui->pbRead, SIGNAL(pressed()), this, SLOT(on_pbRead_pressed()));
    connect(pui->pbWrite, SIGNAL(pressed()), this, SLOT(on_pbWrite_pressed()));
    connect(pui->leSequenceNumber, SIGNAL(editingFinished()), this, SLOT(on_leSequenceNumber_textEdited()));
@@ -277,7 +278,7 @@ void PSG::on_pbCreateNew_pressed()
     psg.clear();
     psg.push_back(point);
     pse = new pseDialog(&psg);
-    pse->show();
+    pse->exec();
 }
 
 void PSG::on_pbSaveToFile_pressed()
@@ -314,7 +315,7 @@ void PSG::on_pbEditCurrent_pressed()
         return;
     }
     pse = new pseDialog(&psg);
-    pse->show();
+    pse->exec();
 }
 
 void PSG::on_leSequenceNumber_textEdited()
@@ -337,6 +338,12 @@ void PSG::on_pbTrigger_pressed()
     pui->statusBar->showMessage(pui->statusBar->currentMessage() + " " + comms->getline());
     comms->waitforline(100);
     pui->statusBar->showMessage(pui->statusBar->currentMessage() + " " + comms->getline());
+}
+
+void PSG::on_pbExitTableMode_pressed()
+{
+    comms->SendCommand("TBLABORT\n");
+    comms->SendCommand("SMOD,LOC\n");
 }
 
 void PSG::on_pbRead_pressed()

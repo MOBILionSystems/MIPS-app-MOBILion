@@ -1,6 +1,7 @@
 #include "help.h"
 #include "ui_help.h"
 #include <QTextOption>
+#include <QDir>
 
 Help::Help(QWidget *parent) :
     QDialog(parent),

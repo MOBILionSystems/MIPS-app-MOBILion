@@ -47,6 +47,7 @@ private slots:
     void on_pbRead_pressed();
     void on_pbWrite_pressed();
     void on_pbVisPulseSequence_pressed();
+    void on_pbExitTableMode_pressed();
 };
 
 #endif // PSG_H

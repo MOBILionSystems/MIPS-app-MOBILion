@@ -107,6 +107,10 @@
 //      1.) Added the group capability for DC bias voltages
 // 1.25, August 2, 2018
 //      1.) Added the user definable control panels
+// 1.26, Sept 9,2018
+//      1.) Added documentation and updated help
+//      2.) Corrected PSG label errors and make the PSE box modal
+//      3.) Added Java Scripting
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -561,6 +565,7 @@ void MIPS::pollLoop(void)
     QString res ="";
     //char c;
 
+    if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
     {
         /*
@@ -1278,6 +1283,7 @@ void MIPS::SelectCP(void)
     if(cp   != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
     ControlPanel *c = new ControlPanel(0,Systems);
+    if(!c->LoadedConfig) return;
     c->show();
     connect(c, SIGNAL(DialogClosed()), this, SLOT(CloseControlPanel()));
     c->Update();
@@ -1291,6 +1297,19 @@ void MIPS::slotScripting(void)
     scriptconsole->show();
 }
 
+// Returns a pointer to the comm port for the MIPS system defined my its name.
+// Returns null if the MIPS system can't be found.
+Comms* MIPS::FindCommPort(QString name, QList<Comms*> Systems)
+{
+   for(int i = 0; i < Systems.length(); i++)
+   {
+       if(Systems.at(i)->MIPSname == name) return(Systems.at(i));
+   }
+   return NULL;
+}
+
+
+
 bool MIPS::SendCommand(QString message)
 {
    return comms->SendCommand(message);
@@ -1299,4 +1318,71 @@ bool MIPS::SendCommand(QString message)
 QString MIPS::SendMess(QString message)
 {
    return comms->SendMess(message);
+}
+
+bool MIPS::SendCommand(QString MIPSname, QString message)
+{
+    QApplication::processEvents();
+    Comms *cp =  FindCommPort(MIPSname,Systems);
+    if(cp==NULL) return false;
+    return cp->SendCommand(message);
+}
+
+QString MIPS::SendMess(QString MIPSname, QString message)
+{
+    QApplication::processEvents();
+    Comms *cp =  FindCommPort(MIPSname,Systems);
+    if(cp==NULL) return "MIPS not found!";
+    return cp->SendMess(message);
+}
+
+void MIPS::msDelay(int ms)
+{
+    QTime timer;
+
+    timer.start();
+    while(timer.elapsed() < ms) QApplication::processEvents();
+}
+
+void MIPS::statusMessage(QString message)
+{
+    QApplication::processEvents();
+    ui->statusBar->showMessage(message);
+    QApplication::processEvents();
+}
+
+void MIPS::popupMessage(QString message)
+{
+    QMessageBox msgBox;
+
+    QApplication::processEvents();
+    msgBox.setText(message);
+    msgBox.setInformativeText("");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.exec();
+}
+
+bool MIPS::popupYesNoMessage(QString message)
+{
+    QMessageBox msgBox;
+
+    QApplication::processEvents();
+    msgBox.setText(message);
+    msgBox.setInformativeText("Are you sure?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+    if(ret == QMessageBox::No) return false;
+    return true;
+}
+
+QString MIPS::popupUserInput(QString title, QString message)
+{
+    bool ok;
+
+    QApplication::processEvents();
+    QString text = QInputDialog::getText(this, title, message, QLineEdit::Normal,QString::null, &ok);
+    if(!ok) text="";
+    QApplication::processEvents();
+    return text;
 }

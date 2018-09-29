@@ -1,0 +1,13 @@
+mips.popupMessage("Press OK to start this demo");
+mips.statusMessage("here we go!");
+while(true)
+{
+   for(i=0;i<10;i++)
+   {
+      mips.msDelay(1000);
+      mips.statusMessage(i+1);
+   }
+   if(!mips.popupYesNoMessage("That was fun, want to do it again?")) break;
+}
+mips.statusMessage("finished");
+status="done";

@@ -6,6 +6,7 @@
 #include "cmdlineapp.h"
 #include "arbwaveformedit.h"
 #include "script.h"
+#include "help.h"
 
 #include <QDialog>
 #include <QDebug>
@@ -21,6 +22,7 @@
 #include <QKeyEvent>
 #include <QBoxLayout>
 #include <QUdpSocket>
+#include <QMenu>
 
 //
 // To dos:
@@ -400,6 +402,7 @@ public:
     QList<Comms*> Systems;
     QStatusBar  *statusBar;
     DCBchannel  *FindDCBchannel(QString name);
+    bool LoadedConfig;
     // The following functions are for the scripting system
     Q_INVOKABLE bool SendCommand(QString MIPSname, QString message);
     Q_INVOKABLE QString SendMess(QString MIPSname, QString message);
@@ -412,10 +415,17 @@ public:
     Q_INVOKABLE void statusMessage(QString message);
     Q_INVOKABLE void popupMessage(QString message);
     Q_INVOKABLE bool popupYesNoMessage(QString message);
+    Q_INVOKABLE QString popupUserInput(QString title, QString message);
 
 private:
     Comms            *FindCommPort(QString name, QList<Comms*> Systems);
     Ui::ControlPanel *ui;
+    QMenu *contextMenu2Dplot;
+    QAction *GeneralHelp;
+    QAction *MIPScommands;
+    QAction *ScriptHelp;
+    QAction *ThisHelp;
+    QString HelpFile;
 
     int         numTextLabels;
     TextLabel   **TextLabels;
@@ -449,6 +459,7 @@ private:
     QPushButton *ScriptButton;
     ScriptingConsole *scriptconsole;
     QUdpSocket *udpSocket;
+    Help *help;
 public slots:
     void pbSD(void);
     void pbSE(void);
@@ -462,6 +473,11 @@ public slots:
     void DCBgroupEnable(void);
     void slotDataAcquired(QString filepath);
     void pbScript(void);
+    void popupHelp(QPoint);
+    void slotGeneralHelp(void);
+    void slotMIPScommands(void);
+    void slotScriptHelp(void);
+    void slotThisControlPanelHelp(void);
 };
 
 #endif // CONTROLPANEL_H

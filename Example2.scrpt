@@ -1,0 +1,9 @@
+mips.popupMessage("Press OK to start demo");
+// Read 5 data files.
+for(i=0;i<5;i++)
+{
+   mips.Acquire("/Users/GAA/desktop/test.0001");
+   while(mips.isAcquiring()) mips.msDelay(1000);
+   mips.DismissAcquire();
+}
+status = "done";

@@ -61,7 +61,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Number of clocks from previous</string>
+     <string>Number of clocks from start of sequence</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -69,12 +69,12 @@
      <rect>
       <x>10</x>
       <y>85</y>
-      <width>211</width>
+      <width>276</width>
       <height>26</height>
      </rect>
     </property>
     <property name="text">
-     <string>Time from previous</string>
+     <string>Time from start of sequence (not used)</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leClocks">

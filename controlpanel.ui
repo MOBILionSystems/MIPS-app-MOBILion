@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Custom control panel</string>
+   <string>Custom control panel, right click for help options</string>
   </property>
   <widget class="QLabel" name="lblBackground">
    <property name="geometry">
@@ -21,6 +21,9 @@
      <width>611</width>
      <height>521</height>
     </rect>
+   </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::CustomContextMenu</enum>
    </property>
    <property name="text">
     <string/>

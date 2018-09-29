@@ -1,0 +1,231 @@
+The MIPS application allows users to write their own scripts, MIPS provides support 
+for application scripting with ECMAScript. 
+
+ECMAScript is a trademarked scripting-language specification standardized by Ecma 
+International in ECMA-262 and ISO/IEC 16262. It was created to standardize 
+JavaScript, so as to foster multiple independent implementations.
+
+Here is a link to a useful Java Script tutorial site: 
+https://www.w3schools.com/js/default.asp
+
+The scripting capability has been customized by exposing the class “mips” to the 
+scripting system. This class has a number of functions that allow you to 
+communicate with the MIPS application and any connected MIPS controllers. 
+
+There are two ways to enable the scripting system in the MIPS application; from 
+the Tools menu of the main MIPS dialog or from a custom user control panel if 
+the control panel has enabled scripting. The functions available from the mips 
+class are different depending on where the scripting is enabled.
+
+When scripting is enabled you will see a scripting dialog box popup that will 
+allow you to enter your script into a text window, load a script from a file or 
+save your script to a file. You will also fine a execute button to start you 
+script and an abort button to stop a running script. Below the execute button 
+is a status message area that will display any errors or final results from your 
+script. A simple example is to enter 4+5 into the scripting text window and press 
+Execute, you will see 9 in the status message area.
+
+Use caution writing scripts, do not write a tight loop such as while(true); this 
+will never release the processor and lock up the application. A loop as shown 
+above will not allow the abort button to work because the button press will never 
+be processed.  Calling function in the mips class allows the system to process 
+events and enables the abort capability so modifying the tight loop example to 
+while(true) mips.msDelay(1); will not lock the system up and you and press the 
+abort button to exit. If you end all of your scripts with status = “done”; then 
+you will see “done” in the status area when your script finishes.
+
+Below is a list of functions available from the mips class, these functions are 
+always available regardless of where the scripting system was started:
+
+mips. SendCommand(name,cmd);
+   This function will send a command to the named MIPS system. The function is useful 
+   when you have multiple connected MIPS system and allows you to direct a message to 
+   a specific system. The argument “name” is a string defining the MIPS system name 
+   and cmd is any valid MIPS command string. This function it intended to send commands 
+   that do not return data. Example mips. SendCommand(“MIPS-1”,“SDCB,1,10\n”); will 
+   set DCbias channel 1 to 10 volts on the MIPS system named MIPS-1.
+
+   Returns true if the command was accepted and false if rejected.
+mips. SendMess(name,message);
+   This function will send a command to the named MIPS system. The function is 
+   useful when you have multiple connected MIPS system and allows you to direct 
+   a message to a specific system. The argument “name” is a string defining the 
+   MIPS system name and cmd is any valid MIPS command string. This function it 
+   intended to send commands that will return data. Example 
+   mips.SendMess(“MIPS-1”, “GVER\n”); will return the current MIPS firmware 
+   version string for the MIPS system named MIPS-1.
+
+   Returns a string containing the reply from MIPS.
+mips. msDelay(delay);
+   This function will delay for the number of milliseconds defined by the integer 
+   delay. This function will not return until the delay time has expired. While 
+   your script is delaying the MIPS application will use this time to process 
+   events.  Example; mips.msDelay(1000);
+mips.statusMessage(message);
+   This function will display a message on the status bar of the main MIPS dialog. 
+   This is the bottom line of the MIPS application dialog. This is useful for your 
+   script to communicate its status to the user.
+mips.popupMessage(message);
+   This function will popup a dialog box containing the message defined by “message”. 
+   This popup will stop script processing and wait for the user to press the “OK” 
+   button.
+mips.popupYesNoMessage(message);
+   This function will popup a message with Yes and No response buttons. The message 
+   displayed is defined by “message” and should be in the form of a yes or no 
+   questions. This function will not return until the user and pressed the yes 
+   or no button.
+mips.popupUserInput(title, message);
+   This function allows a script to popup a user input dialog box. This function 
+   allows you to define the title of the dialog box and a message asking for the 
+   type of input you expect from the user. This function returns a string that 
+   contains the user response.
+
+Below is a list of functions available from the mips class that are only available 
+when the scripting system is started from the MIPS Tool menu:
+
+mips. SendCommand(cmd);
+   This function will send a command string to the connected MIPS system. Any valid 
+   command string can be sent to a MIPS system. Make sure you terminate the command 
+   with the end of line character \n. This function it intended to send commands 
+   that do not return data. Example mips.SendCommand(“SDCB,1,10\n”); will set 
+   DCbias channel 1 to 10 volts.
+
+   Returns true if the command was accepted and false if rejected.
+mips. SendMess(cmd);
+   This function will send a command string to the connected MIPS system. Any valid 
+   command string can be sent to a MIPS system. Make sure you terminate the command 
+   with the end of line character \n. This function it intended to send commands that 
+   will return data. Example mips. SendMess( “GVER\n”); will return the current MIPS 
+   firmware version string.
+
+   Returns a string containing the reply from MIPS.
+
+Below is a list of functions available from the mips class that are only available 
+when the scripting system is started from a custom control panel:
+
+mips.Save(filename);
+   This command will save the current settings on your control panel to a method 
+   file that you define by filename. The argument filename should include the 
+   full path to the file you wish to save. All of the settings are saved to 
+   filename and this file is in text format so you can read it with any text 
+   editor. The settings saved include all the voltages, RF frequencies and 
+   drive levels.
+
+   This function returns a status string indicating the results of the save operation.
+mips.Load(filename);
+   This command will load a settings file and update all the parameters on your 
+   control panel. The filename define the full path and file name to the settings 
+   file you wish to load. After all the parameters have been loaded the system will 
+   delay for 3 seconds to allow everything to stabilize before resuming screen updates.
+
+   This function returns a status string indicating the results of the load operation.
+mips.SystemShutdown();
+   This function is designed to put your system is a safe shutdown state while 
+   saving the operating settings before shutting down. This function will disable 
+   the DCbias voltages by turning off the supply and also set all the RF drive 
+   levels to zero as well as setting ESI voltages to zero.  The system will pause 
+   screen updates for 3 seconds after the function is called.
+mips.SystemEnable();
+   This function will restore the system from a shutdown state. When the system is 
+   shutdown all the operating settings are remembered, this function will restore 
+   those operating parameters and enable system operation. The system will pause 
+   screen updates for 3 seconds after the function is called.
+mips.Acquire(filepath);
+   This function is designed to start a data acquisition and acts similar to 
+   pressing the Trigger button on the IFT control box on your control panel. 
+   This function requires your control panel to have defined the IFT option. 
+   The filepath parameter defines where the files will be saved from the acquire 
+   operation. If the filepath is already present then the final folder name in 
+   the path will have a sequence number added or advanced to insure the path is 
+   unique. It is required that the filepath is present up to the final folder 
+   name. After the filepath is created the current settings will be saved to 
+   the defined path and the Acquire application will be started, this application 
+   name is defined in your control panel configuration file. The console IO to 
+   and from the Acquire program is directed to a dialog box that will appear 
+   after this function is called. The MIPS application will wait for the Acquire 
+   application to issue a “Ready” message and then the pulse sequence will be 
+   started causing the data collection to begin. The Acquire program is a command 
+   line application and it can communicate with MIPS by printing output to its 
+   console. The Acquire application can plot data on the displayed console dialog 
+   by issuing a plot command and then following it up with a plot data. An example 
+   control panel and Acquire program is included with the MIPS app, this is a c++ 
+   program written is QT and illustrates how the acquire program needs to be 
+   designed. After the Acquire program finishes the contents of the acquire console 
+   is saved to the defined filepath. This function does not block and will return 
+   to your script after the call is made and the process is started.
+
+   This function will return true if the process started properly or false if any 
+   error is detected.
+mips.isAcquiring();
+   This function will allow your script to test if the Acquire program is currently 
+   running. The Acquire function defined above does not block so you can use this 
+   function is a loop to wait for the acquire application to finish.
+
+   This function returns true if Acquire is running else false is returned.
+mips.DismissAcquire();
+   This function will destroy the Acquire program popup console IO dialog box. 
+   This console IO dialog box is not automatically destroyed when the Acquire 
+   application finished so this function should be used to remove the dialog.
+
+Below are a few example scripts you can use to learn how the system works and 
+build on to address your specific needs. Scripting is a powerful capability and 
+can allow you to automate the process of collecting data while scanning parameter 
+values to speed the process of characterization. You will find these example 
+scripts in the MIPS install director on your system.
+
+Example 1: This is a simple example this illustrates the message IO options. 
+After this process starts it will count from 1 to 10 on the status bar and 
+then allow you to do it again or stop.
+
+mips.popupMessage("Press OK to start this demo");
+mips.statusMessage("here we go!");
+while(true)
+{
+   for(i=0;i<10;i++)
+   {
+      mips.msDelay(1000);
+      mips.statusMessage(i+1);
+   }
+   if(!mips.popupYesNoMessage("That was fun, want to do it again?")) break;
+}
+mips.statusMessage("finished");
+status = "done";
+
+Example 2: This script will acquire 5 datasets and must be run from a control 
+panel. You can use the example control panel to test this script. You will 
+need to make sure the filepath is correct on your system. 
+
+mips.popupMessage("Press OK to start demo");
+// Read 5 data files.
+for(i=0;i<5;i++)
+{
+   mips.Acquire("/Users/GAA/desktop/test.0001");
+   while(mips.isAcquiring()) mips.msDelay(1000);
+   mips.DismissAcquire();
+}
+status = "done";
+
+Example 3: This last example script illustrates the use of the popupUserInput 
+and changing a MIPS voltage in a data collection loop. This script assumes we 
+are connected to a MIPS controller named MIPS. The script must be run from a 
+custom control panel and have an IFT defined.
+
+mips.popupMessage("Press OK to start demo");
+count = mips.popupUserInput("Setup","Enter number of dataset to record:");
+startV = mips.popupUserInput("Setup","Enter inital voltage:");
+stepV = mips.popupUserInput("Setup","Enter voltage step:");
+for(i=0;i<count;i++)
+{
+   voltage = startV + stepV * i;
+   mips.statusMessage(voltage);
+   mips.SendCommand("MIPS", "SDCB,1," + voltage + "\n");
+   mips.msDelay(100);
+   mips.Acquire("/Users/GAA/desktop/test.0001");
+   while(mips.isAcquiring()) mips.msDelay(1000);
+   mips.DismissAcquire();
+}
+status = "done";
+
+These three examples give you an idea of what is possible using your own scripts 
+to define specialized experiments. Please let us know if you need additional 
+features or find bugs.

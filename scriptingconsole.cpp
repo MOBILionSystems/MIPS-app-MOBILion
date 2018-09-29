@@ -1,5 +1,6 @@
 #include "scriptingconsole.h"
 #include "ui_scriptingconsole.h"
+#include "help.h"
 #include <qscriptengine.h>
 #include <QtCore/QtGlobal>
 #include <QtSerialPort/QSerialPort>
@@ -88,4 +89,13 @@ void ScriptingConsole::on_pbLoad_clicked()
 void ScriptingConsole::on_pbAbort_clicked()
 {
     engine->abortEvaluation();
+}
+
+void ScriptingConsole::on_pbHelp_clicked()
+{
+    Help *help = new Help();
+
+    help->SetTitle("Script Help");
+    help->LoadHelpText(":/scripthelp.txt");
+    help->show();
 }

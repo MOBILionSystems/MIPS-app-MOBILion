@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MIPS, Version 1.25 August 2, 2018</string>
+   <string>MIPS, Version 1.26 Sept 9, 2018</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QTabWidget" name="tabMIPS">
@@ -7761,14 +7761,17 @@ enabled</string>
       <widget class="QLabel" name="label_32">
        <property name="geometry">
         <rect>
-         <x>380</x>
+         <x>385</x>
          <y>30</y>
-         <width>236</width>
-         <height>26</height>
+         <width>231</width>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>External clock frequency</string>
+        <string>External clock frequency, for reference only</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QLineEdit" name="leExternClock">
@@ -7791,7 +7794,7 @@ enabled</string>
      <widget class="QPushButton" name="pbDownload">
       <property name="geometry">
        <rect>
-        <x>15</x>
+        <x>0</x>
         <y>410</y>
         <width>161</width>
         <height>32</height>
@@ -7807,7 +7810,7 @@ enabled</string>
      <widget class="QPushButton" name="pbViewTable">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>155</x>
         <y>410</y>
         <width>191</width>
         <height>32</height>
@@ -7820,9 +7823,9 @@ enabled</string>
      <widget class="QPushButton" name="pbTrigger">
       <property name="geometry">
        <rect>
-        <x>609</x>
+        <x>530</x>
         <y>410</y>
-        <width>161</width>
+        <width>121</width>
         <height>32</height>
        </rect>
       </property>
@@ -8002,7 +8005,7 @@ number on each trigger</string>
      <widget class="QPushButton" name="pbVisPulseSequence">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>340</x>
         <y>410</y>
         <width>191</width>
         <height>32</height>
@@ -8010,6 +8013,22 @@ number on each trigger</string>
       </property>
       <property name="text">
        <string>Visualize pulse sequence</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pbExitTableMode">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>410</y>
+        <width>141</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Issues a command to force a sequence to start.</string>
+      </property>
+      <property name="text">
+       <string>Exit Table Mode</string>
       </property>
      </widget>
     </widget>
