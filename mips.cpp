@@ -660,16 +660,27 @@ void MIPS::resizeEvent(QResizeEvent* event)
    QMainWindow::resizeEvent(event);
 }
 
+void delay()
+{
+    QTime dieTime= QTime::currentTime().addSecs(1);
+    while (QTime::currentTime() < dieTime)
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
 void MIPS::MIPSsetup(void)
 {
     QString res;
+    int numRF=0,numDCB=0;
 
+    qDebug() << "MIPSsetup";
     pgm->comms = comms;
     ui->lblMIPSconfig->setText("MIPS: ");
     // Turn ECHO off
     comms->SendString("\n");
-    comms->SendString("ECHO,FALSE\n");
+    comms->SendCommand("ECHO,FALSE\n");
     res = comms->SendMess("GVER\n");
+    qDebug() << res;
+//    delay();
     if(res=="") return;  // Exit if we timeout, no MIPS comms
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + res);
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\nModules present:");
@@ -678,17 +689,21 @@ void MIPS::MIPSsetup(void)
     if(res=="") return;
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 RF driver\n");
     if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 RF drivers\n");
-    rfdriver->SetNumberOfChannels(res.toInt());
+    numRF = res.toInt();
+    qDebug() << res;
+//    rfdriver->SetNumberOfChannels(numRF);
     if(res.contains("0")) RemoveTab("RFdriver");
     else AddTab("RFdriver");
 
     res = comms->SendMess("GCHAN,DCB\n");
     if(res=="") return;
-    if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 DC bias (8 output channels)\n");
+    if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text()  + "\n   1 DC bias (8 output channels)\n");
     if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 DC bias (16 output channels)\n");
     if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 DC bias (16 output channels)\n");
     if(res.contains("32")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   4 DC bias (16 output channels)\n");
-    dcbias->SetNumberOfChannels(res.toInt());
+    numDCB = res.toInt();
+    qDebug() << res;
+//    dcbias->SetNumberOfChannels(numDCB);
     if(res.contains("0")) RemoveTab("DCbias");
     else AddTab("DCbias");
 
@@ -727,6 +742,10 @@ void MIPS::MIPSsetup(void)
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 Filament modules\n");
     if(res.contains("0")) RemoveTab("Filament");
     else AddTab("Filament");
+
+    rfdriver->SetNumberOfChannels(numRF);
+    dcbias->SetNumberOfChannels(numDCB);
+
 }
 
 // Here when the Connect push button is pressed. This function makes a connection with MIPS.
@@ -738,6 +757,8 @@ void MIPS::MIPSconnect(void)
     comms->host = ui->comboMIPSnetNames->currentText();
     if(comms->ConnectToMIPS())
     {
+       Systems.clear();
+       Systems << comms;
        console->setEnabled(true);
        console->setLocalEchoEnabled(settings->settings().localEchoEnabled);
        ui->lblMIPSconnectionNotes->setHidden(true);
@@ -761,13 +782,6 @@ void MIPS::MIPSsearch(void)
     msg->hide();
 }
 
-void delay()
-{
-    QTime dieTime= QTime::currentTime().addSecs(1);
-    while (QTime::currentTime() < dieTime)
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-}
-
 void MIPS::FindAllMIPSsystems(void)
 {
     Comms *cp;
@@ -783,7 +797,7 @@ void MIPS::FindAllMIPSsystems(void)
             QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
             cp = new Comms(settings,"",ui->statusBar);
             cp->host = ui->comboMIPSnetNames->itemText(j);
-            if(cp->isMIPS(settings->getPortName(j)))
+            // if(cp->isMIPS(settings->getPortName(j)))    //Not sure why this was here?
             if(cp->ConnectToMIPS())
             {
                Systems << (cp);

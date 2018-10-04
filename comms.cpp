@@ -527,7 +527,7 @@ QString Comms::SendMessage(QString message)
         sb->showMessage("Disconnected!",2000);
         return "";
     }
-     for(int i=0;i<2;i++)
+    for(int i=0;i<2;i++)
     {
         rb.clear();
         if (serial->isOpen()) serial->write(message.toStdString().c_str());
