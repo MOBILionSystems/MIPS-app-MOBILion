@@ -8,10 +8,13 @@ Comms::Comms(SettingsDialog *settings, QString Host, QStatusBar *statusbar)
     sb = statusbar;
     host = Host;
     serial = new QSerialPort(this);
+    keepAliveTimer = new QTimer;
     connect(&client, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
     connect(serial, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
     connect(&client, SIGNAL(connected()),this, SLOT(connected()));
     connect(&client, SIGNAL(disconnected()),this, SLOT(disconnected()));
+    connect(&client, SIGNAL(aboutToClose()),this, SLOT(slotAboutToClose()));
+    connect(keepAliveTimer, SIGNAL(timeout()), this, SLOT(slotKeepAlive()));
 }
 
 char Comms::getchar(void)
@@ -464,6 +467,7 @@ void Comms::SendString(QString message)
         sb->showMessage("Disconnected!",2000);
         return;
     }
+    if(client.isOpen()) keepAliveTimer->setInterval(600000);
     if (serial->isOpen()) serial->write(message.toStdString().c_str());
     if (client.isOpen()) client.write(message.toStdString().c_str());
 }
@@ -483,6 +487,7 @@ bool Comms::SendCommand(QString message)
         sb->showMessage("Disconnected!",2000);
         return true;
     }
+    if(client.isOpen()) keepAliveTimer->setInterval(600000);
     for(int i=0;i<2;i++)
     {
         rb.clear();
@@ -527,6 +532,7 @@ QString Comms::SendMessage(QString message)
         sb->showMessage("Disconnected!",2000);
         return "";
     }
+    if(client.isOpen()) keepAliveTimer->setInterval(600000);
     for(int i=0;i<2;i++)
     {
         rb.clear();
@@ -562,6 +568,7 @@ bool Comms::ConnectToMIPS()
     if(host != "")
     {
        client_connected = false;
+       client.setSocketOption(QAbstractSocket::KeepAliveOption, 1);
        client.connectToHost(host, 2015);
        sb->showMessage(tr("Connecting..."));
        timer.start();
@@ -570,6 +577,7 @@ bool Comms::ConnectToMIPS()
            QApplication::processEvents();
            if(client_connected)
            {
+               keepAliveTimer->start(600000);
                MIPSname = SendMessage("GNAME\n");
                return true;
            }
@@ -590,7 +598,11 @@ bool Comms::ConnectToMIPS()
 
 void Comms::DisconnectFromMIPS()
 {
-    if(client.isOpen()) client.close();
+    if(client.isOpen())
+    {
+       client.close();
+       keepAliveTimer->stop();
+    }
     closeSerialPort();
 }
 
@@ -745,4 +757,13 @@ QByteArray Comms::readall(void)
       if(c==0) return data;
       data += c;
     }
+}
+
+void Comms::slotAboutToClose(void)
+{
+}
+
+void Comms::slotKeepAlive(void)
+{
+   SendString("\n");
 }

@@ -7,6 +7,7 @@
 #include "arbwaveformedit.h"
 #include "script.h"
 #include "help.h"
+#include "rfamp.h"
 
 #include <QDialog>
 #include <QDebug>
@@ -444,6 +445,8 @@ private:
     int         numARBchannels;
     ARBchannel  **ARBchans;
     IFTtiming   *IFT;
+    int         numRFamps;
+    RFamp       **rfa;
     int         UpdateHoldOff;
     bool        UpdateStop;
     bool        ShutdownFlag;

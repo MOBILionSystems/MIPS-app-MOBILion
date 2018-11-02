@@ -51,7 +51,8 @@ SOURCES += main.cpp\
     cmdlineapp.cpp \
     script.cpp \
     cdirselectiondlg.cpp \
-    scriptingconsole.cpp
+    scriptingconsole.cpp \
+    rfamp.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -82,7 +83,8 @@ HEADERS  += mips.h \
     cmdlineapp.h \
     script.h \
     cdirselectiondlg.h \
-    scriptingconsole.h
+    scriptingconsole.h \
+    rfamp.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \
@@ -98,7 +100,8 @@ FORMS    += mips.ui \
     mipscomms.ui \
     cmdlineapp.ui \
     script.ui \
-    scriptingconsole.ui
+    scriptingconsole.ui \
+    rfamp.ui
 
 RESOURCES += \
     files.qrc

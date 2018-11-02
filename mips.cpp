@@ -111,6 +111,15 @@
 //      1.) Added documentation and updated help
 //      2.) Corrected PSG label errors and make the PSE box modal
 //      3.) Added Java Scripting
+// 1.27, Oct 5,2018
+//      1.) Fixed the start module ID issue
+//      2.) Fixed the find all MIPS system when using ethernet ports
+// 1.28, Oct 8,2018
+//      1.) Fixed a bug in the DCbias menu that caused a crash when CH 9
+//          or above were changed.
+//      2.) Added message traffic to keep ethernet connections alive
+// 1.29, Nov 1,2018
+//      1.) Added the RFamp to the Custom Control Panel
 //
 #include "mips.h"
 #include "ui_mips.h"

@@ -453,3 +453,8 @@ Below are the commands that you can use in the control panel .cfg file:
         to save the date and the external program will be passed a filename. If
         the parameter tofscans is present then the total number of tof scans to
         acquire is calculated and passed to the external program.
+   •    RFAMPchannels,number This command defines the number of RFamp channels that
+        follow this command.
+   •    RFAMP,name,MIPS name,chan,x,y This command defines a RFamp channel, its name,
+        the MIPS system name, the MIPS RFamp channel (or module) number, and its x,y
+        location.

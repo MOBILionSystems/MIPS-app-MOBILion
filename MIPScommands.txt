@@ -165,6 +165,36 @@ RF driver module
   RETUNERFCH,ch      	Retunes the selected channel
   SRFCAL,ch,m,b        Sets the RF calibration parameters, channel,slope,intercept
 
+RF amplifier QUAD module commands
+  SRFAENA,m,val        Sets the RF system enable mode, m=module, val = ON or OFF
+  GRFAENA,m            Returns the RF system enable mode, m=module
+  SRFAFREQ,m,freq      Sets the RF system frequency, m=module, val=frequency
+  GRFAFREQ,m           Returns the RF frequency, m=module
+  SRFAMOD,m,val        Sets the RF system to open or closed loop, m=module, val = OPEN or CLOSED
+  GRFAMOD,m            Returns the RF mode state, open or closed, m=module
+  SRFADRV,m,val        Sets the RF drive level,m=module, val = 0 to 100 %
+  GRFADRV,m            Returns the RF drive level,m=module
+  SRFALEV,m,val        Sets the RF output voltage setpoint,m=module, val = Vp-p
+  GRFALEV,m            Returns the RF output voltage setpoint,m=module
+  GRFAVPPA,m           Returns the RF output A actual level,m=module
+  GFRAVPPB,m           Returns the RF output B actual level,m=module
+  GRFAPWR,m            Returns the RF amp RF forward pwr,m=module
+  SRFARNG,m,val        Sets the QUAD RF maximum RF level,m=module, val = Vp-p
+  GRFARNG,m            Returns the QUAD RF maximum RF level,m=module
+  SRFAPB,m,val         Sets the pole bias DC,m=module, val = volts
+  GRFAPB,m             Returns the pole bias DC,m=module
+  SRFARDC,m,val        Sets the resolving DC + and - voltages using DC bias channels 1 and 2,m=module, val = volts
+  GRFARDC,m            Returns the resolving DC + and - voltages using DC bias channels 1 and 2,m=module
+  SRFAR0,m,val         Sets the Ro value in mm,m=module, val = Ro
+  GRFAR0,m             Returns the Ro value in mm,m=module
+  SRFAMZ,m,val         Sets the m/z in amu,m=module, val = amu
+  GRFAMZ,m             Returns the m/z in amu,m=module
+  SRFARES,m,val        Sets the resolution in AMU,m=module, val = amu
+  GRFARES,m            Returns the resolution in AMU,m=module
+  RFAQUPDATE,m         Updates the QUAD parameters,m=module
+  SRFAGAIN,m,val       Sets RF head level control gain,m=module, val = HIGH or LOW
+  RRFAAMP,m            Reports RF amplifier parameters,m=module
+
 DIO module
   SDIO,ch,val			Set digital output,ch=A-P,val=0 or 1
   GDIO,ch				Read digital channel, ch=A-X

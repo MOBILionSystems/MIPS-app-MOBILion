@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QObject>
 #include <QTime>
+#include <QTimer>
 #include <QApplication>
 #include <QtNetwork/QTcpSocket>
 #include <QFileInfo>
@@ -78,6 +79,7 @@ public:
     ADCreadStates ADCstate;
     quint16 *ADCbuf;
     int ADClen;
+    QTimer *keepAliveTimer;
 
 private slots:
     void handleError(QSerialPort::SerialPortError error);
@@ -85,6 +87,8 @@ private slots:
     void readData2ADCBuffer(void);
     void connected(void);
     void disconnected(void);
+    void slotAboutToClose(void);
+    void slotKeepAlive(void);
 };
 
 #endif // COMMS

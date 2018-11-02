@@ -135,22 +135,28 @@ void DCbias::DCbiasUpdated(void)
    {
        resList = obj->objectName().split("_");
        res = "leGRP" + resList[1];
-       QLineEdit *leGR = dui->gbDCbias1->findChild<QLineEdit *>(res);
-       if(leGR->text() != "")
+       QLineEdit *leGR = NULL;
+       if(resList[1].toInt() <= 8) leGR = dui->gbDCbias1->findChild<QLineEdit *>(res);
+       else if(resList[1].toInt() <= 16) leGR = dui->gbDCbias2->findChild<QLineEdit *>(res);
+       else if(resList[1].toInt() <= 24) leGR = dui->gbDCbias3->findChild<QLineEdit *>(res);
+       if(leGR != NULL)
        {
-           // Here if this channel has a group label so we need to read the current
-           // MIPS channel value to calculate the change
-           res = "G" + obj->objectName().mid(3).replace("_",",") + "\n";
-           qDebug() << res;
-           ans = comms->SendMess(res);
-           qDebug() << ans;
-           // if(ans == "") ans="100";  // For testing
-           if(ans != "")
+           if(leGR->text() != "")
            {
-               float oldvalue =ans.toFloat();
-               float change = oldvalue - ((QLineEdit *)obj)->text().toFloat();
-               // Now change all the values with the same group name
-               ApplyDelta(leGR->text(),change);
+               // Here if this channel has a group label so we need to read the current
+               // MIPS channel value to calculate the change
+               res = "G" + obj->objectName().mid(3).replace("_",",") + "\n";
+               qDebug() << res;
+               ans = comms->SendMess(res);
+               qDebug() << ans;
+               // if(ans == "") ans="100";  // For testing
+               if(ans != "")
+               {
+                   float oldvalue =ans.toFloat();
+                   float change = oldvalue - ((QLineEdit *)obj)->text().toFloat();
+                   // Now change all the values with the same group name
+                   ApplyDelta(leGR->text(),change);
+               }
            }
        }
    }
@@ -172,7 +178,7 @@ void DCbias::Update(void)
     dui->leGCHAN_DCB->setText(QString::number(NumChannels));
     res = comms->SendMess("GDCPWR\n");
     if(res == "ON") dui->chkPowerEnable->setChecked(true);
-    else  dui->chkPowerEnable->setChecked(false);
+    if(res == "OFF") dui->chkPowerEnable->setChecked(false);
     QObjectList widgetList = dui->gbDCbias1->children();
     foreach(QObject *w, widgetList)
     {
@@ -181,7 +187,8 @@ void DCbias::Update(void)
             if(!((QLineEdit *)w)->hasFocus())
             {
                res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-               ((QLineEdit *)w)->setText(comms->SendMess(res));
+               res = comms->SendMess(res);
+               if(res != "") ((QLineEdit *)w)->setText(res);
             }
        }
     }
@@ -198,7 +205,8 @@ void DCbias::Update(void)
                if(!((QLineEdit *)w)->hasFocus())
                {
                   res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-                  ((QLineEdit *)w)->setText(comms->SendMess(res));
+                  res = comms->SendMess(res);
+                  if(res != "") ((QLineEdit *)w)->setText(res);
                }
            }
         }
@@ -216,7 +224,8 @@ void DCbias::Update(void)
                if(!((QLineEdit *)w)->hasFocus())
                {
                   res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
-                  ((QLineEdit *)w)->setText(comms->SendMess(res));
+                  res = comms->SendMess(res);
+                  if(res != "") ((QLineEdit *)w)->setText(res);
                }
            }
         }
@@ -232,7 +241,7 @@ void DCbias::Update(void)
 void DCbias::DCbiasPower(void)
 {
     if(dui->chkPowerEnable->isChecked()) comms->SendCommand("SDCPWR,ON\n");
-    else  comms->SendCommand("SDCPWR,OFF\n");
+    else comms->SendCommand("SDCPWR,OFF\n");
 }
 
 void DCbias::UpdateDCbias(void)

@@ -43,6 +43,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     mc = NULL;
     DCBgroups = NULL;
     statusBar      = NULL;
+    numRFamps = 0;
     numTextLabels  = 0;
     numRFchannels  = 0;
     numDCBchannels = 0;
@@ -247,6 +248,30 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                     }
                 }
             }
+            if((resList[0].toUpper() == "RAMPCHANNELS") && (resList.length()==2))
+            {
+                numRFamps = resList[1].toInt();
+                rfa = new RFamp * [numRFamps];
+                for(int i = 0; i < numRFamps; i++)
+                {
+                    rfa[i] = NULL;
+                    line = stream.readLine();
+                    if(line.trimmed().startsWith("#")) continue;
+                    resList = line.split(",");
+                    if((resList[0].toUpper() == "RFAMP") && (resList.length()==6))
+                    {
+                        // RFAMP,name,MIPSname,channel,X,Y
+                        rfa[i] = new RFamp(ui->lblBackground,resList[1],resList[2],resList[3].toInt());
+                        rfa[i]->comms = FindCommPort(resList[2],Systems);
+                        QWidget *widget = new QWidget(this);
+                        widget->setGeometry(resList[4].toInt(),resList[5].toInt(),280,290);
+                        QVBoxLayout *layout = new QVBoxLayout(widget);
+                        layout->addWidget(rfa[i]);
+                        rfa[i]->show();
+                    }
+
+                }
+            }
             if((resList[0].toUpper() == "IFT") && (resList.length()==5))
             {
                 IFT = new IFTtiming(ui->lblBackground,resList[1],resList[2],resList[3].toInt(),resList[4].toInt());
@@ -362,7 +387,6 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 if(HelpFile.startsWith("~")) HelpFile = QDir::homePath() + "/" + HelpFile.mid(2);
                 #endif
             }
-
         } while(!line.isNull());
     }
     file.close();
@@ -479,6 +503,7 @@ Comms* ControlPanel::FindCommPort(QString name, QList<Comms*> Systems)
 void ControlPanel::Update(void)
 {
    int i;
+   static bool busy = false;
 
    if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
    if(UpdateStop) return;
@@ -503,10 +528,11 @@ void ControlPanel::Update(void)
        SystemIsShutdown = true;
        UpdateHoldOff = 2;
        // Make sure all MIPS systems are in local mode
-       for(int i=0;i<Systems.count();i++) Systems[i]->SendString("SMOD,LOC\n");
-       for(int i=0;i<numESIchannels;i++) ESIchans[i]->Shutdown();
-       for(int i=0;i<numDCBenables;i++)  DCBenables[i]->Shutdown();
-       for(int i=0;i<numRFchannels;i++)  RFchans[i]->Shutdown();
+       for(i=0;i<Systems.count();i++) Systems[i]->SendString("SMOD,LOC\n");
+       for(i=0;i<numESIchannels;i++) ESIchans[i]->Shutdown();
+       for(i=0;i<numDCBenables;i++)  DCBenables[i]->Shutdown();
+       for(i=0;i<numRFchannels;i++)  RFchans[i]->Shutdown();
+       for(i=0;i<numRFamps;i++)      rfa[i]->Shutdown();
        if(statusBar != NULL) statusBar->showMessage("System shutdown, " + QDateTime().currentDateTime().toString());
        return;
    }
@@ -515,12 +541,15 @@ void ControlPanel::Update(void)
        RestoreFlag = false;
        SystemIsShutdown = false;
        UpdateHoldOff = 2;
-       for(int i=0;i<numESIchannels;i++) ESIchans[i]->Restore();
-       for(int i=0;i<numDCBenables;i++)  DCBenables[i]->Restore();
-       for(int i=0;i<numRFchannels;i++)  RFchans[i]->Restore();
+       for(i=0;i<numESIchannels;i++) ESIchans[i]->Restore();
+       for(i=0;i<numDCBenables;i++)  DCBenables[i]->Restore();
+       for(i=0;i<numRFchannels;i++)  RFchans[i]->Restore();
+       for(i=0;i<numRFamps;i++)      rfa[i]->Restore();
        if(statusBar != NULL) statusBar->showMessage("System enabled, " + QDateTime().currentDateTime().toString());
        return;
    }
+   if(busy) return;
+   busy = true;
    for(i=0;i<numRFchannels;i++)  if(RFchans[i] != NULL)     RFchans[i]->Update();
    for(i=0;i<numDCBchannels;i++) if(DCBchans[i] != NULL)    DCBchans[i]->Update();
    for(i=0;i<numDCBoffsets;i++)  if(DCBoffsets[i] != NULL)  DCBoffsets[i]->Update();
@@ -528,6 +557,8 @@ void ControlPanel::Update(void)
    for(i=0;i<numDIOchannels;i++) if(DIOchannels[i] != NULL) DIOchannels[i]->Update();
    for(i=0;i<numESIchannels;i++) if(ESIchans[i] != NULL)    ESIchans[i]->Update();
    for(i=0;i<numARBchannels;i++) if(ARBchans[i] != NULL)    ARBchans[i]->Update();
+   for(i=0;i<numRFamps;i++)      if(rfa[i] != NULL)         rfa[i]->Update();
+   busy = false;
 }
 
 QString ControlPanel::Save(QString Filename)
@@ -554,58 +585,43 @@ QString ControlPanel::Save(QString Filename)
         if(numRFchannels > 0)
         {
             stream << "RF channels," + QString::number(numRFchannels) + "\n";
-            for(int i=0; i<numRFchannels; i++)
-            {
-                if(RFchans[i] != NULL) stream << RFchans[i]->Report() + "\n";
-            }
+            for(int i=0; i<numRFchannels; i++) if(RFchans[i] != NULL) stream << RFchans[i]->Report() + "\n";
         }
         if(numDCBchannels > 0)
         {
             stream << "DCB channels," + QString::number(numDCBchannels) + "\n";
-            for(int i=0; i<numDCBchannels; i++)
-            {
-                if(DCBchans[i] != NULL) stream << DCBchans[i]->Report() + "\n";
-            }
+            for(int i=0; i<numDCBchannels; i++) if(DCBchans[i] != NULL) stream << DCBchans[i]->Report() + "\n";
         }
         if(numDCBoffsets > 0)
         {
             stream << "DCB offsets," + QString::number(numDCBoffsets) + "\n";
-            for(int i=0; i<numDCBoffsets; i++)
-            {
-                if(DCBoffsets[i] != NULL) stream << DCBoffsets[i]->Report() + "\n";
-            }
+            for(int i=0; i<numDCBoffsets; i++) if(DCBoffsets[i] != NULL) stream << DCBoffsets[i]->Report() + "\n";
         }
         if(numDCBenables > 0)
         {
             stream << "DCB enables," + QString::number(numDCBenables) + "\n";
-            for(int i=0; i<numDCBenables; i++)
-            {
-                if(DCBenables[i] != NULL) stream << DCBenables[i]->Report() + "\n";
-            }
+            for(int i=0; i<numDCBenables; i++) if(DCBenables[i] != NULL) stream << DCBenables[i]->Report() + "\n";
         }
         if(numDIOchannels > 0)
         {
             stream << "DIO channels," + QString::number(numDIOchannels) + "\n";
-            for(int i=0; i<numDIOchannels; i++)
-            {
-                if(DIOchannels[i] != NULL) stream << DIOchannels[i]->Report() + "\n";
-            }
+            for(int i=0; i<numDIOchannels; i++) if(DIOchannels[i] != NULL) stream << DIOchannels[i]->Report() + "\n";
         }
         if(numESIchannels > 0)
         {
             stream << "ESI channels," + QString::number(numESIchannels) + "\n";
-            for(int i=0; i<numESIchannels; i++)
-            {
-                if(ESIchans[i] != NULL) stream << ESIchans[i]->Report() + "\n";
-            }
+            for(int i=0; i<numESIchannels; i++) if(ESIchans[i] != NULL) stream << ESIchans[i]->Report() + "\n";
         }
         if(numARBchannels > 0)
         {
             stream << "ARB channels," + QString::number(numARBchannels) + "\n";
-            for(int i=0; i<numARBchannels; i++)
-            {
-                if(ARBchans[i] != NULL) stream << ARBchans[i]->Report() + "\n";
-            }
+            for(int i=0; i<numARBchannels; i++) if(ARBchans[i] != NULL) stream << ARBchans[i]->Report() + "\n";
+        }
+        if(numRFamps > 0)
+        {
+            stream << "RFamp channels," + QString::number(numRFamps) + "\n";
+            for(int i=0; i<numRFamps; i++) if(rfa[i] != NULL) stream << rfa[i]->Report();
+            stream << "RFampEnd\n";
         }
         if(IFT != NULL)
         {
@@ -645,43 +661,50 @@ QString ControlPanel::Load(QString Filename)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numRFchannels;j++) if(RFchans[j]->SetValues(line)) break;
+                     for(int j=0;j<numRFchannels;j++) if(RFchans[j] != NULL) if(RFchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DCB channels") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numDCBchannels;j++) if(DCBchans[j]->SetValues(line)) break;
+                     for(int j=0;j<numDCBchannels;j++) if(DCBchans[j] != NULL) if(DCBchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DCB offsets") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numDCBoffsets;j++) if(DCBoffsets[j]->SetValues(line)) break;
+                     for(int j=0;j<numDCBoffsets;j++) if(DCBoffsets[j] != NULL) if(DCBoffsets[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DCB enables") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numDCBenables;j++) if(DCBenables[j]->SetValues(line)) break;
+                     for(int j=0;j<numDCBenables;j++) if(DCBenables[j] != NULL) if(DCBenables[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DIO channels") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numDIOchannels;j++) if(DIOchannels[j]->SetValues(line)) break;
+                     for(int j=0;j<numDIOchannels;j++) if(DIOchannels[j] != NULL) if(DIOchannels[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "ESI channels") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numESIchannels;j++) if(ESIchans[j]->SetValues(line)) break;
+                     for(int j=0;j<numESIchannels;j++) if(ESIchans[j] != NULL) if(ESIchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "ARB channels") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numARBchannels;j++) if(ARBchans[j]->SetValues(line)) break;
+                     for(int j=0;j<numARBchannels;j++) if(ARBchans[j] != NULL) if(ARBchans[j]->SetValues(line)) break;
+                }
+                if(resList[0] == "RFamp channels") while(true)
+                {
+                     line = stream.readLine();
+                     if(line.isNull()) break;
+                     if(line.contains("RFampEnd")) break;
+                     for(int j=0;j<numRFamps;j++) if(rfa[j] != NULL) if(rfa[j]->SetValues(line)) break;
                 }
             }
             else if(resList.count() == 1)
@@ -1139,15 +1162,20 @@ void RFchannel::Update(void)
     Updating = true;
     comms->rb.clear();
     res = "GRFDRV,"   + QString::number(Channel) + "\n";
-    if(!Drive->hasFocus()) Drive->setText(comms->SendMess(res));
+    res = comms->SendMess(res);
+    if(!Drive->hasFocus()) if(res != "") Drive->setText(res);
     res = "GRFFRQ,"   + QString::number(Channel) + "\n";
-    if(!Freq->hasFocus()) Freq->setText(comms->SendMess(res));
+    res = comms->SendMess(res);
+    if(!Freq->hasFocus()) if(res != "") Freq->setText(res);
     res = "GRFPPVP,"  + QString::number(Channel) + "\n";
-    RFP->setText(comms->SendMess(res));
+    res = comms->SendMess(res);
+    if(res != "") RFP->setText(res);
     res = "GRFPPVN,"  + QString::number(Channel) + "\n";
-    RFN->setText(comms->SendMess(res));
+    res = comms->SendMess(res);
+    if(res != "") RFN->setText(res);
     res = "GRFPWR,"   + QString::number(Channel) + "\n";
-    Power->setText(comms->SendMess(res));
+    res = comms->SendMess(res);
+    if(res != "") Power->setText(res);
     Updating = false;
 }
 
@@ -1314,10 +1342,22 @@ void DCBchannel::Update(void)
     Updating = true;
     comms->rb.clear();
     res = "GDCB,"  + QString::number(Channel) + "\n";
-    if(!Vsp->hasFocus()) Vsp->setText(comms->SendMess(res));
+    res = comms->SendMess(res);
+    if(res == "")  // if true then the comms timed out
+    {
+        Updating = false;
+        return;
+    }
+    if(!Vsp->hasFocus()) Vsp->setText(res);
     CurrentVsp = Vsp->text().toFloat();
     res = "GDCBV," + QString::number(Channel) + "\n";
-    Vrb->setText(comms->SendMess(res));
+    res = comms->SendMess(res);
+    if(res == "")  // if true then the comms timed out
+    {
+        Updating = false;
+        return;
+    }
+    Vrb->setText(res);
     // Compare setpoint with readback and color the readback background
     // depending on the difference.
     // No data = white
@@ -1494,7 +1534,9 @@ void DCBoffset::Update(void)
     if(comms == NULL) return;
     comms->rb.clear();
     res = "GDCBOF,"  + QString::number(Channel) + "\n";
-    if(!Voff->hasFocus()) Voff->setText(comms->SendMess(res));
+    res = comms->SendMess(res);
+    if(res == "") return;
+    if(!Voff->hasFocus()) Voff->setText(res);
 }
 
 void DCBoffset::VoffChange(void)
@@ -1757,9 +1799,13 @@ void ESI::Update(void)
 
     comms->rb.clear();
     res = "GHV,"  + QString::number(Channel) + "\n";
-    if(!ESIsp->hasFocus()) ESIsp->setText(comms->SendMess(res));
+    res = comms->SendMess(res);
+    if(res == "") return;
+    if(!ESIsp->hasFocus()) ESIsp->setText(res);
     res = "GHVV," + QString::number(Channel) + "\n";
-    ESIrb->setText(comms->SendMess(res));
+    res = comms->SendMess(res);
+    if(res=="") return;
+    ESIrb->setText(res);
     res = comms->SendMess("GHVSTATUS," + QString::number(Channel) + "\n");
     if(res.contains("ON")) ESIena->setChecked(true);
     if(res.contains("OFF")) ESIena->setChecked(false);
@@ -1918,13 +1964,16 @@ void ARBchannel::Update(void)
        if(w->objectName().startsWith("le"))
        {
            res = comms->SendMess("G" + w->objectName().mid(3) + "," + QString::number(Channel) + "\n");
-           if(!((QLineEdit *)w)->hasFocus()) ((QLineEdit *)w)->setText(res);
+           if(!((QLineEdit *)w)->hasFocus()) if(res != "") ((QLineEdit *)w)->setText(res);
        }
     }
     // Update the waveform selection box
     res = comms->SendMess("GWFTYP," + QString::number(Channel) + "\n");
-    int i = Waveform->findData(res);
-    Waveform->setCurrentIndex(i);
+    if(res != "")
+    {
+       int i = Waveform->findData(res);
+       Waveform->setCurrentIndex(i);
+    }
     // Update the dirction radio buttons
     res = comms->SendMess("GWFDIR," + QString::number(Channel) +"\n");
     if(res == "FWD") SWFDIR_FWD->setChecked(true);
