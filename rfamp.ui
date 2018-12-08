@@ -130,7 +130,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>180</y>
+        <y>185</y>
         <width>86</width>
         <height>16</height>
        </rect>
@@ -236,7 +236,7 @@
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>16</y>
+        <y>32</y>
         <width>60</width>
         <height>16</height>
        </rect>
@@ -249,7 +249,7 @@
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>68</y>
+        <y>84</y>
         <width>96</width>
         <height>16</height>
        </rect>
@@ -262,7 +262,7 @@
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>92</y>
+        <y>108</y>
         <width>86</width>
         <height>16</height>
        </rect>
@@ -275,7 +275,7 @@
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>120</y>
+        <y>136</y>
         <width>106</width>
         <height>16</height>
        </rect>
@@ -288,7 +288,7 @@
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>144</y>
+        <y>160</y>
         <width>60</width>
         <height>16</height>
        </rect>
@@ -301,7 +301,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>14</y>
+        <y>30</y>
         <width>113</width>
         <height>21</height>
        </rect>
@@ -311,7 +311,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>66</y>
+        <y>82</y>
         <width>113</width>
         <height>21</height>
        </rect>
@@ -321,7 +321,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>92</y>
+        <y>108</y>
         <width>113</width>
         <height>21</height>
        </rect>
@@ -331,7 +331,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>118</y>
+        <y>134</y>
         <width>113</width>
         <height>21</height>
        </rect>
@@ -341,7 +341,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>144</y>
+        <y>160</y>
         <width>113</width>
         <height>21</height>
        </rect>
@@ -351,7 +351,7 @@
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>176</y>
+        <y>185</y>
         <width>221</width>
         <height>32</height>
        </rect>
@@ -367,7 +367,7 @@
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>40</y>
+        <y>56</y>
         <width>113</width>
         <height>21</height>
        </rect>
@@ -377,13 +377,26 @@
       <property name="geometry">
        <rect>
         <x>14</x>
-        <y>40</y>
+        <y>56</y>
         <width>109</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
        <string>RDC=RFpp/k, k=</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="chkSDCPWR_ON_OFF">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>5</y>
+        <width>176</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>DC power supply enable</string>
       </property>
      </widget>
     </widget>

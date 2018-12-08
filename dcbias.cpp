@@ -335,3 +335,385 @@ void DCbias::Load(QString Filename)
         dui->statusBar->showMessage("Settings loaded from " + Filename,2000);
     }
 }
+
+// *************************************************************************************************
+// DC bias channel  ********************************************************************************
+// *************************************************************************************************
+
+DCBchannel::DCBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
+{
+    p      = parent;
+    Title  = name;
+    MIPSnm = MIPSname;
+    X      = x;
+    Y      = y;
+    comms  = NULL;
+    Updating = false;
+    UpdateOff = false;
+    qApp->installEventFilter(this);
+    DCBs.clear();
+    LinkEnable = false;
+    CurrentVsp = 0;
+}
+
+void DCBchannel::Show(void)
+{
+    frmDCB = new QFrame(p); frmDCB->setGeometry(X,Y,241,21);
+    Vsp = new QLineEdit(frmDCB); Vsp->setGeometry(70,0,70,21); Vsp->setValidator(new QDoubleValidator);
+    Vrb = new QLineEdit(frmDCB); Vrb->setGeometry(140,0,70,21); Vrb->setReadOnly(true);
+    labels[0] = new QLabel(Title,frmDCB); labels[0]->setGeometry(0,0,59,16);
+    labels[1] = new QLabel("V",frmDCB);   labels[1]->setGeometry(220,0,21,16);
+    connect(Vsp,SIGNAL(editingFinished()),this,SLOT(VspChange()));
+    Vsp->setToolTip(MIPSnm + " channel " + QString::number(Channel));
+}
+
+bool DCBchannel::eventFilter(QObject *obj, QEvent *event)
+{
+    float delta = 0;
+
+    if ((obj == Vsp) && (event->type() == QEvent::KeyPress))
+    {
+        if(Updating) return true;
+        UpdateOff = true;
+        QKeyEvent *key = static_cast<QKeyEvent *>(event);
+        if(key->key() == 16777235) delta = 0.1;
+        if(key->key() == 16777237) delta = -0.1;
+        if((QApplication::queryKeyboardModifiers() & 0x2000000) != 0) delta *= 10;
+        if((QApplication::queryKeyboardModifiers() & 0x8000000) != 0) delta *= 100;
+        if(delta != 0)
+        {
+           QString myString;
+           myString.sprintf("%3.2f", Vsp->text().toFloat() + delta);
+           Vsp->setText(myString);
+           Vsp->setModified(true);
+           Vsp->editingFinished();
+           UpdateOff = false;
+           return true;
+        }
+    }
+    UpdateOff = false;
+    return QObject::eventFilter(obj, event);
+}
+
+QString DCBchannel::Report(void)
+{
+    QString res;
+
+    res = Title + "," + Vsp->text() + "," + Vrb->text();
+    return(res);
+}
+
+bool DCBchannel::SetValues(QString strVals)
+{
+    QStringList resList;
+
+    if(!strVals.startsWith(Title)) return false;
+    resList = strVals.split(",");
+    if(resList.count() < 2) return false;
+    Vsp->setText(resList[1]);
+    CurrentVsp = Vsp->text().toFloat();
+    Vsp->setModified(true);
+    Vsp->editingFinished();
+    return true;
+ }
+
+// The following commands are processed:
+// title            return the setpoint
+// title=val        sets the setpoint
+// title.readback   returns the readback voltage
+// returns "?" if the command could not be processed
+QString DCBchannel::ProcessCommand(QString cmd)
+{
+    if(!cmd.startsWith(Title)) return "?";
+    if(cmd == Title) return Vsp->text();
+    if(cmd == Title + ".readback") return Vrb->text();
+    QStringList resList = cmd.split("=");
+    if(resList.count()==2)
+    {
+       Vsp->setText(resList[1].trimmed());
+       Vsp->setModified(true);
+       Vsp->editingFinished();
+       return "";
+    }
+    return "?";
+}
+
+void DCBchannel::Update(void)
+{
+    QString res;
+
+    if(comms == NULL) return;
+    if(UpdateOff) return;
+    Updating = true;
+    comms->rb.clear();
+    res = "GDCB,"  + QString::number(Channel) + "\n";
+    res = comms->SendMess(res);
+    if(res == "")  // if true then the comms timed out
+    {
+        Updating = false;
+        return;
+    }
+    if(!Vsp->hasFocus()) Vsp->setText(res);
+    CurrentVsp = Vsp->text().toFloat();
+    res = "GDCBV," + QString::number(Channel) + "\n";
+    res = comms->SendMess(res);
+    if(res == "")  // if true then the comms timed out
+    {
+        Updating = false;
+        return;
+    }
+    Vrb->setText(res);
+    // Compare setpoint with readback and color the readback background
+    // depending on the difference.
+    // No data = white
+    if((Vsp->text()=="") | (Vrb->text()==""))
+    {
+        Vrb->setStyleSheet("QLineEdit { background: rgb(255, 255, 255); }" );
+        Updating = false;
+        return;
+    }
+    float error = fabs(Vsp->text().toFloat() - Vrb->text().toFloat());
+    if((error > 2.0) & (error > fabs(Vsp->text().toFloat()/100))) Vrb->setStyleSheet("QLineEdit { background: rgb(255, 204, 204); }" );
+    else Vrb->setStyleSheet("QLineEdit { background: rgb(204, 255, 204); }" );
+    //Vrb->setStyleSheet("QLineEdit { background: rgb(255, 204, 204); }" );  // light red
+    //Vrb->setStyleSheet("QLineEdit { background: rgb(255, 255, 204); }" );  // light yellow
+    //Vrb->setStyleSheet("QLineEdit { background: rgb(204, 255, 204); }" );  // light green
+    Updating = false;
+}
+
+void DCBchannel::VspChange(void)
+{
+   //if(comms == NULL) return;
+   if(!Vsp->isModified()) return;
+   QString res = "SDCB," + QString::number(Channel) + "," + Vsp->text() + "\n";
+   if(comms != NULL) comms->SendCommand(res.toStdString().c_str());
+   // If this channel is part of a group calculate the delta and apply to all
+   // other channels
+   if((LinkEnable) && (DCBs.count()>0) && (CurrentVsp != Vsp->text().toFloat()))
+   {
+       float delta = CurrentVsp - Vsp->text().toFloat();
+       foreach(DCBchannel * item, DCBs )
+       {
+           if(item != this)
+           {
+              item->CurrentVsp -= delta;
+              item->Vsp->setText(QString::number(item->CurrentVsp,'f',2));
+              item->CurrentVsp = item->Vsp->text().toFloat();
+              item->Vsp->setModified(true);
+              item->Vsp->editingFinished();
+           }
+       }
+   }
+   CurrentVsp = Vsp->text().toFloat();
+   Vsp->setModified(false);
+}
+
+// *************************************************************************************************
+// DC bias offset  *********************************************************************************
+// *************************************************************************************************
+
+DCBoffset::DCBoffset(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
+{
+    p      = parent;
+    Title  = name;
+    MIPSnm = MIPSname;
+    X      = x;
+    Y      = y;
+    comms  = NULL;
+}
+
+void DCBoffset::Show(void)
+{
+    frmDCBO = new QFrame(p); frmDCBO->setGeometry(X,Y,170,21);
+    Voff = new QLineEdit(frmDCBO); Voff->setGeometry(70,0,70,21); Voff->setValidator(new QDoubleValidator);
+    labels[0] = new QLabel(Title,frmDCBO); labels[0]->setGeometry(0,0,59,16);
+    labels[1] = new QLabel("V",frmDCBO);   labels[1]->setGeometry(150,0,21,16);
+    Voff->setToolTip("Offset/range control " + MIPSnm);
+    connect(Voff,SIGNAL(editingFinished()),this,SLOT(VoffChange()));
+}
+
+QString DCBoffset::Report(void)
+{
+    QString res;
+
+    res = Title + "," + Voff->text();
+    return(res);
+}
+
+bool DCBoffset::SetValues(QString strVals)
+{
+    QStringList resList;
+
+    if(!strVals.startsWith(Title)) return false;
+    resList = strVals.split(",");
+    if(resList.count() < 2) return false;
+    Voff->setText(resList[1]);
+    Voff->setModified(true);
+    Voff->editingFinished();
+    return true;
+}
+
+// The following commands are processed:
+// title            return the offset value
+// title=val        sets the offset value
+// returns "?" if the command could not be processed
+QString DCBoffset::ProcessCommand(QString cmd)
+{
+    if(!cmd.startsWith(Title)) return "?";
+    if(cmd == Title) return Voff->text();
+    QStringList resList = cmd.split("=");
+    if(resList.count()==2)
+    {
+       Voff->setText(resList[1]);
+       Voff->setModified(true);
+       Voff->editingFinished();
+       return "";
+    }
+    return "?";
+}
+
+void DCBoffset::Update(void)
+{
+    QString res;
+
+    if(comms == NULL) return;
+    comms->rb.clear();
+    res = "GDCBOF,"  + QString::number(Channel) + "\n";
+    res = comms->SendMess(res);
+    if(res == "") return;
+    if(!Voff->hasFocus()) Voff->setText(res);
+}
+
+void DCBoffset::VoffChange(void)
+{
+   if(comms == NULL) return;
+   if(!Voff->isModified()) return;
+   QString res = "SDCBOF," + QString::number(Channel) + "," + Voff->text() + "\n";
+   comms->SendCommand(res.toStdString().c_str());
+   Voff->setModified(false);
+}
+
+// *************************************************************************************************
+// DC bias enable  *********************************************************************************
+// *************************************************************************************************
+
+DCBenable::DCBenable(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
+{
+    p      = parent;
+    Title  = name;
+    MIPSnm = MIPSname;
+    X      = x;
+    Y      = y;
+    comms  = NULL;
+    isShutdown = false;
+}
+
+void DCBenable::Show(void)
+{
+    frmDCBena = new QFrame(p); frmDCBena->setGeometry(X,Y,170,21);
+    DCBena = new QCheckBox(frmDCBena); DCBena->setGeometry(0,0,170,21);
+    DCBena->setText(Title);
+    DCBena->setToolTip("Enables all DC bias channels on " + MIPSnm);
+    connect(DCBena,SIGNAL(stateChanged(int)),this,SLOT(DCBenaChange()));
+}
+
+QString DCBenable::Report(void)
+{
+    QString res;
+
+    res = Title + ",";
+    if(isShutdown)
+    {
+        if(activeEnableState) res += "ON";
+        else res += "OFF";
+    }
+    else
+    {
+        if(DCBena->isChecked()) res += "ON";
+        else res += "OFF";
+    }
+    return(res);
+}
+
+bool DCBenable::SetValues(QString strVals)
+{
+    QStringList resList;
+
+    if(!strVals.startsWith(Title)) return false;
+    resList = strVals.split(",");
+    if(resList.count() < 2) return false;
+    if(isShutdown)
+    {
+        if(resList[1].contains("ON")) activeEnableState = true;
+        else activeEnableState = false;
+        return true;
+    }
+    if(resList[1].contains("ON")) DCBena->setChecked(true);
+    else DCBena->setChecked(false);
+    if(resList[1].contains("ON")) DCBena->stateChanged(1);
+    else  DCBena->stateChanged(0);
+    return true;
+}
+
+// The following commands are processed:
+// title            return the status, ON or OFF
+// title=val        sets the status, ON or OFF
+// returns "?" if the command could not be processed
+QString DCBenable::ProcessCommand(QString cmd)
+{
+    if(!cmd.startsWith(Title)) return "?";
+    if(cmd == Title)
+    {
+        if(DCBena->isChecked()) return "ON";
+        return "OFF";
+    }
+    QStringList resList = cmd.split("=");
+    if(resList.count()==2)
+    {
+       if(resList[1] == "ON") DCBena->setChecked(true);
+       else if(resList[1] == "OFF") DCBena->setChecked(false);
+       else return "?";
+       if(resList[1] == "ON") DCBena->stateChanged(1);
+       else  DCBena->stateChanged(0);
+       return "";
+    }
+    return "?";
+}
+
+void DCBenable::Update(void)
+{
+    QString res;
+
+    if(comms == NULL) return;
+    comms->rb.clear();
+    res = comms->SendMess("GDCPWR\n");
+    if(res.contains("ON")) DCBena->setChecked(true);
+    if(res.contains("OFF")) DCBena->setChecked(false);
+}
+
+void DCBenable::DCBenaChange(void)
+{
+   QString res;
+
+   if(comms == NULL) return;
+   if(DCBena->checkState()) res ="SDCPWR,ON\n";
+   else res ="SDCPWR,OFF\n";
+   comms->SendCommand(res.toStdString().c_str());
+}
+
+void DCBenable::Shutdown(void)
+{
+    if(isShutdown) return;
+    isShutdown = true;
+    activeEnableState = DCBena->checkState();
+    DCBena->setChecked(false);
+    DCBena->stateChanged(0);
+}
+
+void DCBenable::Restore(void)
+{
+    if(!isShutdown) return;
+    isShutdown = false;
+    DCBena->setChecked(activeEnableState);
+    DCBena->stateChanged(0);
+}

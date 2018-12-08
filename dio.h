@@ -44,4 +44,27 @@ private slots:
     void RemoteNavSelect(void);
 };
 
+class DIOchannel : public QWidget
+{
+    Q_OBJECT
+public:
+    DIOchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
+    void Show(void);
+    void Update(void);
+    QString Report(void);
+    QString ProcessCommand(QString cmd);
+    bool SetValues(QString strVals);
+    QWidget *p;
+    QString Title;
+    int     X,Y;
+    QString MIPSnm;
+    QString Channel;
+    Comms   *comms;
+private:
+    QFrame      *frmDIO;
+    QCheckBox   *DIO;
+private slots:
+    void DIOChange(void);
+};
+
 #endif // DIO_H

@@ -485,3 +485,251 @@ void ARB::EditARBwaveform(void)
    ARBwfEdit->SetWaveform(Waveform);
    ARBwfEdit->show();
 }
+
+// **********************************************************************************************
+// ARB ******************************************************************************************
+// **********************************************************************************************
+
+ARBchannel::ARBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
+{
+    p      = parent;
+    Title  = name;
+    MIPSnm = MIPSname;
+    X      = x;
+    Y      = y;
+    comms  = NULL;
+    statusBar = NULL;
+}
+
+void ARBchannel::Show(void)
+{
+    // Make a group box
+    gbARB = new QGroupBox(Title,p);
+    gbARB->setGeometry(X,Y,250,200);
+    gbARB->setToolTip(MIPSnm + " ARB channel " + QString::number(Channel));
+    // Place the controls on the group box
+    leSWFREQ = new QLineEdit(gbARB);   leSWFREQ->setGeometry(100,22,91,21);  leSWFREQ->setValidator(new QIntValidator);
+    leSWFVRNG = new QLineEdit(gbARB);  leSWFVRNG->setGeometry(100,46,91,21); leSWFVRNG->setValidator(new QDoubleValidator);
+    leSWFVAUX = new QLineEdit(gbARB);  leSWFVAUX->setGeometry(100,70,91,21); leSWFVAUX->setValidator(new QDoubleValidator);
+    leSWFVOFF = new QLineEdit(gbARB);  leSWFVOFF->setGeometry(100,94,91,21); leSWFVOFF->setValidator(new QDoubleValidator);
+    Waveform = new QComboBox(gbARB); Waveform->setGeometry(100,118,91,21);
+    Waveform->clear();
+    Waveform->addItem("SIN","SIN");
+    Waveform->addItem("RAMP","RAMP");
+    Waveform->addItem("TRI","TRI");
+    Waveform->addItem("PULSE","PULSE");
+    Waveform->addItem("ARB","ARB");
+    EditWaveform = new QPushButton("Edit",gbARB); EditWaveform->setGeometry(100,142,91,30); EditWaveform->setAutoDefault(false);
+    SWFDIR_FWD = new QRadioButton("Forward",gbARB);  SWFDIR_FWD->setGeometry(20,166,91,21);
+    SWFDIR_REV = new QRadioButton("Reverse",gbARB);  SWFDIR_REV->setGeometry(150,166,91,21);
+    // Add labels
+    labels[0] = new QLabel("Frequency",gbARB);     labels[0]->setGeometry(10,26,80,16);
+    labels[1] = new QLabel("Amplitude",gbARB);     labels[1]->setGeometry(10,48,80,16);
+    labels[2] = new QLabel("Aux output",gbARB);    labels[2]->setGeometry(10,73,80,16);
+    labels[3] = new QLabel("Offset output",gbARB); labels[3]->setGeometry(10,96,80,16);
+    labels[4] = new QLabel("Waveform",gbARB);      labels[4]->setGeometry(10,118,80,16);
+    labels[5] = new QLabel("Hz",gbARB);   labels[5]->setGeometry(200,26,31,21);
+    labels[6] = new QLabel("Vp-p",gbARB); labels[6]->setGeometry(200,48,31,21);
+    labels[7] = new QLabel("V",gbARB);    labels[7]->setGeometry(200,73,31,21);
+    labels[8] = new QLabel("V",gbARB);    labels[8]->setGeometry(200,96,31,21);
+    // Connect to the event slots
+    leSWFREQ->setObjectName("leSWFREQ");
+    leSWFVRNG->setObjectName("leSWFVRNG");
+    leSWFVAUX->setObjectName("leSWFVAUX");
+    leSWFVOFF->setObjectName("leSWFVOFF");
+    SWFDIR_FWD->setObjectName("SWFDIR_FWD");
+    SWFDIR_REV->setObjectName("SWFDIR_REV");
+    foreach(QObject *w, gbARB->children())
+    {
+       if(w->objectName().startsWith("le")) connect(((QLineEdit *)w),SIGNAL(editingFinished()),this,SLOT(leChange()));
+    }
+    connect(Waveform,SIGNAL(currentIndexChanged(int)),this,SLOT(wfChange()));
+    connect(EditWaveform,SIGNAL(pressed()),this,SLOT(wfEdit()));
+    connect(SWFDIR_FWD,SIGNAL(clicked(bool)),this,SLOT(rbChange()));
+    connect(SWFDIR_REV,SIGNAL(clicked(bool)),this,SLOT(rbChange()));
+}
+
+QString ARBchannel::Report(void)
+{
+    QString res;
+
+    res = Title + ",";
+    res += leSWFREQ->text() + ",";
+    res += leSWFVRNG->text() + ",";
+    res += leSWFVAUX->text() + ",";
+    res += leSWFVOFF->text() + ",";
+    if(SWFDIR_FWD->isChecked()) res += "FWD,";
+    else res += "REV,";
+    res += Waveform->currentText();
+    return res;
+}
+
+bool ARBchannel::SetValues(QString strVals)
+{
+    QStringList resList;
+
+    if(!strVals.startsWith(Title)) return false;
+    resList = strVals.split(",");
+    if(resList.count() < 7) return false;
+    leSWFREQ->setText(resList[1]);   leSWFREQ->setModified(true); leSWFREQ->editingFinished();
+    leSWFVRNG->setText(resList[2]);  leSWFVRNG->setModified(true); leSWFVRNG->editingFinished();
+    leSWFVAUX->setText(resList[3]);  leSWFVAUX->setModified(true); leSWFVAUX->editingFinished();
+    leSWFVOFF->setText(resList[4]);  leSWFVOFF->setModified(true); leSWFVOFF->editingFinished();
+    if(resList[5] == "ON")
+    {
+        SWFDIR_FWD->setChecked(true);
+        SWFDIR_FWD->clicked(true);
+    }
+    else
+    {
+        SWFDIR_REV->setChecked(true);
+        SWFDIR_REV->clicked(true);
+    }
+    int i = Waveform->findData(resList[6]);
+    Waveform->setCurrentIndex(i);
+    Waveform->currentIndexChanged(i);
+    return true;
+}
+
+void ARBchannel::Update(void)
+{
+    QString res;
+
+    if(comms==NULL) return;
+    comms->rb.clear();
+    // Update the line edit boxes
+    foreach(QObject *w, gbARB->children())
+    {
+       if(w->objectName().startsWith("le"))
+       {
+           res = comms->SendMess("G" + w->objectName().mid(3) + "," + QString::number(Channel) + "\n");
+           if(!((QLineEdit *)w)->hasFocus()) if(res != "") ((QLineEdit *)w)->setText(res);
+       }
+    }
+    // Update the waveform selection box
+    res = comms->SendMess("GWFTYP," + QString::number(Channel) + "\n");
+    if(res != "")
+    {
+       int i = Waveform->findData(res);
+       Waveform->setCurrentIndex(i);
+    }
+    // Update the dirction radio buttons
+    res = comms->SendMess("GWFDIR," + QString::number(Channel) +"\n");
+    if(res == "FWD") SWFDIR_FWD->setChecked(true);
+    if(res == "REV") SWFDIR_REV->setChecked(true);
+}
+
+void ARBchannel::leChange(void)
+{
+    QObject* obj = sender();
+    QString res;
+
+    if(comms == NULL) return;
+    if(!((QLineEdit *)obj)->isModified()) return;
+    res = obj->objectName().mid(2) +"," + QString::number(Channel);
+    res += "," + ((QLineEdit *)obj)->text() + "\n";
+    comms->SendCommand(res.toStdString().c_str());
+    ((QLineEdit *)obj)->setModified(false);
+}
+
+void ARBchannel::rbChange(void)
+{
+    QString res = "SWFDIR,";
+    if(comms == NULL) return;
+    if(SWFDIR_FWD->isChecked()) res += QString::number(Channel) + ",FWD\n";
+    if(SWFDIR_REV->isChecked()) res += QString::number(Channel) + ",REV\n";
+    comms->SendCommand("SWFDIR,1,FWD\n");
+}
+
+void ARBchannel::wfChange(void)
+{
+    qDebug() << "Waveform changed";
+    if(comms == NULL) return;
+    comms->SendCommand("SWFTYP," + QString::number(Channel) + "," + Waveform->currentText() + "\n");
+}
+
+void ARBchannel::ReadWaveform(void)
+{
+    int Wform[32];
+    QString cmd;
+    int i;
+
+    // Read waveform
+    ARBwfEdit->GetWaveform(Wform);
+    // Send waveform to MIPS
+    cmd = "SWFARB,"  + Waveform->currentText();
+    for(i=0; i<32; i++) cmd += "," + QString::number(Wform[i]);
+    cmd += "\n";
+    if(comms == NULL) return;
+    if(!comms->SendCommand(cmd))
+    {
+        if(statusBar != NULL) statusBar->showMessage("Error sending waveform to MIPS",2000);
+    }
+}
+
+void ARBchannel::wfEdit(void)
+{
+    QString res;
+    int Wform[32];
+    int i;
+
+    for(i=0; i<32; i++) Wform[i] = i*4 - 64;
+    // Read the ARB waveform from MIPS
+    if(comms != NULL) res = comms->SendMess("GWFARB," + Waveform->currentText() + "\n");
+    if(res.contains("?"))
+    {
+        // Here if the message was NAKed
+        if(statusBar != NULL) statusBar->showMessage("Error reading waveform from MIPS",2000);
+        return;
+    }
+    QStringList Vals = res.split(",");
+    for(i=0; i<32; i++)
+    {
+        if(i < Vals.count()) Wform[i] = Vals[i].toInt();
+        else Wform[i] = 0;
+    }
+    ARBwfEdit = new ARBwaveformEdit;
+    connect(ARBwfEdit, SIGNAL(WaveformReady()), this, SLOT(ReadWaveform()));
+    ARBwfEdit->SetWaveform(Wform);
+    ARBwfEdit->show();
+}
+
+QString ARBchannel::ProcessCommand(QString cmd)
+{
+    QLineEdit    *le = NULL;
+    QRadioButton *rb = NULL;
+
+    if(!cmd.startsWith(Title)) return "?";
+    QStringList resList = cmd.split("=");
+    if(resList[0].trimmed() == Title + ".Frequency") le = leSWFREQ;
+    else if(resList[0].trimmed() == Title + ".Amplitude") le = leSWFVRNG;
+    else if(resList[0].trimmed() == Title + ".Aux output") le = leSWFVAUX;
+    else if(resList[0].trimmed() == Title + ".Offset output") le = leSWFVOFF;
+    else if(resList[0].trimmed() == Title + ".Forward") rb = SWFDIR_FWD;
+    else if(resList[0].trimmed() == Title + ".Reverse") rb = SWFDIR_REV;
+    else if(resList[0].trimmed() == Title + ".Waveform")
+    {
+       if(resList.count() == 1) return Waveform->currentText();
+       int i = Waveform->findText(resList[1].trimmed());
+       if(i<0) return "?";
+       Waveform->setCurrentIndex(i);
+       return "";
+    }
+    if(le != NULL)
+    {
+       if(resList.count() == 1) return le->text();
+       le->setText(resList[1]);
+       le->setModified(true);
+       le->editingFinished();
+       return "";
+    }
+    if(rb != NULL)
+    {
+        if(resList.count() == 1) if(rb->isChecked()) return "TRUE"; else return "FALSE";
+        if(resList[1].trimmed() == "TRUE") rb->setChecked(true);
+        if(resList[1].trimmed() == "FALSE") rb->setChecked(false);
+        rb->clicked();
+        return "";
+    }
+    return "?";
+}

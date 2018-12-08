@@ -120,6 +120,25 @@
 //      2.) Added message traffic to keep ethernet connections alive
 // 1.29, Nov 1,2018
 //      1.) Added the RFamp to the Custom Control Panel
+// 1.30, Nov 17,2018
+//      1.) Added the TCP/IP socket communications with control panels
+//      2.) Added DAC channels to control panel
+//      3.) Added ADC channels to control panel
+//      4.) Fix RFamp shutdown to include DC volatges
+//      5.) fixed control panel bug that caused crash on save methode
+// 1.31, Nov 20, 2018
+//      1.) Added new timing generation
+//      2.) Fixed bugs in control panel
+//      3.) refactored controlpanel code, a little bit, needs more work
+// 1.32, Nov 27, 2018
+//      1.) Fixed bug in RFamp that was not turning off DC supplies
+//      2.) Added DC power supply enable to RFamp
+//      3.) Save the DCoffsets first when saving methode file
+// 1.33, Dec 2, 2018
+//      1.) Added new timing generator to control panel
+//      2.) Added TCP/IP updates to control panel
+//      3.) Added external trigger options to FAIMS
+//
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -146,6 +165,7 @@
 #include "adc.h"
 #include "controlpanel.h"
 #include "scriptingconsole.h"
+#include "tcpserver.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
@@ -681,15 +701,12 @@ void MIPS::MIPSsetup(void)
     QString res;
     int numRF=0,numDCB=0;
 
-    qDebug() << "MIPSsetup";
     pgm->comms = comms;
     ui->lblMIPSconfig->setText("MIPS: ");
     // Turn ECHO off
     comms->SendString("\n");
     comms->SendCommand("ECHO,FALSE\n");
     res = comms->SendMess("GVER\n");
-    qDebug() << res;
-//    delay();
     if(res=="") return;  // Exit if we timeout, no MIPS comms
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + res);
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\nModules present:");
@@ -699,8 +716,6 @@ void MIPS::MIPSsetup(void)
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 RF driver\n");
     if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 RF drivers\n");
     numRF = res.toInt();
-    qDebug() << res;
-//    rfdriver->SetNumberOfChannels(numRF);
     if(res.contains("0")) RemoveTab("RFdriver");
     else AddTab("RFdriver");
 
@@ -711,8 +726,6 @@ void MIPS::MIPSsetup(void)
     if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 DC bias (16 output channels)\n");
     if(res.contains("32")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   4 DC bias (16 output channels)\n");
     numDCB = res.toInt();
-    qDebug() << res;
-//    dcbias->SetNumberOfChannels(numDCB);
     if(res.contains("0")) RemoveTab("DCbias");
     else AddTab("DCbias");
 

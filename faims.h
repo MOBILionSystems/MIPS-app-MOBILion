@@ -63,6 +63,8 @@ private slots:
     void FAIMSlockOff(void);
     void FAIMSlockOn(void);
     void FAIMSselectLogFile(void);
+    void slotLinearTrigOut(void);
+    void slotStepTrigOut(void);
 };
 
 #endif // FAIMS_H

@@ -15,6 +15,7 @@
 // trapping pulse sequence as well as calling an external application to acquire data from you
 // detection system.
 //
+//
 // Gordon Anderson
 //
 #include "controlpanel.h"
@@ -40,18 +41,23 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     // Init a number of variables
     HelpFile.clear();
     LoadedConfig = false;
-    mc = NULL;
+    mc        = NULL;
+    IFT       = NULL;
+    TC        = NULL;
     DCBgroups = NULL;
-    statusBar      = NULL;
-    numRFamps = 0;
-    numTextLabels  = 0;
-    numRFchannels  = 0;
-    numDCBchannels = 0;
-    numDCBoffsets  = 0;
-    numDCBenables  = 0;
-    numESIchannels = 0;
-    numDIOchannels = 0;
-    numARBchannels = 0;
+    statusBar = NULL;
+    ARBcompressorButton = NULL;
+    comp      = NULL;
+    TextLabels.clear();
+    RFchans.clear();
+    ADCchans.clear();
+    DACchans.clear();
+    DCBchans.clear();
+    DCBoffsets.clear();
+    DCBenables.clear();
+    DIOchannels.clear();
+    ESIchans.clear();
+    ARBchans.clear();
     UpdateHoldOff  = 0;
     UpdateStop     = false;
     ShutdownFlag   = false;
@@ -59,6 +65,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     StartMIPScomms = false;
     SystemIsShutdown = false;
     scriptconsole = NULL;
+    tcp = NULL;
     help = new Help();
     // Allow user to select the configuration file
     QString fileName = QFileDialog::getOpenFileName(this, tr("Load Configuration from File"),"",tr("cfg (*.cfg);;All files (*.*)"));
@@ -98,178 +105,210 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
             }
             if((resList[0].toUpper() == "TEXTLABELS") && (resList.length()==2))
             {
-                numTextLabels = resList[1].toInt();
-                TextLabels = new TextLabel * [numTextLabels];
-                for(int i = 0; i < numTextLabels; i++)
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
                 {
-                    TextLabels[i] = NULL;
-                    // Read each RFchannel
                     line = stream.readLine();
                     if(line.trimmed().startsWith("#")) continue;
                     resList = line.split(",");
                     if((resList[0].toUpper() == "TEXTLABEL") && (resList.length()==5))
                     {
-                        TextLabels[i] = new TextLabel(ui->lblBackground,resList[1],resList[2].toInt(),resList[3].toInt(),resList[4].toInt());
-                        TextLabels[i]->Show();
+                        TextLabels.append(new TextLabel(ui->lblBackground,resList[1],resList[2].toInt(),resList[3].toInt(),resList[4].toInt()));
+                        TextLabels.last()->Show();
                     }
                 }
             }
             if((resList[0].toUpper() == "RFCHANNELS") && (resList.length()==2))
             {
-                numRFchannels = resList[1].toInt();
-                RFchans = new RFchannel * [numRFchannels];
-                for(int i = 0; i < numRFchannels; i++)
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
                 {
-                    RFchans[i] = NULL;
-                    // Read each RFchannel
                     line = stream.readLine();
                     if(line.trimmed().startsWith("#")) continue;
                     resList = line.split(",");
                     if((resList[0].toUpper() == "RFCHANNEL") && (resList.length()==6))
                     {
-                        RFchans[i] = new RFchannel(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt());
-                        RFchans[i]->Channel = resList[3].toInt();
-                        RFchans[i]->comms = FindCommPort(resList[2],Systems);
-                        RFchans[i]->Show();
+                        RFchans.append(new RFchannel(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt()));
+                        RFchans.last()->Channel = resList[3].toInt();
+                        RFchans.last()->comms = FindCommPort(resList[2],Systems);
+                        RFchans.last()->Show();
+                    }
+                }
+            }
+            if((resList[0].toUpper() == "ADCCHANNELS") && (resList.length()==2))
+            {
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
+                {
+                    line = stream.readLine();
+                    if(line.trimmed().startsWith("#")) continue;
+                    resList = line.split(",");
+                    if((resList[0].toUpper() == "ADCCHANNEL") && (resList.length()>=6))
+                    {
+                        ADCchans.append(new ADCchannel(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt()));
+                        ADCchans.last()->Channel = resList[3].toInt();
+                        ADCchans.last()->comms = FindCommPort(resList[2],Systems);
+                        if(resList.length()>=7)  ADCchans.last()->m = resList[6].toFloat();
+                        if(resList.length()>=8)  ADCchans.last()->b = resList[7].toFloat();
+                        if(resList.length()>=9)  ADCchans.last()->Units = resList[8];
+                        if(resList.length()>=10) ADCchans.last()->Format = resList[9];
+                        ADCchans.last()->Show();
+                    }
+                }
+            }
+            if((resList[0].toUpper() == "DACCHANNELS") && (resList.length()==2))
+            {
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
+                {
+                    line = stream.readLine();
+                    if(line.trimmed().startsWith("#")) continue;
+                    resList = line.split(",");
+                    if((resList[0].toUpper() == "DACCHANNEL") && (resList.length()>=6))
+                    {
+                        DACchans.append(new DACchannel(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt()));
+                        DACchans.last()->Channel = resList[3].toInt();
+                        DACchans.last()->comms = FindCommPort(resList[2],Systems);
+                        if(resList.length()>=7)  DACchans.last()->m = resList[6].toFloat();
+                        if(resList.length()>=8)  DACchans.last()->b = resList[7].toFloat();
+                        if(resList.length()>=9)  DACchans.last()->Units = resList[8];
+                        if(resList.length()>=10) DACchans.last()->Format = resList[9];
+                        DACchans.last()->Show();
                     }
                 }
             }
             if((resList[0].toUpper() == "DCBCHANNELS") && (resList.length()==2))
             {
-                numDCBchannels = resList[1].toInt();
-                DCBchans = new DCBchannel * [numDCBchannels];
-                for(int i = 0; i < numDCBchannels; i++)
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
                 {
-                    DCBchans[i] = NULL;
-                    // Read each DCbias channel
                     line = stream.readLine();
                     if(line.trimmed().startsWith("#")) continue;
                     resList = line.split(",");
                     if((resList[0].toUpper() == "DCBCHANNEL") && (resList.length()==6))
                     {
-                        DCBchans[i] = new DCBchannel(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt());
-                        DCBchans[i]->Channel = resList[3].toInt();
-                        DCBchans[i]->comms = FindCommPort(resList[2],Systems);
-                        DCBchans[i]->Show();
+                        DCBchans.append(new DCBchannel(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt()));
+                        DCBchans.last()->Channel = resList[3].toInt();
+                        DCBchans.last()->comms = FindCommPort(resList[2],Systems);
+                        DCBchans.last()->Show();
                     }
                 }
             }
             if((resList[0].toUpper() == "DCBOFFSETS") && (resList.length()==2))
             {
-                numDCBoffsets = resList[1].toInt();
-                DCBoffsets = new DCBoffset * [numDCBoffsets];
-                for(int i = 0; i < numDCBoffsets; i++)
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
                 {
-                    DCBoffsets[i] = NULL;
                     line = stream.readLine();
                     if(line.trimmed().startsWith("#")) continue;
                     resList = line.split(",");
                     if((resList[0].toUpper() == "DCBOFFSET") && (resList.length()==6))
                     {
-                        DCBoffsets[i] = new DCBoffset(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt());
-                        DCBoffsets[i]->Channel = resList[3].toInt();
-                        DCBoffsets[i]->comms = FindCommPort(resList[2],Systems);
-                        DCBoffsets[i]->Show();
+                        DCBoffsets.append(new DCBoffset(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt()));
+                        DCBoffsets.last()->Channel = resList[3].toInt();
+                        DCBoffsets.last()->comms = FindCommPort(resList[2],Systems);
+                        DCBoffsets.last()->Show();
                     }
                 }
             }
             if((resList[0].toUpper() == "DCBENABLES") && (resList.length()==2))
             {
-                numDCBenables = resList[1].toInt();
-                DCBenables = new DCBenable * [numDCBenables];
-                for(int i = 0; i < numDCBenables; i++)
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
                 {
-                    DCBenables[i] = NULL;
                     line = stream.readLine();
                     if(line.trimmed().startsWith("#")) continue;
                     resList = line.split(",");
                     if((resList[0].toUpper() == "DCBENABLE") && (resList.length()==5))
                     {
-                        DCBenables[i] = new DCBenable(ui->lblBackground,resList[1],resList[2],resList[3].toInt(),resList[4].toInt());
-                        DCBenables[i]->comms = FindCommPort(resList[2],Systems);
-                        DCBenables[i]->Show();
+                        DCBenables.append(new DCBenable(ui->lblBackground,resList[1],resList[2],resList[3].toInt(),resList[4].toInt()));
+                        DCBenables.last()->comms = FindCommPort(resList[2],Systems);
+                        DCBenables.last()->Show();
                     }
                 }
             }
             if((resList[0].toUpper() == "DIOCHANNELS") && (resList.length()==2))
             {
-                numDIOchannels = resList[1].toInt();
-                DIOchannels = new DIOchannel * [numDIOchannels];
-                for(int i = 0; i < numDIOchannels; i++)
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
                 {
-                    DIOchannels[i] = NULL;
                     line = stream.readLine();
                     if(line.trimmed().startsWith("#")) continue;
                     resList = line.split(",");
                     if((resList[0].toUpper() == "DIOCHANNEL") && (resList.length()==6))
                     {
-                        DIOchannels[i] = new DIOchannel(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt());
-                        DIOchannels[i]->Channel = resList[3];
-                        DIOchannels[i]->comms = FindCommPort(resList[2],Systems);
-                        DIOchannels[i]->Show();
+                        DIOchannels.append(new DIOchannel(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt()));
+                        DIOchannels.last()->Channel = resList[3];
+                        DIOchannels.last()->comms = FindCommPort(resList[2],Systems);
+                        DIOchannels.last()->Show();
                     }
                 }
             }
             if((resList[0].toUpper() == "ESICHANNELS") && (resList.length()==2))
             {
-                numESIchannels = resList[1].toInt();
-                ESIchans = new ESI * [numESIchannels];
-                for(int i = 0; i < numESIchannels; i++)
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
                 {
-                    ESIchans[i] = NULL;
                     line = stream.readLine();
                     if(line.trimmed().startsWith("#")) continue;
                     resList = line.split(",");
                     if((resList[0].toUpper() == "ESICHANNEL") && (resList.length()==6))
                     {
-                        ESIchans[i] = new ESI(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt());
-                        ESIchans[i]->Channel = resList[3].toInt();
-                        ESIchans[i]->comms = FindCommPort(resList[2],Systems);
-                        ESIchans[i]->Show();
+                        ESIchans.append(new ESI(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt()));
+                        ESIchans.last()->Channel = resList[3].toInt();
+                        ESIchans.last()->comms = FindCommPort(resList[2],Systems);
+                        ESIchans.last()->Show();
                     }
                 }
             }
             if((resList[0].toUpper() == "ARBCHANNELS") && (resList.length()==2))
             {
-                numARBchannels = resList[1].toInt();
-                ARBchans = new ARBchannel * [numARBchannels];
-                for(int i = 0; i < numARBchannels; i++)
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
                 {
-                    ARBchans[i] = NULL;
                     line = stream.readLine();
                     if(line.trimmed().startsWith("#")) continue;
                     resList = line.split(",");
                     if((resList[0].toUpper() == "ARBCHANNEL") && (resList.length()==6))
                     {
-                        ARBchans[i] = new ARBchannel(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt());
-                        ARBchans[i]->Channel = resList[3].toInt();
-                        ARBchans[i]->comms = FindCommPort(resList[2],Systems);
-                        ARBchans[i]->Show();
+                        ARBchans.append(new ARBchannel(ui->lblBackground,resList[1],resList[2],resList[4].toInt(),resList[5].toInt()));
+                        ARBchans.last()->Channel = resList[3].toInt();
+                        ARBchans.last()->comms = FindCommPort(resList[2],Systems);
+                        ARBchans.last()->Show();
                     }
                 }
             }
-            if((resList[0].toUpper() == "RAMPCHANNELS") && (resList.length()==2))
+            if((resList[0].toUpper() == "RFAMPCHANNELS") && (resList.length()==2))
             {
-                numRFamps = resList[1].toInt();
-                rfa = new RFamp * [numRFamps];
-                for(int i = 0; i < numRFamps; i++)
+                int j = resList[1].toInt();
+                for(int i = 0; i < j; i++)
                 {
-                    rfa[i] = NULL;
                     line = stream.readLine();
                     if(line.trimmed().startsWith("#")) continue;
                     resList = line.split(",");
                     if((resList[0].toUpper() == "RFAMP") && (resList.length()==6))
                     {
-                        // RFAMP,name,MIPSname,channel,X,Y
-                        rfa[i] = new RFamp(ui->lblBackground,resList[1],resList[2],resList[3].toInt());
-                        rfa[i]->comms = FindCommPort(resList[2],Systems);
+                        rfa.append(new RFamp(ui->lblBackground,resList[1],resList[2],resList[3].toInt()));
+                        rfa.last()->comms = FindCommPort(resList[2],Systems);
                         QWidget *widget = new QWidget(this);
                         widget->setGeometry(resList[4].toInt(),resList[5].toInt(),280,290);
                         QVBoxLayout *layout = new QVBoxLayout(widget);
-                        layout->addWidget(rfa[i]);
-                        rfa[i]->show();
+                        layout->addWidget(rfa.last());
+                        rfa.last()->show();
                     }
 
+                }
+            }
+            if((resList[0].toUpper() == "TIMING") && (resList.length()==5))
+            {
+                TC = new TimingControl(ui->lblBackground,resList[1],resList[2],resList[3].toInt(),resList[4].toInt());
+                TC->comms = FindCommPort(resList[2],Systems);
+                TC->statusBar = statusBar;
+                TC->Show();
+                if(TC->TG != NULL)
+                {
+                   foreach(DCBchannel *dcb, DCBchans) if(dcb->MIPSnm == TC->MIPSnm) TC->TG->AddSignal(dcb->Title, QString::number(dcb->Channel));
+                   foreach(DIOchannel *dio, DIOchannels) if(dio->MIPSnm == TC->MIPSnm) TC->TG->AddSignal(dio->Title, dio->Channel);
                 }
             }
             if((resList[0].toUpper() == "IFT") && (resList.length()==5))
@@ -285,7 +324,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 if(IFT!=NULL)
                 {
                     IFT->Grid1 = NULL;
-                    for(int i=0; i< numDCBchannels; i++) if(DCBchans[i]->Title == resList[1]) IFT->Grid1 = DCBchans[i];
+                    for(int i=0; i< DCBchans.count(); i++) if(DCBchans[i]->Title == resList[1]) IFT->Grid1 = DCBchans[i];
                 }
             }
             if((resList[0].toUpper() == "GRID2") && (resList.length()==2))
@@ -293,7 +332,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 if(IFT!=NULL)
                 {
                     IFT->Grid2 = NULL;
-                    for(int i=0; i< numDCBchannels; i++) if(DCBchans[i]->Title == resList[1]) IFT->Grid2 = DCBchans[i];
+                    for(int i=0; i< DCBchans.count(); i++) if(DCBchans[i]->Title == resList[1]) IFT->Grid2 = DCBchans[i];
                 }
             }
             if((resList[0].toUpper() == "GRID3") && (resList.length()==2))
@@ -301,7 +340,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 if(IFT!=NULL)
                 {
                     IFT->Grid3 = NULL;
-                    for(int i=0; i< numDCBchannels; i++) if(DCBchans[i]->Title == resList[1]) IFT->Grid3 = DCBchans[i];
+                    for(int i=0; i< DCBchans.count(); i++) if(DCBchans[i]->Title == resList[1]) IFT->Grid3 = DCBchans[i];
                 }
             }
             if((resList[0].toUpper() == "ENABLE") && (resList.length()==2))
@@ -326,6 +365,18 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 connect(SL,SIGNAL(Save()),this,SLOT(pbSave()));
                 connect(SL,SIGNAL(Load()),this,SLOT(pbLoad()));
             }
+            // COMPRESSOR,name,MIPS name,X,Y
+            if((resList[0].toUpper() == "COMPRESSOR") && (resList.length()==5))
+            {
+                // Enable the ARB compressor button
+                ARBcompressorButton = new QPushButton(resList[1],ui->lblBackground);
+                ARBcompressorButton->setGeometry(resList[3].toInt(),resList[4].toInt(),150,32);
+                ARBcompressorButton->setAutoDefault(false);
+                ARBcompressorButton->setToolTip("Press this button to edit the compression options");
+                comp = new Compressor(0,resList[1],resList[2]);
+                comp->comms = FindCommPort(resList[2],Systems);
+                connect(ARBcompressorButton,SIGNAL(pressed()),this,SLOT(pbARBcompressor()));
+            }
             if((resList[0].toUpper() == "MIPSCOMMS") && (resList.length()==3))
             {
                 // Enable the MIPS communication button
@@ -339,9 +390,16 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
             {
                 if(IFT!=NULL)
                 {
-                    IFT->Acquire = line.mid(line.indexOf(",")+1);
+                    IFT->AD->Acquire = line.mid(line.indexOf(",")+1);
                     #ifdef Q_OS_MAC
-                    if(IFT->Acquire.startsWith("~")) IFT->Acquire = QDir::homePath() + "/" + IFT->Acquire.mid(2);
+                    if(IFT->AD->Acquire .startsWith("~")) IFT->AD->Acquire  = QDir::homePath() + "/" + IFT->AD->Acquire .mid(2);
+                    #endif
+                }
+                if(TC!=NULL)
+                {
+                    TC->AD->Acquire = line.mid(line.indexOf(",")+1);
+                    #ifdef Q_OS_MAC
+                    if(TC->AD->Acquire .startsWith("~")) TC->AD->Acquire  = QDir::homePath() + "/" + TC->AD->Acquire .mid(2);
                     #endif
                 }
             }
@@ -353,17 +411,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 ScriptButton->setAutoDefault(false);
                 ScriptButton->setToolTip("Press this button load or define a script");
                 connect(ScriptButton,SIGNAL(pressed()),this,SLOT(pbScript()));
-                scriptconsole = NULL;
-                /* old scripting code
-                QWidget *widget = new QWidget(this);
-                widget->setGeometry(resList[1].toInt(),resList[2].toInt(),350,210);
-                QVBoxLayout *layout = new QVBoxLayout(widget);
-                script = new Script();
-                layout->addWidget(script);
-                // Connect to the slots for loading and shutdown
-                connect(script,SIGNAL(Shutdown()),this,SLOT(scriptShutdown()));
-                connect(script,SIGNAL(Load(QString)),this,SLOT(scriptLoad(QString)));
-                */
+                scriptconsole = new ScriptingConsole(this);
             }
             if((resList[0].toUpper() == "DCBGROUPS") && (resList.length()==3))
             {
@@ -387,6 +435,14 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 if(HelpFile.startsWith("~")) HelpFile = QDir::homePath() + "/" + HelpFile.mid(2);
                 #endif
             }
+            if((resList[0].toUpper() == "TCPSERVER") && (resList.length()==2))
+            {
+                tcp = new TCPserver();
+                tcp->port = resList[1].toInt();
+                tcp->statusbar = statusBar;
+                tcp->listen();
+                connect(tcp,SIGNAL(lineReady()),this,SLOT(tcpCommand()));
+            }
         } while(!line.isNull());
     }
     file.close();
@@ -408,6 +464,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
 
 ControlPanel::~ControlPanel()
 {
+    delete tcp;
     delete ui;
 }
 
@@ -493,10 +550,7 @@ void ControlPanel::InitMIPSsystems(QString initFilename)
 // Returns null if the MIPS system can't be found.
 Comms* ControlPanel::FindCommPort(QString name, QList<Comms*> Systems)
 {
-   for(int i = 0; i < Systems.length(); i++)
-   {
-       if(Systems.at(i)->MIPSname == name) return(Systems.at(i));
-   }
+   for(int i = 0; i < Systems.length(); i++) if(Systems.at(i)->MIPSname == name) return(Systems.at(i));
    return NULL;
 }
 
@@ -526,13 +580,13 @@ void ControlPanel::Update(void)
    {
        ShutdownFlag = false;
        SystemIsShutdown = true;
-       UpdateHoldOff = 2;
+       UpdateHoldOff = 1;
        // Make sure all MIPS systems are in local mode
-       for(i=0;i<Systems.count();i++) Systems[i]->SendString("SMOD,LOC\n");
-       for(i=0;i<numESIchannels;i++) ESIchans[i]->Shutdown();
-       for(i=0;i<numDCBenables;i++)  DCBenables[i]->Shutdown();
-       for(i=0;i<numRFchannels;i++)  RFchans[i]->Shutdown();
-       for(i=0;i<numRFamps;i++)      rfa[i]->Shutdown();
+       for(i=0;i<Systems.count();i++)    Systems[i]->SendString("SMOD,LOC\n");
+       for(i=0;i<ESIchans.count();i++)   ESIchans[i]->Shutdown();
+       for(i=0;i<DCBenables.count();i++) DCBenables[i]->Shutdown();
+       for(i=0;i<RFchans.count();i++)    RFchans[i]->Shutdown();
+       for(i=0;i<rfa.count();i++)        rfa[i]->Shutdown();
        if(statusBar != NULL) statusBar->showMessage("System shutdown, " + QDateTime().currentDateTime().toString());
        return;
    }
@@ -540,24 +594,27 @@ void ControlPanel::Update(void)
    {
        RestoreFlag = false;
        SystemIsShutdown = false;
-       UpdateHoldOff = 2;
-       for(i=0;i<numESIchannels;i++) ESIchans[i]->Restore();
-       for(i=0;i<numDCBenables;i++)  DCBenables[i]->Restore();
-       for(i=0;i<numRFchannels;i++)  RFchans[i]->Restore();
-       for(i=0;i<numRFamps;i++)      rfa[i]->Restore();
+       UpdateHoldOff = 1;
+       for(i=0;i<ESIchans.count();i++)   ESIchans[i]->Restore();
+       for(i=0;i<DCBenables.count();i++) DCBenables[i]->Restore();
+       for(i=0;i<RFchans.count();i++)    RFchans[i]->Restore();
+       for(i=0;i<rfa.count();i++)        rfa[i]->Restore();
        if(statusBar != NULL) statusBar->showMessage("System enabled, " + QDateTime().currentDateTime().toString());
        return;
    }
    if(busy) return;
    busy = true;
-   for(i=0;i<numRFchannels;i++)  if(RFchans[i] != NULL)     RFchans[i]->Update();
-   for(i=0;i<numDCBchannels;i++) if(DCBchans[i] != NULL)    DCBchans[i]->Update();
-   for(i=0;i<numDCBoffsets;i++)  if(DCBoffsets[i] != NULL)  DCBoffsets[i]->Update();
-   for(i=0;i<numDCBenables;i++)  if(DCBenables[i] != NULL)  DCBenables[i]->Update();
-   for(i=0;i<numDIOchannels;i++) if(DIOchannels[i] != NULL) DIOchannels[i]->Update();
-   for(i=0;i<numESIchannels;i++) if(ESIchans[i] != NULL)    ESIchans[i]->Update();
-   for(i=0;i<numARBchannels;i++) if(ARBchans[i] != NULL)    ARBchans[i]->Update();
-   for(i=0;i<numRFamps;i++)      if(rfa[i] != NULL)         rfa[i]->Update();
+   for(i=0;i<RFchans.count();i++)     RFchans[i]->Update();
+   for(i=0;i<ADCchans.count();i++)    ADCchans[i]->Update();
+   for(i=0;i<DACchans.count();i++)    DACchans[i]->Update();
+   for(i=0;i<DCBchans.count();i++)    DCBchans[i]->Update();
+   for(i=0;i<DCBoffsets.count();i++)  DCBoffsets[i]->Update();
+   for(i=0;i<DCBenables.count();i++)  DCBenables[i]->Update();
+   for(i=0;i<DIOchannels.count();i++) DIOchannels[i]->Update();
+   for(i=0;i<ESIchans.count();i++)    ESIchans[i]->Update();
+   for(i=0;i<ARBchans.count();i++)    ARBchans[i]->Update();
+   for(i=0;i<rfa.count();i++)         rfa[i]->Update();
+   if(comp!=NULL)                     comp->Update();
    busy = false;
 }
 
@@ -568,8 +625,8 @@ QString ControlPanel::Save(QString Filename)
     #ifdef Q_OS_MAC
     if(Filename.startsWith("~")) Filename = QDir::homePath() + "/" + Filename.mid(2);
     #endif
-    UpdateHoldOff = 1000;
     if(Filename == "") return "No file defined!";
+    UpdateHoldOff = 1000;
     QFile file(Filename);
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
@@ -577,50 +634,61 @@ QString ControlPanel::Save(QString Filename)
         QTextStream stream(&file);
         QDateTime dateTime = QDateTime::currentDateTime();
         stream << "# Control panel settings, " + dateTime.toString() + "\n";
+        if(DCBoffsets.count() > 0)
+        {
+            stream << "DCB offsets," + QString::number(DCBoffsets.count()) + "\n";
+            for(int i=0; i<DCBoffsets.count(); i++) if(DCBoffsets[i] != NULL) stream << DCBoffsets[i]->Report() + "\n";
+        }
         if(DCBgroups != NULL)
         {
             stream << "DC bias groups\n";
             stream << DCBgroups->Report() + "\n";
         }
-        if(numRFchannels > 0)
+        if(RFchans.count() > 0)
         {
-            stream << "RF channels," + QString::number(numRFchannels) + "\n";
-            for(int i=0; i<numRFchannels; i++) if(RFchans[i] != NULL) stream << RFchans[i]->Report() + "\n";
+            stream << "RF channels," + QString::number(RFchans.count()) + "\n";
+            for(int i=0;i<RFchans.count();i++) stream << RFchans[i]->Report() + "\n";
         }
-        if(numDCBchannels > 0)
+        if(DCBchans.count() > 0)
         {
-            stream << "DCB channels," + QString::number(numDCBchannels) + "\n";
-            for(int i=0; i<numDCBchannels; i++) if(DCBchans[i] != NULL) stream << DCBchans[i]->Report() + "\n";
+            stream << "DCB channels," + QString::number(DCBchans.count()) + "\n";
+            for(int i=0; i<DCBchans.count(); i++) stream << DCBchans[i]->Report() + "\n";
         }
-        if(numDCBoffsets > 0)
+        if(DACchans.count() > 0)
         {
-            stream << "DCB offsets," + QString::number(numDCBoffsets) + "\n";
-            for(int i=0; i<numDCBoffsets; i++) if(DCBoffsets[i] != NULL) stream << DCBoffsets[i]->Report() + "\n";
+            stream << "DAC channels," + QString::number(DACchans.count()) + "\n";
+            for(int i=0; i<DACchans.count(); i++) stream << DACchans[i]->Report() + "\n";
         }
-        if(numDCBenables > 0)
+        if(DCBenables.count() > 0)
         {
-            stream << "DCB enables," + QString::number(numDCBenables) + "\n";
-            for(int i=0; i<numDCBenables; i++) if(DCBenables[i] != NULL) stream << DCBenables[i]->Report() + "\n";
+            stream << "DCB enables," + QString::number(DCBenables.count()) + "\n";
+            for(int i=0; i<DCBenables.count(); i++) stream << DCBenables[i]->Report() + "\n";
         }
-        if(numDIOchannels > 0)
+        if(DIOchannels.count() > 0)
         {
-            stream << "DIO channels," + QString::number(numDIOchannels) + "\n";
-            for(int i=0; i<numDIOchannels; i++) if(DIOchannels[i] != NULL) stream << DIOchannels[i]->Report() + "\n";
+            stream << "DIO channels," + QString::number(DIOchannels.count()) + "\n";
+            for(int i=0; i<DIOchannels.count(); i++) stream << DIOchannels[i]->Report() + "\n";
         }
-        if(numESIchannels > 0)
+        if(ESIchans.count() > 0)
         {
-            stream << "ESI channels," + QString::number(numESIchannels) + "\n";
-            for(int i=0; i<numESIchannels; i++) if(ESIchans[i] != NULL) stream << ESIchans[i]->Report() + "\n";
+            stream << "ESI channels," + QString::number(ESIchans.count()) + "\n";
+            for(int i=0; i<ESIchans.count(); i++) stream << ESIchans[i]->Report() + "\n";
         }
-        if(numARBchannels > 0)
+        if(ARBchans.count() > 0)
         {
-            stream << "ARB channels," + QString::number(numARBchannels) + "\n";
-            for(int i=0; i<numARBchannels; i++) if(ARBchans[i] != NULL) stream << ARBchans[i]->Report() + "\n";
+            stream << "ARB channels," + QString::number(ARBchans.count()) + "\n";
+            for(int i=0; i<ARBchans.count(); i++) stream << ARBchans[i]->Report() + "\n";
         }
-        if(numRFamps > 0)
+        if(comp != NULL)
         {
-            stream << "RFamp channels," + QString::number(numRFamps) + "\n";
-            for(int i=0; i<numRFamps; i++) if(rfa[i] != NULL) stream << rfa[i]->Report();
+            stream << "Compression parameters\n";
+            stream << comp->Report() + "\n";
+            stream << "CompressionEnd\n";
+        }
+        if(rfa.count() > 0)
+        {
+            stream << "RFamp channels," + QString::number(rfa.count()) + "\n";
+            for(int i=0; i<rfa.count(); i++) if(rfa[i] != NULL) stream << rfa[i]->Report();
             stream << "RFampEnd\n";
         }
         if(IFT != NULL)
@@ -628,8 +696,13 @@ QString ControlPanel::Save(QString Filename)
             stream << "IFT parameters\n";
             stream << IFT->Report() + "\n";
         }
+        if(TC != NULL)
+        {
+            stream << "Timing control parameters\n";
+            stream << TC->TG->Report() + "\n";
+        }
         file.close();
-        UpdateHoldOff = 5;
+        UpdateHoldOff = 1;
         return "Settings saved to " + Filename;
     }
     return "Can't open file!";
@@ -642,8 +715,8 @@ QString ControlPanel::Load(QString Filename)
     #ifdef Q_OS_MAC
     if(Filename.startsWith("~")) Filename = QDir::homePath() + "/" + Filename.mid(2);
     #endif
-    UpdateHoldOff = 1000;
     if(Filename == "") return "No file defined!";
+    UpdateHoldOff = 1000;
     QFile file(Filename);
     if(file.open(QIODevice::ReadOnly|QIODevice::Text))
     {
@@ -661,50 +734,56 @@ QString ControlPanel::Load(QString Filename)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numRFchannels;j++) if(RFchans[j] != NULL) if(RFchans[j]->SetValues(line)) break;
+                     for(int j=0;j<RFchans.count();j++) if(RFchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DCB channels") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numDCBchannels;j++) if(DCBchans[j] != NULL) if(DCBchans[j]->SetValues(line)) break;
+                     for(int j=0;j<DCBchans.count();j++)if(DCBchans[j]->SetValues(line)) break;
+                }
+                if(resList[0] == "DAC channels") for(int i=0;i<resList[1].toInt();i++)
+                {
+                     line = stream.readLine();
+                     if(line.isNull()) break;
+                     for(int j=0;j<DACchans.count();j++) if(DACchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DCB offsets") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numDCBoffsets;j++) if(DCBoffsets[j] != NULL) if(DCBoffsets[j]->SetValues(line)) break;
+                     for(int j=0;j<DCBoffsets.count();j++) if(DCBoffsets[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DCB enables") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numDCBenables;j++) if(DCBenables[j] != NULL) if(DCBenables[j]->SetValues(line)) break;
+                     for(int j=0;j<DCBenables.count();j++) if(DCBenables[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DIO channels") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numDIOchannels;j++) if(DIOchannels[j] != NULL) if(DIOchannels[j]->SetValues(line)) break;
+                     for(int j=0;j<DIOchannels.count();j++) if(DIOchannels[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "ESI channels") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numESIchannels;j++) if(ESIchans[j] != NULL) if(ESIchans[j]->SetValues(line)) break;
+                     for(int j=0;j<ESIchans.count();j++) if(ESIchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "ARB channels") for(int i=0;i<resList[1].toInt();i++)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
-                     for(int j=0;j<numARBchannels;j++) if(ARBchans[j] != NULL) if(ARBchans[j]->SetValues(line)) break;
+                     for(int j=0;j<ARBchans.count();j++) if(ARBchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "RFamp channels") while(true)
                 {
                      line = stream.readLine();
                      if(line.isNull()) break;
                      if(line.contains("RFampEnd")) break;
-                     for(int j=0;j<numRFamps;j++) if(rfa[j] != NULL) if(rfa[j]->SetValues(line)) break;
+                     for(int j=0;j<rfa.count();j++) if(rfa[j]->SetValues(line)) break;
                 }
             }
             else if(resList.count() == 1)
@@ -721,9 +800,30 @@ QString ControlPanel::Load(QString Filename)
                     if(line.isNull()) break;
                     if(DCBgroups != NULL) DCBgroups->SetValues(line);
                 }
+                if(resList[0] == "Timing control parameters")
+                {
+                    TC->TG->Events.clear();
+                    while(true)
+                    {
+                        line = stream.readLine();
+                        if(line.isNull()) break;
+                        if(line.contains("TCparametersEnd")) break;
+                        TC->TG->SetValues(line);
+                    }
+                }
+                if(resList[0] == "Compression parameters")
+                {
+                    while(true)
+                    {
+                        line = stream.readLine();
+                        if(line.isNull()) break;
+                        if(line.contains("CompressionEnd")) break;
+                        comp->SetValues(line);
+                    }
+                }
             }
         } while(!line.isNull());
-        UpdateHoldOff = 5;
+        UpdateHoldOff = 1;
         file.close();
         return "Settings loaded from " + Filename;
     }
@@ -780,6 +880,13 @@ void ControlPanel::pbMIPScomms(void)
    StartMIPScomms = true;
 }
 
+void ControlPanel::pbARBcompressor(void)
+{
+    ARBcompressorButton->setDown(false);
+    comp->show();
+    comp->raise();
+}
+
 void ControlPanel::scriptShutdown(void)
 {
     ShutdownFlag = true;
@@ -792,12 +899,12 @@ void ControlPanel::scriptLoad(QString Filename)
 
 void ControlPanel::DCBgroupDisable(void)
 {
-    for(int i=0;i<numDCBchannels;i++) if(DCBchans[i] != NULL) DCBchans[i]->LinkEnable = false;
+    for(int i=0;i<DCBchans.count();i++) DCBchans[i]->LinkEnable = false;
 }
 
 DCBchannel * ControlPanel::FindDCBchannel(QString name)
 {
-    for(int i=0;i<numDCBchannels;i++) if(DCBchans[i]->Title.toUpper() == name.toUpper()) return DCBchans[i];
+    for(int i=0;i<DCBchans.count();i++) if(DCBchans[i]->Title.toUpper() == name.toUpper()) return DCBchans[i];
     return NULL;
 }
 
@@ -811,7 +918,7 @@ void ControlPanel::DCBgroupEnable(void)
         QStringList resList = DCBgroups->comboGroups->itemText(i).split(",");
         DCBs.clear();
         for(int j=0;j<resList.count();j++) if((dcb=FindDCBchannel(resList[j])) != NULL) DCBs.append(dcb);
-        for(int j=0;j<numDCBchannels;j++)
+        for(int j=0;j<DCBchans.count();j++)
         {
             if(DCBs.contains(DCBchans[j]))
             {
@@ -824,8 +931,9 @@ void ControlPanel::DCBgroupEnable(void)
 
 void ControlPanel::pbScript(void)
 {
-    if(!scriptconsole) scriptconsole = new ScriptingConsole(this);
+    if(scriptconsole == NULL) return;
     scriptconsole->show();
+    scriptconsole->raise();
 }
 
 // The following functions are for the scripting system
@@ -860,23 +968,23 @@ void ControlPanel::SystemShutdown(void)
 void ControlPanel::Acquire(QString filePath)
 {
    QApplication::processEvents();
-   if(IFT != NULL)
-   {
-       IFT->AcquireData(filePath);
-   }
+   if(IFT != NULL) IFT->AcquireData(filePath);
+   if(TC != NULL) TC->AcquireData(filePath);
 }
 
 bool ControlPanel::isAcquiring(void)
 {
   QApplication::processEvents();
-  if(IFT != NULL) return(IFT->Acquiring);
+  if(IFT != NULL) return(IFT->AD->Acquiring);
+  if(TC != NULL) return(TC->AD->Acquiring);
   return(false);
 }
 
 void ControlPanel::DismissAcquire(void)
 {
   QApplication::processEvents();
-  if(IFT != NULL)  IFT->Dismiss();
+  if(IFT != NULL)  IFT->AD->Dismiss();
+  if(TC != NULL)  TC->AD->Dismiss();
   QApplication::processEvents();
   QApplication::processEvents();
 }
@@ -930,6 +1038,46 @@ QString ControlPanel::popupUserInput(QString title, QString message)
     if(!ok) text="";
     QApplication::processEvents();
     return text;
+}
+
+// This function is called with a command in the TCP server buffer.
+// This function will process this command.
+void ControlPanel::tcpCommand(void)
+{
+   int     i;
+   QStringList resList;
+   QString res;
+   QString cmd = tcp->readLine();
+
+   // Process global commands first.
+   // Load,Save,Shutdown,Restore
+   if(cmd.toUpper() == "SHUTDOWN") { ShutdownFlag = true; return; }
+   if(cmd.toUpper() == "RESTORE") { RestoreFlag = true; return; }
+   if(cmd.toUpper().startsWith("LOAD"))
+   {
+       resList = cmd.split(",");
+       if(resList.count()==2) Load(resList[1]);
+       return;
+   }
+   if(cmd.toUpper().startsWith("SAVE"))
+   {
+       resList = cmd.split(",");
+       if(resList.count()==2) Save(resList[1]);
+       return;
+   }
+   // Send the command string to all the controls for someone to process!
+   for(i=0;i<DACchans.count();i++)    if((res = DACchans[i]->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   for(i=0;i<ADCchans.count();i++)    if((res = ADCchans[i]->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   for(i=0;i<DCBchans.count();i++)    if((res = DCBchans[i]->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   for(i=0;i<RFchans.count();i++)     if((res = RFchans[i]->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   for(i=0;i<DCBoffsets.count();i++)  if((res = DCBoffsets[i]->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   for(i=0;i<DCBenables.count();i++)  if((res = DCBenables[i]->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   for(i=0;i<DIOchannels.count();i++) if((res = DIOchannels[i]->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   for(i=0;i<ESIchans.count();i++)    if((res = ESIchans[i]->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   for(i=0;i<ARBchans.count();i++)    if((res = ARBchans[i]->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   if(TC != NULL) if((res = TC->TG->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   if(comp != NULL) if((res = comp->ProcessCommand(cmd)) != "?") {tcp->sendMessage(res + "\n"); return;}
+   tcp->sendMessage("?\n");
 }
 
 
@@ -1027,10 +1175,10 @@ void SaveLoad::pbLoadPressed(void)
 }
 
 // *************************************************************************************************
-// RF driver channel  ******************************************************************************
+// DAC channels    *********************************************************************************
 // *************************************************************************************************
 
-RFchannel::RFchannel(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
+DACchannel::DACchannel(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
 {
     p      = parent;
     Title  = name;
@@ -1038,369 +1186,87 @@ RFchannel::RFchannel(QWidget *parent, QString name, QString MIPSname, int x, int
     X      = x;
     Y      = y;
     comms  = NULL;
-    isShutdown = false;
-    qApp->installEventFilter(this);
-    Updating = false;
-    UpdateOff = false;
+    Units = "V";
+    m = 1;
+    b = 0;
+    Format = "%.3f";
 }
 
-void RFchannel::Show(void)
+void DACchannel::Show(void)
 {
-    // Make a group box
-    gbRF = new QGroupBox(Title,p);
-    gbRF->setGeometry(X,Y,200,180);
-    gbRF->setToolTip(MIPSnm + " RF channel " + QString::number(Channel));
-    // Build and place the RF parameters group box
-    Drive = new QLineEdit(gbRF); Drive->setGeometry(60,22,91,21);  Drive->setValidator(new QDoubleValidator);
-    Freq = new QLineEdit(gbRF);  Freq->setGeometry(60,46,91,21);   Freq->setValidator(new QIntValidator);
-    RFP = new QLineEdit(gbRF);   RFP->setGeometry(60,70,91,21);    RFP->setReadOnly(true);
-    RFN = new QLineEdit(gbRF);   RFN->setGeometry(60,94,91,21);    RFN->setReadOnly(true);
-    Power = new QLineEdit(gbRF); Power->setGeometry(60,118,91,21); Power->setReadOnly(true);
-    // Place push buttons
-    Tune = new QPushButton("Tune",gbRF);     Tune->setGeometry(10,147,81,32);    Tune->setAutoDefault(false);
-    Retune = new QPushButton("Retune",gbRF); Retune->setGeometry(102,147,81,32); Retune->setAutoDefault(false);
-    // Add labels
-    labels[0] = new QLabel("Drive",gbRF); labels[0]->setGeometry(10,26,59,16);
-    labels[1] = new QLabel("Freq",gbRF);  labels[1]->setGeometry(10,48,59,16);
-    labels[2] = new QLabel("RF+",gbRF);   labels[2]->setGeometry(10,73,59,16);
-    labels[3] = new QLabel("RF-",gbRF);   labels[3]->setGeometry(10,96,59,16);
-    labels[4] = new QLabel("Power",gbRF); labels[4]->setGeometry(10,118,59,16);
-
-    labels[5] = new QLabel("%",gbRF);     labels[5]->setGeometry(159,26,31,21);
-    labels[6] = new QLabel("Hz",gbRF);    labels[6]->setGeometry(159,48,31,21);
-    labels[7] = new QLabel("Vp-p",gbRF);  labels[7]->setGeometry(159,73,31,21);
-    labels[8] = new QLabel("Vp-p",gbRF);  labels[8]->setGeometry(159,96,31,21);
-    labels[9] = new QLabel("W",gbRF);     labels[9]->setGeometry(159,118,31,21);
-    // Connect to the event slots
-    connect(Drive,SIGNAL(editingFinished()),this,SLOT(DriveChange()));
-    connect(Freq,SIGNAL(editingFinished()),this,SLOT(FreqChange()));
-    connect(Tune,SIGNAL(pressed()),this,SLOT(TunePressed()));
-    connect(Retune,SIGNAL(pressed()),this,SLOT(RetunePressed()));
+    frmDAC = new QFrame(p); frmDAC->setGeometry(X,Y,180,21);
+    Vdac = new QLineEdit(frmDAC); Vdac->setGeometry(70,0,70,21); Vdac->setValidator(new QDoubleValidator);
+    labels[0] = new QLabel(Title,frmDAC); labels[0]->setGeometry(0,0,59,16);
+    labels[1] = new QLabel(Units,frmDAC); labels[1]->setGeometry(150,0,31,16);
+    Vdac->setToolTip("DAC output CH" +  QString::number(Channel) + ", "  + MIPSnm);
+    connect(Vdac,SIGNAL(editingFinished()),this,SLOT(VdacChange()));
 }
 
-bool RFchannel::eventFilter(QObject *obj, QEvent *event)
-{
-    float delta = 0;
-
-    if (((obj == Drive) || (obj == Freq)) && (event->type() == QEvent::KeyPress))
-    {
-        if(Updating) return true;
-        UpdateOff = true;
-        QKeyEvent *key = static_cast<QKeyEvent *>(event);
-        if(key->key() == 16777235) delta = 0.1;
-        if(key->key() == 16777237) delta = -0.1;
-        if((QApplication::queryKeyboardModifiers() & 0x2000000) != 0) delta *= 10;
-        if((QApplication::queryKeyboardModifiers() & 0x8000000) != 0) delta *= 100;
-        if(delta != 0)
-        {
-           QString myString;
-           if(obj == Drive)
-           {
-               myString.sprintf("%3.2f", Drive->text().toFloat() + delta);
-               Drive->setText(myString);
-               Drive->setModified(true);
-               Drive->editingFinished();
-               UpdateOff = false;
-           }
-           if(obj == Freq)
-           {
-               myString.sprintf("%5.0f", Freq->text().toFloat() + delta*1000);
-               Freq->setText(myString);
-               Freq->setModified(true);
-               Freq->editingFinished();
-               UpdateOff = false;
-           }
-           return true;
-        }
-    }
-    UpdateOff = false;
-    return QObject::eventFilter(obj, event);
-}
-
-// Returns a string with the following information
-// Name,RFdrive,RFfreq,RFvolt+,RFvolt-,Power
-QString RFchannel::Report(void)
+QString DACchannel::Report(void)
 {
     QString res;
 
-    if(isShutdown) res = Title + "," + activeDrive;
-    else res = Title + "," + Drive->text();
-    res += "," + Freq->text() + "," + RFP->text() + "," + RFN->text() + "," + Power->text();
+    res = Title + "," + Vdac->text();
     return(res);
 }
 
-// Sets the RFchannel parameters if the name matches and we have atleast 3 total parms
-bool RFchannel::SetValues(QString strVals)
-{
-    QStringList resList;
-
-    if(!strVals.startsWith(Title)) return false;
-    resList = strVals.split(",");
-    if(resList.count() < 3) return false;
-    Freq->setText(resList[2]);
-    Freq->setModified(true);
-    Freq->editingFinished();
-    if(isShutdown)
-    {
-        activeDrive = resList[1];
-    }
-    else
-    {
-        Drive->setText(resList[1]);
-        Drive->setModified(true);
-        Drive->editingFinished();
-    }
-    return true;
- }
-
-void RFchannel::Update(void)
-{
-    QString res;
-
-    if(comms == NULL) return;
-    if(UpdateOff) return;
-    Updating = true;
-    comms->rb.clear();
-    res = "GRFDRV,"   + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
-    if(!Drive->hasFocus()) if(res != "") Drive->setText(res);
-    res = "GRFFRQ,"   + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
-    if(!Freq->hasFocus()) if(res != "") Freq->setText(res);
-    res = "GRFPPVP,"  + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
-    if(res != "") RFP->setText(res);
-    res = "GRFPPVN,"  + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
-    if(res != "") RFN->setText(res);
-    res = "GRFPWR,"   + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
-    if(res != "") Power->setText(res);
-    Updating = false;
-}
-
-void RFchannel::DriveChange(void)
-{
-    if(comms == NULL) return;
-    if(!Drive->isModified()) return;
-    QString res = "SRFDRV," + QString::number(Channel) + "," + Drive->text() + "\n";
-    comms->SendCommand(res.toStdString().c_str());
-    Drive->setModified(false);
-}
-
-void RFchannel::FreqChange(void)
-{
-    if(comms == NULL) return;
-    if(!Freq->isModified()) return;
-    QString res = "SRFFRQ," + QString::number(Channel) + "," + Freq->text() + "\n";
-    comms->SendCommand(res.toStdString().c_str());
-    Freq->setModified(false);
-}
-
-void RFchannel::TunePressed(void)
-{
-    QMessageBox msgBox;
-
-    Tune->setDown(false);
-    QString msg = "This function will tune the RF head attached to " + MIPSnm + " channel " + QString::number(Channel) + ". ";
-    msg += "Make sure the RF head is attached and connected to your system as needed. ";
-    msg += "This process can take up to 3 minutes.\n";
-    msgBox.setText(msg);
-    msgBox.setInformativeText("Are you sure you want to continue?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    int ret = msgBox.exec();
-    if(ret == QMessageBox::No) return;
-    QString res = "TUNERFCH," + QString::number(Channel) + "\n";
-    comms->SendCommand(res);
-}
-
-void RFchannel::RetunePressed(void)
-{
-    QMessageBox msgBox;
-
-    Retune->setDown(false);
-    QString msg = "This function will retune the RF head attached to " + MIPSnm + " channel " + QString::number(Channel) + ". ";
-    msg += "Make sure the RF head is attached and connected to your system as needed. ";
-    msg += "This process can take up to 1 minute.\n";
-    msgBox.setText(msg);
-    msgBox.setInformativeText("Are you sure you want to continue?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    int ret = msgBox.exec();
-    if(ret == QMessageBox::No) return;
-    QString res = "RETUNERFCH," + QString::number(Channel) + "\n";
-    comms->SendCommand(res);
-}
-
-void RFchannel::Shutdown(void)
-{
-    if(isShutdown) return;
-    isShutdown = true;
-    activeDrive = Drive->text();
-    Drive->setText("0");
-    Drive->setModified(true);
-    Drive->editingFinished();
-}
-
-void RFchannel::Restore(void)
-{
-    if(!isShutdown) return;
-    isShutdown = false;
-    Drive->setText(activeDrive);
-    Drive->setModified(true);
-    Drive->editingFinished();
-}
-
-// *************************************************************************************************
-// DC bias channel  ********************************************************************************
-// *************************************************************************************************
-
-DCBchannel::DCBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
-{
-    p      = parent;
-    Title  = name;
-    MIPSnm = MIPSname;
-    X      = x;
-    Y      = y;
-    comms  = NULL;
-    Updating = false;
-    UpdateOff = false;
-    qApp->installEventFilter(this);
-    DCBs.clear();
-    LinkEnable = false;
-    CurrentVsp = 0;
-}
-
-void DCBchannel::Show(void)
-{
-    frmDCB = new QFrame(p); frmDCB->setGeometry(X,Y,241,21);
-    Vsp = new QLineEdit(frmDCB); Vsp->setGeometry(70,0,70,21); Vsp->setValidator(new QDoubleValidator);
-    Vrb = new QLineEdit(frmDCB); Vrb->setGeometry(140,0,70,21); Vrb->setReadOnly(true);
-    labels[0] = new QLabel(Title,frmDCB); labels[0]->setGeometry(0,0,59,16);
-    labels[1] = new QLabel("V",frmDCB);   labels[1]->setGeometry(220,0,21,16);
-    connect(Vsp,SIGNAL(editingFinished()),this,SLOT(VspChange()));
-    Vsp->setToolTip(MIPSnm + " channel " + QString::number(Channel));
-}
-
-bool DCBchannel::eventFilter(QObject *obj, QEvent *event)
-{
-    float delta = 0;
-
-    if ((obj == Vsp) && (event->type() == QEvent::KeyPress))
-    {
-        if(Updating) return true;
-        UpdateOff = true;
-        QKeyEvent *key = static_cast<QKeyEvent *>(event);
-        if(key->key() == 16777235) delta = 0.1;
-        if(key->key() == 16777237) delta = -0.1;
-        if((QApplication::queryKeyboardModifiers() & 0x2000000) != 0) delta *= 10;
-        if((QApplication::queryKeyboardModifiers() & 0x8000000) != 0) delta *= 100;
-        if(delta != 0)
-        {
-           QString myString;
-           myString.sprintf("%3.2f", Vsp->text().toFloat() + delta);
-           Vsp->setText(myString);
-           Vsp->setModified(true);
-           Vsp->editingFinished();
-           UpdateOff = false;
-           return true;
-        }
-    }
-    UpdateOff = false;
-    return QObject::eventFilter(obj, event);
-}
-
-QString DCBchannel::Report(void)
-{
-    QString res;
-
-    res = Title + "," + Vsp->text() + "," + Vrb->text();
-    return(res);
-}
-
-bool DCBchannel::SetValues(QString strVals)
+bool DACchannel::SetValues(QString strVals)
 {
     QStringList resList;
 
     if(!strVals.startsWith(Title)) return false;
     resList = strVals.split(",");
     if(resList.count() < 2) return false;
-    Vsp->setText(resList[1]);
-    CurrentVsp = Vsp->text().toFloat();
-    Vsp->setModified(true);
-    Vsp->editingFinished();
+    Vdac->setText(resList[1]);
+    Vdac->setModified(true);
+    Vdac->editingFinished();
     return true;
- }
+}
 
-void DCBchannel::Update(void)
+// The following commands are processed:
+// title            return the offset value
+// title=val        sets the offset value
+// returns "?" if the command could not be processed
+QString DACchannel::ProcessCommand(QString cmd)
+{
+    if(!cmd.startsWith(Title)) return "?";
+    if(cmd == Title) return Vdac->text();
+    QStringList resList = cmd.split("=");
+    if(resList.count()==2)
+    {
+       Vdac->setText(resList[1]);
+       Vdac->setModified(true);
+       Vdac->editingFinished();
+       return "";
+    }
+    return "?";
+}
+
+// display = m*readValue + b
+void DACchannel::Update(void)
 {
     QString res;
 
     if(comms == NULL) return;
-    if(UpdateOff) return;
-    Updating = true;
     comms->rb.clear();
-    res = "GDCB,"  + QString::number(Channel) + "\n";
+    res = "GDACV,CH"  + QString::number(Channel) + "\n";
     res = comms->SendMess(res);
-    if(res == "")  // if true then the comms timed out
-    {
-        Updating = false;
-        return;
-    }
-    if(!Vsp->hasFocus()) Vsp->setText(res);
-    CurrentVsp = Vsp->text().toFloat();
-    res = "GDCBV," + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
-    if(res == "")  // if true then the comms timed out
-    {
-        Updating = false;
-        return;
-    }
-    Vrb->setText(res);
-    // Compare setpoint with readback and color the readback background
-    // depending on the difference.
-    // No data = white
-    if((Vsp->text()=="") | (Vrb->text()==""))
-    {
-        Vrb->setStyleSheet("QLineEdit { background: rgb(255, 255, 255); }" );
-        Updating = false;
-        return;
-    }
-    float error = fabs(Vsp->text().toFloat() - Vrb->text().toFloat());
-    if((error > 2.0) & (error > fabs(Vsp->text().toFloat()/100))) Vrb->setStyleSheet("QLineEdit { background: rgb(255, 204, 204); }" );
-    else Vrb->setStyleSheet("QLineEdit { background: rgb(204, 255, 204); }" );
-    //Vrb->setStyleSheet("QLineEdit { background: rgb(255, 204, 204); }" );  // light red
-    //Vrb->setStyleSheet("QLineEdit { background: rgb(255, 255, 204); }" );  // light yellow
-    //Vrb->setStyleSheet("QLineEdit { background: rgb(204, 255, 204); }" );  // light green
-    Updating = false;
+    if(res == "") return;
+    res.sprintf(Format.toStdString().c_str(),res.toFloat() * m + b);
+    if(!Vdac->hasFocus()) Vdac->setText(res);
 }
 
-void DCBchannel::VspChange(void)
+// writeValue = (display - b)/m
+void DACchannel::VdacChange(void)
 {
-   //if(comms == NULL) return;
-   if(!Vsp->isModified()) return;
-   QString res = "SDCB," + QString::number(Channel) + "," + Vsp->text() + "\n";
-   if(comms != NULL) comms->SendCommand(res.toStdString().c_str());
-   // If this channel is part of a group calculate the delta and apply to all
-   // other channels
-   if((LinkEnable) && (DCBs.count()>0) && (CurrentVsp != Vsp->text().toFloat()))
-   {
-       float delta = CurrentVsp - Vsp->text().toFloat();
-       foreach(DCBchannel * item, DCBs )
-       {
-           if(item != this)
-           {
-              item->CurrentVsp -= delta;
-              item->Vsp->setText(QString::number(item->CurrentVsp,'f',2));
-              item->CurrentVsp = item->Vsp->text().toFloat();
-              item->Vsp->setModified(true);
-              item->Vsp->editingFinished();
-           }
-       }
-   }
-   CurrentVsp = Vsp->text().toFloat();
-   Vsp->setModified(false);
+   QString val;
+
+   if(comms == NULL) return;
+   if(!Vdac->isModified()) return;
+   val.sprintf("%.3f",(Vdac->text().toFloat() - b)/m);
+   QString res = "SDACV,CH" + QString::number(Channel) + "," + val + "\n";
+   comms->SendCommand(res.toStdString().c_str());
+   Vdac->setModified(false);
 }
 
 // *************************************************************************************************
@@ -1482,242 +1348,6 @@ bool DCbiasGroupsEventFilter::eventFilter(QObject *obj, QEvent *event)
     return QObject::eventFilter(obj, event);
 }
 
-// *************************************************************************************************
-// DC bias offset  *********************************************************************************
-// *************************************************************************************************
-
-DCBoffset::DCBoffset(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
-{
-    p      = parent;
-    Title  = name;
-    MIPSnm = MIPSname;
-    X      = x;
-    Y      = y;
-    comms  = NULL;
-}
-
-void DCBoffset::Show(void)
-{
-    frmDCBO = new QFrame(p); frmDCBO->setGeometry(X,Y,170,21);
-    Voff = new QLineEdit(frmDCBO); Voff->setGeometry(70,0,70,21); Voff->setValidator(new QDoubleValidator);
-    labels[0] = new QLabel(Title,frmDCBO); labels[0]->setGeometry(0,0,59,16);
-    labels[1] = new QLabel("V",frmDCBO);   labels[1]->setGeometry(150,0,21,16);
-    Voff->setToolTip("Offset/range control " + MIPSnm);
-    connect(Voff,SIGNAL(editingFinished()),this,SLOT(VoffChange()));
-}
-
-QString DCBoffset::Report(void)
-{
-    QString res;
-
-    res = Title + "," + Voff->text();
-    return(res);
-}
-
-bool DCBoffset::SetValues(QString strVals)
-{
-    QStringList resList;
-
-    if(!strVals.startsWith(Title)) return false;
-    resList = strVals.split(",");
-    if(resList.count() < 2) return false;
-    Voff->setText(resList[1]);
-    Voff->setModified(true);
-    Voff->editingFinished();
-    return true;
- }
-
-void DCBoffset::Update(void)
-{
-    QString res;
-
-    if(comms == NULL) return;
-    comms->rb.clear();
-    res = "GDCBOF,"  + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
-    if(res == "") return;
-    if(!Voff->hasFocus()) Voff->setText(res);
-}
-
-void DCBoffset::VoffChange(void)
-{
-   if(comms == NULL) return;
-   if(!Voff->isModified()) return;
-   QString res = "SDCBOF," + QString::number(Channel) + "," + Voff->text() + "\n";
-   comms->SendCommand(res.toStdString().c_str());
-   Voff->setModified(false);
-}
-
-// *************************************************************************************************
-// DC bias enable  *********************************************************************************
-// *************************************************************************************************
-
-DCBenable::DCBenable(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
-{
-    p      = parent;
-    Title  = name;
-    MIPSnm = MIPSname;
-    X      = x;
-    Y      = y;
-    comms  = NULL;
-    isShutdown = false;
-}
-
-void DCBenable::Show(void)
-{
-    frmDCBena = new QFrame(p); frmDCBena->setGeometry(X,Y,170,21);
-    DCBena = new QCheckBox(frmDCBena); DCBena->setGeometry(0,0,170,21);
-    DCBena->setText(Title);
-    DCBena->setToolTip("Enables all DC bias channels on " + MIPSnm);
-    connect(DCBena,SIGNAL(stateChanged(int)),this,SLOT(DCBenaChange()));
-}
-
-QString DCBenable::Report(void)
-{
-    QString res;
-
-    res = Title + ",";
-    if(isShutdown)
-    {
-        if(activeEnableState) res += "ON";
-        else res += "OFF";
-    }
-    else
-    {
-        if(DCBena->isChecked()) res += "ON";
-        else res += "OFF";
-    }
-    return(res);
-}
-
-bool DCBenable::SetValues(QString strVals)
-{
-    QStringList resList;
-
-    if(!strVals.startsWith(Title)) return false;
-    resList = strVals.split(",");
-    if(resList.count() < 2) return false;
-    if(isShutdown)
-    {
-        if(resList[1].contains("ON")) activeEnableState = true;
-        else activeEnableState = false;
-        return true;
-    }
-    if(resList[1].contains("ON")) DCBena->setChecked(true);
-    else DCBena->setChecked(false);
-    if(resList[1].contains("ON")) DCBena->stateChanged(1);
-    else  DCBena->stateChanged(0);
-    return true;
- }
-
-void DCBenable::Update(void)
-{
-    QString res;
-
-    if(comms == NULL) return;
-    comms->rb.clear();
-    res = comms->SendMess("GDCPWR\n");
-    if(res.contains("ON")) DCBena->setChecked(true);
-    if(res.contains("OFF")) DCBena->setChecked(false);
-}
-
-void DCBenable::DCBenaChange(void)
-{
-   QString res;
-
-   if(comms == NULL) return;
-   if(DCBena->checkState()) res ="SDCPWR,ON\n";
-   else res ="SDCPWR,OFF\n";
-   comms->SendCommand(res.toStdString().c_str());
-}
-
-void DCBenable::Shutdown(void)
-{
-    if(isShutdown) return;
-    isShutdown = true;
-    activeEnableState = DCBena->checkState();
-    DCBena->setChecked(false);
-    DCBena->stateChanged(0);
-}
-
-void DCBenable::Restore(void)
-{
-    if(!isShutdown) return;
-    isShutdown = false;
-    DCBena->setChecked(activeEnableState);
-    DCBena->stateChanged(0);
-}
-
-// *************************************************************************************************
-// DIO  ********************************************************************************************
-// *************************************************************************************************
-
-DIOchannel::DIOchannel(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
-{
-    p      = parent;
-    Title  = name;
-    MIPSnm = MIPSname;
-    X      = x;
-    Y      = y;
-    Channel = "A";
-    comms  = NULL;
-}
-
-void DIOchannel::Show(void)
-{
-    frmDIO = new QFrame(p); frmDIO->setGeometry(X,Y,170,21);
-    DIO = new QCheckBox(frmDIO); DIO->setGeometry(0,0,170,21);
-    DIO->setText(Title);
-    DIO->setToolTip(MIPSnm + " DIO channel " + Channel);
-    connect(DIO,SIGNAL(stateChanged(int)),this,SLOT(DIOChange()));
-}
-
-QString DIOchannel::Report(void)
-{
-    QString res;
-
-    res = Title + ",";
-    if(DIO->isChecked()) res += "1";
-    else res += "0";
-    return(res);
-}
-
-bool DIOchannel::SetValues(QString strVals)
-{
-    QStringList resList;
-
-    if(!strVals.startsWith(Title)) return false;
-    resList = strVals.split(",");
-    if(resList.count() < 2) return false;
-    if(resList[1].contains("1")) DIO->setChecked(true);
-    else DIO->setChecked(false);
-    if(resList[1].contains("1")) DIO->stateChanged(1);
-    else DIO->stateChanged(0);
-    return true;
- }
-
-void DIOchannel::Update(void)
-{
-    QString res;
-
-    if(comms == NULL) return;
-    comms->rb.clear();
-    res = comms->SendMess("GDIO," + Channel + "\n");
-    if(res.contains("1")) DIO->setChecked(true);
-    if(res.contains("0")) DIO->setChecked(false);
-}
-
-void DIOchannel::DIOChange(void)
-{
-   QString res;
-
-   if(comms == NULL) return;
-   if(DIO->checkState()) res ="SDIO," + Channel + ",1\n";
-   else  res ="SDIO," + Channel + ",0\n";
-   comms->SendCommand(res.toStdString().c_str());
-}
-
-
 // **********************************************************************************************
 // ESI ******************************************************************************************
 // **********************************************************************************************
@@ -1789,7 +1419,45 @@ bool ESI::SetValues(QString strVals)
     ESIsp->setModified(true);
     ESIsp->editingFinished();
     return true;
- }
+}
+
+// title        setpoint
+// title=val    setpoint
+// title.readback
+// title.ena
+// title.ena= ON or OFF
+QString ESI::ProcessCommand(QString cmd)
+{
+    if(!cmd.startsWith(Title)) return "?";
+    if(cmd == Title) return ESIsp->text();
+    if(cmd == Title + ".readback") return ESIrb->text();
+    if(cmd == Title + ".ena")
+    {
+        if(ESIena->isChecked()) return "ON";
+        return "OFF";
+    }
+    QStringList resList = cmd.split("=");
+    if(resList.count()==2)
+    {
+       if(resList[0] == Title)
+       {
+           ESIsp->setText(resList[1]);
+           ESIsp->setModified(true);
+           ESIsp->editingFinished();
+           return "";
+       }
+       if(resList[0] == Title + ".ena")
+       {
+           if(resList[1] == "ON") ESIena->setChecked(true);
+           else if(resList[1] == "OFF") ESIena->setChecked(false);
+           else return "?";
+           if(resList[1] == "ON") ESIena->stateChanged(1);
+           else  ESIena->stateChanged(0);
+           return "";
+       }
+    }
+    return "?";
+}
 
 void ESI::Update(void)
 {
@@ -1845,620 +1513,4 @@ void ESI::Restore(void)
     isShutdown = false;
     ESIena->setChecked(activeEnableState);
     ESIena->stateChanged(0);
-}
-
-// **********************************************************************************************
-// ARB ******************************************************************************************
-// **********************************************************************************************
-
-ARBchannel::ARBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
-{
-    p      = parent;
-    Title  = name;
-    MIPSnm = MIPSname;
-    X      = x;
-    Y      = y;
-    comms  = NULL;
-    statusBar = NULL;
-}
-
-void ARBchannel::Show(void)
-{
-    // Make a group box
-    gbARB = new QGroupBox(Title,p);
-    gbARB->setGeometry(X,Y,250,200);
-    gbARB->setToolTip(MIPSnm + " ARB channel " + QString::number(Channel));
-    // Place the controls on the group box
-    leSWFREQ = new QLineEdit(gbARB);   leSWFREQ->setGeometry(100,22,91,21);  leSWFREQ->setValidator(new QIntValidator);
-    leSWFVRNG = new QLineEdit(gbARB);  leSWFVRNG->setGeometry(100,46,91,21); leSWFVRNG->setValidator(new QDoubleValidator);
-    leSWFVAUX = new QLineEdit(gbARB);  leSWFVAUX->setGeometry(100,70,91,21); leSWFVAUX->setValidator(new QDoubleValidator);
-    leSWFVOFF = new QLineEdit(gbARB);  leSWFVOFF->setGeometry(100,94,91,21); leSWFVOFF->setValidator(new QDoubleValidator);
-    Waveform = new QComboBox(gbARB); Waveform->setGeometry(100,118,91,21);
-    Waveform->clear();
-    Waveform->addItem("SIN","SIN");
-    Waveform->addItem("RAMP","RAMP");
-    Waveform->addItem("TRI","TRI");
-    Waveform->addItem("PULSE","PULSE");
-    Waveform->addItem("ARB","ARB");
-    EditWaveform = new QPushButton("Edit",gbARB); EditWaveform->setGeometry(100,142,91,30); EditWaveform->setAutoDefault(false);
-    SWFDIR_FWD = new QRadioButton("Forward",gbARB);  SWFDIR_FWD->setGeometry(20,166,91,21);
-    SWFDIR_REV = new QRadioButton("Reverse",gbARB);  SWFDIR_REV->setGeometry(150,166,91,21);
-    // Add labels
-    labels[0] = new QLabel("Frequency",gbARB);     labels[0]->setGeometry(10,26,80,16);
-    labels[1] = new QLabel("Amplitude",gbARB);     labels[1]->setGeometry(10,48,80,16);
-    labels[2] = new QLabel("Aux output",gbARB);    labels[2]->setGeometry(10,73,80,16);
-    labels[3] = new QLabel("Offset output",gbARB); labels[3]->setGeometry(10,96,80,16);
-    labels[4] = new QLabel("Waveform",gbARB);      labels[4]->setGeometry(10,118,80,16);
-    labels[5] = new QLabel("Hz",gbARB);   labels[5]->setGeometry(200,26,31,21);
-    labels[6] = new QLabel("Vp-p",gbARB); labels[6]->setGeometry(200,48,31,21);
-    labels[7] = new QLabel("V",gbARB);    labels[7]->setGeometry(200,73,31,21);
-    labels[8] = new QLabel("V",gbARB);    labels[8]->setGeometry(200,96,31,21);
-    // Connect to the event slots
-    leSWFREQ->setObjectName("leSWFREQ");
-    leSWFVRNG->setObjectName("leSWFVRNG");
-    leSWFVAUX->setObjectName("leSWFVAUX");
-    leSWFVOFF->setObjectName("leSWFVOFF");
-    SWFDIR_FWD->setObjectName("SWFDIR_FWD");
-    SWFDIR_REV->setObjectName("SWFDIR_REV");
-    foreach(QObject *w, gbARB->children())
-    {
-       if(w->objectName().startsWith("le")) connect(((QLineEdit *)w),SIGNAL(editingFinished()),this,SLOT(leChange()));
-    }
-    connect(Waveform,SIGNAL(currentIndexChanged(int)),this,SLOT(wfChange()));
-    connect(EditWaveform,SIGNAL(pressed()),this,SLOT(wfEdit()));
-    connect(SWFDIR_FWD,SIGNAL(clicked(bool)),this,SLOT(rbChange()));
-    connect(SWFDIR_REV,SIGNAL(clicked(bool)),this,SLOT(rbChange()));
-}
-
-QString ARBchannel::Report(void)
-{
-    QString res;
-
-    res = Title + ",";
-    res += leSWFREQ->text() + ",";
-    res += leSWFVRNG->text() + ",";
-    res += leSWFVAUX->text() + ",";
-    res += leSWFVOFF->text() + ",";
-    if(SWFDIR_FWD->isChecked()) res += "FWD,";
-    else res += "REV,";
-    res += Waveform->currentText();
-    return res;
-}
-
-bool ARBchannel::SetValues(QString strVals)
-{
-    QStringList resList;
-
-    if(!strVals.startsWith(Title)) return false;
-    resList = strVals.split(",");
-    if(resList.count() < 7) return false;
-    leSWFREQ->setText(resList[1]);   leSWFREQ->setModified(true); leSWFREQ->editingFinished();
-    leSWFVRNG->setText(resList[2]);  leSWFVRNG->setModified(true); leSWFVRNG->editingFinished();
-    leSWFVAUX->setText(resList[3]);  leSWFVAUX->setModified(true); leSWFVAUX->editingFinished();
-    leSWFVOFF->setText(resList[4]);  leSWFVOFF->setModified(true); leSWFVOFF->editingFinished();
-    if(resList[5] == "ON")
-    {
-        SWFDIR_FWD->setChecked(true);
-        SWFDIR_FWD->clicked(true);
-    }
-    else
-    {
-        SWFDIR_REV->setChecked(true);
-        SWFDIR_REV->clicked(true);
-    }
-    int i = Waveform->findData(resList[6]);
-    Waveform->setCurrentIndex(i);
-    Waveform->currentIndexChanged(i);
-    return true;
-}
-
-void ARBchannel::Update(void)
-{
-    QString res;
-
-    if(comms==NULL) return;
-    comms->rb.clear();
-    // Update the line edit boxes
-    foreach(QObject *w, gbARB->children())
-    {
-       if(w->objectName().startsWith("le"))
-       {
-           res = comms->SendMess("G" + w->objectName().mid(3) + "," + QString::number(Channel) + "\n");
-           if(!((QLineEdit *)w)->hasFocus()) if(res != "") ((QLineEdit *)w)->setText(res);
-       }
-    }
-    // Update the waveform selection box
-    res = comms->SendMess("GWFTYP," + QString::number(Channel) + "\n");
-    if(res != "")
-    {
-       int i = Waveform->findData(res);
-       Waveform->setCurrentIndex(i);
-    }
-    // Update the dirction radio buttons
-    res = comms->SendMess("GWFDIR," + QString::number(Channel) +"\n");
-    if(res == "FWD") SWFDIR_FWD->setChecked(true);
-    if(res == "REV") SWFDIR_REV->setChecked(true);
-}
-
-void ARBchannel::leChange(void)
-{
-    QObject* obj = sender();
-    QString res;
-
-    if(comms == NULL) return;
-    if(!((QLineEdit *)obj)->isModified()) return;
-    res = obj->objectName().mid(2) +"," + QString::number(Channel);
-    res += "," + ((QLineEdit *)obj)->text() + "\n";
-    comms->SendCommand(res.toStdString().c_str());
-    ((QLineEdit *)obj)->setModified(false);
-}
-
-void ARBchannel::rbChange(void)
-{
-    QString res = "SWFDIR,";
-
-    if(comms == NULL) return;
-    if(SWFDIR_FWD->isChecked()) res += QString::number(Channel) + ",FWD\n";
-    if(SWFDIR_REV->isChecked()) res += QString::number(Channel) + ",REV\n";
-    comms->SendCommand("SWFDIR,1,FWD\n");
-}
-
-void ARBchannel::wfChange(void)
-{
-    if(comms == NULL) return;
-    comms->SendCommand("SWFTYP," + QString::number(Channel) + "," + Waveform->currentText() + "\n");
-}
-
-void ARBchannel::ReadWaveform(void)
-{
-    int Wform[32];
-    QString cmd;
-    int i;
-
-    // Read waveform
-    ARBwfEdit->GetWaveform(Wform);
-    // Send waveform to MIPS
-    cmd = "SWFARB,"  + Waveform->currentText();
-    for(i=0; i<32; i++) cmd += "," + QString::number(Wform[i]);
-    cmd += "\n";
-    if(comms == NULL) return;
-    if(!comms->SendCommand(cmd))
-    {
-        if(statusBar != NULL) statusBar->showMessage("Error sending waveform to MIPS",2000);
-    }
-}
-
-void ARBchannel::wfEdit(void)
-{
-    QString res;
-    int Wform[32];
-    int i;
-
-    for(i=0; i<32; i++) Wform[i] = i*4 - 64;
-    // Read the ARB waveform from MIPS
-    if(comms != NULL) res = comms->SendMess("GWFARB," + Waveform->currentText() + "\n");
-    if(res.contains("?"))
-    {
-        // Here if the message was NAKed
-        if(statusBar != NULL) statusBar->showMessage("Error reading waveform from MIPS",2000);
-        return;
-    }
-    QStringList Vals = res.split(",");
-    for(i=0; i<32; i++)
-    {
-        if(i < Vals.count()) Wform[i] = Vals[i].toInt();
-        else Wform[i] = 0;
-    }
-    ARBwfEdit = new ARBwaveformEdit;
-    connect(ARBwfEdit, SIGNAL(WaveformReady()), this, SLOT(ReadWaveform()));
-    ARBwfEdit->SetWaveform(Wform);
-    ARBwfEdit->show();
-}
-
-// **********************************************************************************************
-// IFT timing generation ************************************************************************
-// **********************************************************************************************
-IFTtiming::IFTtiming(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
-{
-    p      = parent;
-    Title  = name;
-    MIPSnm = MIPSname;
-    X      = x;
-    Y      = y;
-    comms  = NULL;
-    Enable = "";
-    Acquire = "";
-    Grid1 = Grid3 = Grid2 = NULL;
-    statusBar = NULL;
-    Acquiring = false;
-}
-
-void IFTtiming::Show(void)
-{
-    // Make a group box
-    gbIFT = new QGroupBox(Title,p);
-    gbIFT->setGeometry(X,Y,500,180);
-    gbIFT->setToolTip(MIPSnm + " IFT timing generation");
-    // Place the controls on the group box
-    leFillTime = new QLineEdit(gbIFT);    leFillTime->setGeometry(95,25,51,21);   leFillTime->setValidator(new QIntValidator); leFillTime->setText("50");
-    leTrapTime = new QLineEdit(gbIFT);    leTrapTime->setGeometry(95,50,51,21);   leTrapTime->setValidator(new QIntValidator); leTrapTime->setText("10");
-    leReleaseTime = new QLineEdit(gbIFT); leReleaseTime->setGeometry(95,75,51,21);leReleaseTime->setValidator(new QIntValidator); leReleaseTime->setText("5");
-    leGrid1FillV = new QLineEdit(gbIFT);  leGrid1FillV->setGeometry(250,25,51,21); leGrid1FillV->setValidator(new QDoubleValidator); leGrid1FillV->setText("20");
-    leGrid2ReleaseV = new QLineEdit(gbIFT);  leGrid2ReleaseV->setGeometry(250,50,51,21); leGrid2ReleaseV->setValidator(new QDoubleValidator); leGrid2ReleaseV->setText("30");
-    leGrid3ReleaseV = new QLineEdit(gbIFT);  leGrid3ReleaseV->setGeometry(250,75,51,21); leGrid3ReleaseV->setValidator(new QDoubleValidator); leGrid3ReleaseV->setText("40");
-    FrameSize = new QLineEdit(gbIFT);  FrameSize->setGeometry(405,25,51,21); FrameSize->setValidator(new QIntValidator); FrameSize->setText("1000");
-    Accumulations = new QLineEdit(gbIFT); Accumulations->setGeometry(405,47,51,21); Accumulations->setValidator(new QIntValidator); Accumulations->setText("10");
-    Table = new QLineEdit(gbIFT); Table->setGeometry(50,150,441,21);
-    ClockSource = new QComboBox(gbIFT); ClockSource->setGeometry(400,69,100,21);
-    ClockSource->clear();
-    ClockSource->addItem("Ext","Ext");
-    ClockSource->addItem("ExtN","ExtN");
-    ClockSource->addItem("ExtS","ExtS");
-    ClockSource->addItem("42000000","42000000");
-    ClockSource->addItem("10500000","10500000");
-    ClockSource->addItem("2625000","2625000");
-    ClockSource->addItem("656250","656250");
-    TriggerSource = new QComboBox(gbIFT); TriggerSource->setGeometry(400,91,100,21);
-    TriggerSource->clear();
-    TriggerSource->addItem("Software","Software");
-    TriggerSource->addItem("Edge","Edge");
-    TriggerSource->addItem("Pos","Pos");
-    TriggerSource->addItem("Neg","Neg");
-    GenerateTable = new QPushButton("Generate",gbIFT); GenerateTable->setGeometry(30,118,113,32); GenerateTable->setAutoDefault(false);
-    Download = new QPushButton("Download",gbIFT);  Download->setGeometry(140,118,113,32); Download->setAutoDefault(false);
-    Trigger = new QPushButton("Trigger",gbIFT);  Trigger->setGeometry(250,118,113,32); Trigger->setAutoDefault(false);
-    Abort = new QPushButton("Abort",gbIFT);  Abort->setGeometry(360,118,113,32); Abort->setAutoDefault(false);
-    // Add labels
-    labels[0] = new QLabel("Fill time",gbIFT);       labels[0]->setGeometry(10,25,81,16);
-    labels[1] = new QLabel("Trap time",gbIFT);       labels[1]->setGeometry(10,50,81,16);
-    labels[2] = new QLabel("Release time",gbIFT);    labels[2]->setGeometry(10,75,81,16);
-    labels[3] = new QLabel("Grid1 fill V",gbIFT);    labels[3]->setGeometry(160,25,80,16);
-    labels[4] = new QLabel("Grid2 rel V",gbIFT);     labels[4]->setGeometry(160,50,80,16);
-    labels[5] = new QLabel("Grid3 rel V",gbIFT);     labels[5]->setGeometry(160,75,80,16);
-    labels[6] = new QLabel("Frame length",gbIFT);    labels[6]->setGeometry(310,25,91,16);
-    labels[7] = new QLabel("Accumulations",gbIFT);   labels[7]->setGeometry(310,47,91,16);
-    labels[8] = new QLabel("Clock source",gbIFT);    labels[8]->setGeometry(310,69,91,16);
-    labels[9] = new QLabel("Trigger source",gbIFT);  labels[9]->setGeometry(310,91,91,16);
-    labels[10] =new QLabel("Table",gbIFT);           labels[10]->setGeometry(10,150,59,16);
-    // Connect to the event slots
-    connect(GenerateTable,SIGNAL(pressed()),this,SLOT(pbGenerate()));
-    connect(Download,SIGNAL(pressed()),this,SLOT(pbDownload()));
-    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()));
-    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()));
-    connect(leFillTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
-    connect(leTrapTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
-    connect(leReleaseTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
-    connect(leGrid1FillV,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
-    connect(leGrid2ReleaseV,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
-    connect(leGrid3ReleaseV,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
-    connect(FrameSize,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
-    connect(Accumulations,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
-    TableDownloaded = false;
-    Table->raise();
-}
-
-// Generate table for IFT.
-//
-// 0:[A:accumulations],
-void IFTtiming::pbGenerate(void)
-{
-    QString table,msg;
-    QString Grid1V, Grid2V, Grid3V;
-    QMessageBox msgBox;
-    int     cclock = 0;
-
-    // Load the resting grid voltages from the setting, set to null if the grid is not defined
-    Grid1V = "";
-    if(Grid1 != NULL)
-    {
-        if(Grid1->Vsp->text().contains("?")) Grid1V = "0";
-        else if(Grid1->Vsp->text()=="") Grid1V = "0";
-        else Grid1V = Grid1->Vsp->text();
-    }
-    Grid2V = "";
-    if(Grid2 != NULL)
-    {
-        if(Grid2->Vsp->text().contains("?")) Grid2V = "0";
-        else if(Grid2->Vsp->text()=="") Grid2V = "0";
-        else Grid2V = Grid2->Vsp->text();
-    }
-    Grid3V = "";
-    if(Grid3 != NULL)
-    {
-        if(Grid3->Vsp->text().contains("?")) Grid3V = "0";
-        else if(Grid3->Vsp->text()=="") Grid3V = "0";
-        else Grid3V = Grid3->Vsp->text();
-    }
-    if((Grid2 == NULL) && (Grid3 == NULL))
-    {
-        msg =  "You must define Grid 2 or Grid 3 in the configuration file to use";
-        msg += "the IFT function!";
-        msgBox.setText(msg);
-        msgBox.setInformativeText("");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.exec();
-    }
-    // Build the table
-    table =  "STBLDAT;0:[A:" + QString::number(Accumulations->text().toInt() + 1) + ",";
-    // Add fill time if grid 1 is defined and fill time is > 0
-    if((Grid1 != NULL) && (leFillTime->text().toInt() > 0))
-    {
-        table += QString::number(cclock) + ":" + QString::number(Grid1->Channel) + ":" + leGrid1FillV->text() + ",";
-        cclock += leFillTime->text().toInt();
-    }
-    // If trap time is > 0 then lower grid 1 and wait
-    if(leTrapTime->text().toInt() > 0)
-    {
-        if(Grid1V != "") table += QString::number(cclock) + ":" + QString::number(Grid1->Channel) + ":" + Grid1V + ",";
-        cclock += leTrapTime->text().toInt();
-    }
-    table += QString::number(cclock);
-    if(Grid1V != "") table += ":" + QString::number(Grid1->Channel) + ":" + Grid1V;
-    if(Grid2 != NULL) table += ":" + QString::number(Grid2->Channel) + ":" + leGrid2ReleaseV->text();
-    if(Grid3 != NULL)table += ":" + QString::number(Grid3->Channel) + ":" + leGrid3ReleaseV->text();
-    if(Enable != "") table += ":" + Enable + ":1";
-    table += "," + QString::number(cclock + leReleaseTime->text().toInt());
-    if(Grid2 != NULL) table += ":" + QString::number(Grid2->Channel) + ":" + Grid2V;
-    if(Grid3 != NULL) table += ":" + QString::number(Grid3->Channel) + ":" + Grid3V;
-    cclock += FrameSize->text().toInt();
-    table += "," + QString::number(cclock) + ":" + Enable + ":0];";
-    Table->setText(table);
-}
-
-// Download table parameters to MIPS
-void IFTtiming::pbDownload(void)
-{
-   if(comms == NULL) return;
-   comms->SendCommand("SMOD,LOC\n");        // Make sure the system is in local mode
-   comms->SendCommand("STBLREPLY,FALSE\n"); // Turn off any table messages from MIPS
-   // Make sure a table has been generated
-   if(Table->text() == "")
-   {
-       QMessageBox msgBox;
-       msgBox.setText("There is no Pulse Sequence to download to MIPS!");
-       msgBox.exec();
-       return;
-   }
-   // Set clock
-   comms->SendCommand("STBLCLK," + ClockSource->currentText().toUpper() + "\n");
-   // Set trigger
-   QString res = TriggerSource->currentText().toUpper();
-   if(res == "SOFTWARE") res = "SW";
-   comms->SendCommand("STBLTRG," + res + "\n");
-   // Send table
-   comms->SendCommand(Table->text());
-   // Put system in table mode
-//   if(comms->SendCommand("SMOD,TBL\n"))
-//   {
-//       if(statusBar != NULL) statusBar->showMessage("System mode changed to Table.", 5000);
-       // We should now receive a table ready for trigger command so wait for it
-//       comms->waitforline(1000);
-//       while(comms->rb.numLines() > 0)
-//       {
-//           if(statusBar != NULL) statusBar->showMessage(comms->getline(),5000);
-//       }
-//   }
-//   else if(statusBar != NULL) statusBar->showMessage("System mode change to Table rejected!", 5000);
-   TableDownloaded = true;
-}
-
-void IFTtiming::slotAppFinished(void)
-{
-   // Send a signal that the data collection has finished.
-   emit dataAcquired(filePath);
-   Acquiring = false;
-   if(comms == NULL) return;
-   comms->SendCommand("SMOD,LOC\n");
-   if(statusBar != NULL) statusBar->showMessage("Acquire app finished, returning to local mode.", 5000);
-}
-
-void IFTtiming::AppReady(void)
-{
-    if(comms == NULL) return;
-    // Send table start command
-    if(comms->SendCommand("TBLSTRT\n")) if(statusBar != NULL) statusBar->showMessage("Table trigger command accepted!", 5000);
-    else if(statusBar != NULL) statusBar->showMessage("Table trigger command rejected!", 5000);
-}
-
-void IFTtiming::pbTrigger(void)
-{
-    AcquireData("");
-}
-
-void IFTtiming::AcquireData(QString path)
-{
-    // If the Acquire string is defined then we call the program defined
-    // by The Acquire string. The program is called with optional arguments
-    // as follows:
-    // - Filename, this will result in a dialog box to appear
-    //             allowing the user to select a filename to hold
-    //             the data
-    // - TOFscans, passes the total number of tof scans to acquire, this is
-    //             the product of Frame size and accumulations
-    // The acquire ap is expected to return "Ready" when ready to accept a trigger.
-    filePath = "";
-    // Make sure the system is in table mode
-    if(comms != NULL) if(comms->SendCommand("SMOD,TBL\n"))
-    {
-        if(!TableDownloaded)
-        {
-            QString msg = "Pulse sequence table has not been downloaded to MIPS!";
-            QMessageBox msgBox;
-            msgBox.setText(msg);
-            msgBox.setInformativeText("");
-            msgBox.setStandardButtons(QMessageBox::Ok);
-            msgBox.exec();
-            return;
-        }
-        if(statusBar != NULL) statusBar->showMessage("System mode changed to Table.", 5000);
-        // We should now receive a table ready for trigger command so wait for it
-//        comms->waitforline(1000);
-//        while(comms->rb.numLines() > 0)
-//        {
-//            if(statusBar != NULL) statusBar->showMessage(comms->getline(),5000);
-//        }
-    }
-    if(Acquire != "")
-    {
-        QString cmd = "";
-        QStringList resList = Acquire.split(",");
-        cmd = Acquire;
-        for(int i=0;i<resList.count();i++)
-        {
-            if(i==0) cmd = resList[0];
-            if(resList[i].toUpper() == "TOFSCANS")
-            {
-                cmd += " -S" + QString::number(FrameSize->text().toInt() * Accumulations->text().toInt());
-            }
-            if(resList[i].toUpper() == "FILENAME")
-            {
-                CDirSelectionDlg *cds = new CDirSelectionDlg(QDir::currentPath());
-                cds->setTitle("Select/enter folder to save data files");
-                while(path == "")
-                {
-                    if(cds->exec() != 0)
-                    {
-                        QString selectedPath = cds->selectedPath();
-                        // See if the directory is present
-                        if(QDir(selectedPath).exists())
-                        {
-                            QString msg = "Selected folder exists, please define a unique folder to save data files.";
-                            QMessageBox msgBox;
-                            msgBox.setText(msg);
-                            msgBox.setInformativeText("");
-                            msgBox.setStandardButtons(QMessageBox::Ok);
-                            msgBox.exec();
-                        }
-                        else
-                        {
-                            filePath = selectedPath;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                       if(comms != NULL) comms->SendCommand("SMOD,LOC\n"); // Return to local mode
-                       return;
-                    }
-                }
-                // Create the folder and define the data storage path and file
-                if(path != "")
-                {
-                    filePath = MakePathUnique(path);
-                }
-                QDir().mkdir(filePath);
-                QDir().setCurrent(filePath);
-                cmd += " " + filePath + "/" + "U1084A.data";
-            }
-        }
-        cla = new cmdlineapp();
-        cla->appPath = cmd;
-        cla->show();
-        cla->ReadyMessage = "Ready";
-        cla->InputRequest = "? Y/N :";
-        if(filePath != "") cla->fileName = filePath + "/Acquire.data";
-        connect(cla,SIGNAL(Ready()),this,SLOT(AppReady()));
-        connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()));
-        cla->Execute();
-        Acquiring = true;
-    }
-    else
-    {
-        if(comms == NULL) return;
-        // Send table start command
-        if(comms->SendCommand("TBLSTRT\n")) if(statusBar != NULL) statusBar->showMessage("Table trigger command accepted!", 5000);
-        else if(statusBar != NULL) statusBar->showMessage("Table trigger command rejected!", 5000);
-    }
-}
-
-QString IFTtiming::MakePathUnique(QString path)
-{
-    int i, num;
-
-    // Check if path exists, if it does then see if it ends in a number, if
-    // it does then increment this number, if it does not append -0001 to the
-    // name
-    while(true)
-    {
-       if(QDir(path).exists())
-       {
-           for(i=0;i<path.length();i++) if(!path[path.length()-1-i].isDigit()) break;
-           if(i == 0) path += "-0001";
-           else
-           {
-               num = path.right(i).toInt();
-               num++;
-               path = path.left(path.length()-i) += QString("%1").arg(num,4,10,QLatin1Char('0'));
-           }
-       }
-       else break;
-    }
-    // At this point path is unique
-    return path;
-}
-
-// The function sends the table about command to MIPS. Returns ACK if ok, else returns NAK.
-void IFTtiming::pbAbort(void)
-{
-    if(comms == NULL) return;
-    // Send table abort command
-    if(comms->SendCommand("TBLABRT\n")) if(statusBar != NULL) statusBar->showMessage("Table mode aborted!", 5000);
-    else if(statusBar != NULL) statusBar->showMessage("Table mode abort error!", 5000);
-}
-
-QString IFTtiming::Report(void)
-{
-    QString res;
-
-    res = Title + ",";
-    res += leFillTime->text() + ",";
-    res += leTrapTime->text() + ",";
-    res += leReleaseTime->text() + ",";
-    res += leGrid1FillV->text() + ",";
-    res += leGrid2ReleaseV->text() + ",";
-    res += leGrid3ReleaseV->text() + ",";
-    res += Accumulations->text() + ",";
-    res += FrameSize->text() + ",";
-    res += ClockSource->currentText() + ",";
-    res += TriggerSource->currentText() + ",";
-    res += Table->text() + "\n";
-    return res;
-}
-
-bool IFTtiming::SetValues(QString strVals)
-{
-    QStringList resList;
-
-    if(!strVals.startsWith(Title)) return false;
-    resList = strVals.split(",");
-    if(resList.count() < 12) return false;
-    leFillTime->setText(resList[1]);
-    leTrapTime->setText(resList[2]);
-    leReleaseTime->setText(resList[3]);
-    leGrid1FillV->setText(resList[4]);
-    leGrid2ReleaseV->setText(resList[5]);
-    leGrid3ReleaseV->setText(resList[6]);
-    Accumulations->setText(resList[7]);
-    FrameSize->setText(resList[8]);
-    int i = ClockSource->findData(resList[9]);
-    ClockSource->setCurrentIndex(i);
-    i = TriggerSource->findData(resList[10]);
-    TriggerSource->setCurrentIndex(i);
-    i = strVals.indexOf("STBLDAT");
-    if(i > 0) Table->setText(strVals.mid(i));
-    pbDownload();
-    return true;
-}
-
-void IFTtiming::tblObsolite(void)
-{
-    TableDownloaded = false;
-}
-
-void IFTtiming::Dismiss(void)
-{
-    if(cla == NULL) return;
-//    cla->deleteLater();
-    delete cla;
-    cla = NULL;
 }

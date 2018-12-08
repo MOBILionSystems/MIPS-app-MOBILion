@@ -65,4 +65,41 @@ private slots:
 
 };
 
+class ARBchannel : public QWidget
+{
+    Q_OBJECT
+public:
+    ARBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
+    void Show(void);
+    void Update(void);
+    QString Report(void);
+    bool SetValues(QString strVals);
+    QString ProcessCommand(QString cmd);
+    QWidget *p;
+    QString Title;
+    int     X,Y;
+    QString MIPSnm;
+    int     Channel;
+    Comms   *comms;
+    QStatusBar  *statusBar;
+private:
+    QGroupBox    *gbARB;
+    QLineEdit    *leSWFREQ;
+    QLineEdit    *leSWFVRNG;
+    QLineEdit    *leSWFVAUX;
+    QLineEdit    *leSWFVOFF;
+    QRadioButton *SWFDIR_FWD;
+    QRadioButton *SWFDIR_REV;
+    QComboBox    *Waveform;
+    QPushButton  *EditWaveform;
+    QLabel      *labels[10];
+    ARBwaveformEdit *ARBwfEdit;
+private slots:
+    void leChange(void);
+    void rbChange(void);
+    void wfChange(void);
+    void wfEdit(void);
+    void ReadWaveform(void);
+};
+
 #endif // ARB_H

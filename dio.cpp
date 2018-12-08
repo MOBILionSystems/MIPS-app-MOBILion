@@ -269,3 +269,93 @@ void DIO::RemoteNavSelect(void)
    str[1] = 0;
    comms->SendString(QString::fromStdString(str));
 }
+
+// *************************************************************************************************
+// DIO  ********************************************************************************************
+// *************************************************************************************************
+
+DIOchannel::DIOchannel(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
+{
+    p      = parent;
+    Title  = name;
+    MIPSnm = MIPSname;
+    X      = x;
+    Y      = y;
+    Channel = "A";
+    comms  = NULL;
+}
+
+void DIOchannel::Show(void)
+{
+    frmDIO = new QFrame(p); frmDIO->setGeometry(X,Y,170,21);
+    DIO = new QCheckBox(frmDIO); DIO->setGeometry(0,0,170,21);
+    DIO->setText(Title);
+    DIO->setToolTip(MIPSnm + " DIO channel " + Channel);
+    connect(DIO,SIGNAL(stateChanged(int)),this,SLOT(DIOChange()));
+}
+
+QString DIOchannel::Report(void)
+{
+    QString res;
+
+    res = Title + ",";
+    if(DIO->isChecked()) res += "1";
+    else res += "0";
+    return(res);
+}
+
+bool DIOchannel::SetValues(QString strVals)
+{
+    QStringList resList;
+
+    if(!strVals.startsWith(Title)) return false;
+    resList = strVals.split(",");
+    if(resList.count() < 2) return false;
+    if(resList[1].contains("1")) DIO->setChecked(true);
+    else DIO->setChecked(false);
+    if(resList[1].contains("1")) DIO->stateChanged(1);
+    else DIO->stateChanged(0);
+    return true;
+}
+
+QString DIOchannel::ProcessCommand(QString cmd)
+{
+    if(!cmd.startsWith(Title)) return "?";
+    if(cmd == Title)
+    {
+        if(DIO->isChecked()) return "1";
+        return "0";
+    }
+    QStringList resList = cmd.split("=");
+    if(resList.count()==2)
+    {
+       if(resList[1] == "1") DIO->setChecked(true);
+       else if(resList[1] == "1") DIO->setChecked(false);
+       else return "?";
+       if(resList[1] == "1") DIO->stateChanged(1);
+       else  DIO->stateChanged(0);
+       return "";
+    }
+    return "?";
+}
+
+void DIOchannel::Update(void)
+{
+    QString res;
+
+    if(comms == NULL) return;
+    comms->rb.clear();
+    res = comms->SendMess("GDIO," + Channel + "\n");
+    if(res.contains("1")) DIO->setChecked(true);
+    if(res.contains("0")) DIO->setChecked(false);
+}
+
+void DIOchannel::DIOChange(void)
+{
+   QString res;
+
+   if(comms == NULL) return;
+   if(DIO->checkState()) res ="SDIO," + Channel + ",1\n";
+   else  res ="SDIO," + Channel + ",0\n";
+   comms->SendCommand(res.toStdString().c_str());
+}

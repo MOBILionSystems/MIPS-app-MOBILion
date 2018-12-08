@@ -1,5 +1,5 @@
-#ifndef RFAMP_H
-#define RFAMP_H
+#ifndef COMPRESSOR_H
+#define COMPRESSOR_H
 
 #include <QDialog>
 #include <QtCore/QtGlobal>
@@ -10,44 +10,39 @@
 #include <QApplication>
 #include <QFileInfo>
 #include <QKeyEvent>
-
+#include <QCheckBox>
+#include <QComboBox>
 
 #include "comms.h"
 
 namespace Ui {
-class RFamp;
+class Compressor;
 }
 
-class RFamp : public QDialog
+class Compressor : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit RFamp(QWidget *parent, QString name, QString MIPSname, int Module);
-    ~RFamp();
+    explicit Compressor(QWidget *parent, QString name, QString MIPSname);
+    ~Compressor();
     void Update(void);
     QString Report(void);
     bool SetValues(QString strVals);
-    void Shutdown(void);
-    void Restore(void);
+    QString ProcessCommand(QString cmd);
 
-    int     Channel;
     Comms   *comms;
     QString Title;
     QString MIPSnm;
-    bool    isShutdown;
-    bool    activeEnableState;
 
 private:
-    Ui::RFamp *ui;
+    Ui::Compressor *ui;
     bool Updating;
     bool UpdateOff;
 
 private slots:
     void Updated(void);
-    void slotUpdate(void);
-protected:
-    bool eventFilter(QObject *obj, QEvent *event);
+    void pbARBforceTriggerSlot(void);
 };
 
-#endif // RFAMP_H
+#endif // COMPRESSOR_H

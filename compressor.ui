@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Compressor</class>
+ <widget class="QDialog" name="Compressor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>490</width>
+    <height>249</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QFrame" name="frmCompressor">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>491</width>
+     <height>251</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Plain</enum>
+   </property>
+   <property name="lineWidth">
+    <number>0</number>
+   </property>
+   <widget class="QLabel" name="label_133">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>175</y>
+      <width>59</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Order</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSARBCORDER">
+    <property name="geometry">
+     <rect>
+      <x>55</x>
+      <y>175</y>
+      <width>113</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>2</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="gbARBmode">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>5</y>
+      <width>161</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Mode</string>
+    </property>
+    <widget class="QRadioButton" name="rbSARBCMODE_NORMAL">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>30</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Normal</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbSARBCMODE_COMPRESS">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>50</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Compress</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="gbARBswitch">
+    <property name="geometry">
+     <rect>
+      <x>5</x>
+      <y>85</y>
+      <width>161</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Switch</string>
+    </property>
+    <widget class="QRadioButton" name="rbSARBCSW_CLOSE">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>30</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Close</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rbSARBCSW_OPEN">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>50</y>
+       <width>100</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Open</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="gbARBtiming">
+    <property name="geometry">
+     <rect>
+      <x>185</x>
+      <y>15</y>
+      <width>301</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Multi-pass cycle times</string>
+    </property>
+    <widget class="QLabel" name="label_142">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>25</y>
+       <width>96</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trigger delay</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_143">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>96</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Compress time</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_144">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>75</y>
+       <width>96</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Normal time</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_145">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Non compress time</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSARBCTD">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>25</y>
+       <width>113</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1.0</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_146">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>25</y>
+       <width>26</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>mS</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSARBCTC">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>50</y>
+       <width>113</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1.0</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSARBCTN">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>75</y>
+       <width>113</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1.0</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="leSARBCTNC">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>100</y>
+       <width>113</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>1.0</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_147">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>50</y>
+       <width>26</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>mS</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_148">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>75</y>
+       <width>26</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>mS</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_149">
+     <property name="geometry">
+      <rect>
+       <x>260</x>
+       <y>100</y>
+       <width>26</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>mS</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QLineEdit" name="leSARBCTBL">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>225</y>
+      <width>476</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>C</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbARBforceTrigger">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>170</y>
+      <width>311</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Force Multi-pass trigger</string>
+    </property>
+    <property name="autoDefault">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_150">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>205</y>
+      <width>191</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Multi-pass compressor table</string>
+    </property>
+   </widget>
+  </widget>
+  <zorder>rbSARBCSW_CLOSE</zorder>
+  <zorder>frmCompressor</zorder>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

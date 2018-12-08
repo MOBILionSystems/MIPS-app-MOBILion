@@ -138,3 +138,77 @@ void ADC::SetZoom(void)
         ui->ADCdata->setInteractions(0);
     }
 }
+
+// *************************************************************************************************
+// ADC channels    *********************************************************************************
+// *************************************************************************************************
+
+ADCchannel::ADCchannel(QWidget *parent, QString name, QString MIPSname, int x, int y) : QWidget(parent)
+{
+    p      = parent;
+    Title  = name;
+    MIPSnm = MIPSname;
+    X      = x;
+    Y      = y;
+    comms  = NULL;
+    Units = "V";
+    m = 1;
+    b = 0;
+    Format = "%.3f";
+}
+
+void ADCchannel::Show(void)
+{
+    frmADC = new QFrame(p); frmADC->setGeometry(X,Y,180,21);
+    Vadc = new QLineEdit(frmADC); Vadc->setGeometry(70,0,70,21); Vadc->setValidator(new QDoubleValidator);
+    labels[0] = new QLabel(Title,frmADC); labels[0]->setGeometry(0,0,59,16);
+    labels[1] = new QLabel(Units,frmADC);   labels[1]->setGeometry(150,0,31,16);
+    Vadc->setToolTip("ADC input CH" +  QString::number(Channel) + ", "  + MIPSnm);
+}
+
+QString ADCchannel::Report(void)
+{
+    QString res;
+
+    res = Title + "," + Vadc->text();
+    return(res);
+}
+
+bool ADCchannel::SetValues(QString strVals)
+{
+    QStringList resList;
+
+    if(!strVals.startsWith(Title)) return false;
+    resList = strVals.split(",");
+    if(resList.count() < 2) return false;
+    Vadc->setText(resList[1]);
+    Vadc->setModified(true);
+    Vadc->editingFinished();
+    return true;
+}
+
+// The following commands are processed:
+// title            return the offset value
+// title=val        sets the offset value
+// returns "?" if the command could not be processed
+QString ADCchannel::ProcessCommand(QString cmd)
+{
+    if(!cmd.startsWith(Title)) return "?";
+    if(cmd == Title) return Vadc->text();
+    return "?";
+}
+
+// display = m*readValue + b
+void ADCchannel::Update(void)
+{
+    QString res;
+
+    if(comms == NULL) return;
+    comms->rb.clear();
+    res = "ADC,"  + QString::number(Channel) + "\n";
+    res = comms->SendMess(res);
+    if(res == "") return;
+    res.sprintf(Format.toStdString().c_str(),res.toFloat() * m + b);
+    if(!Vadc->hasFocus()) Vadc->setText(res);
+}
+

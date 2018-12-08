@@ -36,4 +36,46 @@ private slots:
     void AutoRetune(void);
 };
 
+class RFchannel : public QWidget
+{
+    Q_OBJECT
+
+public:
+    RFchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
+    void Show(void);
+    void Update(void);
+    QString Report(void);
+    bool SetValues(QString strVals);
+    void Shutdown(void);
+    void Restore(void);
+    QString ProcessCommand(QString cmd);
+    QWidget *p;
+    QString Title;
+    int     X,Y;
+    QString MIPSnm;
+    int     Channel;
+    Comms   *comms;
+    bool    isShutdown;
+private:
+    QGroupBox   *gbRF;
+    QLineEdit   *Drive;
+    QLineEdit   *Freq;
+    QLineEdit   *RFP;
+    QLineEdit   *RFN;
+    QLineEdit   *Power;
+    QPushButton *Tune;
+    QPushButton *Retune;
+    QLabel      *labels[10];
+    QString     activeDrive;
+    bool Updating;
+    bool UpdateOff;
+private slots:
+    void DriveChange(void);
+    void FreqChange(void);
+    void TunePressed(void);
+    void RetunePressed(void);
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+};
+
 #endif // RFDRIVER_H

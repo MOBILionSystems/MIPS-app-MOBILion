@@ -41,4 +41,28 @@ private slots:
     void SetZoom(void);
 };
 
+class ADCchannel : public QWidget
+{
+    Q_OBJECT
+public:
+    ADCchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
+    void Show(void);
+    void Update(void);
+    QString Report(void);
+    bool SetValues(QString strVals);
+    QString ProcessCommand(QString cmd);
+    QWidget *p;
+    QString Title;
+    int     X,Y;
+    QString MIPSnm;
+    int     Channel;
+    Comms   *comms;
+    float   b,m;
+    QString Units;
+    QString Format;
+private:
+    QFrame      *frmADC;
+    QLineEdit   *Vadc;
+    QLabel      *labels[2];
+};
 #endif // ADC_H

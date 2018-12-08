@@ -28,6 +28,23 @@ FAIMS::FAIMS(Ui::MIPS *w, Comms *c)
     fui->comboFMstepTrig->addItem("R");
     fui->comboFMstepTrig->addItem("S");
     fui->comboFMstepTrig->addItem("T");
+    fui->comboFMlinearTrigOut->clear();
+    fui->comboFMlinearTrigOut->addItem("None");
+    fui->comboFMlinearTrigOut->addItem("B");
+    fui->comboFMlinearTrigOut->addItem("C");
+    fui->comboFMlinearTrigOut->addItem("D");
+    fui->comboFMlinearTrigOut->addItem("B Active low");
+    fui->comboFMlinearTrigOut->addItem("C Active low");
+    fui->comboFMlinearTrigOut->addItem("D Active low");
+    fui->comboFMstepTrigOut->clear();
+    fui->comboFMstepTrigOut->addItem("None");
+    fui->comboFMstepTrigOut->addItem("B");
+    fui->comboFMstepTrigOut->addItem("C");
+    fui->comboFMstepTrigOut->addItem("D");
+    fui->comboFMstepTrigOut->addItem("B Active low");
+    fui->comboFMstepTrigOut->addItem("C Active low");
+    fui->comboFMstepTrigOut->addItem("D Active low");
+
     CVparkingTriggered = false;
     WaitingForLinearScanTrig = false;
     WaitingForStepScanTrig = false;
@@ -54,6 +71,8 @@ FAIMS::FAIMS(Ui::MIPS *w, Comms *c)
     connect(fui->rbSFMLOCK_FALSE,SIGNAL(clicked(bool)),this,SLOT(FAIMSlockOff()));
     connect(fui->rbSFMLOCK_TRUE,SIGNAL(clicked(bool)),this,SLOT(FAIMSlockOn()));
     connect(fui->pbSelectLogFile,SIGNAL(pressed()),this,SLOT(FAIMSselectLogFile()));
+    connect(fui->comboFMlinearTrigOut,SIGNAL(currentTextChanged(QString)),this,SLOT(slotLinearTrigOut()));
+    connect(fui->comboFMstepTrigOut,SIGNAL(currentTextChanged(QString)),this,SLOT(slotStepTrigOut()));
     eTimer.start();
 }
 
@@ -423,6 +442,9 @@ void FAIMS::PollLoop(void)
 
 void FAIMS::FAIMSstartLinearScan(void)
 {
+    QTime timer;
+
+    if(comms == NULL) return;
     // If external trigger is requested then set flag indicating
     // we are waiting for a tigger and display message. If no external
     // trigger start as soon as the button is pressed.
@@ -434,12 +456,26 @@ void FAIMS::FAIMSstartLinearScan(void)
     comms->SendCommand("RPT,T,OFF\n");
     if(fui->comboFMlinearTrig->currentText() == "None")
     {
+        if(fui->comboFMlinearTrigOut->currentText() == "B") comms->SendCommand("SDIO,B,1\n");
+        if(fui->comboFMlinearTrigOut->currentText() == "C") comms->SendCommand("SDIO,C,1\n");
+        if(fui->comboFMlinearTrigOut->currentText() == "D") comms->SendCommand("SDIO,D,1\n");
+        if(fui->comboFMlinearTrigOut->currentText() == "B Active low") comms->SendCommand("SDIO,B,0\n");
+        if(fui->comboFMlinearTrigOut->currentText() == "C Active low") comms->SendCommand("SDIO,C,0\n");
+        if(fui->comboFMlinearTrigOut->currentText() == "D Active low") comms->SendCommand("SDIO,D,0\n");
         fui->statusBar->showMessage(tr("Scan triggered!"));
         comms->SendCommand("SFMSTRTLIN,TRUE\n");
         Log("Linear scan started,CV start = " + fui->leSFMCVSTART->text() +
                                ",CV end = " + fui->leSFMCVEND->text() +
                                ",Duration, S = " + fui->leSFMDUR->text() +
                                ",Loops = " + fui->leSFMLOOPS->text());
+        timer.start();
+        while(timer.elapsed() < 250) QApplication::processEvents();
+        if(fui->comboFMlinearTrigOut->currentText() == "B") comms->SendCommand("SDIO,B,0\n");
+        if(fui->comboFMlinearTrigOut->currentText() == "C") comms->SendCommand("SDIO,C,0\n");
+        if(fui->comboFMlinearTrigOut->currentText() == "D") comms->SendCommand("SDIO,D,0\n");
+        if(fui->comboFMlinearTrigOut->currentText() == "B Active low") comms->SendCommand("SDIO,B,1\n");
+        if(fui->comboFMlinearTrigOut->currentText() == "C Active low") comms->SendCommand("SDIO,C,1\n");
+        if(fui->comboFMlinearTrigOut->currentText() == "D Active low") comms->SendCommand("SDIO,D,1\n");
     }
     else
     {
@@ -470,6 +506,9 @@ void FAIMS::FAIMSabortLinearScan(void)
 
 void FAIMS::FAIMSstartStepScan(void)
 {
+    QTime timer;
+
+    if(comms == NULL) return;
     // If external trigger is requested then set flag indicating
     // we are waiting for a tigger and display message. If no external
     // trigger start as soon as the button is pressed.
@@ -481,6 +520,12 @@ void FAIMS::FAIMSstartStepScan(void)
     comms->SendCommand("RPT,T,OFF\n");
     if(fui->comboFMstepTrig->currentText() == "None")
     {
+        if(fui->comboFMstepTrigOut->currentText() == "B") comms->SendCommand("SDIO,B,1\n");
+        if(fui->comboFMstepTrigOut->currentText() == "C") comms->SendCommand("SDIO,C,1\n");
+        if(fui->comboFMstepTrigOut->currentText() == "D") comms->SendCommand("SDIO,D,1\n");
+        if(fui->comboFMstepTrigOut->currentText() == "B Active low") comms->SendCommand("SDIO,B,0\n");
+        if(fui->comboFMstepTrigOut->currentText() == "C Active low") comms->SendCommand("SDIO,C,0\n");
+        if(fui->comboFMstepTrigOut->currentText() == "D Active low") comms->SendCommand("SDIO,D,0\n");
         fui->statusBar->showMessage(tr("Scan triggered!"));
         comms->SendCommand("SFMSTRTSTP,TRUE\n");
         Log("Step scan started,CV start = " + fui->leSFMCVSTART_->text() +
@@ -488,6 +533,14 @@ void FAIMS::FAIMSstartStepScan(void)
                              ",Step time mS = " + fui->leSFMSTPTM->text() +
                              ",Steps = " + fui->leSFMSTEPS->text() +
                              ",Loops = " + fui->leSFMLOOPS_->text());
+        timer.start();
+        while(timer.elapsed() < 250) QApplication::processEvents();
+        if(fui->comboFMstepTrigOut->currentText() == "B") comms->SendCommand("SDIO,B,0\n");
+        if(fui->comboFMstepTrigOut->currentText() == "C") comms->SendCommand("SDIO,C,0\n");
+        if(fui->comboFMstepTrigOut->currentText() == "D") comms->SendCommand("SDIO,D,0\n");
+        if(fui->comboFMstepTrigOut->currentText() == "B Active low") comms->SendCommand("SDIO,B,1\n");
+        if(fui->comboFMstepTrigOut->currentText() == "C Active low") comms->SendCommand("SDIO,C,1\n");
+        if(fui->comboFMstepTrigOut->currentText() == "D Active low") comms->SendCommand("SDIO,D,1\n");
     }
     else
     {
@@ -579,6 +632,28 @@ void FAIMS::FAIMSselectLogFile(void)
         stream << "Time,Enable,Drive,Mode,Voltage SP,Power,Pos KV,Neg KV,DC bias,DC CV,DC offset\n";
         file.close();
     }
+}
+
+void FAIMS::slotLinearTrigOut(void)
+{
+    if(comms == NULL) return;
+    if(fui->comboFMlinearTrigOut->currentText() == "B") comms->SendCommand("SDIO,B,0\n");
+    if(fui->comboFMlinearTrigOut->currentText() == "C") comms->SendCommand("SDIO,C,0\n");
+    if(fui->comboFMlinearTrigOut->currentText() == "D") comms->SendCommand("SDIO,D,0\n");
+    if(fui->comboFMlinearTrigOut->currentText() == "B Active low") comms->SendCommand("SDIO,B,1\n");
+    if(fui->comboFMlinearTrigOut->currentText() == "C Active low") comms->SendCommand("SDIO,C,1\n");
+    if(fui->comboFMlinearTrigOut->currentText() == "D Active low") comms->SendCommand("SDIO,D,1\n");
+}
+
+void FAIMS::slotStepTrigOut(void)
+{
+    if(comms == NULL) return;
+    if(fui->comboFMstepTrigOut->currentText() == "B") comms->SendCommand("SDIO,B,0\n");
+    if(fui->comboFMstepTrigOut->currentText() == "C") comms->SendCommand("SDIO,C,0\n");
+    if(fui->comboFMstepTrigOut->currentText() == "D") comms->SendCommand("SDIO,D,0\n");
+    if(fui->comboFMstepTrigOut->currentText() == "B Active low") comms->SendCommand("SDIO,B,1\n");
+    if(fui->comboFMstepTrigOut->currentText() == "C Active low") comms->SendCommand("SDIO,C,1\n");
+    if(fui->comboFMstepTrigOut->currentText() == "D Active low") comms->SendCommand("SDIO,D,1\n");
 }
 
 

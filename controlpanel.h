@@ -8,6 +8,14 @@
 #include "script.h"
 #include "help.h"
 #include "rfamp.h"
+#include "tcpserver.h"
+#include "arb.h"
+#include "adc.h"
+#include "dio.h"
+#include "dcbias.h"
+#include "rfdriver.h"
+#include "timinggenerator.h"
+#include "compressor.h"
 
 #include <QDialog>
 #include <QDebug>
@@ -90,124 +98,31 @@ private slots:
     void pbLoadPressed(void);
 };
 
-class RFchannel : public QWidget
+class DACchannel : public QWidget
 {
     Q_OBJECT
-
 public:
-    RFchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
+    DACchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
     void Show(void);
     void Update(void);
     QString Report(void);
     bool SetValues(QString strVals);
-    void Shutdown(void);
-    void Restore(void);
+    QString ProcessCommand(QString cmd);
     QWidget *p;
     QString Title;
     int     X,Y;
     QString MIPSnm;
     int     Channel;
     Comms   *comms;
-    bool    isShutdown;
+    float   b,m;
+    QString Units;
+    QString Format;
 private:
-    QGroupBox   *gbRF;
-    QLineEdit   *Drive;
-    QLineEdit   *Freq;
-    QLineEdit   *RFP;
-    QLineEdit   *RFN;
-    QLineEdit   *Power;
-    QPushButton *Tune;
-    QPushButton *Retune;
-    QLabel      *labels[10];
-    QString     activeDrive;
-    bool Updating;
-    bool UpdateOff;
-private slots:
-    void DriveChange(void);
-    void FreqChange(void);
-    void TunePressed(void);
-    void RetunePressed(void);
-protected:
-    bool eventFilter(QObject *obj, QEvent *event);
-};
-
-class DCBchannel : public QWidget
-{
-    Q_OBJECT
-public:
-    DCBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
-    void Show(void);
-    void Update(void);
-    QString Report(void);
-    bool SetValues(QString strVals);
-    QWidget               *p;
-    QString               Title;
-    int                   X,Y;
-    QString               MIPSnm;
-    int                   Channel;
-    Comms                 *comms;
-    QLineEdit             *Vsp;
-    bool                  LinkEnable;
-    QList<DCBchannel*>    DCBs;
-    float                 CurrentVsp;
-private:
-    QFrame                *frmDCB;
-    QLineEdit             *Vrb;
-    QLabel                *labels[2];
-    bool Updating;
-    bool UpdateOff;
-private slots:
-    void VspChange(void);
-protected:
-    bool eventFilter(QObject *obj, QEvent *event);
-};
-
-class DCBoffset : public QWidget
-{
-    Q_OBJECT
-public:
-    DCBoffset(QWidget *parent, QString name, QString MIPSname, int x, int y);
-    void Show(void);
-    void Update(void);
-    QString Report(void);
-    bool SetValues(QString strVals);
-    QWidget *p;
-    QString Title;
-    int     X,Y;
-    QString MIPSnm;
-    int     Channel;
-    Comms   *comms;
-private:
-    QFrame      *frmDCBO;
-    QLineEdit   *Voff;
+    QFrame      *frmDAC;
+    QLineEdit   *Vdac;
     QLabel      *labels[2];
 private slots:
-    void VoffChange(void);
-};
-
-class DCBenable : public QWidget
-{
-    Q_OBJECT
-public:
-    DCBenable(QWidget *parent, QString name, QString MIPSname, int x, int y);
-    void Show(void);
-    void Update(void);
-    QString Report(void);
-    bool SetValues(QString strVals);
-    void Shutdown(void);
-    void Restore(void);
-    QWidget *p;
-    QString Title;
-    int     X,Y;
-    QString MIPSnm;
-    Comms   *comms;
-    bool    isShutdown;
-private:
-    QFrame      *frmDCBena;
-    QCheckBox   *DCBena;
-    bool        activeEnableState;
-private slots:
-    void DCBenaChange(void);
+    void VdacChange(void);
 };
 
 class DCbiasGroupsEventFilter : public QObject
@@ -238,28 +153,6 @@ private slots:
     void slotEnableChange(void);
 };
 
-class DIOchannel : public QWidget
-{
-    Q_OBJECT
-public:
-    DIOchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
-    void Show(void);
-    void Update(void);
-    QString Report(void);
-    bool SetValues(QString strVals);
-    QWidget *p;
-    QString Title;
-    int     X,Y;
-    QString MIPSnm;
-    QString Channel;
-    Comms   *comms;
-private:
-    QFrame      *frmDIO;
-    QCheckBox   *DIO;
-private slots:
-    void DIOChange(void);
-};
-
 class ESI : public QWidget
 {
     Q_OBJECT
@@ -268,6 +161,7 @@ public:
     void Show(void);
     void Update(void);
     QString Report(void);
+    QString ProcessCommand(QString cmd);
     bool SetValues(QString strVals);
     void Shutdown(void);
     void Restore(void);
@@ -288,101 +182,6 @@ private:
 private slots:
     void ESIChange(void);
     void ESIenaChange(void);
-};
-
-class ARBchannel : public QWidget
-{
-    Q_OBJECT
-public:
-    ARBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
-    void Show(void);
-    void Update(void);
-    QString Report(void);
-    bool SetValues(QString strVals);
-    QWidget *p;
-    QString Title;
-    int     X,Y;
-    QString MIPSnm;
-    int     Channel;
-    Comms   *comms;
-    QStatusBar  *statusBar;
-private:
-    QGroupBox    *gbARB;
-    QLineEdit    *leSWFREQ;
-    QLineEdit    *leSWFVRNG;
-    QLineEdit    *leSWFVAUX;
-    QLineEdit    *leSWFVOFF;
-    QRadioButton *SWFDIR_FWD;
-    QRadioButton *SWFDIR_REV;
-    QComboBox    *Waveform;
-    QPushButton  *EditWaveform;
-    QLabel      *labels[10];
-    ARBwaveformEdit *ARBwfEdit;
-private slots:
-    void leChange(void);
-    void rbChange(void);
-    void wfChange(void);
-    void wfEdit(void);
-    void ReadWaveform(void);
-};
-
-class IFTtiming : public QWidget
-{
-    Q_OBJECT
-signals:
-    void dataAcquired(QString filePath);
-public:
-    IFTtiming(QWidget *parent, QString name, QString MIPSname, int x, int y);
-    void Show(void);
-    void Update(void);
-    QString Report(void);
-    bool SetValues(QString strVals);
-    void AcquireData(QString path);
-    void Dismiss(void);
-    QString MakePathUnique(QString path);
-    QWidget *p;
-    QString Title;
-    QString Acquire;
-    int     X,Y;
-    QString MIPSnm;
-    QString filePath;
-    Comms   *comms;
-    QString Enable;
-    QStatusBar  *statusBar;
-    DCBchannel  *Grid1;
-    DCBchannel  *Grid2;
-    DCBchannel  *Grid3;
-    QProcess    process;
-    bool        TableDownloaded;
-    bool        Acquiring;
-
-private:
-    QGroupBox    *gbIFT;
-    QLineEdit    *leFillTime;
-    QLineEdit    *leTrapTime;
-    QLineEdit    *leReleaseTime;
-    QLineEdit    *leGrid1FillV;
-    QLineEdit    *leGrid2ReleaseV;
-    QLineEdit    *leGrid3ReleaseV;
-    QLineEdit    *Accumulations;
-    QLineEdit    *FrameSize;
-    QLineEdit    *Table;
-    QComboBox    *ClockSource;
-    QComboBox    *TriggerSource;
-    QPushButton  *GenerateTable;
-    QPushButton  *Download;
-    QPushButton  *Trigger;
-    QPushButton  *Abort;
-    QLabel       *labels[11];
-    cmdlineapp   *cla;
-public slots:
-    void pbGenerate(void);
-    void pbDownload(void);
-    void pbTrigger(void);
-    void pbAbort(void);
-    void AppReady(void);
-    void slotAppFinished(void);
-    void tblObsolite(void);
 };
 
 class ControlPanel : public QDialog
@@ -421,6 +220,7 @@ public:
 private:
     Comms            *FindCommPort(QString name, QList<Comms*> Systems);
     Ui::ControlPanel *ui;
+    TCPserver *tcp;
     QMenu *contextMenu2Dplot;
     QAction *GeneralHelp;
     QAction *MIPScommands;
@@ -428,25 +228,20 @@ private:
     QAction *ThisHelp;
     QString HelpFile;
 
-    int         numTextLabels;
-    TextLabel   **TextLabels;
-    int         numRFchannels;
-    RFchannel   **RFchans;
-    int         numDCBchannels;
-    DCBchannel  **DCBchans;
-    int         numDCBoffsets;
-    DCBoffset   **DCBoffsets;
-    int         numDCBenables;
-    DCBenable   **DCBenables;
-    int         numDIOchannels;
-    DIOchannel  **DIOchannels;
-    int         numESIchannels;
-    ESI         **ESIchans;
-    int         numARBchannels;
-    ARBchannel  **ARBchans;
-    IFTtiming   *IFT;
-    int         numRFamps;
-    RFamp       **rfa;
+    QList<TextLabel *>  TextLabels;
+    QList<RFchannel *>  RFchans;
+    QList<ADCchannel *> ADCchans;
+    QList<DACchannel *> DACchans;
+    QList<DCBchannel *> DCBchans;
+    QList<DCBoffset *>  DCBoffsets;
+    QList<DCBenable *>  DCBenables;
+    QList<DIOchannel *> DIOchannels;
+    QList<ESI *>        ESIchans;
+    QList<ARBchannel *> ARBchans;
+    QList<RFamp *>      rfa;
+    IFTtiming           *IFT;
+    TimingControl       *TC;
+    Compressor          *comp;
     int         UpdateHoldOff;
     bool        UpdateStop;
     bool        ShutdownFlag;
@@ -459,6 +254,7 @@ private:
     MIPScomms   *mc;
     DCBiasGroups *DCBgroups;
     QPushButton *MIPScommsButton;
+    QPushButton *ARBcompressorButton;
     QPushButton *ScriptButton;
     ScriptingConsole *scriptconsole;
     QUdpSocket *udpSocket;
@@ -481,6 +277,8 @@ public slots:
     void slotMIPScommands(void);
     void slotScriptHelp(void);
     void slotThisControlPanelHelp(void);
+    void tcpCommand(void);
+    void pbARBcompressor(void);
 };
 
 #endif // CONTROLPANEL_H

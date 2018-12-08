@@ -41,5 +41,87 @@ private slots:
     void UpdateDCbias(void);
 };
 
+class DCBchannel : public QWidget
+{
+    Q_OBJECT
+public:
+    DCBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
+    void Show(void);
+    void Update(void);
+    QString Report(void);
+    bool SetValues(QString strVals);
+    QString ProcessCommand(QString cmd);
+    QWidget               *p;
+    QString               Title;
+    int                   X,Y;
+    QString               MIPSnm;
+    int                   Channel;
+    Comms                 *comms;
+    QLineEdit             *Vsp;
+    bool                  LinkEnable;
+    QList<DCBchannel*>    DCBs;
+    float                 CurrentVsp;
+private:
+    QFrame                *frmDCB;
+    QLineEdit             *Vrb;
+    QLabel                *labels[2];
+    bool Updating;
+    bool UpdateOff;
+private slots:
+    void VspChange(void);
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+};
+
+class DCBoffset : public QWidget
+{
+    Q_OBJECT
+public:
+    DCBoffset(QWidget *parent, QString name, QString MIPSname, int x, int y);
+    void Show(void);
+    void Update(void);
+    QString Report(void);
+    bool SetValues(QString strVals);
+    QString ProcessCommand(QString cmd);
+    QWidget *p;
+    QString Title;
+    int     X,Y;
+    QString MIPSnm;
+    int     Channel;
+    Comms   *comms;
+private:
+    QFrame      *frmDCBO;
+    QLineEdit   *Voff;
+    QLabel      *labels[2];
+private slots:
+    void VoffChange(void);
+};
+
+class DCBenable : public QWidget
+{
+    Q_OBJECT
+public:
+    DCBenable(QWidget *parent, QString name, QString MIPSname, int x, int y);
+    void Show(void);
+    void Update(void);
+    QString Report(void);
+    QString ProcessCommand(QString cmd);
+    bool SetValues(QString strVals);
+    void Shutdown(void);
+    void Restore(void);
+    QWidget *p;
+    QString Title;
+    int     X,Y;
+    QString MIPSnm;
+    Comms   *comms;
+    bool    isShutdown;
+private:
+    QFrame      *frmDCBena;
+    QCheckBox   *DCBena;
+    bool        activeEnableState;
+private slots:
+    void DCBenaChange(void);
+};
+
 #endif // DCBIAS
 

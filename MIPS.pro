@@ -52,7 +52,10 @@ SOURCES += main.cpp\
     script.cpp \
     cdirselectiondlg.cpp \
     scriptingconsole.cpp \
-    rfamp.cpp
+    rfamp.cpp \
+    tcpserver.cpp \
+    timinggenerator.cpp \
+    compressor.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -84,7 +87,10 @@ HEADERS  += mips.h \
     script.h \
     cdirselectiondlg.h \
     scriptingconsole.h \
-    rfamp.h
+    rfamp.h \
+    tcpserver.h \
+    timinggenerator.h \
+    compressor.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \
@@ -101,7 +107,9 @@ FORMS    += mips.ui \
     cmdlineapp.ui \
     script.ui \
     scriptingconsole.ui \
-    rfamp.ui
+    rfamp.ui \
+    timinggenerator.ui \
+    compressor.ui
 
 RESOURCES += \
     files.qrc

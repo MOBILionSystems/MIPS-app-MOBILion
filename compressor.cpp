@@ -1,91 +1,52 @@
-#include "rfamp.h"
-#include "ui_rfamp.h"
+#include "compressor.h"
+#include "ui_compressor.h"
 
-RFamp::RFamp(QWidget *parent, QString name, QString MIPSname, int Module) :
+Compressor::Compressor(QWidget *parent, QString name, QString MIPSname):
     QDialog(parent),
-    ui(new Ui::RFamp)
+    ui(new Ui::Compressor)
 {
     ui->setupUi(this);
     Updating = false;
     UpdateOff = false;
-    isShutdown = false;
     comms = NULL;
     Title  = name;
     MIPSnm = MIPSname;
-    Channel = Module;
-    qApp->installEventFilter(this);
 
-    ui->gbRFamp->setTitle(Title);
-    ui->gbRFamp->setToolTip(MIPSnm + " Module: " + QString::number(Module));
-    QObjectList widgetList = ui->tabRFsettings->children();
-    widgetList += ui->tabMassFilter->children();
+    QWidget::setWindowTitle(Title);
+    QObjectList widgetList = ui->frmCompressor->children();
+    widgetList += ui->gbARBmode->children();
+    widgetList += ui->gbARBswitch->children();
+    widgetList += ui->gbARBtiming->children();
     foreach(QObject *w, widgetList)
     {
        if(w->objectName().contains("leS")) connect(((QLineEdit *)w),SIGNAL(editingFinished()),this,SLOT(Updated()));
        else if(w->objectName().contains("chk")) connect(((QCheckBox *)w),SIGNAL(toggled(bool)),this,SLOT(Updated()));
        else if(w->objectName().contains("rb")) connect(((QRadioButton *)w),SIGNAL(clicked(bool)),this,SLOT(Updated()));
     }
-    connect(ui->pbRFAupdate,SIGNAL(pressed()),this,SLOT(slotUpdate()));
+    connect(ui->pbARBforceTrigger,SIGNAL(pressed()),this,SLOT(pbARBforceTriggerSlot()));
 }
 
-RFamp::~RFamp()
+Compressor::~Compressor()
 {
     delete ui;
 }
 
-bool RFamp::eventFilter(QObject *obj, QEvent *event)
-{
-    QLineEdit *le;
-    float delta = 0;
-
-    if (obj->objectName().startsWith("leS") && (event->type() == QEvent::KeyPress))
-    {
-        if(Updating) return true;
-        UpdateOff = true;
-        le = (QLineEdit *)obj;
-        QKeyEvent *key = static_cast<QKeyEvent *>(event);
-        if(key->key() == 16777235) delta = 0.1;
-        if(key->key() == 16777237) delta = -0.1;
-        if((QApplication::queryKeyboardModifiers() & 0x2000000) != 0) delta *= 10;
-        if((QApplication::queryKeyboardModifiers() & 0x8000000) != 0) delta *= 100;
-        if(delta != 0)
-        {
-           QString myString;
-           if(obj->objectName().startsWith("leSRFAFREQ")) myString.sprintf("%1.0f", le->text().toFloat() + delta*10);
-           else if(obj->objectName().startsWith("leSRFARES")) myString.sprintf("%1.0f", le->text().toFloat() + delta*10);
-           else if(obj->objectName().startsWith("leSRFAR0")) myString.sprintf("%4.3f", le->text().toFloat() + delta/100);
-           else if(obj->objectName().startsWith("leSRFAK")) myString.sprintf("%4.3f", le->text().toFloat() + delta/100);
-           else myString.sprintf("%3.2f", le->text().toFloat() + delta);
-           le->setText(myString);
-           le->setModified(true);
-           le->editingFinished();
-           UpdateOff = false;
-           return true;
-        }
-    }
-    UpdateOff = false;
-    return QObject::eventFilter(obj, event);
-}
-
-void RFamp::Update(void)
+void Compressor::Update(void)
 {
     QStringList resList;
     QString res;
     QString CurrentList;
     int i;
     static bool inited = false;
-    QObjectList widgetList;
 
     if(comms==NULL) return;
     if(UpdateOff) return;
     Updating = true;
     // Update all input boxes for the selected tab
-    if(inited) widgetList = ui->tabRFquad->currentWidget()->children();
-    else
-    {
-        widgetList = ui->tabRFsettings->children();
-        widgetList += ui->tabMassFilter->children();
-    }
+    QObjectList widgetList = ui->frmCompressor->children();
+    widgetList += ui->gbARBmode->children();
+    widgetList += ui->gbARBswitch->children();
+    widgetList += ui->gbARBtiming->children();
     foreach(QObject *w, widgetList)
     {
         comms->rb.clear();
@@ -93,7 +54,7 @@ void RFamp::Update(void)
         {
             if(!((QLineEdit *)w)->hasFocus())
             {
-                res = "G" + w->objectName().mid(3) + "," + QString::number(Channel) + "\n";
+                res = "G" + w->objectName().mid(3) + "\n";
                 ((QLineEdit *)w)->setText(comms->SendMess(res));
             }
         }
@@ -103,7 +64,7 @@ void RFamp::Update(void)
             resList = w->objectName().split("_");
             if(resList.count() == 3)
             {
-                res = "G" + resList[0].mid(3) + "," + QString::number(Channel) + "\n";
+                res = "G" + resList[0].mid(3) + "\n";
                 res = comms->SendMess(res);
                 if(res == resList[1]) ((QCheckBox *)w)->setChecked(true);
                 if(res == resList[2]) ((QCheckBox *)w)->setChecked(false);
@@ -115,7 +76,7 @@ void RFamp::Update(void)
             resList = w->objectName().split("_");
             if(resList.count() == 2)
             {
-                res = "G" + resList[0].mid(3) + "," + QString::number(Channel) + "\n";
+                res = "G" + resList[0].mid(3) + "\n";
                 res = comms->SendMess(res);
                 if(res == resList[1]) ((QRadioButton *)w)->setChecked(true);
             }
@@ -128,7 +89,7 @@ void RFamp::Update(void)
             {
                 i = resList[1].toInt();
                 res = resList[0].mid(3);
-                if(!CurrentList.startsWith(res)) CurrentList = res + "," + comms->SendMess(res + "," + QString::number(Channel) + "\n");
+                if(!CurrentList.startsWith(res)) CurrentList = res + "," + comms->SendMess(res + "\n");
                 resList = CurrentList.split(",");
                 if(resList.count() > i) ((QLineEdit *)w)->setText(resList[i]);
             }
@@ -138,7 +99,7 @@ void RFamp::Update(void)
     inited = true;
 }
 
-void RFamp::Updated(void)
+void Compressor::Updated(void)
 {
     QObject*    obj = sender();
     QString     res;
@@ -149,7 +110,7 @@ void RFamp::Updated(void)
     if(obj->objectName().startsWith("leS"))
     {
         if(!((QLineEdit *)obj)->isModified()) return;
-        res = obj->objectName().mid(2) + "," + QString::number(Channel) + "," + ((QLineEdit *)obj)->text() + "\n";
+        res = obj->objectName().mid(2) + "," + ((QLineEdit *)obj)->text() + "\n";
         comms->SendCommand(res.toStdString().c_str());
         ((QLineEdit *)obj)->setModified(false);
     }
@@ -158,8 +119,8 @@ void RFamp::Updated(void)
         resList = obj->objectName().mid(3).split("_");
         if(resList.count() == 3)
         {
-            if(((QCheckBox *)obj)->isChecked()) comms->SendCommand(resList[0] + "," + QString::number(Channel) + "," + resList[1] + "\n");
-            else comms->SendCommand(resList[0] + "," + QString::number(Channel) + "," + resList[2] + "\n");
+            if(((QCheckBox *)obj)->isChecked()) comms->SendCommand(resList[0] + "," + resList[1] + "\n");
+            else comms->SendCommand(resList[0] + "," + resList[2] + "\n");
         }
     }
     if(obj->objectName().startsWith("rbS"))
@@ -167,19 +128,21 @@ void RFamp::Updated(void)
         resList = obj->objectName().mid(2).split("_");
         if(resList.count() == 2)
         {
-            if(((QRadioButton *)obj)->isChecked()) comms->SendCommand(resList[0] + "," + QString::number(Channel) + "," + resList[1] + "\n");
+            if(((QRadioButton *)obj)->isChecked()) comms->SendCommand(resList[0] + "," + resList[1] + "\n");
         }
     }
 }
 
-QString RFamp::Report(void)
+QString Compressor::Report(void)
 {
    QString res;
    QStringList resList;
 
    res.clear();
-   QObjectList widgetList = ui->tabRFsettings->children();
-   widgetList += ui->tabMassFilter->children();
+   QObjectList widgetList = ui->frmCompressor->children();
+   widgetList += ui->gbARBmode->children();
+   widgetList += ui->gbARBswitch->children();
+   widgetList += ui->gbARBtiming->children();
    foreach(QObject *w, widgetList)
    {
        if(w->objectName().startsWith("leS"))
@@ -204,15 +167,17 @@ QString RFamp::Report(void)
    return res;
 }
 
-bool RFamp::SetValues(QString strVals)
+bool Compressor::SetValues(QString strVals)
 {
     QStringList resList,ctrlList;
 
     if(!strVals.startsWith(Title)) return false;
     resList = strVals.split(",");
     if(resList.count() < 3) return false;
-    QObjectList widgetList = ui->tabRFsettings->children();
-    widgetList += ui->tabMassFilter->children();
+    QObjectList widgetList = ui->frmCompressor->children();
+    widgetList += ui->gbARBmode->children();
+    widgetList += ui->gbARBswitch->children();
+    widgetList += ui->gbARBtiming->children();
     foreach(QObject *w, widgetList)
     {
         if(w->objectName().startsWith(resList[1]))
@@ -248,31 +213,60 @@ bool RFamp::SetValues(QString strVals)
     return false;
 }
 
-void RFamp::slotUpdate(void)
+void Compressor::pbARBforceTriggerSlot(void)
 {
-    if(comms == NULL) return;
-    comms->SendCommand("RFAQUPDATE," + QString::number(Channel) + "\n");
+    if(comms==NULL) return;
+    comms->SendCommand("TARBTRG\n");
 }
 
-void RFamp::Shutdown(void)
+QString Compressor::ProcessCommand(QString cmd)
 {
-    if(isShutdown) return;
-    isShutdown = true;
-    activeEnableState = ui->chkSRFAENA_ON_OFF->checkState();
-    ui->chkSRFAENA_ON_OFF->setChecked(false);
-    ui->chkSRFAENA_ON_OFF->stateChanged(0);
-    // Disable the DC supply
-    ui->chkSDCPWR_ON_OFF->setChecked(false);
-    ui->chkSDCPWR_ON_OFF->stateChanged(0);
-}
+    QLineEdit    *le    = NULL;
+    QRadioButton *rb    = NULL;
+    QComboBox    *combo = NULL;
+    QPushButton  *pb    = NULL;
 
-void RFamp::Restore(void)
-{
-    if(!isShutdown) return;
-    isShutdown = false;
-    ui->chkSRFAENA_ON_OFF->setChecked(activeEnableState);
-    ui->chkSRFAENA_ON_OFF->stateChanged(0);
-    // Enable the DC supply
-    ui->chkSDCPWR_ON_OFF->setChecked(true);
-    ui->chkSDCPWR_ON_OFF->stateChanged(0);
+    if(!cmd.startsWith(Title)) return "?";
+    QStringList resList = cmd.split("=");
+    if(resList[0].trimmed() == Title + ".Order") le = ui->leSARBCORDER;
+    else if(resList[0].trimmed() == Title + ".Table") le = ui->leSARBCTBL;
+    else if(resList[0].trimmed() == Title + ".Compress time") le = ui->leSARBCTC;
+    else if(resList[0].trimmed() == Title + ".Trigger delay") le = ui->leSARBCTD;
+    else if(resList[0].trimmed() == Title + ".Normal time") le = ui->leSARBCTN;
+    else if(resList[0].trimmed() == Title + ".Non compress time") le = ui->leSARBCTNC;
+    else if(resList[0].trimmed() == Title + ".Compress") rb = ui->rbSARBCMODE_COMPRESS;
+    else if(resList[0].trimmed() == Title + ".Normal") rb = ui->rbSARBCMODE_NORMAL;
+    else if(resList[0].trimmed() == Title + ".Close") rb = ui->rbSARBCSW_CLOSE;
+    else if(resList[0].trimmed() == Title + ".Open") rb = ui->rbSARBCSW_OPEN;
+    else if(resList[0].trimmed() == Title + ".Trigger") pb = ui->pbARBforceTrigger;
+    if(le != NULL)
+    {
+       if(resList.count() == 1) return le->text();
+       le->setText(resList[1]);
+       le->setModified(true);
+       le->editingFinished();
+       return "";
+    }
+    if(rb != NULL)
+    {
+        if(resList.count() == 1) if(rb->isChecked()) return "TRUE"; else return "FALSE";
+        if(resList[1].trimmed() == "TRUE") rb->setChecked(true);
+        if(resList[1].trimmed() == "FALSE") rb->setChecked(false);
+        rb->clicked();
+        return "";
+    }
+    if(combo != NULL)
+    {
+       if(resList.count() == 1) return combo->currentText();
+       int i = combo->findText(resList[1].trimmed());
+       if(i<0) return "?";
+       combo->setCurrentIndex(i);
+       return "";
+    }
+    if(pb != NULL)
+    {
+        pb->pressed();
+        return "";
+    }
+    return "?";
 }
