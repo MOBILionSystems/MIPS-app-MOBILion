@@ -55,7 +55,8 @@ SOURCES += main.cpp\
     rfamp.cpp \
     tcpserver.cpp \
     timinggenerator.cpp \
-    compressor.cpp
+    compressor.cpp \
+    properties.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -90,7 +91,8 @@ HEADERS  += mips.h \
     rfamp.h \
     tcpserver.h \
     timinggenerator.h \
-    compressor.h
+    compressor.h \
+    properties.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \
@@ -109,7 +111,8 @@ FORMS    += mips.ui \
     scriptingconsole.ui \
     rfamp.ui \
     timinggenerator.ui \
-    compressor.ui
+    compressor.ui \
+    properties.ui
 
 RESOURCES += \
     files.qrc

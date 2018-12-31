@@ -16,6 +16,7 @@
 #include "rfdriver.h"
 #include "timinggenerator.h"
 #include "compressor.h"
+#include "properties.h"
 
 #include <QDialog>
 #include <QDebug>
@@ -192,7 +193,7 @@ signals:
     void DialogClosed(void);
 
 public:
-    explicit ControlPanel(QWidget *parent, QList<Comms*> S);
+    explicit ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S, Properties *prop);
     ~ControlPanel();
     virtual void reject();
     void Update(void);
@@ -203,6 +204,7 @@ public:
     QStatusBar  *statusBar;
     DCBchannel  *FindDCBchannel(QString name);
     bool LoadedConfig;
+    Properties *properties;
     // The following functions are for the scripting system
     Q_INVOKABLE bool SendCommand(QString MIPSname, QString message);
     Q_INVOKABLE QString SendMess(QString MIPSname, QString message);

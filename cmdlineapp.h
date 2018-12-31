@@ -37,6 +37,8 @@ public:
     QString  ReadyMessage;
     QString  InputRequest;
     void Execute(void);
+    void Clear(void);
+    void Dismiss(void);
 
 private:
     Ui::cmdlineapp *ui;

@@ -29,7 +29,7 @@
 #include <QTreeView>
 #include <QUdpSocket>
 
-ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
+ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S, Properties *prop) :
     QDialog(parent),
     ui(new Ui::ControlPanel)
 {
@@ -66,9 +66,12 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
     SystemIsShutdown = false;
     scriptconsole = NULL;
     tcp = NULL;
+    properties = prop;
     help = new Help();
     // Allow user to select the configuration file
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Configuration from File"),"",tr("cfg (*.cfg);;All files (*.*)"));
+    QString fileName;
+    if(CPfileName == "") fileName = QFileDialog::getOpenFileName(this, tr("Load Configuration from File"),"",tr("cfg (*.cfg);;All files (*.*)"));
+    else fileName = CPfileName;
     QFile file(fileName);
     if((fileName == "") || (fileName.isEmpty())) return;
     // Open UDP socket to send commands to reader app
@@ -304,18 +307,21 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 TC = new TimingControl(ui->lblBackground,resList[1],resList[2],resList[3].toInt(),resList[4].toInt());
                 TC->comms = FindCommPort(resList[2],Systems);
                 TC->statusBar = statusBar;
+                TC->properties = properties;
                 TC->Show();
                 if(TC->TG != NULL)
                 {
                    foreach(DCBchannel *dcb, DCBchans) if(dcb->MIPSnm == TC->MIPSnm) TC->TG->AddSignal(dcb->Title, QString::number(dcb->Channel));
                    foreach(DIOchannel *dio, DIOchannels) if(dio->MIPSnm == TC->MIPSnm) TC->TG->AddSignal(dio->Title, dio->Channel);
                 }
+                connect(TC,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
             }
             if((resList[0].toUpper() == "IFT") && (resList.length()==5))
             {
                 IFT = new IFTtiming(ui->lblBackground,resList[1],resList[2],resList[3].toInt(),resList[4].toInt());
                 IFT->comms = FindCommPort(resList[2],Systems);
                 IFT->statusBar = statusBar;
+                IFT->properties = properties;
                 IFT->Show();
                 connect(IFT,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
             }
@@ -373,7 +379,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 ARBcompressorButton->setGeometry(resList[3].toInt(),resList[4].toInt(),150,32);
                 ARBcompressorButton->setAutoDefault(false);
                 ARBcompressorButton->setToolTip("Press this button to edit the compression options");
-                comp = new Compressor(0,resList[1],resList[2]);
+                comp = new Compressor(ui->lblBackground,resList[1],resList[2]);
                 comp->comms = FindCommPort(resList[2],Systems);
                 connect(ARBcompressorButton,SIGNAL(pressed()),this,SLOT(pbARBcompressor()));
             }
@@ -411,7 +417,7 @@ ControlPanel::ControlPanel(QWidget *parent, QList<Comms*> S) :
                 ScriptButton->setAutoDefault(false);
                 ScriptButton->setToolTip("Press this button load or define a script");
                 connect(ScriptButton,SIGNAL(pressed()),this,SLOT(pbScript()));
-                scriptconsole = new ScriptingConsole(this);
+                scriptconsole = new ScriptingConsole(this,properties);
             }
             if((resList[0].toUpper() == "DCBGROUPS") && (resList.length()==3))
             {
@@ -556,7 +562,7 @@ Comms* ControlPanel::FindCommPort(QString name, QList<Comms*> Systems)
 
 void ControlPanel::Update(void)
 {
-   int i;
+   int i,j,k;
    static bool busy = false;
 
    if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
@@ -604,13 +610,73 @@ void ControlPanel::Update(void)
    }
    if(busy) return;
    busy = true;
-   for(i=0;i<RFchans.count();i++)     RFchans[i]->Update();
+   // For each MIPS system present if there are RF channels for the selected
+   // MIPS system then read all values using the read all commands to speed up the process.
+   for(i=0;i<Systems.count();i++)
+   {
+       for(j=0;j<RFchans.count();j++) if(RFchans[j]->comms == Systems[i])
+       {
+           // Read all the RF parameters
+           QString RFallRes = Systems[i]->SendMess("GRFALL\n");
+           QStringList RFallResList = RFallRes.split(",");
+           if(RFallResList.count() < 1)
+           {
+               // Here with group read error so process one at a time
+               for(k=0;k<RFchans.count();k++) if(RFchans[k]->comms == Systems[i]) RFchans[k]->Update();
+           }
+           else
+           {
+               // build strings and update all channels that use this comm port
+               for(k=0;k<RFchans.count();k++) if(RFchans[k]->comms == Systems[i])
+               {
+                   if(RFallResList.count() < (RFchans[k]->Channel * 4)) RFchans[k]->Update();
+                   else RFchans[k]->Update(RFallResList[(RFchans[k]->Channel - 1) * 4 + 0] + "," + \
+                                           RFallResList[(RFchans[k]->Channel - 1) * 4 + 1] + "," + \
+                                           RFallResList[(RFchans[k]->Channel - 1) * 4 + 2] + "," + \
+                                           RFallResList[(RFchans[k]->Channel - 1) * 4 + 3]);
+               }
+           }
+           break;
+       }
+   }
    for(i=0;i<ADCchans.count();i++)    ADCchans[i]->Update();
    for(i=0;i<DACchans.count();i++)    DACchans[i]->Update();
-   for(i=0;i<DCBchans.count();i++)    DCBchans[i]->Update();
+   // For each MIPS system present if there are DCBchannels for the selected
+   // MIPS system then read all setpoints and values using the read all
+   // commands to speed up the process.
+   for(i=0;i<Systems.count();i++)
+   {
+       for(j=0;j<DCBchans.count();j++) if(DCBchans[j]->comms == Systems[i])
+       {
+           // Read all the setpoints and readbacks and parse the strings
+           QString VspRes = Systems[i]->SendMess("GDCBALL\n");
+           QStringList VspResList = VspRes.split(",");
+           QString VrbRes = Systems[i]->SendMess("GDCBALLV\n");
+           QStringList VrbResList = VrbRes.split(",");
+           if((VspResList.count() != VrbResList.count()) || (VspResList.count() < 1))
+           {
+               // Here with group read error so process one at a time
+               for(k=0;k<DCBchans.count();k++) if(DCBchans[k]->comms == Systems[i]) DCBchans[k]->Update();
+           }
+           else
+           {
+               // build strings and update all channels that use this comm port
+               for(k=0;k<DCBchans.count();k++) if(DCBchans[k]->comms == Systems[i])
+               {
+                   if(VspResList.count() < (DCBchans[k]->Channel)) DCBchans[k]->Update();
+                   else DCBchans[k]->Update(VspResList[DCBchans[k]->Channel - 1] + "," + VrbResList[DCBchans[k]->Channel - 1]);
+               }
+           }
+           break;
+       }
+   }
    for(i=0;i<DCBoffsets.count();i++)  DCBoffsets[i]->Update();
    for(i=0;i<DCBenables.count();i++)  DCBenables[i]->Update();
-   for(i=0;i<DIOchannels.count();i++) DIOchannels[i]->Update();
+   if(TC != NULL) if(!TC->TG->isTableMode())
+   {
+       for(i=0;i<DIOchannels.count();i++) DIOchannels[i]->Update();
+   }
+   else for(i=0;i<DIOchannels.count();i++) DIOchannels[i]->Update();
    for(i=0;i<ESIchans.count();i++)    ESIchans[i]->Update();
    for(i=0;i<ARBchans.count();i++)    ARBchans[i]->Update();
    for(i=0;i<rfa.count();i++)         rfa[i]->Update();
@@ -840,6 +906,9 @@ void ControlPanel::slotDataAcquired(QString filepath)
         QString mess = "Load,"+filepath+"/U1084A.data";
         udpSocket->writeDatagram(mess.toLocal8Bit(),QHostAddress::LocalHost, 7755);
     }
+    // Dismiss the acquire box
+//    if(IFT != NULL)  IFT->AD->Dismiss();
+//    if(TC != NULL)  TC->AD->Dismiss();
 }
 
 // System shutdown
@@ -859,13 +928,20 @@ void ControlPanel::pbSE(void)
 
 void ControlPanel::pbSave(void)
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
+    QFileDialog fileDialog;
+
+    if(properties != NULL) fileDialog.setDirectory(properties->MethodesPath);
+    QString fileName = fileDialog.getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
+    if(fileName == "") return;
     statusBar->showMessage(Save(fileName), 5000);
 }
 
 void ControlPanel::pbLoad(void)
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
+    QFileDialog fileDialog;
+
+    if(properties != NULL) fileDialog.setDirectory(properties->MethodesPath);
+    QString fileName = fileDialog.getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
     if(fileName == "") return;
     statusBar->showMessage(Load(fileName), 5000);
 }
@@ -1475,8 +1551,10 @@ void ESI::Update(void)
     if(res=="") return;
     ESIrb->setText(res);
     res = comms->SendMess("GHVSTATUS," + QString::number(Channel) + "\n");
+    bool oldState = ESIena->blockSignals(true);
     if(res.contains("ON")) ESIena->setChecked(true);
     if(res.contains("OFF")) ESIena->setChecked(false);
+    ESIena->blockSignals(oldState);
 }
 
 void ESI::ESIChange(void)

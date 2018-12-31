@@ -326,7 +326,7 @@
    <widget class="QPushButton" name="pbARBforceTrigger">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>175</x>
       <y>170</y>
       <width>311</width>
       <height>32</height>
@@ -353,8 +353,6 @@
     </property>
    </widget>
   </widget>
-  <zorder>rbSARBCSW_CLOSE</zorder>
-  <zorder>frmCompressor</zorder>
  </widget>
  <resources/>
  <connections/>

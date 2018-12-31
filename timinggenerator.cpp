@@ -1,6 +1,25 @@
 #include "timinggenerator.h"
 #include "ui_timinggenerator.h"
 
+// This function tests if the system is in table mode by sending the trigger source
+// option. If its in table mode then a NAK will be received from MIPS
+bool isTblMode(Comms *comms, QString TriggerSource)
+{
+   if(comms == NULL) return false;
+   QString res = TriggerSource;
+   if(res.toUpper() == "SOFTWARE") res = "SW";
+   comms->rb.clear();
+   comms->SendString("STBLTRG," + res + "\n");
+   comms->rb.waitforline(1000);
+   if(comms->rb.numLines() >= 1)
+   {
+       res = comms->rb.getline();
+       if(res == "?") return true;
+       if(res == "") return false;
+   }
+   return false;
+}
+
 // Download table parameters to MIPS.
 // If the system is in table mode it will be placed in local mode.
 // The table is downloaded and the system will remain in local mode.
@@ -19,10 +38,10 @@ bool DownloadTable(Comms *comms, QString Table, QString ClockSource, QString Tri
        return false;
    }
    // Set clock
-   comms->SendCommand("STBLCLK," + ClockSource + "\n");
+   comms->SendCommand("STBLCLK," + ClockSource.toUpper() + "\n");
    // Set trigger
    QString res = TriggerSource;
-   if(res == "SOFTWARE") res = "SW";
+   if(res.toUpper() == "SOFTWARE") res = "SW";
    comms->SendCommand("STBLTRG," + res + "\n");
    // Send table
    comms->SendCommand(Table);
@@ -60,16 +79,17 @@ QString MakePathUnique(QString path)
 // **********************************************************************************************
 AcquireData::AcquireData(QWidget *parent)
 {
+    p = parent;
     comms  = NULL;
-    cla == NULL;
+    cla = NULL;
     Acquire = "";
     statusBar = NULL;
+    properties = NULL;
     Acquiring = false;
 }
 
 void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
 {
-    qDebug() << Acquire;
     // If the Acquire string is defined then we call the program defined
     // by The Acquire string. The program is called with optional arguments
     // as follows:
@@ -81,7 +101,7 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
     // The acquire ap is expected to return "Ready" when ready to accept a trigger.
     filePath = "";
     // Make sure the system is in table mode
-    if(comms != NULL) if(comms->SendCommand("SMOD,TBL\n"))
+    if(comms != NULL) if(comms->SendCommand("SMOD,ONCE\n"))
     {
         if(!TableDownloaded)
         {
@@ -115,11 +135,13 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
             }
             if(resList[i].toUpper() == "FILENAME")
             {
-                CDirSelectionDlg *cds = new CDirSelectionDlg(QDir::currentPath());
+                CDirSelectionDlg *cds = new CDirSelectionDlg(QDir::currentPath(),p);
                 cds->setTitle("Select/enter folder to save data files");
                 while(path == "")
                 {
-                    if(cds->exec() != 0)
+                    cds->show();
+                    while(cds->isVisible()) QApplication::processEvents();
+                    if(cds->result() != 0)
                     {
                         QString selectedPath = cds->selectedPath();
                         // See if the directory is present
@@ -147,21 +169,37 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
                 // Create the folder and define the data storage path and file
                 if(path != "")
                 {
-                    filePath = MakePathUnique(path);
+                    if(properties->AutoFileName) filePath = MakePathUnique(path);
+                    else
+                    {
+                        filePath = path;
+                        if(QDir(filePath).exists())
+                        {
+                            if(statusBar != NULL) statusBar->showMessage("File path not unique, please try again!", 5000);
+                            if(comms != NULL) comms->SendCommand("SMOD,LOC\n"); // Return to local mode
+                            return;
+                        }
+                    }
                 }
                 QDir().mkdir(filePath);
                 QDir().setCurrent(filePath);
                 cmd += " " + filePath + "/" + "U1084A.data";
             }
         }
-        cla = new cmdlineapp();
+        if(cla == NULL)
+        {
+           cla = new cmdlineapp(p);
+           connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()));
+           connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()));
+           connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()));
+        }
         cla->appPath = cmd;
+        cla->Clear();
         cla->show();
+        cla->raise();
         cla->ReadyMessage = "Ready";
         cla->InputRequest = "? Y/N :";
         if(filePath != "") cla->fileName = filePath + "/Acquire.data";
-        connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()));
-        connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()));
         cla->Execute();
         Acquiring = true;
     }
@@ -172,6 +210,14 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
         if(comms->SendCommand("TBLSTRT\n")) if(statusBar != NULL) statusBar->showMessage("Table trigger command accepted!", 5000);
         else if(statusBar != NULL) statusBar->showMessage("Table trigger command rejected!", 5000);
     }
+}
+
+void AcquireData::slotDialogClosed(void)
+{
+    disconnect(cla,SIGNAL(Ready()),0,0);
+    disconnect(cla,SIGNAL(AppCompleted()),0,0);
+    disconnect(cla,SIGNAL(DialogClosed()),0,0);
+    cla = NULL;
 }
 
 void AcquireData::slotAppReady(void)
@@ -185,18 +231,17 @@ void AcquireData::slotAppReady(void)
 void AcquireData::slotAppFinished(void)
 {
     // Send a signal that the data collection has finished.
-    emit dataAcquired(filePath);
     Acquiring = false;
     if(comms == NULL) return;
     comms->SendCommand("SMOD,LOC\n");
     if(statusBar != NULL) statusBar->showMessage("Acquire app finished, returning to local mode.", 5000);
+    emit dataAcquired(filePath);
 }
 
 void AcquireData::Dismiss(void)
 {
     if(cla == NULL) return;
-    delete cla;
-    cla = NULL;
+    cla->Dismiss();
 }
 
 
@@ -214,6 +259,7 @@ TimingControl::TimingControl(QWidget *parent, QString name, QString MIPSname, in
     comms  = NULL;
     Acquire = "";
     statusBar = NULL;
+    properties = NULL;
     Acquiring = false;
 }
 
@@ -233,10 +279,13 @@ void TimingControl::Show(void)
     connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()));
     TableDownloaded = false;
     TG = new TimingGenerator(p,Title,MIPSnm);
+    TG->comms = comms;
     // Create the AcquireData object and init
-    AD = new class AcquireData();
+    AD = new class AcquireData(p);
     AD->comms = comms;
     AD->statusBar = statusBar;
+    AD->properties = properties;
+    connect(AD,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
 }
 
 void TimingControl::pbEdit(void)
@@ -248,23 +297,40 @@ void TimingControl::pbEdit(void)
 
 void TimingControl::pbTrigger(void)
 {
+    static bool busy = false;
     Trigger->setDown(false);
+    if(TG->isTableMode())
+    {
+        if(statusBar != NULL) statusBar->showMessage("Can't trigger, system in table mode!", 5000);
+        return;
+    }
+    if(busy)
+    {
+        if(statusBar != NULL) statusBar->showMessage("Can't trigger, system busy!", 5000);
+        return;
+    }
+    busy = true;
     // If the table line edit box is empty, generate table
     if(TG->ui->leTable->text() == "") TG->slotGenerate();
     TableDownloaded = DownloadTable(comms, TG->ui->leTable->text(),TG->ui->comboClockSource->currentText(), TG->ui->comboTriggerSource->currentText());
-    AcquireData("");
+    if(properties != NULL)
+    {
+        if((properties->DataFilePath != "") && (properties->FileName != "")) AcquireData(properties->DataFilePath + "/" + properties->FileName);
+        else AcquireData("");
+    }
+    else AcquireData("");
+    busy = false;
 }
 
-void TimingControl::slotDataAcquired(QString)
+void TimingControl::slotDataAcquired(QString filepath)
 {
-    emit dataAcquired(filePath);
+    emit dataAcquired(filepath);
 }
 
 void TimingControl::AcquireData(QString path)
 {
     AD->TableDownloaded = TableDownloaded;
     AD->StartAcquire(path, TG->ui->leFrameWidth->text().toInt(), TG->ui->leAccumulations->text().toInt());
-    connect(AD,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
 }
 
 void TimingControl::pbAbort(void)
@@ -272,7 +338,7 @@ void TimingControl::pbAbort(void)
     Abort->setDown(false);
     if(comms == NULL) return;
     // Send table abort command
-    if(comms->SendCommand("TBLABRT\n")) if(statusBar != NULL) statusBar->showMessage("Table mode aborted!", 5000);
+    if(comms->SendCommand("TBLABRT\n")) { if(statusBar != NULL) statusBar->showMessage("Table mode aborted!", 5000); }
     else if(statusBar != NULL) statusBar->showMessage("Table mode abort error!", 5000);
 }
 
@@ -321,13 +387,16 @@ TimingGenerator::TimingGenerator(QWidget *parent, QString name, QString MIPSname
     ui->comboEventSignal->clear();
     ui->comboEventSignal->addItem("","");
 
-    connect(ui->comboSelectEvent,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventChange(int)));
+    connect(ui->comboSelectEvent,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventChange()));
     connect(ui->leEventStart,SIGNAL(editingFinished()),this,SLOT(slotEventUpdated()));
     connect(ui->leEventWidth,SIGNAL(editingFinished()),this,SLOT(slotEventUpdated()));
     connect(ui->leEventValue,SIGNAL(editingFinished()),this,SLOT(slotEventUpdated()));
     connect(ui->leEventValueOff,SIGNAL(editingFinished()),this,SLOT(slotEventUpdated()));
     connect(ui->comboEventSignal,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventUpdated()));
     connect(ui->pbGenerate,SIGNAL(pressed()),this,SLOT(slotGenerate()));
+    connect(ui->pbClearEvents,SIGNAL(pressed()),this,SLOT(slotClearEvents()));
+    connect(ui->pbLoad,SIGNAL(pressed()),this,SLOT(slotLoad()));
+    connect(ui->pbSave,SIGNAL(pressed()),this,SLOT(slotSave()));
 }
 
 TimingGenerator::~TimingGenerator()
@@ -335,7 +404,7 @@ TimingGenerator::~TimingGenerator()
     delete ui;
 }
 
-// Reports all the setting to be saved in methodes file
+// Reports all the setting to be saved in methodes file or sequence file
 QString TimingGenerator::Report(void)
 {
     QString res;
@@ -383,9 +452,10 @@ bool TimingGenerator::SetValues(QString strVals)
            ui->comboSelectEvent->addItem("");
            ui->comboSelectEvent->addItem("New event");
            ui->comboSelectEvent->addItem("Delete current");
+           connect(ui->comboSelectEvent,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventChange()));
        }
        ui->comboSelectEvent->addItem(resList[2]);
-       connect(ui->comboSelectEvent,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventChange(int)));
+//       connect(ui->comboSelectEvent,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventChange()));
        return true;
     }
     if(strVals.startsWith("TGframe," + Title + ","))
@@ -421,6 +491,11 @@ bool TimingGenerator::SetValues(QString strVals)
     return false;
 }
 
+bool TimingGenerator::isTableMode(void)
+{
+    return isTblMode(comms,ui->comboTriggerSource->currentText());
+}
+
 void TimingGenerator::AddSignal(QString title, QString chan)
 {
     ui->comboEventSignal->addItem(title,chan);
@@ -432,6 +507,7 @@ void  TimingGenerator::slotGenerate(void)
     bool timeFlag;
     QString table;
 
+    slotEventUpdated();
     table.clear();
     table = "STBLDAT;0:[A:" + QString::number(ui->leAccumulations->text().toInt() + 1);
     for(int i=0;i <= maxCount;i++)
@@ -466,7 +542,7 @@ void  TimingGenerator::slotGenerate(void)
             {
                table += ":" +  ui->comboEnable->currentText() + ":0";
             }
-            table += "];";
+            table += ":];";
         }
     }
     ui->leTable->setText(table);
@@ -483,7 +559,7 @@ void TimingGenerator::slotEventUpdated(void)
     selectedEvent->ValueOff = ui->leEventValueOff->text().toFloat();
 }
 
-void TimingGenerator::slotEventChange(int index)
+void TimingGenerator::slotEventChange(void)
 {
     bool ok;
     QString text;
@@ -533,10 +609,10 @@ void TimingGenerator::slotEventChange(int index)
     {
         int   i;
 
-        if((i=ui->comboSelectEvent->findText(ui->leEventName->text())) > 2)
+        if((i=ui->comboSelectEvent->findText(ui->leEventName->text())) >= 2)
         {
             // Find in Event list and remove
-            foreach(Event *evt, Events) if(evt->Name == ui->comboSelectEvent->currentText())  Events.removeOne(evt);
+            foreach(Event *evt, Events) if(evt->Name == ui->leEventName->text()) Events.removeOne(evt);
             ui->comboSelectEvent->removeItem(i);
             ui->comboSelectEvent->setCurrentIndex(0);
             ui->leEventName->setText("");
@@ -551,8 +627,18 @@ void TimingGenerator::slotEventChange(int index)
     else
     {
         // Find the event entry in list and update the controls
+        selectedEvent = NULL;
         foreach(Event *evt, Events) if(evt->Name == ui->comboSelectEvent->currentText()) selectedEvent = evt;
-        if(selectedEvent == NULL) return;
+        if(selectedEvent == NULL)
+        {
+            ui->leEventName->clear();
+            ui->leEventStart->clear();
+            ui->leEventWidth->clear();
+            ui->leEventValue->clear();
+            ui->leEventValueOff->clear();
+            ui->comboEventSignal->setCurrentIndex(0);
+            return;
+        }
         ui->leEventName->setText(selectedEvent->Name);
         ui->leEventStart->setText(QString::number(selectedEvent->Start));
         ui->leEventWidth->setText(QString::number(selectedEvent->Width));
@@ -586,7 +672,6 @@ QString TimingGenerator::ProcessCommand(QString cmd)
     else if(resList[0].trimmed() == Title + ".Event.Signal") combo = ui->comboEventSignal;
     else if(resList[0].trimmed() == Title + ".Select event") combo = ui->comboSelectEvent;
     else if(resList[0].trimmed() == Title + ".Generate") pb = ui->pbGenerate;
-    else if(resList[0].trimmed() == Title + ".Download") pb = ui->pbDownload;
     if(le != NULL)
     {
        if(resList.count() == 1) return le->text();
@@ -597,7 +682,7 @@ QString TimingGenerator::ProcessCommand(QString cmd)
     }
     if(rb != NULL)
     {
-        if(resList.count() == 1) if(rb->isChecked()) return "TRUE"; else return "FALSE";
+        if(resList.count() == 1) { if(rb->isChecked()) return "TRUE"; else return "FALSE"; }
         if(resList[1].trimmed() == "TRUE") rb->setChecked(true);
         if(resList[1].trimmed() == "FALSE") rb->setChecked(false);
         rb->clicked();
@@ -619,6 +704,58 @@ QString TimingGenerator::ProcessCommand(QString cmd)
     return "?";
 }
 
+void TimingGenerator::slotClearEvents(void)
+{
+   ui->pbClearEvents->setDown(false);
+   Events.clear();
+   ui->comboSelectEvent->clear();
+   ui->comboSelectEvent->addItem("");
+   ui->comboSelectEvent->addItem("New event");
+   ui->comboSelectEvent->addItem("Delete current");
+}
+
+void TimingGenerator::slotLoad(void)
+{
+    ui->pbLoad->setDown(false);
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Load Sequence from File"),"",tr("Sequence (*.seq);;All files (*.*)"));
+    if(fileName == "") return;
+    QFile file(fileName);
+    if(file.open(QIODevice::ReadOnly|QIODevice::Text))
+    {
+        // We're going to streaming the file
+        // to a QString
+        QTextStream stream(&file);
+        QString line;
+        Events.clear();
+        do
+        {
+            line = stream.readLine();
+            SetValues(line);
+        } while(!line.isNull());
+    }
+    file.close();
+}
+
+void TimingGenerator::slotSave(void)
+{
+    QString res;
+
+    ui->pbSave->setDown(false);
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Sequence File"),"",tr("Sequence (*.seq);;All files (*.*)"));
+    if(fileName == "") return;
+    QFile file(fileName);
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        // We're going to streaming text to the file
+        QTextStream stream(&file);
+        QDateTime dateTime = QDateTime::currentDateTime();
+        stream << "# Timing sequence, " + dateTime.toString() + "\n";
+        stream << Report() + "\n";
+        file.close();
+    }
+}
+
+
 // **********************************************************************************************
 // IFT timing generation ************************************************************************
 // **********************************************************************************************
@@ -630,6 +767,7 @@ IFTtiming::IFTtiming(QWidget *parent, QString name, QString MIPSname, int x, int
     X      = x;
     Y      = y;
     comms  = NULL;
+    properties = NULL;
     Enable = "";
     Grid1 = Grid3 = Grid2 = NULL;
     statusBar = NULL;
@@ -698,9 +836,11 @@ void IFTtiming::Show(void)
     TableDownloaded = false;
     Table->raise();
     // Create the AcquireData object and init
-    AD = new class AcquireData();
+    AD = new class AcquireData(this);
     AD->comms = comms;
     AD->statusBar = statusBar;
+    AD->properties = properties;
+    connect(AD,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
 }
 
 // Generate table for IFT.
@@ -779,10 +919,15 @@ void IFTtiming::pbDownload(void)
 
 void IFTtiming::pbTrigger(void)
 {
-    AcquireData("");
+    if(properties != NULL)
+    {
+        if((properties->DataFilePath != "") && (properties->FileName != "")) AcquireData(properties->DataFilePath + "/" + properties->FileName);
+        else AcquireData("");
+    }
+    else AcquireData("");
 }
 
-void IFTtiming::slotDataAcquired(QString)
+void IFTtiming::slotDataAcquired(QString filePath)
 {
     emit dataAcquired(filePath);
 }
@@ -791,7 +936,7 @@ void IFTtiming::AcquireData(QString path)
 {
     AD->TableDownloaded = TableDownloaded;
     AD->StartAcquire(path, FrameSize->text().toInt(), Accumulations->text().toInt());
-    connect(AD,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
+//    connect(AD,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
 }
 
 // The function sends the table about command to MIPS. Returns ACK if ok, else returns NAK.

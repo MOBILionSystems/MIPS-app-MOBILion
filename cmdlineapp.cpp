@@ -13,6 +13,10 @@ cmdlineapp::cmdlineapp(QWidget *parent) :
     responseTimer = new QTimer;
 
     connect(responseTimer, SIGNAL(timeout()), this, SLOT(sendNO()));
+    connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readProcessOutput()));
+    connect(&process,SIGNAL(readyReadStandardError()),this,SLOT(readProcessOutput()));
+    connect(&process,SIGNAL(finished(int)),this,SLOT(AppFinished()));
+    connect(ui->leCommand,SIGNAL(editingFinished()),this,SLOT(readMessage()));
 }
 
 cmdlineapp::~cmdlineapp()
@@ -27,6 +31,18 @@ void cmdlineapp::reject()
     delete this;
 }
 
+void cmdlineapp::Dismiss()
+{
+    process.close();
+    emit DialogClosed();
+    delete this;
+}
+
+void cmdlineapp::Clear(void)
+{
+   ui->txtTerm->clear();
+}
+
 void cmdlineapp::Execute(void)
 {
     QStringList arguments;
@@ -39,10 +55,6 @@ void cmdlineapp::Execute(void)
     process.start(appPath);
 #endif
     ui->txtTerm->appendPlainText("Application should start soon...\n");
-    connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readProcessOutput()));
-    connect(&process,SIGNAL(readyReadStandardError()),this,SLOT(readProcessOutput()));
-    connect(&process,SIGNAL(finished(int)),this,SLOT(AppFinished()));
-    connect(ui->leCommand,SIGNAL(editingFinished()),this,SLOT(readMessage()));
 }
 
 void cmdlineapp::setupPlot(QString mess)
@@ -50,7 +62,13 @@ void cmdlineapp::setupPlot(QString mess)
     QStringList reslist = mess.split(",");
     if(reslist.count() != 5) return;
     // Setup the plot used to display the waaveform
+    ui->plot->clearGraphs();
     ui->plot->addGraph();
+    if( ui->plot->plotLayout()->rowCount() > 1)
+    {
+        ui->plot->plotLayout()->removeAt(ui->plot->plotLayout()->rowColToIndex(0, 0));
+        ui->plot->plotLayout()->simplify();
+    }
     ui->plot->plotLayout()->insertRow(0);
     ui->plot->plotLayout()->addElement(0, 0, new QCPTextElement(ui->plot, reslist[1], QFont("sans", 12, QFont::Bold)));
     // give the axes some labels:

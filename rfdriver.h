@@ -43,7 +43,7 @@ class RFchannel : public QWidget
 public:
     RFchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
     void Show(void);
-    void Update(void);
+    void Update(QString sVals = "");
     QString Report(void);
     bool SetValues(QString strVals);
     void Shutdown(void);

@@ -354,6 +354,7 @@ DCBchannel::DCBchannel(QWidget *parent, QString name, QString MIPSname, int x, i
     DCBs.clear();
     LinkEnable = false;
     CurrentVsp = 0;
+    UpdateCount = (qrand() & 3);
 }
 
 void DCBchannel::Show(void)
@@ -438,30 +439,47 @@ QString DCBchannel::ProcessCommand(QString cmd)
     return "?";
 }
 
-void DCBchannel::Update(void)
+// If sVals can contain two values, Vsp,Vrb. If both values
+// are present then MIPS is now read and the values updated.
+// If only one value is present then its assumed to be Vsp.
+// If its an empty string the MIPS is read for all the needed
+// data.
+void DCBchannel::Update(QString sVals)
 {
     QString res;
+    QStringList sValsList;
 
+    sValsList = sVals.split(",");
     if(comms == NULL) return;
     if(UpdateOff) return;
     Updating = true;
     comms->rb.clear();
-    res = "GDCB,"  + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
-    if(res == "")  // if true then the comms timed out
+    if(UpdateCount == 0) UpdateCount = 3;
+    else UpdateCount--;
+    if(sValsList.count() < 1)
     {
-        Updating = false;
-        return;
+       res = "GDCB,"  + QString::number(Channel) + "\n";
+       res = comms->SendMess(res);
+       if(res == "")  // if true then the comms timed out
+       {
+          Updating = false;
+          return;
+       }
     }
+    else res = sValsList[0];
     if(!Vsp->hasFocus()) Vsp->setText(res);
     CurrentVsp = Vsp->text().toFloat();
-    res = "GDCBV," + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
-    if(res == "")  // if true then the comms timed out
+    if(sValsList.count() < 2)
     {
-        Updating = false;
-        return;
+       res = "GDCBV," + QString::number(Channel) + "\n";
+       res = comms->SendMess(res);
+       if(res == "")  // if true then the comms timed out
+       {
+          Updating = false;
+          return;
+       }
     }
+    else res = sValsList[1];
     Vrb->setText(res);
     // Compare setpoint with readback and color the readback background
     // depending on the difference.
@@ -687,8 +705,10 @@ void DCBenable::Update(void)
     if(comms == NULL) return;
     comms->rb.clear();
     res = comms->SendMess("GDCPWR\n");
+    bool oldState = DCBena->blockSignals(true);
     if(res.contains("ON")) DCBena->setChecked(true);
     if(res.contains("OFF")) DCBena->setChecked(false);
+    DCBena->blockSignals(oldState);
 }
 
 void DCBenable::DCBenaChange(void)

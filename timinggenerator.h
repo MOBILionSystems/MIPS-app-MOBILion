@@ -5,6 +5,7 @@
 #include "cmdlineapp.h"
 #include "dcbias.h"
 #include "cdirselectiondlg.h"
+#include "properties.h"
 
 #include <QDialog>
 #include <QStatusBar>
@@ -35,12 +36,13 @@ public:
     void        StartAcquire(QString path, int FrameSize, int Accumulations);
     void        Dismiss(void);
     Comms       *comms;
+    QWidget     *p;
     QStatusBar  *statusBar;
     QString     filePath;
-    QProcess    process;
     bool        TableDownloaded;
     bool        Acquiring;
     QString     Acquire;
+    Properties  *properties;
 
 private:
     cmdlineapp   *cla;
@@ -48,6 +50,7 @@ private:
 private slots:
     void slotAppReady(void);
     void slotAppFinished(void);
+    void slotDialogClosed(void);
 };
 
 namespace Ui {
@@ -67,6 +70,7 @@ public:
     QString Report(void);
     bool    SetValues(QString strVals);
     QString ProcessCommand(QString cmd);
+    bool              isTableMode(void);
     QWidget     *p;
     QString     Title;
     QString     MIPSnm;
@@ -77,9 +81,12 @@ public:
     Ui::TimingGenerator *ui;
 
 public slots:
-    void slotEventChange(int index);
+    void slotEventChange(void);
     void slotEventUpdated(void);
     void slotGenerate(void);
+    void slotClearEvents(void);
+    void slotLoad(void);
+    void slotSave(void);
 };
 
 class TimingControl : public QWidget
@@ -104,13 +111,14 @@ public:
     TimingGenerator   *TG;
     bool              TableDownloaded;
     bool              Acquiring;
+    Properties       *properties;
 
 private:
     QGroupBox        *gbTC;
     QPushButton      *Edit;
     QPushButton      *Trigger;
     QPushButton      *Abort;
-    cmdlineapp       *cla;
+//    cmdlineapp       *cla;
 
 public slots:
     void pbEdit(void);
@@ -144,7 +152,7 @@ public:
     DCBchannel  *Grid3;
     QProcess    process;
     bool        TableDownloaded;
-    //bool        Acquiring;
+    Properties  *properties;
 
 private:
     QGroupBox    *gbIFT;

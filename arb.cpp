@@ -643,7 +643,6 @@ void ARBchannel::rbChange(void)
 
 void ARBchannel::wfChange(void)
 {
-    qDebug() << "Waveform changed";
     if(comms == NULL) return;
     comms->SendCommand("SWFTYP," + QString::number(Channel) + "," + Waveform->currentText() + "\n");
 }

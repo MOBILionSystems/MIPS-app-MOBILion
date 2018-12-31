@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QScriptEngine>
 
+#include "properties.h"
+
 namespace Ui {
 class ScriptingConsole;
 }
@@ -13,9 +15,10 @@ class ScriptingConsole : public QDialog
     Q_OBJECT
 
 public:
-    explicit ScriptingConsole(QWidget *parent = 0);
+    explicit ScriptingConsole(QWidget *parent = 0, Properties *prop = NULL);
     void UpdateStatus(void);
     ~ScriptingConsole();
+    Properties  *properties;
 
 private:
     Ui::ScriptingConsole *ui;

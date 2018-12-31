@@ -12,11 +12,13 @@
 #include <QFileDialog>
 #include <QTextStream>
 
-ScriptingConsole::ScriptingConsole(QWidget *parent) :
+ScriptingConsole::ScriptingConsole(QWidget *parent, Properties *prop) :
     QDialog(parent),
     ui(new Ui::ScriptingConsole)
 {
     ui->setupUi(this);
+
+    properties = prop;
 
     this->setFixedSize(501,366);
     engine = new QScriptEngine(this);
@@ -59,7 +61,10 @@ void ScriptingConsole::UpdateStatus(void)
 
 void ScriptingConsole::on_pbSave_clicked()
 {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save script to file"),"",tr("scrpt (*.scrpt);;All files (*.*)"));
+    QFileDialog fileDialog;
+
+    if(properties != NULL) fileDialog.setDirectory(properties->ScriptPath);
+    QString fileName = fileDialog.getSaveFileName(this, tr("Save script to file"),"",tr("scrpt (*.scrpt);;All files (*.*)"));
     if(fileName == "") return;
     QFile file(fileName);
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -73,7 +78,10 @@ void ScriptingConsole::on_pbSave_clicked()
 
 void ScriptingConsole::on_pbLoad_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Load script from File"),"",tr("scrpt (*.scrpt);;All files (*.*)"));
+    QFileDialog fileDialog;
+
+    if(properties != NULL) fileDialog.setDirectory(properties->ScriptPath);
+    QString fileName = fileDialog.getOpenFileName(this, tr("Load script from File"),"",tr("scrpt (*.scrpt);;All files (*.*)"));
     if(fileName == "") return;
     QFile file(fileName);
     ui->txtScript->clear();

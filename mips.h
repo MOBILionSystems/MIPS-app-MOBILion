@@ -38,6 +38,7 @@ class ARBwaveformEdit;
 class ADC;
 class ControlPanel;
 class ScriptingConsole;
+class Properties;
 
 class DeleteHighlightedItemWhenShiftDelPressedEventFilter : public QObject
 {
@@ -107,11 +108,13 @@ public slots:
     void ReadARBFLASH(void);
     void WriteARBFLASH(void);
     void ARBupload(void);
-    void SelectCP(void);
+    void SelectCP(QString fileName = "");
     void CloseControlPanel(void);
     void slotScripting(void);
+    void DisplayProperties(void);
 
 private:
+    Properties *properties;
     Comms *comms;
     Twave *twave;
     DCbias *dcbias;

@@ -47,7 +47,7 @@ class DCBchannel : public QWidget
 public:
     DCBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
     void Show(void);
-    void Update(void);
+    void Update(QString sVals = "");
     QString Report(void);
     bool SetValues(QString strVals);
     QString ProcessCommand(QString cmd);
@@ -65,6 +65,7 @@ private:
     QFrame                *frmDCB;
     QLineEdit             *Vrb;
     QLabel                *labels[2];
+    int                   UpdateCount;
     bool Updating;
     bool UpdateOff;
 private slots:

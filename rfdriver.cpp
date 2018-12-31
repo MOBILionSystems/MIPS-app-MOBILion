@@ -356,29 +356,55 @@ QString RFchannel::ProcessCommand(QString cmd)
     return "?";
 }
 
-
-void RFchannel::Update(void)
+// If sVals can contain up to five values, drive, freq, RF+, RF-, Power.
+// This list is a comma seperated string. The values present are used
+// and communications with MIPS is canceled.
+// If its an empty string the MIPS is read for all the needed data.
+void RFchannel::Update(QString sVals)
 {
     QString res;
+    QStringList sValsList;
 
+    if(sVals == "") sValsList.clear();
+    else sValsList = sVals.split(",");
     if(comms == NULL) return;
     if(UpdateOff) return;
     Updating = true;
     comms->rb.clear();
-    res = "GRFDRV,"   + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
+    if(sValsList.count() < 2)
+    {
+      res = "GRFDRV,"   + QString::number(Channel) + "\n";
+      res = comms->SendMess(res);
+    }
+    else res = sValsList[1];
     if(!Drive->hasFocus()) if(res != "") Drive->setText(res);
-    res = "GRFFRQ,"   + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
+    if(sValsList.count() < 1)
+    {
+      res = "GRFFRQ,"   + QString::number(Channel) + "\n";
+      res = comms->SendMess(res);
+    }
+    else res = sValsList[0];
     if(!Freq->hasFocus()) if(res != "") Freq->setText(res);
-    res = "GRFPPVP,"  + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
+    if(sValsList.count() < 3)
+    {
+      res = "GRFPPVP,"  + QString::number(Channel) + "\n";
+      res = comms->SendMess(res);
+    }
+    else res = sValsList[2];
     if(res != "") RFP->setText(res);
-    res = "GRFPPVN,"  + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
+    if(sValsList.count() < 4)
+    {
+      res = "GRFPPVN,"  + QString::number(Channel) + "\n";
+      res = comms->SendMess(res);
+    }
+    else res = sValsList[3];
     if(res != "") RFN->setText(res);
-    res = "GRFPWR,"   + QString::number(Channel) + "\n";
-    res = comms->SendMess(res);
+    if(sValsList.count() < 5)
+    {
+      res = "GRFPWR,"   + QString::number(Channel) + "\n";
+      res = comms->SendMess(res);
+    }
+    else res = sValsList[4];
     if(res != "") Power->setText(res);
     Updating = false;
 }

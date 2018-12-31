@@ -52,6 +52,18 @@ CDirSelectionDlg::CDirSelectionDlg(const QString initialPath, QWidget *parent) :
     setLayout(mainLayout);
 }
 
+void CDirSelectionDlg::accept(void)
+{
+    this->setResult(1);
+    this->hide();
+}
+
+void CDirSelectionDlg::reject(void)
+{
+    this->setResult(0);
+    this->hide();
+}
+
 void CDirSelectionDlg::setTitle(QString title)
 {
     this->setWindowTitle(title);

@@ -26,4 +26,8 @@ private:
     QPushButton *m_OKbutton;
     QPushButton *m_Cancelbutton;
     QString m_initialPath;
+
+private slots:
+    void accept(void);
+    void reject(void);
 };

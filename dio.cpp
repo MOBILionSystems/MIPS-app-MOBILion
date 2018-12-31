@@ -346,8 +346,10 @@ void DIOchannel::Update(void)
     if(comms == NULL) return;
     comms->rb.clear();
     res = comms->SendMess("GDIO," + Channel + "\n");
+    bool oldState = DIO->blockSignals(true);
     if(res.contains("1")) DIO->setChecked(true);
     if(res.contains("0")) DIO->setChecked(false);
+    DIO->blockSignals(oldState);
 }
 
 void DIOchannel::DIOChange(void)

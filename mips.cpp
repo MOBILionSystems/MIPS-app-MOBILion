@@ -138,7 +138,26 @@
 //      1.) Added new timing generator to control panel
 //      2.) Added TCP/IP updates to control panel
 //      3.) Added external trigger options to FAIMS
+// 1.34, Dec 13, 2018
+//      1.) Fixed a number of bugs in the timing generator control
+// 1.35, Dec 15, 2018
+//      1.) Added Save, Load, and Clear all events buttons to timing generator
+//      2.) Fixed bugs in timing generator
+// 1.36, Dec 26, 2018
+//      1.) Improved the control panel performance by using the read all DCbias
+//          and RF driver commands.
+//      2.) Addressed stability issues that were causing some system crashes.
+//      3.) Added the properties page with ability to set folders and startup
+//          behaivor.
 //
+// Planded updates:
+//      - Add ploting capability. Also support this through the Scripting system.
+//      - Add properties page with dir setting and system options. allow
+//        auto connect and auto load of a control panel.
+//      - Reduce the rate that leS boxes are updated to reduce traffic
+//      - Make sure find all MIPS uses 115200 baud
+//      - Develop auto reconnection
+//      - Add load and save to timing generator dialog
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -166,6 +185,7 @@
 #include "controlpanel.h"
 #include "scriptingconsole.h"
 #include "tcpserver.h"
+#include "properties.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
@@ -203,6 +223,7 @@ MIPS::MIPS(QWidget *parent) :
     ui->lblMIPSconnectionNotes->setFont(font);
     #endif
 
+    properties = new Properties;
     scriptconsole = NULL;
     qApp->installEventFilter(this);
     sf = NULL;
@@ -258,6 +279,7 @@ MIPS::MIPS(QWidget *parent) :
     ui->menuTerminal->setEnabled(false);
     ui->actionScripting->setEnabled(true);
 
+    connect(ui->actionProperties,SIGNAL(triggered(bool)), this, SLOT(DisplayProperties()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(loadSettings()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveSettings()));
     connect(ui->pbConfigure, SIGNAL(pressed()), settings, SLOT(show()));
@@ -288,6 +310,8 @@ MIPS::MIPS(QWidget *parent) :
     ui->comboMIPSnetNames->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
     // Sets the polling loop interval and starts the timer
     pollTimer->start(1000);
+
+    for(int i=0;i<properties->MIPS_TCPIP.count();i++) ui->comboMIPSnetNames->addItem(properties->MIPS_TCPIP[i]);
 }
 
 MIPS::~MIPS()
@@ -441,6 +465,11 @@ void MIPS::DisplayAboutMessage(void)
         tr("MIPS interface application, written by Gordon Anderson. This application allows communications with the MIPS system supporting monitoring and control as well as pulse sequence generation.") );
 }
 
+void MIPS::DisplayProperties(void)
+{
+    properties->exec();
+}
+
 void MIPS::loadSettings(void)
 {
     if(sl != NULL)
@@ -591,9 +620,18 @@ void MIPS::saveSettings(void)
 
 void MIPS::pollLoop(void)
 {
+    static  bool firstCall = true;
     QString res ="";
-    //char c;
 
+    if(firstCall)
+    {
+        if(properties->AutoConnect) MIPSsearch();
+        if(Systems.count() >= properties->MinMIPS)
+        {
+           if(properties->LoadControlPanel != "") SelectCP(properties->LoadControlPanel);
+        }
+    }
+    firstCall = false;
     if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
     {
@@ -1310,7 +1348,7 @@ void MIPS::CloseControlPanel(void)
     this->setWindowState(Qt::WindowMaximized);
 }
 
-void MIPS::SelectCP(void)
+void MIPS::SelectCP(QString fileName)
 {
     if(sf   != NULL) return;
     if(sl   != NULL) return;
@@ -1318,18 +1356,19 @@ void MIPS::SelectCP(void)
     if(grid != NULL) return;
     if(cp   != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
-    ControlPanel *c = new ControlPanel(0,Systems);
+    ControlPanel *c = new ControlPanel(0,fileName,Systems,properties);
     if(!c->LoadedConfig) return;
-    c->show();
+//    c->show();
     connect(c, SIGNAL(DialogClosed()), this, SLOT(CloseControlPanel()));
     c->Update();
     this->setWindowState(Qt::WindowMinimized);
     cp = c;
+    cp->show();
 }
 
 void MIPS::slotScripting(void)
 {
-    if(!scriptconsole) scriptconsole = new ScriptingConsole(this);
+    if(!scriptconsole) scriptconsole = new ScriptingConsole(this,properties);
     scriptconsole->show();
 }
 
