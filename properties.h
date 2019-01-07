@@ -21,11 +21,13 @@ public:
     void UpdateVars(void);
     void Save(QString fileName);
     void Load(QString fileName);
+    void Log(QString Message);
     QString DataFilePath;
     QString MethodesPath;
     QString ScriptPath;
     QString LoadControlPanel;
     QString FileName;
+    QString LogFile;
     bool AutoFileName;
     bool AutoConnect;
     int  MinMIPS;

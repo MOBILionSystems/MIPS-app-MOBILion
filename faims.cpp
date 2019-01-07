@@ -336,7 +336,7 @@ void FAIMS::PollLoop(void)
    {
        if(fui->leFMstatus->text() == "Waiting for trigger")
        {
-           // If we received a trigger report then change status to running and
+           // If we received a trigger report the change status to running and
            // set the triggered flag
            // Looking for "DIC,x,RISING,time. where x is the input trigger
            // selected.
@@ -356,7 +356,15 @@ void FAIMS::PollLoop(void)
            }
            return;
        }
-       if(!CVparkingTriggered) return;
+       if(!CVparkingTriggered)
+       {
+           if( fui->tabMIPS->tabText(fui->tabMIPS->currentIndex()) == "FAIMS")
+           {
+              Update();
+              Log("");
+           }
+           return;
+       }
        CurrentMin = (float)eTimer.elapsed()/(float)60000;
        fui->leFMelasped->setText(QString::number(CurrentMin, 'f', 1));
        switch(State)

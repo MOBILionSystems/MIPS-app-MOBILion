@@ -34,11 +34,7 @@
 #include <QUdpSocket>
 #include <QMenu>
 
-//
-// To dos:
-//
-// Need to add classes for:
-// DIO
+extern QString Version;
 
 namespace Ui {
 class ControlPanel;
@@ -229,6 +225,7 @@ private:
     QAction *ScriptHelp;
     QAction *ThisHelp;
     QString HelpFile;
+    QString ControlPanelFile;
 
     QList<TextLabel *>  TextLabels;
     QList<RFchannel *>  RFchans;
@@ -254,13 +251,13 @@ private:
     Shutdown    *SD;
     SaveLoad    *SL;
     MIPScomms   *mc;
-    DCBiasGroups *DCBgroups;
-    QPushButton *MIPScommsButton;
-    QPushButton *ARBcompressorButton;
-    QPushButton *ScriptButton;
+    DCBiasGroups     *DCBgroups;
+    QPushButton      *MIPScommsButton;
+    QPushButton      *ARBcompressorButton;
+    QPushButton      *ScriptButton;
     ScriptingConsole *scriptconsole;
-    QUdpSocket *udpSocket;
-    Help *help;
+    QUdpSocket       *udpSocket;
+    Help             *help;
 public slots:
     void pbSD(void);
     void pbSE(void);

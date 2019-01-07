@@ -47,7 +47,9 @@ public:
     void SendString(QString name, QString message);
     void SendString(QString message);
     void writeData(const QByteArray &data);
+    void msDelay(int ms);
     bool openSerialPort();
+    void reopenSerialPort(void);
     void closeSerialPort();
     void waitforline(int timeout);
     char getchar(void);

@@ -149,15 +149,20 @@
 //      2.) Addressed stability issues that were causing some system crashes.
 //      3.) Added the properties page with ability to set folders and startup
 //          behaivor.
+// 1.37, Jan 6, 2019
+//      1.) Added version to method file saved from control panel
+//      2.) Added control panel file name to method file saved from control panel
+//      3.) Changed signals from acquire program to be queued
+//      4.) Disable trigger button until event is complete
+//      5.) Added comm port re-open on timeout
+//
+// Must dos:
+//      1.) Add logging capability, add log fine selection to properties and log
+//          method to properties class. (in process)
 //
 // Planded updates:
 //      - Add ploting capability. Also support this through the Scripting system.
-//      - Add properties page with dir setting and system options. allow
-//        auto connect and auto load of a control panel.
-//      - Reduce the rate that leS boxes are updated to reduce traffic
-//      - Make sure find all MIPS uses 115200 baud
 //      - Develop auto reconnection
-//      - Add load and save to timing generator dialog
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -202,7 +207,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QInputDialog>
 
-//RingBuffer rb;
+QString Version = "MIPS, Version 1.37 Jan 6, 2019";
 
 MIPS::MIPS(QWidget *parent) :
     QMainWindow(parent),
@@ -216,6 +221,8 @@ MIPS::MIPS(QWidget *parent) :
 
     ui->comboSystems->setVisible(false);
     ui->lblSystems->setVisible(false);
+
+    MIPS::setWindowTitle(Version);
 
     #if defined(Q_OS_MAC)
     QFont font = ui->lblMIPSconnectionNotes->font();
@@ -1175,6 +1182,7 @@ void MIPS::GetRepeatMessage(void)
     {
         RepeatMessage = "";
     }
+    comms->reopenSerialPort();
 }
 
 void MIPS::GetFileFromMIPS(void)

@@ -50,6 +50,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     comp      = NULL;
     TextLabels.clear();
     RFchans.clear();
+    rfa.clear();
     ADCchans.clear();
     DACchans.clear();
     DCBchans.clear();
@@ -72,8 +73,9 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     QString fileName;
     if(CPfileName == "") fileName = QFileDialog::getOpenFileName(this, tr("Load Configuration from File"),"",tr("cfg (*.cfg);;All files (*.*)"));
     else fileName = CPfileName;
-    QFile file(fileName);
     if((fileName == "") || (fileName.isEmpty())) return;
+    QFile file(fileName);
+    ControlPanelFile = fileName;
     // Open UDP socket to send commands to reader app
     udpSocket = new QUdpSocket(this);
     udpSocket->bind(QHostAddress::LocalHost, 7755);
@@ -700,6 +702,8 @@ QString ControlPanel::Save(QString Filename)
         QTextStream stream(&file);
         QDateTime dateTime = QDateTime::currentDateTime();
         stream << "# Control panel settings, " + dateTime.toString() + "\n";
+        stream << "# " + Version + "\n";
+        stream << "# Control panel file, " + ControlPanelFile + "\n";
         if(DCBoffsets.count() > 0)
         {
             stream << "DCB offsets," + QString::number(DCBoffsets.count()) + "\n";

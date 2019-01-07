@@ -29,6 +29,20 @@ Properties::~Properties()
     delete ui;
 }
 
+void Properties::Log(QString Message)
+{
+    // Exit if log filenamee is empty
+    if(LogFile == "") return;
+    // Open file for append and add message
+    QFile file(LogFile);
+    if(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+    {
+        QTextStream stream(&file);
+        stream << Message + "," + QDateTime::currentDateTime().toString() + "\n";
+        file.close();
+    }
+}
+
 void Properties::UpdateVars(void)
 {
     DataFilePath = ui->leDataFilePath->text();

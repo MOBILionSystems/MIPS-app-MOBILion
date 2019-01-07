@@ -189,9 +189,9 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
         if(cla == NULL)
         {
            cla = new cmdlineapp(p);
-           connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()));
-           connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()));
-           connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()));
+           connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()),Qt::QueuedConnection);
+           connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()),Qt::QueuedConnection);
+           connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()),Qt::QueuedConnection);
         }
         cla->appPath = cmd;
         cla->Clear();
@@ -275,8 +275,8 @@ void TimingControl::Show(void)
     Abort = new QPushButton("Abort",gbTC);     Abort->setGeometry(20,85,100,32); Abort->setAutoDefault(false);
     // Connect to the event slots
     connect(Edit,SIGNAL(pressed()),this,SLOT(pbEdit()));
-    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()));
-    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()));
+    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()),Qt::QueuedConnection);
+    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()),Qt::QueuedConnection);
     TableDownloaded = false;
     TG = new TimingGenerator(p,Title,MIPSnm);
     TG->comms = comms;
@@ -297,19 +297,13 @@ void TimingControl::pbEdit(void)
 
 void TimingControl::pbTrigger(void)
 {
-    static bool busy = false;
     Trigger->setDown(false);
     if(TG->isTableMode())
     {
         if(statusBar != NULL) statusBar->showMessage("Can't trigger, system in table mode!", 5000);
         return;
     }
-    if(busy)
-    {
-        if(statusBar != NULL) statusBar->showMessage("Can't trigger, system busy!", 5000);
-        return;
-    }
-    busy = true;
+    Trigger->setEnabled(false);
     // If the table line edit box is empty, generate table
     if(TG->ui->leTable->text() == "") TG->slotGenerate();
     TableDownloaded = DownloadTable(comms, TG->ui->leTable->text(),TG->ui->comboClockSource->currentText(), TG->ui->comboTriggerSource->currentText());
@@ -319,7 +313,7 @@ void TimingControl::pbTrigger(void)
         else AcquireData("");
     }
     else AcquireData("");
-    busy = false;
+    Trigger->setEnabled(true);
 }
 
 void TimingControl::slotDataAcquired(QString filepath)
@@ -822,9 +816,9 @@ void IFTtiming::Show(void)
     labels[10] =new QLabel("Table",gbIFT);           labels[10]->setGeometry(10,150,59,16);
     // Connect to the event slots
     connect(GenerateTable,SIGNAL(pressed()),this,SLOT(pbGenerate()));
-    connect(Download,SIGNAL(pressed()),this,SLOT(pbDownload()));
-    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()));
-    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()));
+    connect(Download,SIGNAL(pressed()),this,SLOT(pbDownload()),Qt::QueuedConnection);
+    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()),Qt::QueuedConnection);
+    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()),Qt::QueuedConnection);
     connect(leFillTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
     connect(leTrapTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
     connect(leReleaseTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
@@ -919,12 +913,14 @@ void IFTtiming::pbDownload(void)
 
 void IFTtiming::pbTrigger(void)
 {
+    Trigger->setEnabled(false);
     if(properties != NULL)
     {
         if((properties->DataFilePath != "") && (properties->FileName != "")) AcquireData(properties->DataFilePath + "/" + properties->FileName);
         else AcquireData("");
     }
     else AcquireData("");
+    Trigger->setEnabled(true);
 }
 
 void IFTtiming::slotDataAcquired(QString filePath)

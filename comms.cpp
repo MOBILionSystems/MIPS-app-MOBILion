@@ -506,6 +506,8 @@ bool Comms::SendCommand(QString message)
             }
         }
     }
+    // Here if the message transaction timmed out
+    reopenSerialPort();
     res = message + " :Timeout";
     sb->showMessage(res.toStdString().c_str(),2000);
     return true;
@@ -545,6 +547,8 @@ QString Comms::SendMessage(QString message)
             if(res != "") return res;
         }
     }
+    // Here if the message transaction timmed out
+    reopenSerialPort();
     res = message + " :Timeout";
     sb->showMessage(res.toStdString().c_str(),2000);
     res = "";
@@ -647,6 +651,23 @@ bool Comms::isMIPS(QString port)
     serial->clearError();
     rb.clear();
     return false;
+}
+
+void Comms::msDelay(int ms)
+{
+    QTime timer;
+
+    timer.start();
+    while(timer.elapsed() < ms) QApplication::processEvents();
+}
+
+void Comms::reopenSerialPort(void)
+{
+    if(!serial->isOpen()) return;
+    serial->close();
+    msDelay(250);
+    serial->open(QIODevice::ReadWrite);
+    serial->setDataTerminalReady(true);
 }
 
 bool Comms::openSerialPort()
