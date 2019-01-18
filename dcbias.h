@@ -46,10 +46,12 @@ class DCBchannel : public QWidget
     Q_OBJECT
 public:
     DCBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
-    void Show(void);
-    void Update(QString sVals = "");
+    void    Show(void);
+    void    Update(QString sVals = "");
     QString Report(void);
-    bool SetValues(QString strVals);
+    bool    SetValues(QString strVals);
+    void    Shutdown(void);
+    void    Restore(void);
     QString ProcessCommand(QString cmd);
     QWidget               *p;
     QString               Title;
@@ -61,13 +63,15 @@ public:
     bool                  LinkEnable;
     QList<DCBchannel*>    DCBs;
     float                 CurrentVsp;
+    bool                  isShutdown;
 private:
     QFrame                *frmDCB;
     QLineEdit             *Vrb;
     QLabel                *labels[2];
     int                   UpdateCount;
-    bool Updating;
-    bool UpdateOff;
+    QString               activeVoltage;
+    bool                  Updating;
+    bool                  UpdateOff;
 private slots:
     void VspChange(void);
 protected:

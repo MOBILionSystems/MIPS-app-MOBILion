@@ -196,6 +196,7 @@ public:
     Q_INVOKABLE QString Save(QString Filename);
     Q_INVOKABLE QString Load(QString Filename);
     void InitMIPSsystems(QString initFilename);
+    void LogDataFile(void);
     QList<Comms*> Systems;
     QStatusBar  *statusBar;
     DCBchannel  *FindDCBchannel(QString name);
@@ -219,12 +220,15 @@ private:
     Comms            *FindCommPort(QString name, QList<Comms*> Systems);
     Ui::ControlPanel *ui;
     TCPserver *tcp;
-    QMenu *contextMenu2Dplot;
+    QMenu   *contextMenu2Dplot;
     QAction *GeneralHelp;
     QAction *MIPScommands;
     QAction *ScriptHelp;
     QAction *ThisHelp;
+    QAction *OpenLogFile;
+    QAction *CloseLogFile;
     QString HelpFile;
+    QString LogFile;;
     QString ControlPanelFile;
 
     QList<TextLabel *>  TextLabels;
@@ -241,6 +245,8 @@ private:
     IFTtiming           *IFT;
     TimingControl       *TC;
     Compressor          *comp;
+    uint        LogStartTime;
+    int         LogPeriod;
     int         UpdateHoldOff;
     bool        UpdateStop;
     bool        ShutdownFlag;
@@ -278,6 +284,9 @@ public slots:
     void slotThisControlPanelHelp(void);
     void tcpCommand(void);
     void pbARBcompressor(void);
+    void slotLogStatusBarMessage(QString);
+    void slotOpenLogFile(void);
+    void slotCloseLogFile(void);
 };
 
 #endif // CONTROLPANEL_H

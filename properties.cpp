@@ -22,6 +22,7 @@ Properties::Properties(QWidget *parent) :
     connect(ui->pbLoadControlPanel, SIGNAL(pressed()), this, SLOT(slotLoadControlPanel()));
     connect(ui->pbClear, SIGNAL(pressed()), this, SLOT(slotClear()));
     connect(ui->pbOK, SIGNAL(pressed()), this, SLOT(slotOK()));
+    connect(ui->pbLogFile, SIGNAL(pressed()), this, SLOT(slotLogFile()));
 }
 
 Properties::~Properties()
@@ -31,6 +32,9 @@ Properties::~Properties()
 
 void Properties::Log(QString Message)
 {
+    // Exit if message is empty
+    if(Message.isEmpty()) return;
+    if(Message == "") return;
     // Exit if log filenamee is empty
     if(LogFile == "") return;
     // Open file for append and add message
@@ -38,7 +42,7 @@ void Properties::Log(QString Message)
     if(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
     {
         QTextStream stream(&file);
-        stream << Message + "," + QDateTime::currentDateTime().toString() + "\n";
+        stream << Message.replace("\n","") + "," + QDateTime::currentDateTime().toString() + "\n";
         file.close();
     }
 }
@@ -50,6 +54,7 @@ void Properties::UpdateVars(void)
     ScriptPath   = ui->leScriptPath->text();
     LoadControlPanel = ui->leControlPanel->text();
     FileName = ui->leFileName->text();
+    LogFile = ui->leLogFile->text();
     MinMIPS = ui->leMinMIPS->text().toInt();
     if(ui->chkAutoConnect->isChecked()) AutoConnect = true;
     else AutoConnect = false;
@@ -97,6 +102,16 @@ void Properties::slotLoadControlPanel(void)
 
 }
 
+void Properties::slotLogFile(void)
+{
+    ui->pbLogFile->setDown(false);
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setOptions(QFileDialog::DontConfirmOverwrite);
+    QString fileName = dialog.getSaveFileName(this, tr("Select log file name"),"",tr("log (*.log);;All files (*.*)"),0, QFileDialog::DontConfirmOverwrite);
+    ui->leLogFile->setText(fileName);
+}
+
 void Properties::slotClear(void)
 {
     ui->comboTCPIPlist->clear();
@@ -126,6 +141,7 @@ void Properties::Save(QString fileName)
         stream << "LoadControlPanel," + LoadControlPanel + "\n";
         stream << "FileName," + FileName + "\n";
         stream << "MinMIPS," + QString::number(MinMIPS) + "\n";
+        stream << "LogFile," + LogFile + "\n";
         if(AutoFileName) stream << "AutoFileName,TRUE\n";
         else stream << "AutoFileName,FALSE\n";
         if(AutoConnect) stream << "AutoConnect,TRUE\n";
@@ -156,6 +172,7 @@ void Properties::Load(QString fileName)
             else if((reslist.count() == 2) && (reslist[0] == "LoadControlPanel")) ui->leControlPanel->setText(reslist[1]);
             else if((reslist.count() == 2) && (reslist[0] == "FileName")) ui->leFileName->setText(reslist[1]);
             else if((reslist.count() == 2) && (reslist[0] == "MinMIPS")) ui->leMinMIPS->setText(reslist[1]);
+            else if((reslist.count() == 2) && (reslist[0] == "LogFile")) ui->leLogFile->setText(reslist[1]);
             else if((reslist.count() == 2) && (reslist[0] == "AutoFileName") && (reslist[1] == "TRUE")) ui->chkAutoFileName->setChecked(true);
             else if((reslist.count() == 2) && (reslist[0] == "AutoFileName") && (reslist[1] == "FALSE")) ui->chkAutoFileName->setChecked(false);
             else if((reslist.count() == 2) && (reslist[0] == "AutoConnect") && (reslist[1] == "TRUE")) ui->chkAutoConnect->setChecked(true);

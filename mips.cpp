@@ -155,10 +155,24 @@
 //      3.) Changed signals from acquire program to be queued
 //      4.) Disable trigger button until event is complete
 //      5.) Added comm port re-open on timeout
-//
-// Must dos:
-//      1.) Add logging capability, add log fine selection to properties and log
-//          method to properties class. (in process)
+// 1.38, Jan 7, 2019
+//      1.) Added log file to properties and started adding log statements.
+// 1.39, Jan 11, 2019
+//      1.) Added logging of all MIPS status bar messages and control panel
+//          status bar mesages
+//      2.) Added delays in restore function in control panel
+// 1.40, Jan 12, 2019
+//      1.) Fixed a few minor bugs
+//      2.) Updated logging, added MIPS FW version to control panel logs
+//      3.) Added data log option
+// 1.41, Jan 14, 2019
+//      1.) Added serial critical error to logging
+// 1.42, Jan 16, 2019
+//      1.) Update the control panel restore function to set all voltages to 0
+//          then turn on supplies and finally reset the voltages.
+//      2.) Updated the script acquire function to abort is acquire is in progress.
+//      3.) Added code to validate the data received from MIPS before populating the
+//          text boxes.
 //
 // Planded updates:
 //      - Add ploting capability. Also support this through the Scripting system.
@@ -207,7 +221,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QInputDialog>
 
-QString Version = "MIPS, Version 1.37 Jan 6, 2019";
+QString Version = "MIPS, Version 1.42 Jan 16, 2019";
 
 MIPS::MIPS(QWidget *parent) :
     QMainWindow(parent),
@@ -313,12 +327,14 @@ MIPS::MIPS(QWidget *parent) :
     connect(ui->actionARB_upload, SIGNAL(triggered()), this, SLOT(ARBupload()));
     connect(ui->actionSelect, SIGNAL(triggered()), this, SLOT(SelectCP()));
     connect(ui->actionScripting, SIGNAL(triggered()), this, SLOT(slotScripting()));
+    connect(ui->statusBar,SIGNAL(messageChanged(QString)),this,SLOT(slotLogStatusBarMessage(QString)));
 
     ui->comboMIPSnetNames->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
     // Sets the polling loop interval and starts the timer
     pollTimer->start(1000);
 
     for(int i=0;i<properties->MIPS_TCPIP.count();i++) ui->comboMIPSnetNames->addItem(properties->MIPS_TCPIP[i]);
+    if(properties != NULL) properties->Log("MIPS loaded: " + Version);
 }
 
 MIPS::~MIPS()
@@ -327,6 +343,7 @@ MIPS::~MIPS()
 //    if(sf != NULL) delete sf;
 //    delete settings;
 //    delete ui;
+    if(properties != NULL) properties->Log("MIPS closing: " + Version);
 }
 
 void MIPS::closeEvent(QCloseEvent *event)
@@ -972,7 +989,7 @@ void MIPS::UpdateSystem(void)
 void MIPS::tabSelected()
 {
     static QString LastTab = "System";
-
+    if(properties != NULL) properties->Log("Tab selected, " + ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()));
     disconnect(comms, SIGNAL(DataReady()),0,0);
     disconnect(console, SIGNAL(getData(QByteArray)),0,0);
     ui->menuTerminal->setEnabled(false);
@@ -1182,7 +1199,6 @@ void MIPS::GetRepeatMessage(void)
     {
         RepeatMessage = "";
     }
-    comms->reopenSerialPort();
 }
 
 void MIPS::GetFileFromMIPS(void)
@@ -1354,6 +1370,7 @@ void MIPS::CloseControlPanel(void)
 {
     cp_deleteRequest = true;
     this->setWindowState(Qt::WindowMaximized);
+    ui->tabMIPS->setDisabled(false);
 }
 
 void MIPS::SelectCP(QString fileName)
@@ -1372,6 +1389,7 @@ void MIPS::SelectCP(QString fileName)
     this->setWindowState(Qt::WindowMinimized);
     cp = c;
     cp->show();
+    ui->tabMIPS->setDisabled(true);
 }
 
 void MIPS::slotScripting(void)
@@ -1468,4 +1486,11 @@ QString MIPS::popupUserInput(QString title, QString message)
     if(!ok) text="";
     QApplication::processEvents();
     return text;
+}
+
+void MIPS::slotLogStatusBarMessage(QString statusMess)
+{
+    if(statusMess == "") return;
+    if(statusMess.isEmpty()) return;
+    if(properties != NULL) properties->Log("MIPS StatusBar: " + statusMess);
 }

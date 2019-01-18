@@ -42,12 +42,12 @@ class RFchannel : public QWidget
 
 public:
     RFchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
-    void Show(void);
-    void Update(QString sVals = "");
+    void    Show(void);
+    void    Update(QString sVals = "");
     QString Report(void);
-    bool SetValues(QString strVals);
-    void Shutdown(void);
-    void Restore(void);
+    bool    SetValues(QString strVals);
+    void    Shutdown(void);
+    void    Restore(void);
     QString ProcessCommand(QString cmd);
     QWidget *p;
     QString Title;
@@ -67,8 +67,8 @@ private:
     QPushButton *Retune;
     QLabel      *labels[10];
     QString     activeDrive;
-    bool Updating;
-    bool UpdateOff;
+    bool        Updating;
+    bool        UpdateOff;
 private slots:
     void DriveChange(void);
     void FreqChange(void);

@@ -348,8 +348,9 @@ DCBchannel::DCBchannel(QWidget *parent, QString name, QString MIPSname, int x, i
     X      = x;
     Y      = y;
     comms  = NULL;
-    Updating = false;
-    UpdateOff = false;
+    isShutdown = false;
+    Updating   = false;
+    UpdateOff  = false;
     qApp->installEventFilter(this);
     DCBs.clear();
     LinkEnable = false;
@@ -400,7 +401,8 @@ QString DCBchannel::Report(void)
 {
     QString res;
 
-    res = Title + "," + Vsp->text() + "," + Vrb->text();
+    if(isShutdown) res = Title + "," + activeVoltage + "," + Vrb->text();
+    else res = Title + "," + Vsp->text() + "," + Vrb->text();
     return(res);
 }
 
@@ -411,10 +413,18 @@ bool DCBchannel::SetValues(QString strVals)
     if(!strVals.startsWith(Title)) return false;
     resList = strVals.split(",");
     if(resList.count() < 2) return false;
-    Vsp->setText(resList[1]);
-    CurrentVsp = Vsp->text().toFloat();
-    Vsp->setModified(true);
-    Vsp->editingFinished();
+    if(isShutdown)
+    {
+        activeVoltage = resList[1];
+        CurrentVsp = activeVoltage.toFloat();
+    }
+    else
+    {
+        Vsp->setText(resList[1]);
+        CurrentVsp = Vsp->text().toFloat();
+        Vsp->setModified(true);
+        Vsp->editingFinished();
+    }
     return true;
  }
 
@@ -446,8 +456,9 @@ QString DCBchannel::ProcessCommand(QString cmd)
 // data.
 void DCBchannel::Update(QString sVals)
 {
-    QString res;
+    QString     res;
     QStringList sValsList;
+    bool        ok;
 
     sValsList = sVals.split(",");
     if(comms == NULL) return;
@@ -467,7 +478,8 @@ void DCBchannel::Update(QString sVals)
        }
     }
     else res = sValsList[0];
-    if(!Vsp->hasFocus()) Vsp->setText(res);
+    res.toFloat(&ok);
+    if(!Vsp->hasFocus() && ok) Vsp->setText(res);
     CurrentVsp = Vsp->text().toFloat();
     if(sValsList.count() < 2)
     {
@@ -480,7 +492,8 @@ void DCBchannel::Update(QString sVals)
        }
     }
     else res = sValsList[1];
-    Vrb->setText(res);
+    res.toFloat(&ok);
+    if(ok) Vrb->setText(res);
     // Compare setpoint with readback and color the readback background
     // depending on the difference.
     // No data = white
@@ -524,6 +537,25 @@ void DCBchannel::VspChange(void)
    }
    CurrentVsp = Vsp->text().toFloat();
    Vsp->setModified(false);
+}
+
+void DCBchannel::Shutdown(void)
+{
+    if(isShutdown) return;
+    isShutdown = true;
+    activeVoltage = Vsp->text();
+    Vsp->setText("0");
+    Vsp->setModified(true);
+    Vsp->editingFinished();
+}
+
+void DCBchannel::Restore(void)
+{
+    if(!isShutdown) return;
+    isShutdown = false;
+    Vsp->setText(activeVoltage);
+    Vsp->setModified(true);
+    Vsp->editingFinished();
 }
 
 // *************************************************************************************************

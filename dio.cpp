@@ -46,8 +46,10 @@ void DIO::Update(void)
        if(w->objectName().contains("chk"))
        {
             res = "G" + w->objectName().mid(4).replace("_",",") + "\n";
+            bool oldState = ((QCheckBox *)w)->blockSignals(true);
             if(comms->SendMess(res).toInt()==1) ((QCheckBox *)w)->setChecked(true);
             else ((QCheckBox *)w)->setChecked(false);
+            ((QCheckBox *)w)->blockSignals(oldState);
        }
        if(w->objectName().contains("le"))
        {
@@ -66,7 +68,7 @@ void DIO::Update(void)
        }
     }
     dui->tabMIPS->setEnabled(true);
-    dui->statusBar->showMessage(tr(""));
+    dui->statusBar->clearMessage();
 }
 
 void DIO::UpdateDIO(void)
@@ -80,10 +82,13 @@ void DIO::DOUpdated(void)
     QObject* obj = sender();
     QString res;
 
-    res = obj->objectName().mid(3).replace("_",",") + ",";
-    if(((QCheckBox *)obj)->checkState()) res += "1\n";
-    else res+= "0\n";
-    comms->SendCommand(res.toStdString().c_str());
+    if(obj->objectName().startsWith("chkS"))
+    {
+        res = obj->objectName().mid(3).replace("_",",") + ",";
+        if(((QCheckBox *)obj)->checkState()) res += "1\n";
+        else res+= "0\n";
+        comms->SendCommand(res.toStdString().c_str());
+    }
 }
 
 // Slot for Trigger high pushbutton
@@ -348,7 +353,7 @@ void DIOchannel::Update(void)
     res = comms->SendMess("GDIO," + Channel + "\n");
     bool oldState = DIO->blockSignals(true);
     if(res.contains("1")) DIO->setChecked(true);
-    if(res.contains("0")) DIO->setChecked(false);
+    else if(res.contains("0")) DIO->setChecked(false);
     DIO->blockSignals(oldState);
 }
 

@@ -35,9 +35,10 @@ ScriptingConsole::~ScriptingConsole()
 void ScriptingConsole::on_pbEvaluate_clicked()
 {
     ui->pbEvaluate->setDown(false);
+    if(engine->isEvaluating()) return;
+    if(properties != NULL) properties->Log("Script executed");
     QString script = ui->txtScript->toPlainText();
     QScriptValue result = engine->evaluate(script);
-
     QString markup;
     if(result.isError())
         markup.append("<font color=\"red\">");
@@ -73,6 +74,7 @@ void ScriptingConsole::on_pbSave_clicked()
         QTextStream stream(&file);
         stream << ui->txtScript->toPlainText();
         file.close();
+        if(properties != NULL) properties->Log("Script saved: " + fileName);
     }
 }
 
@@ -91,12 +93,14 @@ void ScriptingConsole::on_pbLoad_clicked()
         QString text = stream.readAll();
         ui->txtScript->append(text);
         file.close();
+        if(properties != NULL) properties->Log("Script loaded: " + fileName);
     }
 }
 
 void ScriptingConsole::on_pbAbort_clicked()
 {
     engine->abortEvaluation();
+    if(properties != NULL) properties->Log("Script aborted");
 }
 
 void ScriptingConsole::on_pbHelp_clicked()

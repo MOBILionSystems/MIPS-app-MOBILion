@@ -112,6 +112,7 @@ public slots:
     void CloseControlPanel(void);
     void slotScripting(void);
     void DisplayProperties(void);
+    void slotLogStatusBarMessage(QString);
 
 private:
     Properties *properties;

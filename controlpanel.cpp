@@ -36,6 +36,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     QStringList resList;
 
     ui->setupUi(this);
+    ControlPanel::setWindowTitle("Custom control panel, right click for options");
     Systems = S;
 
     // Init a number of variables
@@ -69,6 +70,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     tcp = NULL;
     properties = prop;
     help = new Help();
+    LogFile.clear();
     // Allow user to select the configuration file
     QString fileName;
     if(CPfileName == "") fileName = QFileDialog::getOpenFileName(this, tr("Load Configuration from File"),"",tr("cfg (*.cfg);;All files (*.*)"));
@@ -76,6 +78,15 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     if((fileName == "") || (fileName.isEmpty())) return;
     QFile file(fileName);
     ControlPanelFile = fileName;
+    if(properties != NULL)
+    {
+        properties->Log("Control panel loaded: " + ControlPanelFile);
+        for(int i=0;i<Systems.count();i++)
+        {
+            // Add MIPS firmware version to log file
+            properties->Log(Systems[i]->MIPSname + ": " + Systems[i]->SendMess("GVER\n"));
+        }
+    }
     // Open UDP socket to send commands to reader app
     udpSocket = new QUdpSocket(this);
     udpSocket->bind(QHostAddress::LocalHost, 7755);
@@ -98,6 +109,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
                 statusBar->setGeometry(0,resList[2].toInt()-18,resList[1].toInt(),18);
                 statusBar->showMessage("Control panel loaded: " + QDateTime().currentDateTime().toString());
                 statusBar->raise();
+                connect(statusBar,SIGNAL(messageChanged(QString)),this,SLOT(slotLogStatusBarMessage(QString)));
             }
             if((resList[0].toUpper() == "IMAGE") && (resList.length()==2))
             {
@@ -456,7 +468,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     file.close();
     LoadedConfig = true;
     connect(ui->lblBackground, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popupHelp(QPoint)));
-    // Popup help menu actions
+    // Popup options menu actions
     GeneralHelp = new QAction("General help", this);
     connect(GeneralHelp, SIGNAL(triggered()), this, SLOT(slotGeneralHelp()));
     MIPScommands = new QAction("MIPS commands", this);
@@ -468,10 +480,15 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
         ThisHelp = new QAction("This control panel help", this);
         connect(ThisHelp, SIGNAL(triggered()), this, SLOT(slotThisControlPanelHelp()));
     }
+    OpenLogFile = new QAction("Open data log", this);
+    connect(OpenLogFile, SIGNAL(triggered()), this, SLOT(slotOpenLogFile()));
+    CloseLogFile = new QAction("Close data log", this);
+    connect(CloseLogFile, SIGNAL(triggered()), this, SLOT(slotCloseLogFile()));
 }
 
 ControlPanel::~ControlPanel()
 {
+    if(properties != NULL) properties->Log("Control panel unloading");
     delete tcp;
     delete ui;
 }
@@ -480,7 +497,7 @@ void ControlPanel::reject()
 {
     QMessageBox msgBox;
 
-    if(SystemIsShutdown)  // If it shutdown send warning
+    if(SystemIsShutdown)  // If its shutdown send warning
     {
         QString msg = "The system is currently shutdown, this means all volatges are disabled and ";
         msg += "all RF drive levels are set to 0. Make sure you have saved all your settings ";
@@ -502,6 +519,8 @@ void ControlPanel::popupHelp(QPoint qp)
     contextMenu2Dplot->addAction(MIPScommands);
     contextMenu2Dplot->addAction(ScriptHelp);
     if(!HelpFile.isEmpty()) contextMenu2Dplot->addAction(ThisHelp);
+    if(LogFile == "") contextMenu2Dplot->addAction(OpenLogFile);
+    if(LogFile != "") contextMenu2Dplot->addAction(CloseLogFile);
     contextMenu2Dplot->exec(qp);
 }
 
@@ -532,6 +551,117 @@ void ControlPanel::slotThisControlPanelHelp(void)
     help->SetTitle("This Control panel help");
     help->LoadHelpText(HelpFile);
     help->show();
+}
+
+void ControlPanel::slotLogStatusBarMessage(QString statusMess)
+{
+    if(statusMess == "") return;
+    if(statusMess.isEmpty()) return;
+    if(properties != NULL) properties->Log("CP StatusBar: " + statusMess);
+}
+
+// This menu option allows the user to define a data log file name and
+// define the minimum time between samples. After the file is opened a header
+// is written with the variable names and the time the logging started.
+// The data file is CSV with wach record having a time stamp in seconds from
+// the time the file was opened.
+void ControlPanel::slotOpenLogFile(void)
+{
+    QFileDialog fileDialog;
+    QMessageBox msgBox;
+    bool ok;
+
+    QString msg = "This option will open a data log file allowing you to define the ";
+    msg += "minimum time between samples. The data file in CSV with a header holding ";
+    msg += "the value names. Most control parameter values are saved.\n";
+    msgBox.setText(msg);
+    msgBox.setInformativeText("Are you sure you want to continue?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+    int ret = msgBox.exec();
+    if(ret == QMessageBox::No) return;
+    // Ask for file name
+    QString dataFile = fileDialog.getSaveFileName(this, tr("Save data to log File"),"",tr("Log (*.log);;All files (*.*)"));
+    if(dataFile == "") return;
+    // Ask for time between samples
+    QString res = QInputDialog::getText(this, "Log file sample period", "Enter the minimum time in seconds between samples.", QLineEdit::Normal,"10", &ok);
+    // Initalize the logging parameters
+    LogStartTime = 0;
+    LogPeriod = res.toInt();
+    if(LogPeriod <= 0) LogPeriod = 1;
+    LogFile = dataFile;
+    statusBar->showMessage("Data log file opened: " + dataFile);
+    ControlPanel::setWindowTitle("Custom control panel, right click for options, data log file open: " + dataFile);
+}
+
+void ControlPanel::slotCloseLogFile(void)
+{
+    LogFile.clear();
+    statusBar->showMessage("Data log file closed!");
+    ControlPanel::setWindowTitle("Custom control panel, right click for options");
+}
+
+void ControlPanel::LogDataFile(void)
+{
+   QStringList vals;
+   QString     header;
+   QString     record;
+   int         i;
+   QDateTime   qt;
+   static uint NextSampleTime;
+
+   if(LogFile.isEmpty()) return;
+   header.clear();
+   record.clear();
+   if(LogStartTime == 0)
+   {
+       LogStartTime = qt.currentDateTime().toTime_t();
+       NextSampleTime = LogStartTime;
+       // Write the file header
+       header = QDateTime().currentDateTime().toString() + "\n";
+       // Build the CSV header record
+       header += "Seconds";
+       for(i=0;i<DCBchans.count();i++)
+       {
+           vals = DCBchans[i]->Report().split(",");
+           header += "," + vals[0] + ".SP," + vals[0] + ".RP";
+       }
+       for(i=0;i<RFchans.count();i++)
+       {
+           vals = RFchans[i]->Report().split(",");
+           header += "," + vals[0] + ".DRV," + vals[0] + ".FREQ," + vals[0] + ".RF+," + vals[0] + ".RF-," + vals[0] + ".PWR";
+       }
+       header += "\n";
+   }
+   if(qt.currentDateTime().toTime_t() >= NextSampleTime)
+   {
+       while(NextSampleTime <= qt.currentDateTime().toTime_t()) NextSampleTime += LogPeriod;
+       record = QString::number(qt.currentDateTime().toTime_t() - LogStartTime);
+       // Build the data string to write to the log file
+       for(i=0;i<DCBchans.count();i++)
+       {
+           vals = DCBchans[i]->Report().split(",");
+           record += "," + vals[1] + "," + vals[2];
+       }
+       for(i=0;i<RFchans.count();i++)
+       {
+           vals = RFchans[i]->Report().split(",");
+           record += "," + vals[1] + "," + vals[2] + "," + vals[3] + "," + vals[4] + "," + vals[5];
+       }
+       record += "\n";
+   }
+   if(!header.isEmpty() || !record.isEmpty())
+   {
+       // Open file for append and save log results
+       QFile file(LogFile);
+       if(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+       {
+           QTextStream stream(&file);
+           if(!header.isEmpty()) stream << header;
+           if(!record.isEmpty()) stream << record;
+           file.close();
+       }
+   }
 }
 
 void ControlPanel::InitMIPSsystems(QString initFilename)
@@ -596,6 +726,7 @@ void ControlPanel::Update(void)
        for(i=0;i<RFchans.count();i++)    RFchans[i]->Shutdown();
        for(i=0;i<rfa.count();i++)        rfa[i]->Shutdown();
        if(statusBar != NULL) statusBar->showMessage("System shutdown, " + QDateTime().currentDateTime().toString());
+       if(properties != NULL) properties->Log("System Shutdown");
        return;
    }
    if(RestoreFlag)
@@ -604,10 +735,18 @@ void ControlPanel::Update(void)
        SystemIsShutdown = false;
        UpdateHoldOff = 1;
        for(i=0;i<ESIchans.count();i++)   ESIchans[i]->Restore();
-       for(i=0;i<DCBenables.count();i++) DCBenables[i]->Restore();
-       for(i=0;i<RFchans.count();i++)    RFchans[i]->Restore();
+       msDelay(100);
+       // To prevent voltage transients we will first shutdown all the DC bias values
+//       for(i=0;i<DCBchans.count();i++) {DCBchans[i]->Shutdown(); msDelay(50);}
+//       msDelay(100);
+       for(i=0;i<DCBenables.count();i++) {DCBenables[i]->Restore(); msDelay(250);}
+       // Now restore all the DCbias voltages
+//       for(i=0;i<DCBchans.count();i++)  {DCBchans[i]->Restore(); msDelay(50);}
+//       msDelay(100);
+       for(i=0;i<RFchans.count();i++)    {RFchans[i]->Restore(); msDelay(250);}
        for(i=0;i<rfa.count();i++)        rfa[i]->Restore();
        if(statusBar != NULL) statusBar->showMessage("System enabled, " + QDateTime().currentDateTime().toString());
+       if(properties != NULL) properties->Log("System Restored");
        return;
    }
    if(busy) return;
@@ -674,9 +813,9 @@ void ControlPanel::Update(void)
    }
    for(i=0;i<DCBoffsets.count();i++)  DCBoffsets[i]->Update();
    for(i=0;i<DCBenables.count();i++)  DCBenables[i]->Update();
-   if(TC != NULL) if(!TC->TG->isTableMode())
+   if(TC != NULL)
    {
-       for(i=0;i<DIOchannels.count();i++) DIOchannels[i]->Update();
+       if(!TC->TG->isTableMode()) for(i=0;i<DIOchannels.count();i++) DIOchannels[i]->Update();
    }
    else for(i=0;i<DIOchannels.count();i++) DIOchannels[i]->Update();
    for(i=0;i<ESIchans.count();i++)    ESIchans[i]->Update();
@@ -684,6 +823,7 @@ void ControlPanel::Update(void)
    for(i=0;i<rfa.count();i++)         rfa[i]->Update();
    if(comp!=NULL)                     comp->Update();
    busy = false;
+   LogDataFile();
 }
 
 QString ControlPanel::Save(QString Filename)
@@ -695,6 +835,7 @@ QString ControlPanel::Save(QString Filename)
     #endif
     if(Filename == "") return "No file defined!";
     UpdateHoldOff = 1000;
+    if(properties != NULL) properties->Log("Save method file: " + Filename);
     QFile file(Filename);
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
@@ -788,6 +929,7 @@ QString ControlPanel::Load(QString Filename)
     if(Filename == "") return "No file defined!";
     UpdateHoldOff = 1000;
     QFile file(Filename);
+    if(properties != NULL) properties->Log("Load method file: " + Filename);
     if(file.open(QIODevice::ReadOnly|QIODevice::Text))
     {
         // We're going to streaming the file
@@ -905,6 +1047,7 @@ void ControlPanel::slotDataAcquired(QString filepath)
 {
     if(filepath != "")
     {
+        if(properties != NULL) properties->Log("Data acquired: " + filepath);
         Save(filepath + "/Method.settings");
         // Send UDP message to allow reader to open the data file
         QString mess = "Load,"+filepath+"/U1084A.data";
@@ -1048,6 +1191,16 @@ void ControlPanel::SystemShutdown(void)
 void ControlPanel::Acquire(QString filePath)
 {
    QApplication::processEvents();
+   filePath.replace("\\","/");
+   if(isAcquiring())
+   {
+       // If here the system is in the acquire state so create the
+       // empty folder and log error
+       if(properties->AutoFileName) filePath = MakePathUnique(filePath);
+       QDir().mkdir(filePath);
+       statusBar->showMessage("Already acquiring, request ignored but attempted folder creation!");
+       return;
+   }
    if(IFT != NULL) IFT->AcquireData(filePath);
    if(TC != NULL) TC->AcquireData(filePath);
 }

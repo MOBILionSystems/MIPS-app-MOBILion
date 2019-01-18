@@ -692,7 +692,7 @@ bool Comms::openSerialPort()
     else
     {
         QMessageBox::critical(this, QString("Error"), serial->errorString());
-        sb->showMessage(QString("Open error"));
+        sb->showMessage(tr("Open error: ") + serial->errorString());
     }
     return false;
 }
@@ -712,6 +712,7 @@ void Comms::handleError(QSerialPort::SerialPortError error)
     if (error == QSerialPort::ResourceError)
     {
         QMessageBox::critical(this, tr("Critical Error"), serial->errorString());
+        sb->showMessage(tr("Critical Error, port closing: ") + serial->errorString());
         closeSerialPort();
     }
 }

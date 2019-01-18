@@ -43,6 +43,7 @@ private slots:
     void slotLoadControlPanel(void);
     void slotClear(void);
     void slotOK(void);
+    void slotLogFile(void);
 };
 
 #endif // PROPERTIES_H

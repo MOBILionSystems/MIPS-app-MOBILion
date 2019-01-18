@@ -34,6 +34,7 @@ signals:
 public:
     AcquireData(QWidget *parent = 0);
     void        StartAcquire(QString path, int FrameSize, int Accumulations);
+    bool        isRunning(void);
     void        Dismiss(void);
     Comms       *comms;
     QWidget     *p;

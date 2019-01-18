@@ -99,6 +99,7 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
     // - TOFscans, passes the total number of tof scans to acquire, this is
     //             the product of Frame size and accumulations
     // The acquire ap is expected to return "Ready" when ready to accept a trigger.
+    if(properties != NULL) properties->Log("StartAcquire:" + path);
     filePath = "";
     // Make sure the system is in table mode
     if(comms != NULL) if(comms->SendCommand("SMOD,ONCE\n"))
@@ -202,6 +203,7 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
         if(filePath != "") cla->fileName = filePath + "/Acquire.data";
         cla->Execute();
         Acquiring = true;
+        if(properties != NULL) properties->Log("Aquire app started: " + filePath + "/Acquire.data");
     }
     else
     {
@@ -214,22 +216,42 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
 
 void AcquireData::slotDialogClosed(void)
 {
-    disconnect(cla,SIGNAL(Ready()),0,0);
-    disconnect(cla,SIGNAL(AppCompleted()),0,0);
-    disconnect(cla,SIGNAL(DialogClosed()),0,0);
+// These disconnects cause it to crash if connect is Qt::QueuedConnection, ??
+//    disconnect(cla,SIGNAL(Ready()),0,0);
+//    disconnect(cla,SIGNAL(AppCompleted()),0,0);
+//    disconnect(cla,SIGNAL(DialogClosed()),0,0);
+    if(properties != NULL) properties->Log("Aquire application dialog was closed!");
     cla = NULL;
+}
+
+bool AcquireData::isRunning(void)
+{
+   if(cla == NULL) return(false);
+   if(cla->process.state() == QProcess::NotRunning) return(false);
+   cla->raise();
+   return(true);
 }
 
 void AcquireData::slotAppReady(void)
 {
+    if(properties != NULL) properties->Log("Aquire app ready");
     if(comms == NULL) return;
     // Send table start command
-    if(comms->SendCommand("TBLSTRT\n")) if(statusBar != NULL) statusBar->showMessage("Table trigger command accepted!", 5000);
-    else if(statusBar != NULL) statusBar->showMessage("Table trigger command rejected!", 5000);
+    if(comms->SendCommand("TBLSTRT\n"))
+    {
+        if(statusBar != NULL) statusBar->showMessage("Table trigger command accepted!", 5000);
+        if(properties != NULL) properties->Log("Table triggered");
+    }
+    else
+    {
+        if(statusBar != NULL) statusBar->showMessage("Table trigger command rejected!", 5000);
+        if(properties != NULL) properties->Log("Table trigger failed");
+    }
 }
 
 void AcquireData::slotAppFinished(void)
 {
+    if(properties != NULL) properties->Log("Aquire finished");
     // Send a signal that the data collection has finished.
     Acquiring = false;
     if(comms == NULL) return;
@@ -298,6 +320,12 @@ void TimingControl::pbEdit(void)
 void TimingControl::pbTrigger(void)
 {
     Trigger->setDown(false);
+    if(AD->isRunning())
+    {
+        if(properties != NULL) properties->Log("Timing control trigger pressed while running!");
+        return;
+    }
+    if(properties != NULL) properties->Log("Timing control trigger pressed");
     if(TG->isTableMode())
     {
         if(statusBar != NULL) statusBar->showMessage("Can't trigger, system in table mode!", 5000);
@@ -913,7 +941,13 @@ void IFTtiming::pbDownload(void)
 
 void IFTtiming::pbTrigger(void)
 {
+    if(AD->isRunning())
+    {
+        if(properties != NULL) properties->Log("IFT trigger pressed while running!");
+        return;
+    }
     Trigger->setEnabled(false);
+    if(properties != NULL) properties->Log("IFT trigger pressed");
     if(properties != NULL)
     {
         if((properties->DataFilePath != "") && (properties->FileName != "")) AcquireData(properties->DataFilePath + "/" + properties->FileName);
