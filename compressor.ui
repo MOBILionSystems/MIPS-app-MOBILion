@@ -69,7 +69,7 @@
     <property name="title">
      <string>Mode</string>
     </property>
-    <widget class="QRadioButton" name="rbSARBCMODE_NORMAL">
+    <widget class="QRadioButton" name="rbSARBCMODE_Normal">
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -85,7 +85,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QRadioButton" name="rbSARBCMODE_COMPRESS">
+    <widget class="QRadioButton" name="rbSARBCMODE_Compress">
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -111,7 +111,7 @@
     <property name="title">
      <string>Switch</string>
     </property>
-    <widget class="QRadioButton" name="rbSARBCSW_CLOSE">
+    <widget class="QRadioButton" name="rbSARBCSW_Close">
      <property name="geometry">
       <rect>
        <x>15</x>
@@ -127,7 +127,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QRadioButton" name="rbSARBCSW_OPEN">
+    <widget class="QRadioButton" name="rbSARBCSW_Open">
      <property name="geometry">
       <rect>
        <x>15</x>

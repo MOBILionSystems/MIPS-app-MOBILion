@@ -1,5 +1,4 @@
 #include "ringbuffer.h"
-
 #include <QDebug>
 
 
@@ -24,19 +23,16 @@ void RingBuffer::waitforline(int timeout = 0)
     {
         while(1)
         {
-            QApplication::processEvents();
             if(lines > 0) break;
+            QApplication::processEvents();
         }
         return;
     }
     timer.start();
     while(timer.elapsed() < timeout)
     {
+        if(lines > 0) break;
         QApplication::processEvents();
-        if(lines > 0)
-        {
-            break;
-        }
     }
 }
 

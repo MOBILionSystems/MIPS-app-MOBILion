@@ -16,12 +16,13 @@ ScriptingConsole::ScriptingConsole(QWidget *parent, Properties *prop) :
     QDialog(parent),
     ui(new Ui::ScriptingConsole)
 {
-    ui->setupUi(this);
+   ui->setupUi(this);
 
-    properties = prop;
+   properties = prop;
 
-    this->setFixedSize(501,366);
-    engine = new QScriptEngine(this);
+   this->setFixedSize(501,366);
+   engine = new QScriptEngine(this);
+   engine->setProcessEventsInterval(100);
 
    QScriptValue mips = engine->newQObject(parent);
    engine->globalObject().setProperty("mips",mips);
@@ -32,9 +33,13 @@ ScriptingConsole::~ScriptingConsole()
     delete ui;
 }
 
-void ScriptingConsole::on_pbEvaluate_clicked()
+void ScriptingConsole::paintEvent(QPaintEvent *event)
 {
-    ui->pbEvaluate->setDown(false);
+    UpdateStatus();
+}
+
+void ScriptingConsole::RunScript(void)
+{
     if(engine->isEvaluating()) return;
     if(properties != NULL) properties->Log("Script executed");
     QString script = ui->txtScript->toPlainText();
@@ -46,6 +51,12 @@ void ScriptingConsole::on_pbEvaluate_clicked()
     if(result.isError())
         markup.append("</font>");
     ui->lblStatus->setText(markup);
+}
+
+void ScriptingConsole::on_pbEvaluate_clicked()
+{
+    ui->pbEvaluate->setDown(false);
+    RunScript();
 }
 
 void ScriptingConsole::UpdateStatus(void)

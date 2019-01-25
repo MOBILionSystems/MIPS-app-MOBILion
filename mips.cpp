@@ -173,6 +173,16 @@
 //      2.) Updated the script acquire function to abort is acquire is in progress.
 //      3.) Added code to validate the data received from MIPS before populating the
 //          text boxes.
+// 1.43, Jan 19, 2019
+//      1.) Fixed error in Compresssor dialog that causes the mode and switch radio
+//          button to fail
+// 1.44, Jan 22, 2019
+//      1.) Removed all the lock and unlock commands, they caused all kinds of issues
+// 1.45, Jan 24, 2019
+//      1.) Removed the comms return if busy code
+// 1.46, Jan 25, 2019
+//      1.) Redesiged comms code so it blocks untill transaction is complete
+//      2.) Added file path ti acquire dialog
 //
 // Planded updates:
 //      - Add ploting capability. Also support this through the Scripting system.
@@ -221,7 +231,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QInputDialog>
 
-QString Version = "MIPS, Version 1.42 Jan 16, 2019";
+QString Version = "MIPS, Version 1.46 Jan 25, 2019";
 
 MIPS::MIPS(QWidget *parent) :
     QMainWindow(parent),
@@ -1390,6 +1400,7 @@ void MIPS::SelectCP(QString fileName)
     cp = c;
     cp->show();
     ui->tabMIPS->setDisabled(true);
+    cp->raise();
 }
 
 void MIPS::slotScripting(void)

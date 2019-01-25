@@ -234,10 +234,10 @@ QString Compressor::ProcessCommand(QString cmd)
     else if(resList[0].trimmed() == Title + ".Trigger delay") le = ui->leSARBCTD;
     else if(resList[0].trimmed() == Title + ".Normal time") le = ui->leSARBCTN;
     else if(resList[0].trimmed() == Title + ".Non compress time") le = ui->leSARBCTNC;
-    else if(resList[0].trimmed() == Title + ".Compress") rb = ui->rbSARBCMODE_COMPRESS;
-    else if(resList[0].trimmed() == Title + ".Normal") rb = ui->rbSARBCMODE_NORMAL;
-    else if(resList[0].trimmed() == Title + ".Close") rb = ui->rbSARBCSW_CLOSE;
-    else if(resList[0].trimmed() == Title + ".Open") rb = ui->rbSARBCSW_OPEN;
+    else if(resList[0].trimmed() == Title + ".Compress") rb = ui->rbSARBCMODE_Compress;
+    else if(resList[0].trimmed() == Title + ".Normal") rb = ui->rbSARBCMODE_Normal;
+    else if(resList[0].trimmed() == Title + ".Close") rb = ui->rbSARBCSW_Close;
+    else if(resList[0].trimmed() == Title + ".Open") rb = ui->rbSARBCSW_Open;
     else if(resList[0].trimmed() == Title + ".Trigger") pb = ui->pbARBforceTrigger;
     if(le != NULL)
     {

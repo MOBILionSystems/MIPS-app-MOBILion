@@ -39,6 +39,7 @@ public:
     void Execute(void);
     void Clear(void);
     void Dismiss(void);
+    void AppendText(QString message);
 
 private:
     Ui::cmdlineapp *ui;

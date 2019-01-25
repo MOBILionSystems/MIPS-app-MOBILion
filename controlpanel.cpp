@@ -29,6 +29,8 @@
 #include <QTreeView>
 #include <QUdpSocket>
 
+QMutex cpUpdateLock;
+
 ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S, Properties *prop) :
     QDialog(parent),
     ui(new Ui::ControlPanel)
@@ -695,7 +697,6 @@ Comms* ControlPanel::FindCommPort(QString name, QList<Comms*> Systems)
 void ControlPanel::Update(void)
 {
    int i,j,k;
-   static bool busy = false;
 
    if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
    if(UpdateStop) return;
@@ -749,8 +750,7 @@ void ControlPanel::Update(void)
        if(properties != NULL) properties->Log("System Restored");
        return;
    }
-   if(busy) return;
-   busy = true;
+   if(!cpUpdateLock.tryLock()) return;
    // For each MIPS system present if there are RF channels for the selected
    // MIPS system then read all values using the read all commands to speed up the process.
    for(i=0;i<Systems.count();i++)
@@ -822,7 +822,7 @@ void ControlPanel::Update(void)
    for(i=0;i<ARBchans.count();i++)    ARBchans[i]->Update();
    for(i=0;i<rfa.count();i++)         rfa[i]->Update();
    if(comp!=NULL)                     comp->Update();
-   busy = false;
+   cpUpdateLock.unlock();
    LogDataFile();
 }
 
@@ -1157,6 +1157,7 @@ void ControlPanel::pbScript(void)
     if(scriptconsole == NULL) return;
     scriptconsole->show();
     scriptconsole->raise();
+    scriptconsole->repaint();
 }
 
 // The following functions are for the scripting system
@@ -1271,6 +1272,13 @@ QString ControlPanel::popupUserInput(QString title, QString message)
     if(!ok) text="";
     QApplication::processEvents();
     return text;
+}
+
+bool ControlPanel::UpdateHalted(bool stop)
+{
+    bool orginalState = UpdateStop;
+    UpdateStop = stop;
+    return UpdateStop;
 }
 
 // This function is called with a command in the TCP server buffer.

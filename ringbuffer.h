@@ -5,6 +5,8 @@
 #include <QString>
 #include <QTime>
 #include <QApplication>
+#include <QtNetwork/QTcpSocket>
+#include <QtSerialPort/QSerialPort>
 
 #define rbSIZE 10000
 

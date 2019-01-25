@@ -1,5 +1,4 @@
 #include <QTime>
-
 #include "comms.h"
 
 Comms::Comms(SettingsDialog *settings, QString Host, QStatusBar *statusbar)
@@ -455,21 +454,22 @@ void Comms::ARBupload(QString Faddress, QString FileName)
     }
 }
 
-void Comms::SendString(QString name, QString message)
+bool Comms::SendString(QString name, QString message)
 {
-    if((name == MIPSname) || (name == "")) SendString(message);
+    if((name == MIPSname) || (name == "")) return SendString(message);
 }
 
-void Comms::SendString(QString message)
+bool Comms::SendString(QString message)
 {
     if (!serial->isOpen() && !client.isOpen())
     {
         sb->showMessage("Disconnected!",2000);
-        return;
+        return true;
     }
     if(client.isOpen()) keepAliveTimer->setInterval(600000);
     if (serial->isOpen()) serial->write(message.toStdString().c_str());
     if (client.isOpen()) client.write(message.toStdString().c_str());
+    return true;
 }
 
 bool Comms::SendCommand(QString name, QString message)
@@ -493,7 +493,7 @@ bool Comms::SendCommand(QString message)
         rb.clear();
         if (serial->isOpen()) serial->write(message.toStdString().c_str());
         if (client.isOpen()) client.write(message.toStdString().c_str());
-        rb.waitforline(1000);
+        waitforline(1000);
         if(rb.numLines() >= 1)
         {
             res = rb.getline();
@@ -525,6 +525,30 @@ QString Comms::SendMess(QString name, QString message)
     return "";
 }
 
+void Comms::waitforline(int timeout)
+{
+//    rb.waitforline(timeout);
+//    return;
+
+    QTime timer;
+
+    if(timeout == 0)
+    {
+        while(1)
+        {
+            readData2RingBuffer();
+            if(rb.numLines() > 0) break;
+        }
+        return;
+    }
+    timer.start();
+    while(timer.elapsed() < timeout)
+    {
+        readData2RingBuffer();
+        if(rb.numLines() > 0) break;
+    }
+}
+
 QString Comms::SendMessage(QString message)
 {
     QString res;
@@ -540,7 +564,7 @@ QString Comms::SendMessage(QString message)
         rb.clear();
         if (serial->isOpen()) serial->write(message.toStdString().c_str());
         if (client.isOpen()) client.write(message.toStdString().c_str());
-        rb.waitforline(1000);
+        waitforline(1000);
         if(rb.numLines() >= 1)
         {
             res = rb.getline();
@@ -729,13 +753,19 @@ void Comms::readData2RingBuffer(void)
 
     if(client.isOpen())
     {
-        QByteArray data = client.readAll();
-        for(i=0;i<data.size();i++) rb.putch(data[i]);
+        if(client.waitForReadyRead(1) || (client.bytesAvailable() > 0))
+        {
+           QByteArray data = client.readAll();
+           for(i=0;i<data.size();i++) rb.putch(data[i]);
+        }
     }
     if(serial->isOpen())
     {
-        QByteArray data = serial->readAll();
-        for(i=0;i<data.size();i++) rb.putch(data[i]);
+        if(serial->waitForReadyRead(1) || (serial->bytesAvailable() > 0))
+        {
+           QByteArray data = serial->readAll();
+           for(i=0;i<data.size();i++) rb.putch(data[i]);
+        }
     }
     emit DataReady();
 }
@@ -756,11 +786,6 @@ bool Comms::isConnected(void)
 void Comms::disconnected(void)
 {
     sb->showMessage(tr("Disconnected"));
-}
-
-void Comms::waitforline(int timeout)
-{
-    rb.waitforline(timeout);
 }
 
 QString Comms::getline(void)

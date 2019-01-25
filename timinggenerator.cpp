@@ -90,6 +90,9 @@ AcquireData::AcquireData(QWidget *parent)
 
 void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
 {
+    QString StatusMessage;
+
+    StatusMessage.clear();
     // If the Acquire string is defined then we call the program defined
     // by The Acquire string. The program is called with optional arguments
     // as follows:
@@ -102,7 +105,8 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
     if(properties != NULL) properties->Log("StartAcquire:" + path);
     filePath = "";
     // Make sure the system is in table mode
-    if(comms != NULL) if(comms->SendCommand("SMOD,ONCE\n"))
+    if(comms == NULL) StatusMessage += "No open comms channels!\n";
+    else if(comms->SendCommand("SMOD,ONCE\n"))
     {
         if(!TableDownloaded)
         {
@@ -115,13 +119,9 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
             return;
         }
         if(statusBar != NULL) statusBar->showMessage("System mode changed to Table.", 5000);
-        // We should now receive a table ready for trigger command so wait for it
-//        comms->waitforline(1000);
-//        while(comms->rb.numLines() > 0)
-//        {
-//            if(statusBar != NULL) statusBar->showMessage(comms->getline(),5000);
-//        }
+        StatusMessage += "System mode changed to Table.\n";
     }
+    else StatusMessage += "MIPS failed to enter table mode!\n";
     if(Acquire != "")
     {
         QString cmd = "";
@@ -198,6 +198,7 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
         cla->Clear();
         cla->show();
         cla->raise();
+        cla->AppendText(StatusMessage);
         cla->ReadyMessage = "Ready";
         cla->InputRequest = "? Y/N :";
         if(filePath != "") cla->fileName = filePath + "/Acquire.data";
@@ -331,7 +332,6 @@ void TimingControl::pbTrigger(void)
         if(statusBar != NULL) statusBar->showMessage("Can't trigger, system in table mode!", 5000);
         return;
     }
-    Trigger->setEnabled(false);
     // If the table line edit box is empty, generate table
     if(TG->ui->leTable->text() == "") TG->slotGenerate();
     TableDownloaded = DownloadTable(comms, TG->ui->leTable->text(),TG->ui->comboClockSource->currentText(), TG->ui->comboTriggerSource->currentText());
@@ -341,7 +341,6 @@ void TimingControl::pbTrigger(void)
         else AcquireData("");
     }
     else AcquireData("");
-    Trigger->setEnabled(true);
 }
 
 void TimingControl::slotDataAcquired(QString filepath)
@@ -946,7 +945,6 @@ void IFTtiming::pbTrigger(void)
         if(properties != NULL) properties->Log("IFT trigger pressed while running!");
         return;
     }
-    Trigger->setEnabled(false);
     if(properties != NULL) properties->Log("IFT trigger pressed");
     if(properties != NULL)
     {
@@ -954,7 +952,6 @@ void IFTtiming::pbTrigger(void)
         else AcquireData("");
     }
     else AcquireData("");
-    Trigger->setEnabled(true);
 }
 
 void IFTtiming::slotDataAcquired(QString filePath)

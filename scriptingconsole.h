@@ -17,8 +17,12 @@ class ScriptingConsole : public QDialog
 public:
     explicit ScriptingConsole(QWidget *parent = 0, Properties *prop = NULL);
     void UpdateStatus(void);
+    void RunScript(void);
     ~ScriptingConsole();
     Properties  *properties;
+
+protected:
+    void paintEvent(QPaintEvent *event);
 
 private:
     Ui::ScriptingConsole *ui;

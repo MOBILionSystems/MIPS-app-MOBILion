@@ -12,6 +12,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QFileInfo>
 #include <QFileDialog>
+#include <QMutex>
 
 #include "settingsdialog.h"
 #include "ringbuffer.h"
@@ -44,8 +45,8 @@ public:
     QString SendMessage(QString message);
     QString SendMess(QString name, QString message);
     QString SendMess(QString message);
-    void SendString(QString name, QString message);
-    void SendString(QString message);
+    bool SendString(QString name, QString message);
+    bool SendString(QString message);
     void writeData(const QByteArray &data);
     void msDelay(int ms);
     bool openSerialPort();
@@ -83,9 +84,11 @@ public:
     int ADClen;
     QTimer *keepAliveTimer;
 
+public slots:
+    void readData2RingBuffer(void);
+
 private slots:
     void handleError(QSerialPort::SerialPortError error);
-    void readData2RingBuffer(void);
     void readData2ADCBuffer(void);
     void connected(void);
     void disconnected(void);

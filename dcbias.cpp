@@ -146,9 +146,9 @@ void DCbias::DCbiasUpdated(void)
                // Here if this channel has a group label so we need to read the current
                // MIPS channel value to calculate the change
                res = "G" + obj->objectName().mid(3).replace("_",",") + "\n";
-               qDebug() << res;
+               //qDebug() << res;
                ans = comms->SendMess(res);
-               qDebug() << ans;
+               //qDebug() << ans;
                // if(ans == "") ans="100";  // For testing
                if(ans != "")
                {
@@ -182,6 +182,7 @@ void DCbias::Update(void)
     QObjectList widgetList = dui->gbDCbias1->children();
     foreach(QObject *w, widgetList)
     {
+       if( dui->tabMIPS->tabText(dui->tabMIPS->currentIndex()) != "DCbias") {Updating = false; return;}
        if((w->objectName().contains("le")) & (!w->objectName().contains("leGRP")))
        {
             if(!((QLineEdit *)w)->hasFocus())
@@ -200,6 +201,7 @@ void DCbias::Update(void)
         QObjectList widgetList = dui->gbDCbias2->children();
         foreach(QObject *w, widgetList)
         {
+           if( dui->tabMIPS->tabText(dui->tabMIPS->currentIndex()) != "DCbias") {Updating = false; return;}
            if((w->objectName().contains("le")) & (!w->objectName().contains("leGRP")))
            {
                if(!((QLineEdit *)w)->hasFocus())
@@ -219,6 +221,7 @@ void DCbias::Update(void)
         QObjectList widgetList = dui->gbDCbias3->children();
         foreach(QObject *w, widgetList)
         {
+           if( dui->tabMIPS->tabText(dui->tabMIPS->currentIndex()) != "DCbias") {Updating = false; return;}
            if(w->objectName().contains("le"))
            {
                if(!((QLineEdit *)w)->hasFocus())

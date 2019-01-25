@@ -33,6 +33,7 @@
 #include <QBoxLayout>
 #include <QUdpSocket>
 #include <QMenu>
+#include <QMutex>
 
 extern QString Version;
 
@@ -215,6 +216,7 @@ public:
     Q_INVOKABLE void popupMessage(QString message);
     Q_INVOKABLE bool popupYesNoMessage(QString message);
     Q_INVOKABLE QString popupUserInput(QString title, QString message);
+    Q_INVOKABLE bool UpdateHalted(bool stop);
 
 private:
     Comms            *FindCommPort(QString name, QList<Comms*> Systems);

@@ -12,6 +12,7 @@ cmdlineapp::cmdlineapp(QWidget *parent) :
     fileName = "";
     responseTimer = new QTimer;
 
+    cmdlineapp::setWindowTitle("Acquire");
     connect(responseTimer, SIGNAL(timeout()), this, SLOT(sendNO()));
     connect(&process,SIGNAL(readyReadStandardOutput()),this,SLOT(readProcessOutput()));
     connect(&process,SIGNAL(readyReadStandardError()),this,SLOT(readProcessOutput()));
@@ -38,8 +39,14 @@ void cmdlineapp::Dismiss()
     delete this;
 }
 
+void cmdlineapp::AppendText(QString message)
+{
+    ui->txtTerm->appendPlainText(message);
+}
+
 void cmdlineapp::Clear(void)
 {
+   cmdlineapp::setWindowTitle("Acquire");
    ui->txtTerm->clear();
 }
 
@@ -47,6 +54,7 @@ void cmdlineapp::Execute(void)
 {
     QStringList arguments;
 
+    cmdlineapp::setWindowTitle("Acquire, " + appPath);
     arguments << "-c";
     arguments << appPath;
 #if defined(Q_OS_MAC)
