@@ -22,7 +22,7 @@ ScriptingConsole::ScriptingConsole(QWidget *parent, Properties *prop) :
 
    this->setFixedSize(501,366);
    engine = new QScriptEngine(this);
-   engine->setProcessEventsInterval(100);
+   engine->setProcessEventsInterval(10);
 
    QScriptValue mips = engine->newQObject(parent);
    engine->globalObject().setProperty("mips",mips);

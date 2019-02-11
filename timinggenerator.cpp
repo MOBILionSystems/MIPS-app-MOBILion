@@ -10,7 +10,7 @@ bool isTblMode(Comms *comms, QString TriggerSource)
    if(res.toUpper() == "SOFTWARE") res = "SW";
    comms->rb.clear();
    comms->SendString("STBLTRG," + res + "\n");
-   comms->rb.waitforline(1000);
+   comms->waitforline(1000);
    if(comms->rb.numLines() >= 1)
    {
        res = comms->rb.getline();
@@ -136,15 +136,16 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
             }
             if(resList[i].toUpper() == "FILENAME")
             {
-                CDirSelectionDlg *cds = new CDirSelectionDlg(QDir::currentPath(),p);
-                cds->setTitle("Select/enter folder to save data files");
                 while(path == "")
                 {
+                    CDirSelectionDlg *cds = new CDirSelectionDlg(QDir::currentPath(),p);
+                    cds->setTitle("Select/enter folder to save data files");
                     cds->show();
                     while(cds->isVisible()) QApplication::processEvents();
                     if(cds->result() != 0)
                     {
                         QString selectedPath = cds->selectedPath();
+                        delete cds;
                         // See if the directory is present
                         if(QDir(selectedPath).exists())
                         {
@@ -190,9 +191,12 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
         if(cla == NULL)
         {
            cla = new cmdlineapp(p);
-           connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()),Qt::QueuedConnection);
-           connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()),Qt::QueuedConnection);
-           connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()),Qt::QueuedConnection);
+           //           connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()),Qt::QueuedConnection);
+           //           connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()),Qt::QueuedConnection);
+           //           connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()),Qt::QueuedConnection);
+           connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()));
+           connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()));
+           connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()));
         }
         cla->appPath = cmd;
         cla->Clear();
@@ -298,8 +302,8 @@ void TimingControl::Show(void)
     Abort = new QPushButton("Abort",gbTC);     Abort->setGeometry(20,85,100,32); Abort->setAutoDefault(false);
     // Connect to the event slots
     connect(Edit,SIGNAL(pressed()),this,SLOT(pbEdit()));
-    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()),Qt::QueuedConnection);
-    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()),Qt::QueuedConnection);
+    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()));
+    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()));
     TableDownloaded = false;
     TG = new TimingGenerator(p,Title,MIPSnm);
     TG->comms = comms;
@@ -843,9 +847,9 @@ void IFTtiming::Show(void)
     labels[10] =new QLabel("Table",gbIFT);           labels[10]->setGeometry(10,150,59,16);
     // Connect to the event slots
     connect(GenerateTable,SIGNAL(pressed()),this,SLOT(pbGenerate()));
-    connect(Download,SIGNAL(pressed()),this,SLOT(pbDownload()),Qt::QueuedConnection);
-    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()),Qt::QueuedConnection);
-    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()),Qt::QueuedConnection);
+    connect(Download,SIGNAL(pressed()),this,SLOT(pbDownload()));
+    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()));
+    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()));
     connect(leFillTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
     connect(leTrapTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));
     connect(leReleaseTime,SIGNAL(editingFinished()),this,SLOT(tblObsolite()));

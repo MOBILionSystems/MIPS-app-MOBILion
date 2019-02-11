@@ -575,12 +575,12 @@ bool ARBchannel::SetValues(QString strVals)
     leSWFVRNG->setText(resList[2]);  leSWFVRNG->setModified(true); leSWFVRNG->editingFinished();
     leSWFVAUX->setText(resList[3]);  leSWFVAUX->setModified(true); leSWFVAUX->editingFinished();
     leSWFVOFF->setText(resList[4]);  leSWFVOFF->setModified(true); leSWFVOFF->editingFinished();
-    if(resList[5] == "ON")
+    if(resList[5] == "FWD")
     {
         SWFDIR_FWD->setChecked(true);
         SWFDIR_FWD->clicked(true);
     }
-    else
+    else if(resList[5] == "REV")
     {
         SWFDIR_REV->setChecked(true);
         SWFDIR_REV->clicked(true);
@@ -638,7 +638,7 @@ void ARBchannel::rbChange(void)
     if(comms == NULL) return;
     if(SWFDIR_FWD->isChecked()) res += QString::number(Channel) + ",FWD\n";
     if(SWFDIR_REV->isChecked()) res += QString::number(Channel) + ",REV\n";
-    comms->SendCommand("SWFDIR,1,FWD\n");
+    comms->SendCommand(res);
 }
 
 void ARBchannel::wfChange(void)

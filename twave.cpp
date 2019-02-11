@@ -257,7 +257,7 @@ void Twave::Update(void)
        {
             res = "G" + w->objectName().mid(3).replace("_",",") + "\n";
             ((QLineEdit *)w)->setText(comms->SendMess(res));
-            comms->rb.waitforline(1);
+            comms->waitforline(1);
             res = comms->rb.getline();
        }
     }

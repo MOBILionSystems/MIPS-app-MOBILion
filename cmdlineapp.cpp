@@ -63,6 +63,7 @@ void cmdlineapp::Execute(void)
     process.start(appPath);
 #endif
     ui->txtTerm->appendPlainText("Application should start soon...\n");
+    process.waitForStarted(-1);
 }
 
 void cmdlineapp::setupPlot(QString mess)
@@ -134,10 +135,10 @@ void cmdlineapp::readProcessOutput(void)
         messlinelist = messline.split("\n");
         messline = "";
         for(int i=1;i<messlinelist.count();i++) messline += messlinelist[i];
-        if(messlinelist.count() > 0)
+        for(int i=0; i<messlinelist.count();i++)
         {
             // Here with full lines of text
-            if(ploting) plotDataPoint(messlinelist[0]);
+            if(ploting) plotDataPoint(messlinelist[i]);
             if(mess.contains("Plot,"))
             {
                 setupPlot(messlinelist[0]);
@@ -182,5 +183,6 @@ void cmdlineapp::AppFinished(void)
     }
     ui->plot->hide();
     ui->txtTerm->appendPlainText("App signaled its finished!");
+    process.close();
     emit AppCompleted();
 }

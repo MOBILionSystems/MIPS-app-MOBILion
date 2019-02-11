@@ -183,6 +183,18 @@
 // 1.46, Jan 25, 2019
 //      1.) Redesiged comms code so it blocks untill transaction is complete
 //      2.) Added file path ti acquire dialog
+// 1.47, Feb 1, 2019
+//      1.) Added process events to the control panel update routine
+//      2.) Changed process events interval to 10 mS in script processor
+//      3.) Changed to non queued event processing in console window
+// 1.48, Feb 2, 2019
+//      1.) Remove lock code from control panel
+//      2.) Removed queue option from connectors in timing classes
+//      3.) Removed the use of the ringbuffer wait for line function
+// 1.49, Feb 5, 2019
+//      1.) Added wait for start to process start in cmdlineapp
+//      2.) Found memory leak in the acquire class
+//      3.) Fixed bug in ARB dir in the control panel code
 //
 // Planded updates:
 //      - Add ploting capability. Also support this through the Scripting system.
@@ -231,7 +243,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QInputDialog>
 
-QString Version = "MIPS, Version 1.46 Jan 25, 2019";
+QString Version = "MIPS, Version 1.49 Feb 5, 2019";
 
 MIPS::MIPS(QWidget *parent) :
     QMainWindow(parent),

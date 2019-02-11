@@ -243,8 +243,15 @@ void Comms::PutMIPSfile(QString MIPSfile, QString LocalFile)
         {
             len = 1024;
             if((dblock.count() - i) < 1024) len = dblock.count() - i;
-            SendString(dblock.mid(i,len));
-            if(len == 1024)
+            // Send this in chunks in case the sender is a lot faster than MIPS
+//            for(int k=0;k<len;k+=128)
+//            {
+//                if(len > (k + 128)) SendString(dblock.mid(i+k,128));
+//                else SendString(dblock.mid(i+k,len - k));
+//                msDelay(10);
+//            }
+             SendString(dblock.mid(i,len));
+            if((len == 1024) && ((dblock.count() - i) != 1024))
             {
                 waitforline(1000);
                 if((res = getline()) == "")
@@ -435,7 +442,14 @@ void Comms::ARBupload(QString Faddress, QString FileName)
         {
             len = 512;
             if((dblock.count() - i) < 512) len = dblock.count() - i;
-            SendString(dblock.mid(i,len));
+            // Send this in chunks in case the sender is a lot faster than MIPS
+            for(int k=0;k<len;k+=128)
+            {
+                if(len > (k + 128)) SendString(dblock.mid(i+k,128));
+                else SendString(dblock.mid(i+k,len - k));
+                msDelay(10);
+            }
+//            SendString(dblock.mid(i,len));
             if(len == 512)
             {
                 waitforline(2000);

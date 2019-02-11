@@ -107,7 +107,7 @@ void RFamp::Update(void)
                 res = comms->SendMess(res);
                 if(res == resList[1]) ((QCheckBox *)w)->setChecked(true);
                 if(res == resList[2]) ((QCheckBox *)w)->setChecked(false);
-                if(res.contains("?")) comms->rb.waitforline(100);
+                if(res.contains("?")) comms->waitforline(100);
             }
         }
         else if(w->objectName().contains("rb"))

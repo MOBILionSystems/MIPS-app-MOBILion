@@ -29,8 +29,6 @@
 #include <QTreeView>
 #include <QUdpSocket>
 
-QMutex cpUpdateLock;
-
 ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S, Properties *prop) :
     QDialog(parent),
     ui(new Ui::ControlPanel)
@@ -719,38 +717,36 @@ void ControlPanel::Update(void)
    {
        ShutdownFlag = false;
        SystemIsShutdown = true;
-       UpdateHoldOff = 1;
+       UpdateHoldOff = 1000;
        // Make sure all MIPS systems are in local mode
        for(i=0;i<Systems.count();i++)    Systems[i]->SendString("SMOD,LOC\n");
+       msDelay(100);
+       for(i=0;i<Systems.count();i++) Systems[i]->rb.clear();
+
        for(i=0;i<ESIchans.count();i++)   ESIchans[i]->Shutdown();
        for(i=0;i<DCBenables.count();i++) DCBenables[i]->Shutdown();
        for(i=0;i<RFchans.count();i++)    RFchans[i]->Shutdown();
        for(i=0;i<rfa.count();i++)        rfa[i]->Shutdown();
        if(statusBar != NULL) statusBar->showMessage("System shutdown, " + QDateTime().currentDateTime().toString());
        if(properties != NULL) properties->Log("System Shutdown");
+       UpdateHoldOff = 1;
        return;
    }
    if(RestoreFlag)
    {
        RestoreFlag = false;
        SystemIsShutdown = false;
-       UpdateHoldOff = 1;
+       UpdateHoldOff = 1000;
        for(i=0;i<ESIchans.count();i++)   ESIchans[i]->Restore();
        msDelay(100);
-       // To prevent voltage transients we will first shutdown all the DC bias values
-//       for(i=0;i<DCBchans.count();i++) {DCBchans[i]->Shutdown(); msDelay(50);}
-//       msDelay(100);
        for(i=0;i<DCBenables.count();i++) {DCBenables[i]->Restore(); msDelay(250);}
-       // Now restore all the DCbias voltages
-//       for(i=0;i<DCBchans.count();i++)  {DCBchans[i]->Restore(); msDelay(50);}
-//       msDelay(100);
        for(i=0;i<RFchans.count();i++)    {RFchans[i]->Restore(); msDelay(250);}
        for(i=0;i<rfa.count();i++)        rfa[i]->Restore();
        if(statusBar != NULL) statusBar->showMessage("System enabled, " + QDateTime().currentDateTime().toString());
        if(properties != NULL) properties->Log("System Restored");
+       UpdateHoldOff = 1;
        return;
    }
-   if(!cpUpdateLock.tryLock()) return;
    // For each MIPS system present if there are RF channels for the selected
    // MIPS system then read all values using the read all commands to speed up the process.
    for(i=0;i<Systems.count();i++)
@@ -759,11 +755,12 @@ void ControlPanel::Update(void)
        {
            // Read all the RF parameters
            QString RFallRes = Systems[i]->SendMess("GRFALL\n");
+           QApplication::processEvents();
            QStringList RFallResList = RFallRes.split(",");
            if(RFallResList.count() < 1)
            {
                // Here with group read error so process one at a time
-               for(k=0;k<RFchans.count();k++) if(RFchans[k]->comms == Systems[i]) RFchans[k]->Update();
+               for(k=0;k<RFchans.count();k++) if(RFchans[k]->comms == Systems[i]) { RFchans[k]->Update(); QApplication::processEvents(); }
            }
            else
            {
@@ -775,13 +772,14 @@ void ControlPanel::Update(void)
                                            RFallResList[(RFchans[k]->Channel - 1) * 4 + 1] + "," + \
                                            RFallResList[(RFchans[k]->Channel - 1) * 4 + 2] + "," + \
                                            RFallResList[(RFchans[k]->Channel - 1) * 4 + 3]);
+                   QApplication::processEvents();
                }
            }
            break;
        }
    }
-   for(i=0;i<ADCchans.count();i++)    ADCchans[i]->Update();
-   for(i=0;i<DACchans.count();i++)    DACchans[i]->Update();
+   for(i=0;i<ADCchans.count();i++)    {ADCchans[i]->Update(); QApplication::processEvents();}
+   for(i=0;i<DACchans.count();i++)    {DACchans[i]->Update(); QApplication::processEvents();}
    // For each MIPS system present if there are DCBchannels for the selected
    // MIPS system then read all setpoints and values using the read all
    // commands to speed up the process.
@@ -791,13 +789,15 @@ void ControlPanel::Update(void)
        {
            // Read all the setpoints and readbacks and parse the strings
            QString VspRes = Systems[i]->SendMess("GDCBALL\n");
+           QApplication::processEvents();
            QStringList VspResList = VspRes.split(",");
            QString VrbRes = Systems[i]->SendMess("GDCBALLV\n");
+           QApplication::processEvents();
            QStringList VrbResList = VrbRes.split(",");
            if((VspResList.count() != VrbResList.count()) || (VspResList.count() < 1))
            {
                // Here with group read error so process one at a time
-               for(k=0;k<DCBchans.count();k++) if(DCBchans[k]->comms == Systems[i]) DCBchans[k]->Update();
+               for(k=0;k<DCBchans.count();k++) if(DCBchans[k]->comms == Systems[i]) {DCBchans[k]->Update(); QApplication::processEvents();}
            }
            else
            {
@@ -808,21 +808,20 @@ void ControlPanel::Update(void)
                    else DCBchans[k]->Update(VspResList[DCBchans[k]->Channel - 1] + "," + VrbResList[DCBchans[k]->Channel - 1]);
                }
            }
-           break;
+           break;  //??
        }
    }
-   for(i=0;i<DCBoffsets.count();i++)  DCBoffsets[i]->Update();
-   for(i=0;i<DCBenables.count();i++)  DCBenables[i]->Update();
+   for(i=0;i<DCBoffsets.count();i++)  {DCBoffsets[i]->Update(); QApplication::processEvents();}
+   for(i=0;i<DCBenables.count();i++)  {DCBenables[i]->Update(); QApplication::processEvents();}
    if(TC != NULL)
    {
-       if(!TC->TG->isTableMode()) for(i=0;i<DIOchannels.count();i++) DIOchannels[i]->Update();
+       if(!TC->TG->isTableMode()) for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); QApplication::processEvents();}
    }
-   else for(i=0;i<DIOchannels.count();i++) DIOchannels[i]->Update();
-   for(i=0;i<ESIchans.count();i++)    ESIchans[i]->Update();
-   for(i=0;i<ARBchans.count();i++)    ARBchans[i]->Update();
-   for(i=0;i<rfa.count();i++)         rfa[i]->Update();
-   if(comp!=NULL)                     comp->Update();
-   cpUpdateLock.unlock();
+   else for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); QApplication::processEvents();}
+   for(i=0;i<ESIchans.count();i++)    {ESIchans[i]->Update(); QApplication::processEvents();}
+   for(i=0;i<ARBchans.count();i++)    {ARBchans[i]->Update(); QApplication::processEvents();}
+   for(i=0;i<rfa.count();i++)         {rfa[i]->Update(); QApplication::processEvents();}
+   if(comp!=NULL)                     {comp->Update(); QApplication::processEvents();}
    LogDataFile();
 }
 
