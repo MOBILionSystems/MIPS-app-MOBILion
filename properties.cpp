@@ -35,7 +35,7 @@ void Properties::Log(QString Message)
     // Exit if message is empty
     if(Message.isEmpty()) return;
     if(Message == "") return;
-    // Exit if log filenamee is empty
+    // Exit if log file name is empty
     if(LogFile == "") return;
     // Open file for append and add message
     QFile file(LogFile);

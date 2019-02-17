@@ -755,12 +755,12 @@ void ControlPanel::Update(void)
        {
            // Read all the RF parameters
            QString RFallRes = Systems[i]->SendMess("GRFALL\n");
-           QApplication::processEvents();
+           //QApplication::processEvents();
            QStringList RFallResList = RFallRes.split(",");
            if(RFallResList.count() < 1)
            {
                // Here with group read error so process one at a time
-               for(k=0;k<RFchans.count();k++) if(RFchans[k]->comms == Systems[i]) { RFchans[k]->Update(); QApplication::processEvents(); }
+               for(k=0;k<RFchans.count();k++) if(RFchans[k]->comms == Systems[i]) { RFchans[k]->Update(); /*QApplication::processEvents();*/ }
            }
            else
            {
@@ -772,14 +772,14 @@ void ControlPanel::Update(void)
                                            RFallResList[(RFchans[k]->Channel - 1) * 4 + 1] + "," + \
                                            RFallResList[(RFchans[k]->Channel - 1) * 4 + 2] + "," + \
                                            RFallResList[(RFchans[k]->Channel - 1) * 4 + 3]);
-                   QApplication::processEvents();
+                   //QApplication::processEvents();
                }
            }
            break;
        }
    }
-   for(i=0;i<ADCchans.count();i++)    {ADCchans[i]->Update(); QApplication::processEvents();}
-   for(i=0;i<DACchans.count();i++)    {DACchans[i]->Update(); QApplication::processEvents();}
+   for(i=0;i<ADCchans.count();i++)    {ADCchans[i]->Update(); /*QApplication::processEvents();*/}
+   for(i=0;i<DACchans.count();i++)    {DACchans[i]->Update(); /*QApplication::processEvents();*/}
    // For each MIPS system present if there are DCBchannels for the selected
    // MIPS system then read all setpoints and values using the read all
    // commands to speed up the process.
@@ -789,15 +789,15 @@ void ControlPanel::Update(void)
        {
            // Read all the setpoints and readbacks and parse the strings
            QString VspRes = Systems[i]->SendMess("GDCBALL\n");
-           QApplication::processEvents();
+           //QApplication::processEvents();
            QStringList VspResList = VspRes.split(",");
            QString VrbRes = Systems[i]->SendMess("GDCBALLV\n");
-           QApplication::processEvents();
+           //QApplication::processEvents();
            QStringList VrbResList = VrbRes.split(",");
            if((VspResList.count() != VrbResList.count()) || (VspResList.count() < 1))
            {
                // Here with group read error so process one at a time
-               for(k=0;k<DCBchans.count();k++) if(DCBchans[k]->comms == Systems[i]) {DCBchans[k]->Update(); QApplication::processEvents();}
+               for(k=0;k<DCBchans.count();k++) if(DCBchans[k]->comms == Systems[i]) {DCBchans[k]->Update(); /*QApplication::processEvents();*/}
            }
            else
            {
@@ -811,17 +811,17 @@ void ControlPanel::Update(void)
            break;  //??
        }
    }
-   for(i=0;i<DCBoffsets.count();i++)  {DCBoffsets[i]->Update(); QApplication::processEvents();}
-   for(i=0;i<DCBenables.count();i++)  {DCBenables[i]->Update(); QApplication::processEvents();}
+   for(i=0;i<DCBoffsets.count();i++)  {DCBoffsets[i]->Update(); /*QApplication::processEvents();*/}
+   for(i=0;i<DCBenables.count();i++)  {DCBenables[i]->Update(); /*QApplication::processEvents();*/}
    if(TC != NULL)
    {
-       if(!TC->TG->isTableMode()) for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); QApplication::processEvents();}
+       if(!TC->TG->isTableMode()) for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); /*QApplication::processEvents();*/}
    }
-   else for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); QApplication::processEvents();}
-   for(i=0;i<ESIchans.count();i++)    {ESIchans[i]->Update(); QApplication::processEvents();}
-   for(i=0;i<ARBchans.count();i++)    {ARBchans[i]->Update(); QApplication::processEvents();}
-   for(i=0;i<rfa.count();i++)         {rfa[i]->Update(); QApplication::processEvents();}
-   if(comp!=NULL)                     {comp->Update(); QApplication::processEvents();}
+   else for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); /*QApplication::processEvents();*/}
+   for(i=0;i<ESIchans.count();i++)    {ESIchans[i]->Update(); /*QApplication::processEvents();*/}
+   for(i=0;i<ARBchans.count();i++)    {ARBchans[i]->Update(); /*QApplication::processEvents();*/}
+   for(i=0;i<rfa.count();i++)         {rfa[i]->Update(); /*QApplication::processEvents();*/}
+   if(comp!=NULL)                     {comp->Update(); /*QApplication::processEvents();*/}
    LogDataFile();
 }
 

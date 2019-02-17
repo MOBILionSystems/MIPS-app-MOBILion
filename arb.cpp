@@ -656,7 +656,7 @@ void ARBchannel::ReadWaveform(void)
     // Read waveform
     ARBwfEdit->GetWaveform(Wform);
     // Send waveform to MIPS
-    cmd = "SWFARB,"  + Waveform->currentText();
+    cmd = "SWFARB,"  + QString::number(Channel);
     for(i=0; i<32; i++) cmd += "," + QString::number(Wform[i]);
     cmd += "\n";
     if(comms == NULL) return;
@@ -674,7 +674,7 @@ void ARBchannel::wfEdit(void)
 
     for(i=0; i<32; i++) Wform[i] = i*4 - 64;
     // Read the ARB waveform from MIPS
-    if(comms != NULL) res = comms->SendMess("GWFARB," + Waveform->currentText() + "\n");
+    if(comms != NULL) res = comms->SendMess("GWFARB," + QString::number(Channel) + "\n");
     if(res.contains("?"))
     {
         // Here if the message was NAKed

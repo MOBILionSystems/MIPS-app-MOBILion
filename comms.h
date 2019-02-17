@@ -12,7 +12,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QFileInfo>
 #include <QFileDialog>
-#include <QMutex>
+#include <QThread>
 
 #include "settingsdialog.h"
 #include "ringbuffer.h"

@@ -195,6 +195,10 @@
 //      1.) Added wait for start to process start in cmdlineapp
 //      2.) Found memory leak in the acquire class
 //      3.) Fixed bug in ARB dir in the control panel code
+// 1.50, Feb 14, 2019
+//      1.) Fixed bug in the control panel arb waveform editor.
+//      2.) Removed the doevents from the control panel update function, if it was
+//          interrupted by the scripting engine then the update will freeze.
 //
 // Planded updates:
 //      - Add ploting capability. Also support this through the Scripting system.
@@ -243,7 +247,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QInputDialog>
 
-QString Version = "MIPS, Version 1.49 Feb 5, 2019";
+QString Version = "MIPS, Version 1.50 Feb 14, 2019";
 
 MIPS::MIPS(QWidget *parent) :
     QMainWindow(parent),

@@ -749,6 +749,10 @@ void Comms::handleError(QSerialPort::SerialPortError error)
 {
     if (error == QSerialPort::ResourceError)
     {
+        qDebug() << "serial port error";
+        QThread::sleep(1);
+//        reopenSerialPort();
+//        return;
         QMessageBox::critical(this, tr("Critical Error"), serial->errorString());
         sb->showMessage(tr("Critical Error, port closing: ") + serial->errorString());
         closeSerialPort();
