@@ -2,12 +2,16 @@
 #include "ui_arbwaveformedit.h"
 #include "qcustomplot.h"
 
-ARBwaveformEdit::ARBwaveformEdit(QWidget *parent) :
+ARBwaveformEdit::ARBwaveformEdit(QWidget *parent, int ppp) :
     QDialog(parent),
     ui(new Ui::ARBwaveformEdit)
 {
     ui->setupUi(this);
     this->setFixedSize(617,494);
+
+    PPP = ppp;
+    if(PPP < 8) PPP = 8;
+    if(PPP >32) PPP = 32;
 
     connect(ui->pbGenUpDown,SIGNAL(pressed()),this,SLOT(GenerateUpDown()));
     connect(ui->pbGenSine,SIGNAL(pressed()),this,SLOT(GenerateSine()));
@@ -21,7 +25,7 @@ ARBwaveformEdit::ARBwaveformEdit(QWidget *parent) :
     ui->plot->xAxis->setLabel("index");
     ui->plot->yAxis->setLabel("amplitude");
     // set axes ranges, so we see all data:
-    ui->plot->xAxis->setRange(0, 31);
+    ui->plot->xAxis->setRange(0, PPP-1);
     ui->plot->yAxis->setRange(-105, 105);
     ui->plot->replot();
 }
@@ -37,14 +41,14 @@ void ARBwaveformEdit::SetWaveform(int *wf)
 
    if(wf == NULL) return;
    ui->txtData->clear();
-   for(i=0; i<32; i++)
+   for(i=0; i<PPP; i++)
    {
        Waveform[i] = wf[i];
        ui->txtData->appendPlainText(QString::number(Waveform[i]));
    }
    ui->txtData->moveCursor (QTextCursor::Start);
-   QVector<double> x(32), y(32);
-   for(i=0; i<32; i++)
+   QVector<double> x(PPP), y(PPP);
+   for(i=0; i<PPP; i++)
    {
        x[i] = i;
        y[i] = Waveform[i];
@@ -66,18 +70,18 @@ void ARBwaveformEdit::GenerateUpDown(void)
 
    up = ui->leUp->text().toInt();
    down = ui->leDown->text().toInt();
-   binsper = 32/(up + down);
+   binsper = PPP/(up + down);
    // Fill waveform with data
    ui->txtData->clear();
-   for(i=0; i<32; i++)
+   for(i=0; i<PPP; i++)
    {
        if(i < up * binsper) Waveform[i] = 100;
        else Waveform[i] = -100;
        ui->txtData->appendPlainText(QString::number(Waveform[i]));
    }
    ui->txtData->moveCursor (QTextCursor::Start);
-   QVector<double> x(32), y(32);
-   for(i=0; i<32; i++)
+   QVector<double> x(PPP), y(PPP);
+   for(i=0; i<PPP; i++)
    {
        x[i] = i;
        y[i] = Waveform[i];
@@ -92,14 +96,14 @@ void ARBwaveformEdit::GenerateSine(void)
 
    // Fill waveform with data
    ui->txtData->clear();
-   for(i=0; i<32; i++)
+   for(i=0; i<PPP; i++)
    {
-       Waveform[i] = qSin(qDegreesToRadians((ui->leCycles->text().toFloat() * 360.0 * i)/32) + qDegreesToRadians(ui->lePhase->text().toFloat())) * 100.0;
+       Waveform[i] = qSin(qDegreesToRadians((ui->leCycles->text().toFloat() * 360.0 * i)/PPP) + qDegreesToRadians(ui->lePhase->text().toFloat())) * 100.0;
        ui->txtData->appendPlainText(QString::number(Waveform[i]));
    }
    ui->txtData->moveCursor (QTextCursor::Start);
-   QVector<double> x(32), y(32);
-   for(i=0; i<32; i++)
+   QVector<double> x(PPP), y(PPP);
+   for(i=0; i<PPP; i++)
    {
        x[i] = i;
        y[i] = Waveform[i];
@@ -116,7 +120,7 @@ void ARBwaveformEdit::PlotData(void)
     QString text = ui->txtData->toPlainText();
     QStringList valStrings = text.split( "\n" );
     // Write the data to the waveform buffer
-    for(i=0; i<32; i++)
+    for(i=0; i<PPP; i++)
     {
         if(valStrings.count() > i)
         {
@@ -124,8 +128,8 @@ void ARBwaveformEdit::PlotData(void)
         }
         else Waveform[i] = 0;
     }
-    QVector<double> x(32), y(32);
-    for(i=0; i<32; i++)
+    QVector<double> x(PPP), y(PPP);
+    for(i=0; i<PPP; i++)
     {
         x[i] = i;
         y[i] = Waveform[i];
@@ -142,7 +146,7 @@ void ARBwaveformEdit::InvertData(void)
     QString text = ui->txtData->toPlainText();
     QStringList valStrings = text.split( "\n" );
     // Write the data to the waveform buffer
-    for(i=0; i<32; i++)
+    for(i=0; i<PPP; i++)
     {
         if(valStrings.count() > i)
         {
@@ -150,9 +154,9 @@ void ARBwaveformEdit::InvertData(void)
         }
         else Waveform[i] = 0;
     }
-    QVector<double> x(32), y(32);
+    QVector<double> x(PPP), y(PPP);
     ui->txtData->clear();
-    for(i=0; i<32; i++)
+    for(i=0; i<PPP; i++)
     {
         x[i] = i;
         y[i] = Waveform[i];

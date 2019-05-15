@@ -51,6 +51,7 @@ public:
     void msDelay(int ms);
     bool openSerialPort();
     void reopenSerialPort(void);
+    void reopenPort(void);
     void closeSerialPort();
     void waitforline(int timeout);
     char getchar(void);
@@ -69,6 +70,7 @@ public:
     QString MIPSname;
     QByteArray readall(void);
     bool isMIPS(QString port);
+    bool isAMPS(QString port, QString baud);
 
     QSerialPort *serial;
     QStatusBar *sb;

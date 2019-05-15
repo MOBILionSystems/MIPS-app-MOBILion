@@ -403,8 +403,12 @@ bool DCBchannel::eventFilter(QObject *obj, QEvent *event)
 QString DCBchannel::Report(void)
 {
     QString res;
+    QString title;
 
-    if(isShutdown) res = Title + "," + activeVoltage + "," + Vrb->text();
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(isShutdown) res = title + "," + activeVoltage + "," + Vrb->text();
     else res = Title + "," + Vsp->text() + "," + Vrb->text();
     return(res);
 }
@@ -412,8 +416,12 @@ QString DCBchannel::Report(void)
 bool DCBchannel::SetValues(QString strVals)
 {
     QStringList resList;
+    QString title;
 
-    if(!strVals.startsWith(Title)) return false;
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!strVals.startsWith(title)) return false;
     resList = strVals.split(",");
     if(resList.count() < 2) return false;
     if(isShutdown)
@@ -438,9 +446,14 @@ bool DCBchannel::SetValues(QString strVals)
 // returns "?" if the command could not be processed
 QString DCBchannel::ProcessCommand(QString cmd)
 {
-    if(!cmd.startsWith(Title)) return "?";
-    if(cmd == Title) return Vsp->text();
-    if(cmd == Title + ".readback") return Vrb->text();
+    QString title;
+
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!cmd.startsWith(title)) return "?";
+    if(cmd == title) return Vsp->text();
+    if(cmd == title + ".readback") return Vrb->text();
     QStringList resList = cmd.split("=");
     if(resList.count()==2)
     {
@@ -588,16 +601,24 @@ void DCBoffset::Show(void)
 QString DCBoffset::Report(void)
 {
     QString res;
+    QString title;
 
-    res = Title + "," + Voff->text();
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    res = title + "," + Voff->text();
     return(res);
 }
 
 bool DCBoffset::SetValues(QString strVals)
 {
     QStringList resList;
+    QString title;
 
-    if(!strVals.startsWith(Title)) return false;
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!strVals.startsWith(title)) return false;
     resList = strVals.split(",");
     if(resList.count() < 2) return false;
     Voff->setText(resList[1]);
@@ -612,8 +633,13 @@ bool DCBoffset::SetValues(QString strVals)
 // returns "?" if the command could not be processed
 QString DCBoffset::ProcessCommand(QString cmd)
 {
-    if(!cmd.startsWith(Title)) return "?";
-    if(cmd == Title) return Voff->text();
+    QString title;
+
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!cmd.startsWith(title)) return "?";
+    if(cmd == title) return Voff->text();
     QStringList resList = cmd.split("=");
     if(resList.count()==2)
     {
@@ -673,8 +699,12 @@ void DCBenable::Show(void)
 QString DCBenable::Report(void)
 {
     QString res;
+    QString title;
 
-    res = Title + ",";
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    res = title + ",";
     if(isShutdown)
     {
         if(activeEnableState) res += "ON";
@@ -691,8 +721,12 @@ QString DCBenable::Report(void)
 bool DCBenable::SetValues(QString strVals)
 {
     QStringList resList;
+    QString title;
 
-    if(!strVals.startsWith(Title)) return false;
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!strVals.startsWith(title)) return false;
     resList = strVals.split(",");
     if(resList.count() < 2) return false;
     if(isShutdown)
@@ -714,8 +748,13 @@ bool DCBenable::SetValues(QString strVals)
 // returns "?" if the command could not be processed
 QString DCBenable::ProcessCommand(QString cmd)
 {
-    if(!cmd.startsWith(Title)) return "?";
-    if(cmd == Title)
+    QString title;
+
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!cmd.startsWith(title)) return "?";
+    if(cmd == title)
     {
         if(DCBena->isChecked()) return "ON";
         return "OFF";

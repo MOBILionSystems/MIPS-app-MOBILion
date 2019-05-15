@@ -37,7 +37,7 @@
 #include <QScrollBar>
 #include <QApplication>
 #include <QClipboard>
-#include <QDateTime.h>
+#include <qdatetime.h>
 #include <QtCore/QDebug>
 #include <QTextCodec>
 

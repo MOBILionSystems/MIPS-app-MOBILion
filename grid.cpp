@@ -62,7 +62,7 @@ Grid::Grid(QWidget *parent, Comms *c, QStatusBar *statusbar) :
     connect(ui->chkYauto,SIGNAL(toggled(bool)),this,SLOT(YautoScale()));
     time = QTime::currentTime();
 
-    // Init the pulse sequennce variables and controls
+    // Init the pulse sequence variables and controls
     Tp = 150;
     Ts1 = 50;
     Ts2 = 50;
@@ -279,7 +279,7 @@ void Grid::Update(void)
     // Plot the voltage
     if(ui->chkEnablePlot->isChecked())
     {
-        double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
+        double key = time.elapsed()/1000.0;
         ui->Vplot->graph(0)->addData(key, ui->leGRFPPVP_1->text().toFloat());
         ui->Vplot->xAxis->setRangeUpper(key);
         if(ui->chkYauto->isChecked()) ui->Vplot->yAxis->rescale(true);

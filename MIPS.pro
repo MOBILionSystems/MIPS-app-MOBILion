@@ -56,7 +56,8 @@ SOURCES += main.cpp\
     tcpserver.cpp \
     timinggenerator.cpp \
     compressor.cpp \
-    properties.cpp
+    properties.cpp \
+    plot.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -92,7 +93,8 @@ HEADERS  += mips.h \
     tcpserver.h \
     timinggenerator.h \
     compressor.h \
-    properties.h
+    properties.h \
+    plot.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \
@@ -112,12 +114,19 @@ FORMS    += mips.ui \
     rfamp.ui \
     timinggenerator.ui \
     compressor.ui \
-    properties.ui
+    properties.ui \
+    plot.ui
 
 RESOURCES += \
     files.qrc
 
 QMAKE_LFLAGS_WINDOWS = /SUBSYSTEM:WINDOWS,5.01
-QMAKE_MAC_SDK = macosx10.12
+QMAKE_MAC_SDK = macosx10.14
+
+
+
+
+
+
 
 

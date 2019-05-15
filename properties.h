@@ -28,9 +28,13 @@ public:
     QString LoadControlPanel;
     QString FileName;
     QString LogFile;
+    QString AMPSbaud;
+    bool SearchAMPS;
     bool AutoFileName;
     bool AutoConnect;
+    bool AutoRestore;
     int  MinMIPS;
+    int  UpdateSecs;
     QStringList MIPS_TCPIP;
 
 private:

@@ -32,6 +32,7 @@ public:
 private:
     Ui::MIPS *aui;
     int NumChannels;
+    int PPP;
     QString LogString;
     Help *LogedData;
     ARBwaveformEdit *ARBwfEdit;
@@ -80,6 +81,7 @@ public:
     int     X,Y;
     QString MIPSnm;
     int     Channel;
+    int     PPP;
     Comms   *comms;
     QStatusBar  *statusBar;
 private:

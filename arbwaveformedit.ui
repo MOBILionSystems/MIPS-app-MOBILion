@@ -55,7 +55,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Arbitrary waveform data. Enter/edit 32 values from -100 to 100 in the table below.</string>
+    <string>Arbitrary waveform data. Enter/edit values from -100 to 100 in the table below.</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>

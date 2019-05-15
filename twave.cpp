@@ -1,7 +1,7 @@
 //
 // This class supports the Twave dialog options on the Twave tab.
 //
-#include "Twave.h"
+#include "twave.h"
 
 namespace Ui {
 class MIPS;

@@ -16,6 +16,7 @@ ARB::ARB(Ui::MIPS *w, Comms *c)
     LogedData = new Help();
 //NumChannels = 32;
     Compressor = true;
+    PPP = 32;
     // Setup the module selection combo box
     aui->comboARBmodule->clear();
     for(int i=0;i<4;i++)
@@ -452,7 +453,7 @@ void ARB::ReadWaveform(void)
     ARBwfEdit->GetWaveform(Waveform);
     // Send waveform to MIPS
     cmd = "SWFARB,"  + aui->comboARBmodule->currentText();
-    for(i=0; i<32; i++) cmd += "," + QString::number(Waveform[i]);
+    for(i=0; i<PPP; i++) cmd += "," + QString::number(Waveform[i]);
     cmd += "\n";
     if(!comms->SendCommand(cmd))
     {
@@ -462,12 +463,25 @@ void ARB::ReadWaveform(void)
 
 void ARB::EditARBwaveform(void)
 {
-   int Waveform[32];
-   int i;
+   int     Waveform[32];
+   int     i;
+   QString cmd,res;
 
    for(i=0; i<32; i++) Waveform[i] = i*4 - 64;
+   // Determine the PPP before we popup the edit dialog
+   if(comms != NULL)
+   {
+       cmd =  "GARBPPP,"  + aui->comboARBmodule->currentText();
+       res = comms->SendMess(cmd + "\n");
+       if(!res.isEmpty())
+       {
+           PPP = res.toInt();
+           if(PPP < 8) PPP = 8;
+           if(PPP > 32) PPP = 32;
+       }
+   }
    // Read the ARB waveform from MIPS
-   QString res = comms->SendMess("GWFARB," + aui->comboARBmodule->currentText() + "\n");
+   res = comms->SendMess("GWFARB," + aui->comboARBmodule->currentText() + "\n");
    if(res.contains("?"))
    {
        // Here if the message was NAKed
@@ -475,12 +489,12 @@ void ARB::EditARBwaveform(void)
        return;
    }
    QStringList Vals = res.split(",");
-   for(i=0; i<32; i++)
+   for(i=0; i<PPP; i++)
    {
        if(i < Vals.count()) Waveform[i] = Vals[i].toInt();
        else Waveform[i] = 0;
    }
-   ARBwfEdit = new ARBwaveformEdit;
+   ARBwfEdit = new ARBwaveformEdit(0,PPP);
    connect(ARBwfEdit, SIGNAL(WaveformReady()), this, SLOT(ReadWaveform()));
    ARBwfEdit->SetWaveform(Waveform);
    ARBwfEdit->show();
@@ -499,6 +513,7 @@ ARBchannel::ARBchannel(QWidget *parent, QString name, QString MIPSname, int x, i
     Y      = y;
     comms  = NULL;
     statusBar = NULL;
+    PPP = 32;
 }
 
 void ARBchannel::Show(void)
@@ -512,16 +527,16 @@ void ARBchannel::Show(void)
     leSWFVRNG = new QLineEdit(gbARB);  leSWFVRNG->setGeometry(100,46,91,21); leSWFVRNG->setValidator(new QDoubleValidator);
     leSWFVAUX = new QLineEdit(gbARB);  leSWFVAUX->setGeometry(100,70,91,21); leSWFVAUX->setValidator(new QDoubleValidator);
     leSWFVOFF = new QLineEdit(gbARB);  leSWFVOFF->setGeometry(100,94,91,21); leSWFVOFF->setValidator(new QDoubleValidator);
-    Waveform = new QComboBox(gbARB); Waveform->setGeometry(100,118,91,21);
+    Waveform = new QComboBox(gbARB);   Waveform->setGeometry(100,118,91,21);
     Waveform->clear();
     Waveform->addItem("SIN","SIN");
     Waveform->addItem("RAMP","RAMP");
     Waveform->addItem("TRI","TRI");
     Waveform->addItem("PULSE","PULSE");
     Waveform->addItem("ARB","ARB");
-    EditWaveform = new QPushButton("Edit",gbARB); EditWaveform->setGeometry(100,142,91,30); EditWaveform->setAutoDefault(false);
-    SWFDIR_FWD = new QRadioButton("Forward",gbARB);  SWFDIR_FWD->setGeometry(20,166,91,21);
-    SWFDIR_REV = new QRadioButton("Reverse",gbARB);  SWFDIR_REV->setGeometry(150,166,91,21);
+    EditWaveform = new QPushButton("Edit",gbARB);     EditWaveform->setGeometry(100,142,91,30); EditWaveform->setAutoDefault(false);
+    SWFDIR_FWD   = new QRadioButton("Forward",gbARB); SWFDIR_FWD->setGeometry(20,166,91,21);
+    SWFDIR_REV   = new QRadioButton("Reverse",gbARB); SWFDIR_REV->setGeometry(150,166,91,21);
     // Add labels
     labels[0] = new QLabel("Frequency",gbARB);     labels[0]->setGeometry(10,26,80,16);
     labels[1] = new QLabel("Amplitude",gbARB);     labels[1]->setGeometry(10,48,80,16);
@@ -552,8 +567,12 @@ void ARBchannel::Show(void)
 QString ARBchannel::Report(void)
 {
     QString res;
+    QString title;
 
-    res = Title + ",";
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    res = title + ",";
     res += leSWFREQ->text() + ",";
     res += leSWFVRNG->text() + ",";
     res += leSWFVAUX->text() + ",";
@@ -567,8 +586,12 @@ QString ARBchannel::Report(void)
 bool ARBchannel::SetValues(QString strVals)
 {
     QStringList resList;
+    QString title;
 
-    if(!strVals.startsWith(Title)) return false;
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!strVals.startsWith(title)) return false;
     resList = strVals.split(",");
     if(resList.count() < 7) return false;
     leSWFREQ->setText(resList[1]);   leSWFREQ->setModified(true); leSWFREQ->editingFinished();
@@ -650,14 +673,15 @@ void ARBchannel::wfChange(void)
 void ARBchannel::ReadWaveform(void)
 {
     int Wform[32];
-    QString cmd;
+    QString cmd,res;
     int i;
 
     // Read waveform
     ARBwfEdit->GetWaveform(Wform);
     // Send waveform to MIPS
     cmd = "SWFARB,"  + QString::number(Channel);
-    for(i=0; i<32; i++) cmd += "," + QString::number(Wform[i]);
+
+    for(i=0; i<PPP; i++) cmd += "," + QString::number(Wform[i]);
     cmd += "\n";
     if(comms == NULL) return;
     if(!comms->SendCommand(cmd))
@@ -668,11 +692,20 @@ void ARBchannel::ReadWaveform(void)
 
 void ARBchannel::wfEdit(void)
 {
-    QString res;
+    QString cmd,res;
     int Wform[32];
     int i;
 
     for(i=0; i<32; i++) Wform[i] = i*4 - 64;
+    // Determine the PPP before we popup the edit dialog
+    if(comms != NULL)
+    {
+        cmd =  "GARBPPP,"  + QString::number(Channel);
+        res = comms->SendMess(cmd + "\n");
+        PPP = res.toInt();
+        if(PPP < 8) PPP = 8;
+        if(PPP > 32) PPP = 32;
+    }
     // Read the ARB waveform from MIPS
     if(comms != NULL) res = comms->SendMess("GWFARB," + QString::number(Channel) + "\n");
     if(res.contains("?"))
@@ -682,12 +715,12 @@ void ARBchannel::wfEdit(void)
         return;
     }
     QStringList Vals = res.split(",");
-    for(i=0; i<32; i++)
+    for(i=0; i<PPP; i++)
     {
         if(i < Vals.count()) Wform[i] = Vals[i].toInt();
         else Wform[i] = 0;
     }
-    ARBwfEdit = new ARBwaveformEdit;
+    ARBwfEdit = new ARBwaveformEdit(0,PPP);
     connect(ARBwfEdit, SIGNAL(WaveformReady()), this, SLOT(ReadWaveform()));
     ARBwfEdit->SetWaveform(Wform);
     ARBwfEdit->show();
@@ -697,16 +730,20 @@ QString ARBchannel::ProcessCommand(QString cmd)
 {
     QLineEdit    *le = NULL;
     QRadioButton *rb = NULL;
+    QString title;
 
-    if(!cmd.startsWith(Title)) return "?";
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!cmd.startsWith(title)) return "?";
     QStringList resList = cmd.split("=");
-    if(resList[0].trimmed() == Title + ".Frequency") le = leSWFREQ;
-    else if(resList[0].trimmed() == Title + ".Amplitude") le = leSWFVRNG;
-    else if(resList[0].trimmed() == Title + ".Aux output") le = leSWFVAUX;
-    else if(resList[0].trimmed() == Title + ".Offset output") le = leSWFVOFF;
-    else if(resList[0].trimmed() == Title + ".Forward") rb = SWFDIR_FWD;
-    else if(resList[0].trimmed() == Title + ".Reverse") rb = SWFDIR_REV;
-    else if(resList[0].trimmed() == Title + ".Waveform")
+    if(resList[0].trimmed() == title + ".Frequency") le = leSWFREQ;
+    else if(resList[0].trimmed() == title + ".Amplitude") le = leSWFVRNG;
+    else if(resList[0].trimmed() == title + ".Aux output") le = leSWFVAUX;
+    else if(resList[0].trimmed() == title + ".Offset output") le = leSWFVOFF;
+    else if(resList[0].trimmed() == title + ".Forward") rb = SWFDIR_FWD;
+    else if(resList[0].trimmed() == title + ".Reverse") rb = SWFDIR_REV;
+    else if(resList[0].trimmed() == title + ".Waveform")
     {
        if(resList.count() == 1) return Waveform->currentText();
        int i = Waveform->findText(resList[1].trimmed());

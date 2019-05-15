@@ -136,6 +136,7 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
             }
             if(resList[i].toUpper() == "FILENAME")
             {
+                // If the path is undefined popup and folder selection dialog
                 while(path == "")
                 {
                     CDirSelectionDlg *cds = new CDirSelectionDlg(QDir::currentPath(),p);
@@ -183,7 +184,16 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
                         }
                     }
                 }
-                QDir().mkdir(filePath);
+                if(!QDir().mkdir(filePath))
+                {
+                    // If here the defined path cannot be created so warn the user!
+                    QMessageBox msgBox;
+                    QString msg = "The path you have defined cannot be created. You will need to ";
+                    msg += "abort this acquisition and restart with a valid path. The path you defined ";
+                    msg += "is: " + filePath + "\n";
+                    msgBox.setText(msg);
+                    msgBox.exec();
+                }
                 QDir().setCurrent(filePath);
                 cmd += " " + filePath + "/" + "U1084A.data";
             }

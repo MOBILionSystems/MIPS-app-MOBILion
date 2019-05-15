@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QScriptEngine>
+#include <QStatusBar>
 
 #include "properties.h"
 
@@ -34,6 +35,29 @@ private slots:
     void on_pbLoad_clicked();
     void on_pbAbort_clicked();
     void on_pbHelp_clicked();
+};
+
+// Creates a script buttom on the control panel. When pressed the
+// script is loaded and executed. If a script is alreay executing
+// then the user is asked if he would like to abort.
+class ScriptButton : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit ScriptButton(QWidget *parent, QString name, QString ScriptFile, int x, int y, Properties *prop, QStatusBar *statusbar);
+    void             Show(void);
+    QString          Title;
+    QString          FileName;
+    int              X,Y;
+    QWidget          *p;
+    QStatusBar       *sb;
+    Properties       *properties;
+private:
+    QPushButton      *pbButton;
+    QScriptEngine    *engine;
+private slots:
+    void pbButtonPressed(void);
 };
 
 #endif // SCRIPTINGCONSOLE_H

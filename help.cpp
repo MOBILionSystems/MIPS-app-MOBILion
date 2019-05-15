@@ -42,8 +42,6 @@ void Help::LoadHelpText(QString FileName)
 {
     QStringList resList;
 
-    const int tabStop = 4;  // 4 characters
-
     ui->plainTextEdit->clear();
 //    QScrollBar *sb = ui->plainTextEdit->verticalScrollBar();
 //    QFontMetrics metrics(ui->plainTextEdit->font());

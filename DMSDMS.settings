@@ -1,0 +1,51 @@
+# Control panel settings, Mon May 6 08:07:22 2019
+# MIPS, Version 1.52a Mar 5, 2019
+# Control panel file, /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMS.cfg
+# MIPS: Version 1.154a, April 24, 2019
+# MIPS: System has been up for at least: 3.28 minutes
+Custom control channels,45
+DMS1.Enable,TRUE
+DMS1.Drive,15.93,15.93
+DMS1.Closed loop,FALSE
+DMS1.Vrf,500.00,500.00,495.64
+DMS1.Voltage,4.61
+DMS1.Current,144.72
+DMS1.Power,0.67
+DMS1.Freq,1500000,1500000
+DMS1.Duty,50,50
+DMS1.CV,0.00,0.00,0.02
+DMS1.BIAS,0.00,0.00,-0.03
+DMS1.CVstart,10.00,10.00
+DMS1.CVend,10.00,10.00
+DMS1.VRFstart,800.00,800.00
+DMS1.VRFend,800.00,800.00
+DMS1.Steps,200,200
+DMS2.Enable,TRUE
+DMS2.Drive,26.49,26.49
+DMS2.Closed loop,FALSE
+DMS2.Vrf,800.00,800.00,789.02
+DMS2.Voltage,8.00
+DMS2.Current,350.56
+DMS2.Power,2.80
+DMS2.Freq,1500000,1500000
+DMS2.Duty,50,50
+DMS2.CV,0.00,0.00,-0.01
+DMS2.BIAS,0.00,0.00,-0.02
+DMS2.CVstart,0.00,0.00
+DMS2.CVend,10.00,10.00
+DMS2.VRFstart,800.00,800.00
+DMS2.VRFend,800.00,800.00
+DMS2.Steps,200,200
+Electrometer.Pos Cur,0.0000
+Electrometer.Neg Cur,0.0305
+Electrometer.Pos Off,0.0000,0.0000
+Electrometer.Neg Off,-0.0000,-0.0000
+
+Step dur,5,5
+Average,1,1
+Scans,10,10
+Steps per CV scan.Param,DMS1.CV,DMS1.CV
+Steps per CV scan.Start,-10,-10
+Steps per CV scan.Stop,10,10
+Steps per CV scan.Step,1,1
+Steps per CV scan.Delay,2,2

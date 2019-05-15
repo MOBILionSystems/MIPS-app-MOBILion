@@ -302,8 +302,12 @@ void DIOchannel::Show(void)
 QString DIOchannel::Report(void)
 {
     QString res;
+    QString title;
 
-    res = Title + ",";
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    res = title + ",";
     if(DIO->isChecked()) res += "1";
     else res += "0";
     return(res);
@@ -312,8 +316,12 @@ QString DIOchannel::Report(void)
 bool DIOchannel::SetValues(QString strVals)
 {
     QStringList resList;
+    QString title;
 
-    if(!strVals.startsWith(Title)) return false;
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!strVals.startsWith(title)) return false;
     resList = strVals.split(",");
     if(resList.count() < 2) return false;
     if(resList[1].contains("1")) DIO->setChecked(true);
@@ -325,8 +333,13 @@ bool DIOchannel::SetValues(QString strVals)
 
 QString DIOchannel::ProcessCommand(QString cmd)
 {
-    if(!cmd.startsWith(Title)) return "?";
-    if(cmd == Title)
+    QString title;
+
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!cmd.startsWith(title)) return "?";
+    if(cmd == title)
     {
         if(DIO->isChecked()) return "1";
         return "0";

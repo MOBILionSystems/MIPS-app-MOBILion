@@ -15,7 +15,7 @@ signals:
     void WaveformReady(void);
 
 public:
-    explicit ARBwaveformEdit(QWidget *parent = 0);
+    explicit ARBwaveformEdit(QWidget *parent, int ppp);
     ~ARBwaveformEdit();
     void SetWaveform(int *wf);
     void GetWaveform(int *wf);
@@ -23,6 +23,7 @@ public:
 private:
     Ui::ARBwaveformEdit *ui;
     int Waveform[32];
+    int PPP;
 
 private slots:
     void GenerateUpDown(void);

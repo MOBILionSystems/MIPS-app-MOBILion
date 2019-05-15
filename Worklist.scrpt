@@ -1,0 +1,58 @@
+// Work list script
+//
+// This script is desiged to enable the auto sampler and optionally use
+// a work list to define method files and data file names and paths.
+//
+// Gordon Anderson
+//
+mips.popupMessage("Autosampler, rev 1.0 2019")
+if(mips.popupYesNoMessage("Do you want to use a worklist file?") == true)
+{
+   worklist = mips.SelectFile("Open","Select worklist file","csv")
+   maxLines = mips.ReadCSVfile(worklist,",")
+   mips.popupMessage(maxLines + " entries found in work list file")
+   for(start = 0; start < maxLines; start++)
+  {
+     if(mips.ReadCSVentry(start,0) == 1)
+    {
+      // Now process each entry in the CSV file
+      for(Injection = start;Injection < maxLines; Injection++)
+      {
+         // Load the method
+         mips.statusMessage("Loading method file: " + mips.ReadCSVentry(Injection,2))
+         // Acquire the data
+         AcquireData(mips.ReadCSVentry(Injection,3))
+      }
+    }
+  }
+  mips.popupMessage("Work list finished!")
+}
+// If here we are not using a worklist so ask for the number of samples
+ mips.popupMessage("Press OK to start Autosampler");
+ count = mips.popupUserInput("Setup","Enter number of injections you wish to perform:");
+ mips.statusMessage("Loop count entered: " + count);
+ for(i=0;i<count;i++)
+ {
+    mips.statusMessage("Loop: "  +  i );
+    AcquireDataFile("C:/Data/20190315/Vial_Testing/Reserpine_test_0000")
+ }
+mips.statusMessage("Script finished." );
+
+
+function AcquireDataFile(datafile)
+{
+    mips.statusMessage("Waiting for start." );
+    mips.SendCommand("MIPS-2","MDIO,V,FALLING\n");
+    while(true)
+    {
+       if(mips.SendMess("MIPS-2","RDIO,V\n") == "TRUE") break;
+       mips.msDelay(100);
+    }
+    mips.statusMessage("Start detected, starting acquire." );
+    mips.Acquire(datafile);
+    mips.msDelay(100);
+    mips.statusMessage("Waiting for acquire to finish." );
+    while(mips.isAcquiring()) mips.msDelay(500);
+    mips.msDelay(5000);
+}
+

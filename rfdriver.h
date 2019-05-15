@@ -78,4 +78,52 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event);
 };
 
+class RFCchannel : public QWidget
+{
+    Q_OBJECT
+
+public:
+    RFCchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
+    void    Show(void);
+    void    Update(QString sVals = "");
+    QString Report(void);
+    bool    SetValues(QString strVals);
+    void    Shutdown(void);
+    void    Restore(void);
+    QString ProcessCommand(QString cmd);
+    QWidget *p;
+    QString Title;
+    int     X,Y;
+    QString MIPSnm;
+    int     Channel;
+    Comms   *comms;
+    bool    isShutdown;
+private:
+    QGroupBox   *gbRF;
+    QLineEdit   *Drive;
+    QLineEdit   *Setpoint;
+    QLineEdit   *Freq;
+    QLineEdit   *RFP;
+    QLineEdit   *RFN;
+    QLineEdit   *Power;
+    QRadioButton *Open_Loop;
+    QRadioButton *Closed_Loop;
+    QPushButton *Tune;
+    QPushButton *Retune;
+    QLabel      *labels[12];
+    QString     activeDrive;
+    QString     activeSetpoint;
+    bool        Updating;
+    bool        UpdateOff;
+private slots:
+    void DriveChange(void);
+    void SetpointChange(void);
+    void FreqChange(void);
+    void TunePressed(void);
+    void RetunePressed(void);
+    void rbChange(void);
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+};
+
 #endif // RFDRIVER_H

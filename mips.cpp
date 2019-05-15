@@ -199,10 +199,38 @@
 //      1.) Fixed bug in the control panel arb waveform editor.
 //      2.) Removed the doevents from the control panel update function, if it was
 //          interrupted by the scripting engine then the update will freeze.
+// 1.51, Feb 21, 2019
+//      1.) Added update rates adjustment to properties page.
+//      2.) Added MIPS box names to the methode file.
+//      3.) Added wait for update function for scripting.
+//      4.) Added MIPS name to comm errors
+// 1.52, in process
+//      1.) Added uptime to the methode file save in control panel.
+//      2.) Set RF drive to zero just before auto tune and then delay for 1 sec,
+//          likely fixes a bug when pressing auto tune when at power.
+//      3.) Fixed ARB edit, it depends of PPP for download. This is a temp fix
+//          need to update the editor, fixed 03/11/19 but not tested
+//      4.) Added the ability to popup a control panel from with in a control panel,
+//          a child control panel. ControlPanel,Name,config file,X,Y
+//      5.) Test for valid path when experiment starts and popup an error if invalid
+//          path is detected.
+//      6.) Added closed loop option to RF driver in control panel
+//      7.) Added support for AMPS, the properties page allow you to enable searching
+//          for AMPS system and allows you to select baud rate. AMPS are 8 bit, even
+//          parity, 2 stop bits and Xon/Xoff flow control
+//      8.) To dos:
+//          - Add group box command to place controls in a group. This
+//            will also require an end statement. Add group name string to
+//            all control supporting this function. This allows same name controls
+//            in different groups.
+//          - Resolve table not downloaded issue
+//          - Control panel to dos:
+//              - Allow data file name definition, have U1084A.data be the default
+//              - Script button
+//              - Plotting capability
 //
 // Planded updates:
 //      - Add ploting capability. Also support this through the Scripting system.
-//      - Develop auto reconnection
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -210,17 +238,17 @@
 #include "settingsdialog.h"
 #include "pse.h"
 #include "ringbuffer.h"
-#include "Comms.h"
-#include "Twave.h"
-#include "DCbias.h"
-#include "DIO.h"
-#include "RFdriver.h"
-#include "PSG.h"
-#include "Program.h"
-#include "Help.h"
-#include "ARB.h"
-#include "FAIMS.h"
-#include "Filament.h"
+#include "comms.h"
+#include "twave.h"
+#include "dcbias.h"
+#include "dio.h"
+#include "rfdriver.h"
+#include "psg.h"
+#include "program.h"
+#include "help.h"
+#include "arb.h"
+#include "faims.h"
+#include "filament.h"
 #include "singlefunnel.h"
 #include "softlanding.h"
 #include "softlanding2.h"
@@ -247,7 +275,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QInputDialog>
 
-QString Version = "MIPS, Version 1.50 Feb 14, 2019";
+QString Version = "MIPS, Version 1.52a Mar 5, 2019";
 
 MIPS::MIPS(QWidget *parent) :
     QMainWindow(parent),
@@ -357,7 +385,8 @@ MIPS::MIPS(QWidget *parent) :
 
     ui->comboMIPSnetNames->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
     // Sets the polling loop interval and starts the timer
-    pollTimer->start(1000);
+    if(properties != NULL) pollTimer->start(1000 * properties->UpdateSecs);
+    else pollTimer->start(1000);
 
     for(int i=0;i<properties->MIPS_TCPIP.count();i++) ui->comboMIPSnetNames->addItem(properties->MIPS_TCPIP[i]);
     if(properties != NULL) properties->Log("MIPS loaded: " + Version);
@@ -933,8 +962,26 @@ void MIPS::FindAllMIPSsystems(void)
             if(cp->ConnectToMIPS())
             {
                Systems << (cp);
-               cp = new Comms(settings,"",ui->statusBar);
+               cp = new Comms(settings,"",ui->statusBar);    // Why??
             }
+          }
+          else if(properties != NULL)
+          {
+              if(properties->SearchAMPS)
+              {
+                  if(cp->isAMPS(settings->getPortName(j),properties->AMPSbaud))
+                  {
+                    delay();
+                    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+                    cp->host = "";
+                    //cp->SendString("RTM,ON\n");  // Port is closed here
+                    if(cp->ConnectToMIPS())
+                    {
+                       Systems << (cp);
+                       cp = new Comms(settings,"",ui->statusBar);  // Why??
+                    }
+                  }
+              }
           }
         }
     }

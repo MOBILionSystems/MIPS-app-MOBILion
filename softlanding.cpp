@@ -265,7 +265,7 @@ void SoftLanding::AutoTune(void)
 {
     QObject* obj = sender();
     int tch = 0, rtch = 0;
-    bool stat;
+    bool stat=false;
 
     ((QPushButton *)(obj))->setDown(false);
     if(obj->objectName() == "pbTuneF1") tch = 1;

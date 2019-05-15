@@ -1,0 +1,4 @@
+// Script to load a file and display in plot window
+filename = mips.SelectFile("Open","Select plot file","plot")
+mips.CreatePlot("CV scan","Current, pA","Time, mS",2)
+mips.PlotCommand("Load," + filename)

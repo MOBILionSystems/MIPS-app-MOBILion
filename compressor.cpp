@@ -50,7 +50,7 @@ void Compressor::Update(void)
     foreach(QObject *w, widgetList)
     {
         comms->rb.clear();
-        if(w->objectName().contains("leS") || w->objectName().contains("leG"))
+        if(w->objectName().startsWith("leS") || w->objectName().startsWith("leG"))
         {
             if(!((QLineEdit *)w)->hasFocus())
             {
@@ -58,7 +58,7 @@ void Compressor::Update(void)
                 ((QLineEdit *)w)->setText(comms->SendMess(res));
             }
         }
-        else if(w->objectName().contains("chk"))
+        else if(w->objectName().startsWith("chk"))
         {
             // Checkbox names encode the command and response for check and uncheck
             resList = w->objectName().split("_");
@@ -71,7 +71,7 @@ void Compressor::Update(void)
                 if(res.contains("?")) comms->waitforline(100);
             }
         }
-        else if(w->objectName().contains("rb"))
+        else if(w->objectName().startsWith("rb"))
         {
             resList = w->objectName().split("_");
             if(resList.count() == 2)
@@ -81,7 +81,7 @@ void Compressor::Update(void)
                 if(res == resList[1]) ((QRadioButton *)w)->setChecked(true);
             }
         }
-        else if(w->objectName().contains("lel"))
+        else if(w->objectName().startsWith("lel"))
         {
             // This is a list of parameters from a command common to several line edit boxes
             resList = w->objectName().split("_");

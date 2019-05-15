@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QDialog>
-#include <Qdir>
+#include <QDir>
 
 class QTreeView;
 class QFileSystemModel;

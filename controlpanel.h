@@ -17,6 +17,8 @@
 #include "timinggenerator.h"
 #include "compressor.h"
 #include "properties.h"
+#include "scriptingconsole.h"
+#include "plot.h"
 
 #include <QDialog>
 #include <QDebug>
@@ -33,7 +35,7 @@
 #include <QBoxLayout>
 #include <QUdpSocket>
 #include <QMenu>
-#include <QMutex>
+#include <QScriptEngine>
 
 extern QString Version;
 
@@ -182,6 +184,71 @@ private slots:
     void ESIenaChange(void);
 };
 
+class Ccontrol : public QWidget
+{
+    Q_OBJECT
+public:
+    Ccontrol(QWidget *parent, QString name, QString MIPSname,QString Type, QString Gcmd, QString Scmd, QString RBcmd, QString Units, int x, int y);
+    void    Show(void);
+    void    Update(void);
+    QString Report(void);
+    bool    SetValues(QString strVals);
+    void    Shutdown(void);
+    void    Restore(void);
+    QString ProcessCommand(QString cmd);
+    QWidget          *p;
+    QString          Title;
+    int              X,Y;
+    QString          MIPSnm;
+    QString          Ctype;
+    QString          Dtype;
+    QString          GetCmd;
+    QString          SetCmd;
+    QString          ReadbackCmd;
+    QString          UnitsText;
+    QString          ActiveValue;
+    QString          ShutdownValue;
+    Comms            *comms;
+    bool             isShutdown;
+private:
+    QFrame                *frmCc;
+    QLineEdit             *Vsp;
+    QLineEdit             *Vrb;
+    QPushButton           *pbButton;
+    QCheckBox             *chkBox;
+    QLabel                *labels[2];
+    bool                  Updating;
+    bool                  UpdateOff;
+private slots:
+    void VspChange(void);
+    void pbButtonPressed(void);
+    void chkBoxStateChanged(int);
+//protected:
+//    bool eventFilter(QObject *obj, QEvent *event);
+};
+
+// Creates a new control panel and places a button on the parent control
+// panel that will show this new control panel.
+class Cpanel : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit Cpanel(QWidget *parent, QString name, QString CPfileName, int x, int y, QList<Comms*> S, Properties *prop);
+//    ~Cpanel();
+    void             Show(void);    // This will show the button, pressing the button will show the control panel
+    void             Update(void);
+    QString          Title;
+    int              X,Y;
+    QWidget          *p;
+    ControlPanel     *cp;
+private:
+    QPushButton      *pbButton;
+private slots:
+    void pbButtonPressed(void);
+    void slotDialogClosed(void);
+};
+
 class ControlPanel : public QDialog
 {
     Q_OBJECT
@@ -203,7 +270,9 @@ public:
     DCBchannel  *FindDCBchannel(QString name);
     bool LoadedConfig;
     Properties *properties;
+    QWidget *Container;
     // The following functions are for the scripting system
+    Q_INVOKABLE QString GetLine(QString MIPSname);
     Q_INVOKABLE bool SendCommand(QString MIPSname, QString message);
     Q_INVOKABLE QString SendMess(QString MIPSname, QString message);
     Q_INVOKABLE void SystemEnable(void);
@@ -217,6 +286,13 @@ public:
     Q_INVOKABLE bool popupYesNoMessage(QString message);
     Q_INVOKABLE QString popupUserInput(QString title, QString message);
     Q_INVOKABLE bool UpdateHalted(bool stop);
+    Q_INVOKABLE void WaitForUpdate(void);
+    Q_INVOKABLE QString SelectFile(QString fType, QString Title, QString Ext);
+    Q_INVOKABLE int ReadCSVfile(QString fileName, QString delimiter);
+    Q_INVOKABLE QString ReadCSVentry(int line, int entry);
+    Q_INVOKABLE QString Command(QString cmd);
+    Q_INVOKABLE void CreatePlot(QString Title, QString Yaxis, QString Xaxis, int NumPlots);
+    Q_INVOKABLE void PlotCommand(QString cmd);
 
 private:
     Comms            *FindCommPort(QString name, QList<Comms*> Systems);
@@ -230,23 +306,31 @@ private:
     QAction *OpenLogFile;
     QAction *CloseLogFile;
     QString HelpFile;
-    QString LogFile;;
+    QString LogFile;
     QString ControlPanelFile;
+    QString MIPSnames;
 
-    QList<TextLabel *>  TextLabels;
-    QList<RFchannel *>  RFchans;
-    QList<ADCchannel *> ADCchans;
-    QList<DACchannel *> DACchans;
-    QList<DCBchannel *> DCBchans;
-    QList<DCBoffset *>  DCBoffsets;
-    QList<DCBenable *>  DCBenables;
-    QList<DIOchannel *> DIOchannels;
-    QList<ESI *>        ESIchans;
-    QList<ARBchannel *> ARBchans;
-    QList<RFamp *>      rfa;
-    IFTtiming           *IFT;
-    TimingControl       *TC;
-    Compressor          *comp;
+    QList<QGroupBox *>    GroupBoxes;
+    QList<ScriptButton *> ScripButtons;
+    QList<Cpanel *>       Cpanels;
+    QList<TextLabel *>    TextLabels;
+    QList<RFchannel *>    RFchans;
+    QList<RFCchannel *>   RFCchans;
+    QList<ADCchannel *>   ADCchans;
+    QList<DACchannel *>   DACchans;
+    QList<DCBchannel *>   DCBchans;
+    QList<DCBoffset *>    DCBoffsets;
+    QList<DCBenable *>    DCBenables;
+    QList<DIOchannel *>   DIOchannels;
+    QList<ESI *>          ESIchans;
+    QList<ARBchannel *>   ARBchans;
+    QList<RFamp *>        rfa;
+    QList<Ccontrol *>     Ccontrols;
+    QList<QStringList *>  CSVdata;
+    QList<Plot *>         plots;
+    IFTtiming             *IFT;
+    TimingControl         *TC;
+    Compressor            *comp;
     uint        LogStartTime;
     int         LogPeriod;
     int         UpdateHoldOff;
@@ -255,6 +339,7 @@ private:
     bool        RestoreFlag;
     bool        SystemIsShutdown;
     bool        StartMIPScomms;
+    bool        RequestUpdate;
     Script      *script;
     Shutdown    *SD;
     SaveLoad    *SL;
@@ -262,7 +347,7 @@ private:
     DCBiasGroups     *DCBgroups;
     QPushButton      *MIPScommsButton;
     QPushButton      *ARBcompressorButton;
-    QPushButton      *ScriptButton;
+    QPushButton      *scriptButton;
     ScriptingConsole *scriptconsole;
     QUdpSocket       *udpSocket;
     Help             *help;

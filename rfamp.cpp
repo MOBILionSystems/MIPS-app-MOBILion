@@ -5,6 +5,7 @@ RFamp::RFamp(QWidget *parent, QString name, QString MIPSname, int Module) :
     QDialog(parent),
     ui(new Ui::RFamp)
 {
+    p = parent;
     ui->setupUi(this);
     Updating = false;
     UpdateOff = false;
@@ -176,7 +177,11 @@ QString RFamp::Report(void)
 {
    QString res;
    QStringList resList;
+   QString title;
 
+   title.clear();
+   if(p->objectName() != "") title = p->objectName() + ".";
+   title += Title;
    res.clear();
    QObjectList widgetList = ui->tabRFsettings->children();
    widgetList += ui->tabMassFilter->children();
@@ -184,21 +189,21 @@ QString RFamp::Report(void)
    {
        if(w->objectName().startsWith("leS"))
        {
-           res += Title + "," + w->objectName() + "," + ((QLineEdit *)w)->text() + "\n";
+           res += title + "," + w->objectName() + "," + ((QLineEdit *)w)->text() + "\n";
        }
        if(w->objectName().startsWith("chkS"))
        {
            resList = w->objectName().split("_");
            if(resList.count() == 3)
            {
-               if(((QCheckBox *)w)->isChecked()) res += Title + "," + resList[0] + "," + resList[1] + "\n";
-               else res += Title + "," + resList[0] + "," + resList[2] + "\n";
+               if(((QCheckBox *)w)->isChecked()) res += title + "," + resList[0] + "," + resList[1] + "\n";
+               else res += title + "," + resList[0] + "," + resList[2] + "\n";
            }
        }
        if(w->objectName().startsWith("rbS"))
        {
            resList = w->objectName().split("_");
-           if(resList.count() == 2) if(((QRadioButton *)w)->isChecked()) res += Title + "," + resList[0] + "," + resList[1] + "\n";
+           if(resList.count() == 2) if(((QRadioButton *)w)->isChecked()) res += title + "," + resList[0] + "," + resList[1] + "\n";
        }
    }
    return res;
@@ -207,8 +212,12 @@ QString RFamp::Report(void)
 bool RFamp::SetValues(QString strVals)
 {
     QStringList resList,ctrlList;
+    QString title;
 
-    if(!strVals.startsWith(Title)) return false;
+    title.clear();
+    if(p->objectName() != "") title = p->objectName() + ".";
+    title += Title;
+    if(!strVals.startsWith(title)) return false;
     resList = strVals.split(",");
     if(resList.count() < 3) return false;
     QObjectList widgetList = ui->tabRFsettings->children();

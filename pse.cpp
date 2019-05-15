@@ -188,7 +188,6 @@ void pseDialog::on_pbPrevious_pressed()
 void pseDialog::on_pbInsert_pressed()
 {
     psgPoint *point = new psgPoint;
-    psgPoint *nextPoint = NULL;
     QList<psgPoint*>::iterator it;
     int i,deltaT;
 

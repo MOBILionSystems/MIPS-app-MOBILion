@@ -1,4 +1,4 @@
-#include "CDirSelectionDlg.h"
+#include "cdirselectiondlg.h"
 #include "scriptingconsole.h"
 
 #include <QLabel>

@@ -1,0 +1,49 @@
+// DMS or DMSDMS script for scanning and plotting the data
+mips.CreatePlot("CV scan","Current, pA","Time, mS",2)
+steps = mips.Command("DMS1.Steps")
+dur = mips.Command("Step dur")
+res = "Xrange,0," + (steps * dur).toString()
+mips.PlotCommand(res)
+mips.PlotCommand("Yrange,-1,500")
+averages = mips.Command("Average")
+numscans = mips.Command("Scans")
+Param = mips.Command("Steps per CV scan.Param").trim()
+if(Param != "")
+{
+   start = mips.Command("Steps per CV scan.Start")
+   delta = (mips.Command("Steps per CV scan.Stop") - mips.Command("Steps per CV scan.Start")) / (numscans-1)
+}
+for(scans=0;scans<numscans;scans++)
+{
+   if(Param != "")
+   {
+      if((scans % parseInt(mips.Command("Steps per CV scan.Step"),10)) == 0)
+      {
+         mips.Command(Param + "=" + (parseFloat(start) + delta * (scans)).toFixed(2))
+         mips.PlotCommand(Param + "=" + (parseFloat(start) + delta * (scans)).toFixed(2))
+         mips.msDelay(mips.Command("Steps per CV scan.Delay"))
+      }
+   }
+   ReadScan(averages)
+}
+// This function read one CV scan
+function ReadScan(averages)
+{
+   steps = mips.Command("DMS1.Steps")
+   dur = mips.Command("Step dur")
+   mips.PlotCommand("NewGraph,2," + (steps * dur).toString());
+   for(avg=0;avg<averages;avg++)
+   {
+      mips.statusMessage("Reading average " + (avg+1).toString() + " of " + averages.toString())
+      mips.UpdateHalted(true);
+      mips.SendCommand("MIPS","FBSCNSTRT,1\n")
+      for(i=0;i<steps;i++)
+      {
+         res = mips.GetLine("MIPS")
+         mips.PlotCommand("AddPoint," + res);
+      }
+      mips.UpdateHalted(false);
+   }
+   mips.PlotCommand("Plot");
+   mips.PlotCommand("Refresh");  
+}

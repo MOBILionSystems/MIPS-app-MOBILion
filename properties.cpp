@@ -7,7 +7,6 @@ Properties::Properties(QWidget *parent) :
 {
     ui->setupUi(this);
     // Set some defaults incase we can't load the properties file
-
     ui->leDataFilePath->setText(QDir::currentPath());
     ui->leMethodesPath->setText(QDir::currentPath());
     ui->leScriptPath->setText(QDir::currentPath());
@@ -56,8 +55,14 @@ void Properties::UpdateVars(void)
     FileName = ui->leFileName->text();
     LogFile = ui->leLogFile->text();
     MinMIPS = ui->leMinMIPS->text().toInt();
+    UpdateSecs = ui->leUpdateSecs->text().toInt();
+    AMPSbaud = ui->leAMPSbaud->text();
+    if(ui->chkSearchAMPS->isChecked()) SearchAMPS = true;
+    else SearchAMPS = false;
     if(ui->chkAutoConnect->isChecked()) AutoConnect = true;
     else AutoConnect = false;
+    if(ui->chkAutoRestore->isChecked()) AutoRestore = true;
+    else AutoRestore = false;
     if(ui->chkAutoFileName->isChecked()) AutoFileName = true;
     else AutoFileName = false;
     MIPS_TCPIP.clear();
@@ -141,11 +146,17 @@ void Properties::Save(QString fileName)
         stream << "LoadControlPanel," + LoadControlPanel + "\n";
         stream << "FileName," + FileName + "\n";
         stream << "MinMIPS," + QString::number(MinMIPS) + "\n";
+        stream << "UpdateSecs," + QString::number(UpdateSecs) + "\n";
         stream << "LogFile," + LogFile + "\n";
+        stream << "AMPSbaud," + AMPSbaud + "\n";
+        if(SearchAMPS) stream << "SearchAMPS,TRUE\n";
+        else stream << "SearchAMPS,FALSE\n";
         if(AutoFileName) stream << "AutoFileName,TRUE\n";
         else stream << "AutoFileName,FALSE\n";
         if(AutoConnect) stream << "AutoConnect,TRUE\n";
         else stream << "AutoConnect,FALSE\n";
+        if(AutoRestore) stream << "AutoRestore,TRUE\n";
+        else stream << "AutoRestore,FALSE\n";
         stream << "MIPS_TCPIP";
         for(int i=0; i<MIPS_TCPIP.count(); i++) stream << "," + MIPS_TCPIP[i];
         stream << "\n";
@@ -172,11 +183,17 @@ void Properties::Load(QString fileName)
             else if((reslist.count() == 2) && (reslist[0] == "LoadControlPanel")) ui->leControlPanel->setText(reslist[1]);
             else if((reslist.count() == 2) && (reslist[0] == "FileName")) ui->leFileName->setText(reslist[1]);
             else if((reslist.count() == 2) && (reslist[0] == "MinMIPS")) ui->leMinMIPS->setText(reslist[1]);
+            else if((reslist.count() == 2) && (reslist[0] == "UpdateSecs")) ui->leUpdateSecs->setText(reslist[1]);
             else if((reslist.count() == 2) && (reslist[0] == "LogFile")) ui->leLogFile->setText(reslist[1]);
+            else if((reslist.count() == 2) && (reslist[0] == "AMPSbaud")) ui->leAMPSbaud->setText(reslist[1]);
+            else if((reslist.count() == 2) && (reslist[0] == "SearchAMPS") && (reslist[1] == "TRUE")) ui->chkSearchAMPS->setChecked(true);
+            else if((reslist.count() == 2) && (reslist[0] == "SearchAMPS") && (reslist[1] == "FALSE")) ui->chkSearchAMPS->setChecked(false);
             else if((reslist.count() == 2) && (reslist[0] == "AutoFileName") && (reslist[1] == "TRUE")) ui->chkAutoFileName->setChecked(true);
             else if((reslist.count() == 2) && (reslist[0] == "AutoFileName") && (reslist[1] == "FALSE")) ui->chkAutoFileName->setChecked(false);
             else if((reslist.count() == 2) && (reslist[0] == "AutoConnect") && (reslist[1] == "TRUE")) ui->chkAutoConnect->setChecked(true);
             else if((reslist.count() == 2) && (reslist[0] == "AutoConnect") && (reslist[1] == "FALSE")) ui->chkAutoConnect->setChecked(false);
+            else if((reslist.count() == 2) && (reslist[0] == "AutoRestore") && (reslist[1] == "TRUE")) ui->chkAutoRestore->setChecked(true);
+            else if((reslist.count() == 2) && (reslist[0] == "AutoRestore") && (reslist[1] == "FALSE")) ui->chkAutoRestore->setChecked(false);
             else if((reslist.count() >= 1) && (reslist[0] == "MIPS_TCPIP"))
             {
                 ui->comboTCPIPlist->clear();

@@ -471,13 +471,15 @@ void Comms::ARBupload(QString Faddress, QString FileName)
 bool Comms::SendString(QString name, QString message)
 {
     if((name == MIPSname) || (name == "")) return SendString(message);
+    return false;
 }
 
 bool Comms::SendString(QString message)
 {
     if (!serial->isOpen() && !client.isOpen())
     {
-        sb->showMessage("Disconnected!",2000);
+        if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + " SS Disconnected!",2000);
+        else sb->showMessage("SS Disconnected!",2000);
         return true;
     }
     if(client.isOpen()) keepAliveTimer->setInterval(600000);
@@ -498,7 +500,8 @@ bool Comms::SendCommand(QString message)
 
     if (!serial->isOpen() && !client.isOpen())
     {
-        sb->showMessage("Disconnected!",2000);
+        if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + " SC Disconnected!",2000);
+        else sb->showMessage("SC Disconnected!",2000);
         return true;
     }
     if(client.isOpen()) keepAliveTimer->setInterval(600000);
@@ -515,7 +518,8 @@ bool Comms::SendCommand(QString message)
             if(res == "?")
             {
                 res = message + " :NAK";
-                sb->showMessage(res.toStdString().c_str(),2000);
+                if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + ", " + res.toStdString().c_str(),2000);
+                else sb->showMessage(res.toStdString().c_str(),2000);
                 return false;
             }
         }
@@ -523,7 +527,8 @@ bool Comms::SendCommand(QString message)
     // Here if the message transaction timmed out
     reopenSerialPort();
     res = message + " :Timeout";
-    sb->showMessage(res.toStdString().c_str(),2000);
+    if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + ", " + res.toStdString().c_str(),2000);
+    else sb->showMessage(res.toStdString().c_str(),2000);
     return true;
 }
 
@@ -569,7 +574,8 @@ QString Comms::SendMessage(QString message)
 
     if (!serial->isOpen() && !client.isOpen())
     {
-        sb->showMessage("Disconnected!",2000);
+        if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + " SM Disconnected!",2000);
+        else sb->showMessage("SM Disconnected!",2000);
         return "";
     }
     if(client.isOpen()) keepAliveTimer->setInterval(600000);
@@ -588,7 +594,8 @@ QString Comms::SendMessage(QString message)
     // Here if the message transaction timmed out
     reopenSerialPort();
     res = message + " :Timeout";
-    sb->showMessage(res.toStdString().c_str(),2000);
+    if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + ", " + res.toStdString().c_str(),2000);
+    else sb->showMessage(res.toStdString().c_str(),2000);
     res = "";
     return res;
 }
@@ -648,6 +655,52 @@ void Comms::DisconnectFromMIPS()
     closeSerialPort();
 }
 
+bool Comms::isAMPS(QString port, QString baud)
+{
+    QString res;
+
+    if(serial->isOpen()) return false;  // If the port is open then return false
+    disconnect(serial, SIGNAL(error(QSerialPort::SerialPortError)),0,0);
+    // Init the port parameters
+    p.name = port;
+    serial->setPortName(p.name);
+#if defined(Q_OS_MAC)
+    serial->setPortName("cu." + p.name);
+#endif
+    if(serial->isOpen()) return false;
+    p.baudRate = baud.toInt();
+    p.dataBits = QSerialPort::Data8;
+    p.parity = QSerialPort::EvenParity;
+    p.stopBits = QSerialPort::TwoStop;
+    p.flowControl = QSerialPort::SoftwareControl;
+    serial->setBaudRate(p.baudRate);
+    serial->setDataBits(p.dataBits);
+    serial->setParity(p.parity);
+    serial->setStopBits(p.stopBits);
+    serial->setFlowControl(p.flowControl);
+    if (serial->open(QIODevice::ReadWrite))
+    {
+        serial->setDataTerminalReady(true);  // Required on PC but not on a MAC
+        QApplication::processEvents(QEventLoop::AllEvents, 100);
+        SendMessage("\n");   // Flush anything out!
+        rb.clear();
+        res = SendMessage("GVER\n");
+        SendString("RTM,ON\n");
+        QApplication::processEvents(QEventLoop::AllEvents, 100);
+        serial->close();
+        serial->close();
+        serial->close();
+        serial->close();
+        serial->clearError();
+        QApplication::processEvents(QEventLoop::AllEvents, 100);
+        rb.clear();
+        if(res.startsWith("V")) return true;
+    }
+    serial->clearError();
+    rb.clear();
+    return false;
+}
+
 bool Comms::isMIPS(QString port)
 {
     QString res;
@@ -676,6 +729,7 @@ bool Comms::isMIPS(QString port)
         serial->setDataTerminalReady(true);  // Required on PC but not on a MAC
         QApplication::processEvents(QEventLoop::AllEvents, 100);
         res = SendMessage("GVER\n");
+        SendString("ECHO,FALSE\n");
         QApplication::processEvents(QEventLoop::AllEvents, 100);
         serial->close();
         serial->close();
@@ -706,6 +760,36 @@ void Comms::reopenSerialPort(void)
     msDelay(250);
     serial->open(QIODevice::ReadWrite);
     serial->setDataTerminalReady(true);
+}
+
+void Comms::reopenPort(void)
+{
+    QTime timer;
+
+    if(host != "")
+    {
+        client_connected = false;
+        client.setSocketOption(QAbstractSocket::KeepAliveOption, 1);
+        client.connectToHost(host, 2015);
+        sb->showMessage(tr("Connecting..."));
+        timer.start();
+        while(timer.elapsed() < 5000)
+        {
+            QApplication::processEvents();
+            if(client_connected) return;
+        }
+        sb->showMessage(tr("MIPS failed to connect!"));
+        client.abort();
+        client.close();
+        return;
+    }
+    else
+    {
+        serial->close();
+        msDelay(250);
+        serial->open(QIODevice::ReadWrite);
+        serial->setDataTerminalReady(true);
+    }
 }
 
 bool Comms::openSerialPort()
@@ -741,7 +825,8 @@ void Comms::closeSerialPort()
     serial->close();
     serial->close();
     serial->close();
-    sb->showMessage(tr("Disconnected"));
+    if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + " Closed!",2000);
+    else sb->showMessage("Closed!",2000);
     disconnect(serial, SIGNAL(error(QSerialPort::SerialPortError)),0,0);
 }
 
@@ -753,9 +838,10 @@ void Comms::handleError(QSerialPort::SerialPortError error)
         QThread::sleep(1);
 //        reopenSerialPort();
 //        return;
-        QMessageBox::critical(this, tr("Critical Error"), serial->errorString());
-        sb->showMessage(tr("Critical Error, port closing: ") + serial->errorString());
+//        QMessageBox::critical(this, tr("Critical Error"), serial->errorString());
         closeSerialPort();
+        if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + tr(" Critical Error, port closing: ") + serial->errorString());
+        else sb->showMessage(tr("Critical Error, port closing: ") + serial->errorString());
     }
 }
 
@@ -790,7 +876,8 @@ void Comms::readData2RingBuffer(void)
 
 void Comms::connected(void)
 {
-    sb->showMessage(tr("MIPS connected"));
+    if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + tr(" MIPS connected"));
+    else sb->showMessage(tr("MIPS connected"));
     client_connected = true;
 }
 
@@ -803,7 +890,8 @@ bool Comms::isConnected(void)
 
 void Comms::disconnected(void)
 {
-    sb->showMessage(tr("Disconnected"));
+    if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + " Disconnect signaled!",2000);
+    else sb->showMessage("Disconnect signaled!!",2000);
 }
 
 QString Comms::getline(void)

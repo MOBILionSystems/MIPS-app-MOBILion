@@ -42,6 +42,7 @@ private:
     Ui::RFamp *ui;
     bool Updating;
     bool UpdateOff;
+    QWidget *p;
 
 private slots:
     void Updated(void);
