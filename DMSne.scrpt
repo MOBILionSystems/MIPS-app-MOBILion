@@ -1,10 +1,8 @@
-// DMS or DMSDMS script for scanning and plotting the data
-mips.CreatePlot("CV scan","Current, pA","Time, mS",2)
+// DMS or DMSDMS script for scanning with no plotting
+// This script is designed for systems with no electrometer
+mips.SendCommand("MIPS","SDIO,A,1\n")
 steps = mips.Command("DMS1.Steps")
 dur = mips.Command("Step dur")
-res = "Xrange,0," + (steps * dur).toString()
-mips.PlotCommand(res)
-mips.PlotCommand("Yrange,-1,500")
 averages = mips.Command("Average")
 numscans = mips.Command("Scans")
 Param = mips.Command("Steps per CV scan.Param").trim()
@@ -20,30 +18,39 @@ for(scans=0;scans<numscans;scans++)
       if((scans % parseInt(mips.Command("Steps per CV scan.Step"),10)) == 0)
       {
          mips.Command(Param + "=" + (parseFloat(start) + delta * (scans)).toFixed(2))
-         mips.PlotCommand(Param + "=" + (parseFloat(start) + delta * (scans)).toFixed(2))
          mips.msDelay(mips.Command("Steps per CV scan.Delay"))
       }
    }
+   if(mips.Command("Ext Trig") == "TRUE\n")
+   {
+      // Wait for trigger input, R, to go high
+      mips.SendCommand("MIPS","MDIO,R,RISING\n")
+      mips.statusMessage("Scan " + (scans+1).toString() + " waiting for trigger on input R...");
+      mips.msDelay(1000)
+      while(1)
+      {
+        if(mips.SendMess("MIPS","RDIO,R\n") == "TRUE") break;
+        mips.msDelay(100)
+      }
+      mips.statusMessage("Triggered!");
+   }
    ReadScan(averages)
+   mips.statusMessage("Read scan " + (scans+1).toString() + " of " + numscans.toString())
 }
 // This function read one CV scan
 function ReadScan(averages)
 {
    steps = mips.Command("DMS1.Steps")
    dur = mips.Command("Step dur")
-   mips.PlotCommand("NewGraph,2," + (steps * dur).toString());
    for(avg=0;avg<averages;avg++)
    {
-      mips.statusMessage("Reading average " + (avg+1).toString() + " of " + averages.toString())
       mips.UpdateHalted(true);
       mips.SendCommand("MIPS","FBSCNSTRT,3\n")
       for(i=0;i<steps;i++)
       {
          res = mips.GetLine("MIPS")
-         mips.PlotCommand("AddPoint," + res);
       }
+      mips.statusMessage("Read average " + (avg+1).toString() + " of " + averages.toString())
       mips.UpdateHalted(false);
    }
-   mips.PlotCommand("Plot");
-   mips.PlotCommand("Refresh");  
 }

@@ -449,7 +449,7 @@ QString TimingGenerator::Report(void)
     foreach(Event *evt, Events)
     {
         res += "TGevent," + Title + "," + evt->Name + "," + evt->Channel + ",";
-        res += QString::number(evt->Start) + "," + QString::number(evt->Width) + ",";
+        res += evt->Start + "," + evt->Width + ",";
         res += QString::number(evt->Value) + "," + QString::number(evt->ValueOff) + "\n";
     }
     // Frame parameters
@@ -475,8 +475,8 @@ bool TimingGenerator::SetValues(QString strVals)
        Event *event = new Event();
        event->Name = resList[2];
        event->Channel = resList[3];
-       event->Start = resList[4].toInt();
-       event->Width = resList[5].toInt();
+       event->Start = resList[4];
+       event->Width = resList[5];
        event->Value = resList[6].toFloat();
        event->ValueOff = resList[7].toFloat();
        Events.append(event);
@@ -536,9 +536,61 @@ void TimingGenerator::AddSignal(QString title, QString chan)
     ui->comboEventSignal->addItem(title,chan);
 }
 
+QStringList TimingGenerator::Split(QString str, QString del)
+{
+    QString     s;
+    QStringList reslist;
+
+    reslist.clear();
+    s.clear();
+    for(int i= 0;i<str.count();i++)
+    {
+        if(str.mid(i,1) == " ") continue;
+        if(del.contains(str.mid(i,1)))
+        {
+            if(!s.isEmpty()) reslist.append(s);
+            s.clear();
+            reslist.append(str.mid(i,1));
+        }
+        else s += str.mid(i,1);
+    }
+    if(!s.isEmpty()) reslist.append(s);
+    return(reslist);
+}
+
+int   TimingGenerator::ConvertToCount(QString val)
+{
+    QStringList reslist;
+    bool ok;
+    int  result=0, j, sign = 1;
+
+    //reslist = val.split(" ");
+    reslist = Split(val,"+-");
+    for(int i=0;i<reslist.count();i++)
+    {
+        j = reslist[i].toInt(&ok);
+        if(ok) result += sign * j;
+        else if(reslist[i] == "+") sign *=  1;
+        else if(reslist[i] == "-") sign *= -1;
+        else
+        {
+            foreach(Event *evt, Events)
+            {
+               if(evt->Name == reslist[i])
+               {
+                   result += sign * ConvertToCount(evt->Start);
+                   break;
+               }
+            }
+            break;
+        }
+    }
+    return(result);
+}
+
 void  TimingGenerator::slotGenerate(void)
 {
-    int maxCount = ui->leFrameWidth->text().toInt() + ui->leFrameStart->text().toInt();
+    int maxCount = ConvertToCount(ui->leFrameWidth->text()) + ConvertToCount(ui->leFrameStart->text());
     bool timeFlag;
     QString table;
 
@@ -551,18 +603,21 @@ void  TimingGenerator::slotGenerate(void)
         // Search for event at this clock cycle
         foreach(Event *evt, Events)
         {
-            if(evt->Start == i)
+            if(ConvertToCount(evt->Start) == i)
             {
                 if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
                 table += ":" + evt->Channel + ":" + QString::number(evt->Value);
             }
-            if((evt->Start + evt->Width) == i)
+            if((ConvertToCount(evt->Start) + ConvertToCount(evt->Width)) == i)
             {
-                if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
-                table += ":" + evt->Channel + ":" + QString::number(evt->ValueOff);
+                if(ConvertToCount(evt->Width) > 0)
+                {
+                   if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
+                   table += ":" + evt->Channel + ":" + QString::number(evt->ValueOff);
+                }
             }
         }
-        if(ui->leFrameStart->text().toInt() == i)
+        if(ConvertToCount(ui->leFrameStart->text()) == i)
         {
             if(ui->comboEnable->currentText() != "")
             {
@@ -588,8 +643,8 @@ void TimingGenerator::slotEventUpdated(void)
     if(selectedEvent == NULL) return;
     selectedEvent->Name = ui->leEventName->text();
     selectedEvent->Channel = ui->comboEventSignal->currentData().toString();
-    selectedEvent->Start = ui->leEventStart->text().toInt();
-    selectedEvent->Width = ui->leEventWidth->text().toInt();
+    selectedEvent->Start = ui->leEventStart->text();
+    selectedEvent->Width = ui->leEventWidth->text();
     selectedEvent->Value = ui->leEventValue->text().toFloat();
     selectedEvent->ValueOff = ui->leEventValueOff->text().toFloat();
 }
@@ -626,12 +681,12 @@ void TimingGenerator::slotEventChange(void)
         event->Name = text;
         ui->comboEventSignal->setCurrentIndex(0);
         event->Channel = ui->comboEventSignal->currentData().toString();
-        event->Start = 0;
-        event->Width = 10;
+        event->Start = "0";
+        event->Width = "10";
         event->Value = 0;
         ui->leEventName->setText(event->Name);
-        ui->leEventStart->setText(QString::number(event->Start));
-        ui->leEventWidth->setText(QString::number(event->Width));
+        ui->leEventStart->setText(event->Start);
+        ui->leEventWidth->setText(event->Width);
         ui->leEventValue->setText(QString::number(event->Value));
         ui->leEventValueOff->setText(QString::number(event->ValueOff));
         Events.append(event);
@@ -675,8 +730,8 @@ void TimingGenerator::slotEventChange(void)
             return;
         }
         ui->leEventName->setText(selectedEvent->Name);
-        ui->leEventStart->setText(QString::number(selectedEvent->Start));
-        ui->leEventWidth->setText(QString::number(selectedEvent->Width));
+        ui->leEventStart->setText(selectedEvent->Start);
+        ui->leEventWidth->setText(selectedEvent->Width);
         ui->leEventValue->setText(QString::number(selectedEvent->Value));
         ui->leEventValueOff->setText(QString::number(selectedEvent->ValueOff));
         int i = ui->comboEventSignal->findData(selectedEvent->Channel);

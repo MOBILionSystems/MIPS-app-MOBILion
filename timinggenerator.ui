@@ -426,7 +426,7 @@
   <widget class="QPushButton" name="pbSave">
    <property name="geometry">
     <rect>
-     <x>460</x>
+     <x>565</x>
      <y>185</y>
      <width>86</width>
      <height>32</height>
@@ -442,7 +442,7 @@
   <widget class="QPushButton" name="pbLoad">
    <property name="geometry">
     <rect>
-     <x>565</x>
+     <x>465</x>
      <y>185</y>
      <width>86</width>
      <height>32</height>

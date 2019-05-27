@@ -10766,3 +10766,1313 @@ MIPS loaded: MIPS, Version 1.52a Mar 5, 2019,Tue May 14 19:06:28 2019
 MIPS closing: MIPS, Version 1.52a Mar 5, 2019,Tue May 14 19:06:30 2019
 MIPS loaded: MIPS, Version 1.52a Mar 5, 2019,Tue May 14 19:12:14 2019
 MIPS closing: MIPS, Version 1.52a Mar 5, 2019,Tue May 14 19:12:20 2019
+MIPS loaded: MIPS, Version 1.52 May 19, 2019,Thu May 23 11:22:29 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 11:22:43 2019
+Control panel loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMSne.cfg,Thu May 23 11:22:57 2019
+MIPS: Version 1.154a, April 24, 2019,Thu May 23 11:22:57 2019
+CP StatusBar: Server started!,Thu May 23 11:22:57 2019
+Control panel unloading,Thu May 23 11:23:35 2019
+Control panel loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMSne.cfg,Thu May 23 11:23:44 2019
+MIPS: Version 1.154a, April 24, 2019,Thu May 23 11:23:44 2019
+CP StatusBar: Server started!,Thu May 23 11:23:44 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMS.scrpt,Thu May 23 11:24:37 2019
+CP StatusBar: Reading average 1 of 1,Thu May 23 11:24:37 2019
+Script finished!,Thu May 23 11:24:38 2019
+CP StatusBar: Script finished!,Thu May 23 11:24:38 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMS.scrpt,Thu May 23 11:25:00 2019
+CP StatusBar: Reading average 1 of 1,Thu May 23 11:25:00 2019
+Script finished!,Thu May 23 11:25:11 2019
+CP StatusBar: Script finished!,Thu May 23 11:25:11 2019
+Control panel unloading,Thu May 23 11:27:46 2019
+Tab selected, Terminal,Thu May 23 11:27:48 2019
+Tab selected, System,Thu May 23 11:41:36 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 11:41:37 2019
+MIPS closing: MIPS, Version 1.52 May 19, 2019,Thu May 23 11:41:55 2019
+MIPS loaded: MIPS, Version 1.52 May 19, 2019,Thu May 23 11:42:03 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 11:42:20 2019
+MIPS StatusBar: GNAME :Timeout,Thu May 23 11:42:22 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 11:42:24 2019
+MIPS StatusBar: MIPS, ECHO,FALSE :Timeout,Thu May 23 11:42:24 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 11:42:27 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 11:42:28 2019
+Tab selected, Terminal,Thu May 23 11:42:30 2019
+Tab selected, System,Thu May 23 11:56:00 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 11:56:03 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 11:57:20 2019
+Tab selected, Terminal,Thu May 23 11:57:22 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:00:20 2019
+MIPS StatusBar: MIPS Critical Error, port closing: Operation timed out,Thu May 23 12:00:20 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:00:20 2019
+MIPS StatusBar: MIPS Critical Error, port closing: Device not configured,Thu May 23 12:00:20 2019
+Tab selected, System,Thu May 23 12:01:48 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:01:49 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 12:01:56 2019
+Tab selected, Terminal,Thu May 23 12:01:57 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:04:22 2019
+MIPS StatusBar: MIPS Critical Error, port closing: Operation timed out,Thu May 23 12:04:22 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:04:22 2019
+MIPS StatusBar: MIPS Critical Error, port closing: Device not configured,Thu May 23 12:04:22 2019
+Tab selected, System,Thu May 23 12:04:24 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:04:26 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 12:04:34 2019
+Tab selected, Terminal,Thu May 23 12:04:36 2019
+Tab selected, System,Thu May 23 12:15:45 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:15:46 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 12:16:43 2019
+Tab selected, Terminal,Thu May 23 12:16:44 2019
+Tab selected, System,Thu May 23 12:18:18 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:18:20 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 12:26:33 2019
+Tab selected, Terminal,Thu May 23 12:26:34 2019
+Tab selected, System,Thu May 23 12:27:38 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:27:45 2019
+MIPS StatusBar: MIPS Critical Error, port closing: Operation timed out,Thu May 23 12:27:45 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:27:45 2019
+MIPS StatusBar: MIPS Critical Error, port closing: Device not configured,Thu May 23 12:27:45 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:27:53 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 12:28:03 2019
+Tab selected, Terminal,Thu May 23 12:28:05 2019
+Tab selected, System,Thu May 23 12:33:34 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:33:35 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 12:33:56 2019
+Tab selected, Terminal,Thu May 23 12:33:57 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:38:29 2019
+MIPS StatusBar: MIPS Critical Error, port closing: Operation timed out,Thu May 23 12:38:29 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:38:29 2019
+MIPS StatusBar: MIPS Critical Error, port closing: Device not configured,Thu May 23 12:38:29 2019
+Tab selected, System,Thu May 23 12:38:47 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 12:38:48 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Thu May 23 12:38:50 2019
+Tab selected, Terminal,Thu May 23 12:38:52 2019
+Tab selected, System,Thu May 23 12:39:11 2019
+Control panel loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMSne.cfg,Thu May 23 12:39:29 2019
+MIPS: Version 1.154a, April 24, 2019,Thu May 23 12:39:29 2019
+CP StatusBar: Server started!,Thu May 23 12:39:29 2019
+Control panel unloading,Thu May 23 12:45:16 2019
+Tab selected, Digital IO,Thu May 23 12:45:21 2019
+MIPS StatusBar: Updating Digital IO controls...,Thu May 23 12:45:21 2019
+MIPS StatusBar: Updating Digital IO controls...,Thu May 23 12:46:09 2019
+MIPS StatusBar: Updating Digital IO controls...,Thu May 23 12:46:19 2019
+MIPS StatusBar: Updating Digital IO controls...,Thu May 23 12:46:50 2019
+MIPS StatusBar: Updating Digital IO controls...,Thu May 23 12:46:52 2019
+MIPS StatusBar: Updating Digital IO controls...,Thu May 23 12:46:52 2019
+Tab selected, ADC,Thu May 23 12:46:54 2019
+Tab selected, Terminal,Thu May 23 12:46:54 2019
+Tab selected, System,Thu May 23 12:46:54 2019
+Tab selected, Terminal,Thu May 23 12:46:54 2019
+Tab selected, ADC,Thu May 23 12:46:54 2019
+Tab selected, Digital IO,Thu May 23 12:46:54 2019
+MIPS StatusBar: Updating Digital IO controls...,Thu May 23 12:46:54 2019
+Tab selected, ADC,Thu May 23 12:46:54 2019
+Tab selected, Terminal,Thu May 23 12:46:54 2019
+Tab selected, ADC,Thu May 23 12:46:54 2019
+Tab selected, Digital IO,Thu May 23 12:46:54 2019
+MIPS StatusBar: Updating Digital IO controls...,Thu May 23 12:46:54 2019
+Tab selected, System,Thu May 23 12:46:55 2019
+Control panel loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMSne.cfg,Thu May 23 12:47:07 2019
+MIPS: Version 1.154a, April 24, 2019,Thu May 23 12:47:07 2019
+CP StatusBar: Server started!,Thu May 23 12:47:07 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 13:13:29 2019
+MIPS StatusBar: MIPS Critical Error, port closing: Operation timed out,Thu May 23 13:13:29 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 13:13:29 2019
+MIPS StatusBar: MIPS Critical Error, port closing: Device not configured,Thu May 23 13:13:29 2019
+MIPS StatusBar: MIPS, GFBENA,1 :Timeout,Thu May 23 13:13:30 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:30 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:33 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:35 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:37 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:39 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:41 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:43 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:45 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:47 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:49 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:51 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:53 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:55 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:57 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:13:59 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:01 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:03 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:05 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:07 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:09 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:11 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:13 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:15 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:17 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:19 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:21 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:23 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:25 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:27 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:29 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:31 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:33 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:35 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:37 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:39 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:41 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:43 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:45 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:47 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:49 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:51 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:53 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:55 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:57 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:14:59 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:01 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:03 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:05 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:07 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:09 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:11 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:13 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:15 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:17 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:19 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:21 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:23 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:25 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:27 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:29 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:31 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:33 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:35 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:37 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:39 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:41 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:43 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:45 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:47 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:49 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:51 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:53 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:55 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:57 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:15:59 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:01 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:03 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:05 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:07 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:09 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:11 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:13 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:15 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:17 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:19 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:21 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:23 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:25 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:27 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:29 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:31 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:33 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:35 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:37 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:39 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:41 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:43 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:45 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:47 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:49 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:51 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:53 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:55 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:57 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:16:59 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:01 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:03 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:05 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:07 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:09 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:11 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:13 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:15 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:17 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:19 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:21 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:23 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:25 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:27 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:29 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:31 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:33 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:35 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:37 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:39 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:41 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:43 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:45 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:47 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:49 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:51 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:53 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:55 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:57 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:17:59 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:01 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:03 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:05 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:07 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:09 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:11 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:13 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:15 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:17 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:19 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:21 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:23 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:25 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:27 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:29 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:31 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:33 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:35 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:37 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:39 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:41 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:43 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:45 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:47 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:49 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:51 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:53 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:55 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:57 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:18:59 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:01 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:03 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:05 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:07 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:09 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:11 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:13 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:15 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:17 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:19 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:21 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:23 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:25 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:27 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:29 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:31 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:33 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:35 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:37 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:39 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:41 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:43 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:45 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:47 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:49 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:51 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:53 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:55 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:57 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:19:59 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:01 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:03 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:05 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:07 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:09 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:11 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:13 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:15 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:17 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:19 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:21 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:23 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:25 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:27 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:29 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:31 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:33 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:35 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:37 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:39 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:41 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:43 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:45 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:47 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:49 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:51 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:53 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:55 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:57 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:20:59 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:01 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:03 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:05 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:07 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:09 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:11 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:13 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:15 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:17 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:19 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:21 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:23 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:25 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:27 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:29 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:31 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:33 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:35 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:37 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:39 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:41 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:43 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:45 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:47 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:49 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:51 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:53 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:55 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:57 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:21:59 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:01 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:03 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:05 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:07 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:09 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:11 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:13 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:15 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:17 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:19 2019
+MIPS StatusBar: MIPS SM Disconnected!,Thu May 23 13:22:21 2019
+Control panel unloading,Thu May 23 13:22:23 2019
+MIPS StatusBar: MIPS Closed!,Thu May 23 13:22:25 2019
+MIPS closing: MIPS, Version 1.52 May 19, 2019,Thu May 23 13:22:27 2019
+MIPS loaded: MIPS, Version 1.52 May 19, 2019,Fri May 24 08:00:17 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Fri May 24 08:00:24 2019
+Tab selected, Terminal,Fri May 24 08:00:25 2019
+Tab selected, System,Fri May 24 08:04:08 2019
+Control panel loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMSne.cfg,Fri May 24 08:04:17 2019
+MIPS: Version 1.154a, April 24, 2019,Fri May 24 08:04:17 2019
+CP StatusBar: Server started!,Fri May 24 08:04:17 2019
+Control panel unloading,Fri May 24 09:25:41 2019
+MIPS StatusBar: MIPS Closed!,Fri May 24 09:25:42 2019
+MIPS StatusBar: Connected to usbmodem14211101 : 9600, 8, None, 1, None,Fri May 24 12:27:54 2019
+Control panel loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMSne.cfg,Fri May 24 12:28:06 2019
+MIPS: Version 1.154a, April 24, 2019,Fri May 24 12:28:06 2019
+CP StatusBar: Server started!,Fri May 24 12:28:06 2019
+Control panel unloading,Fri May 24 12:31:22 2019
+Control panel loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMSne.cfg,Fri May 24 12:31:37 2019
+MIPS: Version 1.154a, April 24, 2019,Fri May 24 12:31:37 2019
+CP StatusBar: Server started!,Fri May 24 12:31:37 2019
+Control panel unloading,Fri May 24 12:35:44 2019
+Control panel loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMSne.cfg,Fri May 24 12:35:55 2019
+MIPS: Version 1.154a, April 24, 2019,Fri May 24 12:35:55 2019
+CP StatusBar: Server started!,Fri May 24 12:35:55 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:36:18 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:36:22 2019
+Script finished!,Fri May 24 12:36:32 2019
+CP StatusBar: Script finished!,Fri May 24 12:36:32 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:38:00 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:38:00 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 12:38:01 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:38:01 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 12:38:02 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:38:02 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 12:38:03 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:38:03 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 12:38:05 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:38:05 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 12:38:06 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:38:06 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 12:38:07 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:38:07 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 12:38:08 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:38:08 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 12:38:09 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:38:09 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 12:38:10 2019
+CP StatusBar: Reading average 1 of 1,Fri May 24 12:38:10 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 12:38:11 2019
+Script finished!,Fri May 24 12:38:11 2019
+CP StatusBar: Script finished!,Fri May 24 12:38:11 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:38:54 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:38:55 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 12:38:55 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:38:56 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 12:38:56 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:38:57 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 12:38:57 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:38:58 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 12:38:58 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:38:59 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 12:38:59 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:39:01 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 12:39:01 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:39:02 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 12:39:02 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:39:03 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 12:39:03 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:39:04 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 12:39:04 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:39:05 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 12:39:05 2019
+Script finished!,Fri May 24 12:39:05 2019
+CP StatusBar: Script finished!,Fri May 24 12:39:05 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:41:19 2019
+CP StatusBar: FALSE,Fri May 24 12:41:20 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:41:22 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 12:41:22 2019
+CP StatusBar: FALSE,Fri May 24 12:41:22 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:41:24 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 12:41:24 2019
+CP StatusBar: FALSE,Fri May 24 12:41:24 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:41:26 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 12:41:26 2019
+CP StatusBar: TRUE,Fri May 24 12:41:26 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:41:28 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 12:41:28 2019
+CP StatusBar: TRUE,Fri May 24 12:41:28 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:41:30 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 12:41:30 2019
+CP StatusBar: TRUE,Fri May 24 12:41:30 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:41:32 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 12:41:32 2019
+CP StatusBar: TRUE,Fri May 24 12:41:32 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:41:34 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 12:41:34 2019
+CP StatusBar: TRUE,Fri May 24 12:41:34 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:41:36 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 12:41:36 2019
+CP StatusBar: TRUE,Fri May 24 12:41:36 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:41:38 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 12:41:38 2019
+CP StatusBar: TRUE,Fri May 24 12:41:38 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:41:40 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 12:41:40 2019
+Script finished!,Fri May 24 12:41:40 2019
+CP StatusBar: Script finished!,Fri May 24 12:41:40 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:49:12 2019
+Script error: SyntaxError: Parse error,Fri May 24 12:49:12 2019
+CP StatusBar: Script error: SyntaxError: Parse error,Fri May 24 12:49:12 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:49:56 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:49:58 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 12:49:58 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:49:59 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 12:49:59 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:00 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 12:50:00 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:01 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 12:50:01 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:02 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 12:50:02 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:03 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 12:50:03 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:04 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 12:50:04 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:05 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 12:50:05 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:06 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 12:50:06 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:07 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 12:50:07 2019
+Script finished!,Fri May 24 12:50:07 2019
+CP StatusBar: Script finished!,Fri May 24 12:50:07 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:50:16 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:17 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 12:50:17 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:18 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 12:50:18 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:20 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 12:50:20 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:21 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 12:50:21 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:22 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 12:50:22 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:23 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 12:50:23 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:24 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 12:50:24 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:25 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 12:50:25 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:26 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 12:50:26 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:27 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 12:50:27 2019
+Script finished!,Fri May 24 12:50:27 2019
+CP StatusBar: Script finished!,Fri May 24 12:50:27 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:50:49 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:50 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 12:50:50 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:51 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 12:50:51 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:52 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 12:50:52 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:53 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 12:50:53 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:54 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 12:50:54 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:55 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 12:50:55 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:56 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 12:50:56 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:57 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 12:50:57 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:58 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 12:50:58 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:50:59 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 12:50:59 2019
+Script finished!,Fri May 24 12:50:59 2019
+CP StatusBar: Script finished!,Fri May 24 12:50:59 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:51:28 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:30 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 12:51:30 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:31 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 12:51:31 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:32 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 12:51:32 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:33 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 12:51:33 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:34 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 12:51:34 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:35 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 12:51:35 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:36 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 12:51:36 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:37 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 12:51:37 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:38 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 12:51:38 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:39 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 12:51:39 2019
+Script finished!,Fri May 24 12:51:39 2019
+CP StatusBar: Script finished!,Fri May 24 12:51:39 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:51:41 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:42 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 12:51:42 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:43 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 12:51:43 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:44 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 12:51:44 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:45 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 12:51:45 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:46 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 12:51:46 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:47 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 12:51:47 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:48 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 12:51:48 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:49 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 12:51:49 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:50 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 12:51:50 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:51:51 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 12:51:51 2019
+Script finished!,Fri May 24 12:51:51 2019
+CP StatusBar: Script finished!,Fri May 24 12:51:51 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:52:21 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:52:23 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 12:52:23 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:52:24 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 12:52:24 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:52:25 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 12:52:25 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:52:26 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 12:52:26 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:52:27 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 12:52:27 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:52:28 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 12:52:28 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:52:29 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 12:52:29 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:52:30 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 12:52:30 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:52:31 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 12:52:31 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:52:32 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 12:52:32 2019
+Script finished!,Fri May 24 12:52:32 2019
+CP StatusBar: Script finished!,Fri May 24 12:52:32 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 12:58:40 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:58:41 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 12:58:41 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:58:42 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 12:58:42 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:58:43 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 12:58:43 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:58:44 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 12:58:44 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:58:45 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 12:58:45 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:58:46 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 12:58:46 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:58:47 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 12:58:47 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:58:48 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 12:58:48 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:58:49 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 12:58:49 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 12:58:50 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 12:58:50 2019
+Script finished!,Fri May 24 12:58:50 2019
+CP StatusBar: Script finished!,Fri May 24 12:58:50 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:00:26 2019
+CP StatusBar: TRUE,Fri May 24 13:00:26 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:00:28 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:00:28 2019
+CP StatusBar: TRUE,Fri May 24 13:00:28 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:00:30 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:00:30 2019
+CP StatusBar: TRUE,Fri May 24 13:00:30 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:00:32 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:00:32 2019
+CP StatusBar: TRUE,Fri May 24 13:00:32 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:00:35 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:00:35 2019
+CP StatusBar: TRUE,Fri May 24 13:00:35 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:00:37 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:00:37 2019
+CP StatusBar: TRUE,Fri May 24 13:00:37 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:00:39 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:00:39 2019
+CP StatusBar: TRUE,Fri May 24 13:00:39 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:00:41 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:00:41 2019
+CP StatusBar: TRUE,Fri May 24 13:00:41 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:00:43 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:00:43 2019
+CP StatusBar: TRUE,Fri May 24 13:00:43 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:00:45 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:00:45 2019
+CP StatusBar: TRUE,Fri May 24 13:00:45 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:00:47 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:00:47 2019
+Script finished!,Fri May 24 13:00:47 2019
+CP StatusBar: Script finished!,Fri May 24 13:00:47 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:01:29 2019
+CP StatusBar: TRUE,Fri May 24 13:01:29 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:01:31 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:01:31 2019
+CP StatusBar: TRUE,Fri May 24 13:01:31 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:01:33 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:01:33 2019
+CP StatusBar: TRUE,Fri May 24 13:01:33 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:01:35 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:01:35 2019
+CP StatusBar: TRUE,Fri May 24 13:01:35 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:01:37 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:01:37 2019
+CP StatusBar: TRUE,Fri May 24 13:01:37 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:01:39 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:01:39 2019
+CP StatusBar: TRUE,Fri May 24 13:01:39 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:01:42 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:01:42 2019
+CP StatusBar: TRUE,Fri May 24 13:01:42 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:01:44 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:01:44 2019
+CP StatusBar: TRUE,Fri May 24 13:01:44 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:01:46 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:01:46 2019
+CP StatusBar: TRUE,Fri May 24 13:01:46 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:01:48 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:01:48 2019
+CP StatusBar: TRUE,Fri May 24 13:01:48 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:01:50 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:01:50 2019
+Script finished!,Fri May 24 13:01:50 2019
+CP StatusBar: Script finished!,Fri May 24 13:01:50 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:02:08 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:02:09 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:02:09 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:02:10 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:02:10 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:02:11 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:02:11 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:02:13 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:02:13 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:02:14 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:02:14 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:02:15 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:02:15 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:02:16 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:02:16 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:02:17 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:02:17 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:02:18 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:02:18 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:02:19 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:02:19 2019
+Script finished!,Fri May 24 13:02:19 2019
+CP StatusBar: Script finished!,Fri May 24 13:02:19 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:03:14 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:03:15 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:03:15 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:03:16 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:03:16 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:03:17 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:03:17 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:03:18 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:03:18 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:03:19 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:03:19 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:03:20 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:03:20 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:03:21 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:03:21 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:03:22 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:03:22 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:03:23 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:03:23 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:03:24 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:03:24 2019
+Script finished!,Fri May 24 13:03:24 2019
+CP StatusBar: Script finished!,Fri May 24 13:03:24 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:03:41 2019
+Script error: ReferenceError: Left side of assignment is not a reference.,Fri May 24 13:03:41 2019
+CP StatusBar: Script error: ReferenceError: Left side of assignment is not a reference.,Fri May 24 13:03:41 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:03:59 2019
+Script error: ReferenceError: Left side of assignment is not a reference.,Fri May 24 13:03:59 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:04:09 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:10 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:04:10 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:11 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:04:11 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:12 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:04:12 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:13 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:04:13 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:14 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:04:14 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:16 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:04:16 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:17 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:04:17 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:18 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:04:18 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:19 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:04:19 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:20 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:04:20 2019
+Script finished!,Fri May 24 13:04:20 2019
+CP StatusBar: Script finished!,Fri May 24 13:04:20 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:04:22 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:24 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:04:24 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:25 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:04:25 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:26 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:04:26 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:27 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:04:27 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:28 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:04:28 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:29 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:04:29 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:30 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:04:30 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:31 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:04:31 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:32 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:04:32 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:33 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:04:33 2019
+Script finished!,Fri May 24 13:04:33 2019
+CP StatusBar: Script finished!,Fri May 24 13:04:33 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:04:56 2019
+CP StatusBar: TRUE,Fri May 24 13:04:57 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:04:59 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:04:59 2019
+CP StatusBar: TRUE,Fri May 24 13:04:59 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:01 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:05:01 2019
+CP StatusBar: TRUE,Fri May 24 13:05:01 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:03 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:05:03 2019
+CP StatusBar: TRUE,Fri May 24 13:05:03 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:05 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:05:05 2019
+CP StatusBar: TRUE,Fri May 24 13:05:05 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:07 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:05:07 2019
+CP StatusBar: TRUE,Fri May 24 13:05:07 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:09 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:05:09 2019
+CP StatusBar: TRUE,Fri May 24 13:05:09 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:11 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:05:11 2019
+CP StatusBar: TRUE,Fri May 24 13:05:11 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:13 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:05:13 2019
+CP StatusBar: TRUE,Fri May 24 13:05:13 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:15 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:05:15 2019
+CP StatusBar: TRUE,Fri May 24 13:05:15 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:17 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:05:17 2019
+Script finished!,Fri May 24 13:05:17 2019
+CP StatusBar: Script finished!,Fri May 24 13:05:17 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:05:26 2019
+CP StatusBar: TRUE,Fri May 24 13:05:26 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:28 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:05:28 2019
+CP StatusBar: TRUE,Fri May 24 13:05:28 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:30 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:05:30 2019
+CP StatusBar: TRUE,Fri May 24 13:05:30 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:32 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:05:32 2019
+CP StatusBar: TRUE,Fri May 24 13:05:32 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:34 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:05:34 2019
+CP StatusBar: TRUE,Fri May 24 13:05:34 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:36 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:05:36 2019
+CP StatusBar: TRUE,Fri May 24 13:05:36 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:38 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:05:38 2019
+CP StatusBar: TRUE,Fri May 24 13:05:38 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:40 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:05:40 2019
+CP StatusBar: TRUE,Fri May 24 13:05:40 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:42 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:05:42 2019
+CP StatusBar: TRUE,Fri May 24 13:05:42 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:44 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:05:44 2019
+CP StatusBar: TRUE,Fri May 24 13:05:44 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:05:47 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:05:47 2019
+Script finished!,Fri May 24 13:05:47 2019
+CP StatusBar: Script finished!,Fri May 24 13:05:47 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:05:48 2019
+CP StatusBar: TRUE,Fri May 24 13:05:48 2019
+Script error: ReferenceError: Can't find variable: TRUE,Fri May 24 13:05:49 2019
+CP StatusBar: Script error: ReferenceError: Can't find variable: TRUE,Fri May 24 13:05:49 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:06:21 2019
+CP StatusBar: TRUE,Fri May 24 13:06:21 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:06:23 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:06:23 2019
+CP StatusBar: TRUE,Fri May 24 13:06:23 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:06:25 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:06:25 2019
+CP StatusBar: TRUE,Fri May 24 13:06:25 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:06:27 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:06:27 2019
+CP StatusBar: TRUE,Fri May 24 13:06:27 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:06:29 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:06:29 2019
+CP StatusBar: TRUE,Fri May 24 13:06:29 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:06:31 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:06:31 2019
+CP StatusBar: TRUE,Fri May 24 13:06:31 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:06:33 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:06:33 2019
+CP StatusBar: TRUE,Fri May 24 13:06:33 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:06:35 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:06:35 2019
+CP StatusBar: TRUE,Fri May 24 13:06:35 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:06:37 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:06:37 2019
+CP StatusBar: TRUE,Fri May 24 13:06:37 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:06:39 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:06:39 2019
+CP StatusBar: TRUE,Fri May 24 13:06:39 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:06:41 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:06:41 2019
+Script finished!,Fri May 24 13:06:41 2019
+CP StatusBar: Script finished!,Fri May 24 13:06:41 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:07:14 2019
+CP StatusBar: TRUE,Fri May 24 13:07:14 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:07:15 2019
+Script error: TypeError: Result of expression 'mips.SendMessage' [undefined] is not a function.,Fri May 24 13:07:25 2019
+CP StatusBar: Script error: TypeError: Result of expression 'mips.SendMessage' [undefined] is not a function.,Fri May 24 13:07:25 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:09:35 2019
+CP StatusBar: TRUE,Fri May 24 13:09:35 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:09:36 2019
+CP StatusBar: Triggered!,Fri May 24 13:10:00 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:10:01 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:10:01 2019
+CP StatusBar: TRUE,Fri May 24 13:10:01 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:10:02 2019
+CP StatusBar: Triggered!,Fri May 24 13:10:04 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:10:05 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:10:05 2019
+CP StatusBar: TRUE,Fri May 24 13:10:05 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:10:06 2019
+CP StatusBar: Triggered!,Fri May 24 13:10:07 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:10:08 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:10:08 2019
+CP StatusBar: TRUE,Fri May 24 13:10:08 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:10:09 2019
+CP StatusBar: Triggered!,Fri May 24 13:10:10 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:10:11 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:10:11 2019
+CP StatusBar: TRUE,Fri May 24 13:10:11 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:10:12 2019
+CP StatusBar: Triggered!,Fri May 24 13:10:13 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:10:14 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:10:14 2019
+CP StatusBar: TRUE,Fri May 24 13:10:14 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:10:15 2019
+CP StatusBar: Triggered!,Fri May 24 13:10:16 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:10:17 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:10:17 2019
+CP StatusBar: TRUE,Fri May 24 13:10:17 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:10:18 2019
+CP StatusBar: Triggered!,Fri May 24 13:10:20 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:10:21 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:10:21 2019
+CP StatusBar: TRUE,Fri May 24 13:10:21 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:10:22 2019
+CP StatusBar: Triggered!,Fri May 24 13:10:24 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:10:25 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:10:25 2019
+CP StatusBar: TRUE,Fri May 24 13:10:25 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:10:26 2019
+CP StatusBar: Triggered!,Fri May 24 13:10:27 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:10:28 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:10:28 2019
+CP StatusBar: TRUE,Fri May 24 13:10:28 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:10:29 2019
+CP StatusBar: Triggered!,Fri May 24 13:10:30 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:10:31 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:10:31 2019
+Script finished!,Fri May 24 13:10:31 2019
+CP StatusBar: Script finished!,Fri May 24 13:10:31 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:11:15 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:15 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:17 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:11:17 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:17 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:19 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:11:19 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:19 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:21 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:11:21 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:21 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:23 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:11:23 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:23 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:25 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:11:25 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:25 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:27 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:11:27 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:27 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:29 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:11:29 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:29 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:31 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:11:31 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:31 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:33 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:11:33 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:33 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:35 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:11:35 2019
+Script finished!,Fri May 24 13:11:35 2019
+CP StatusBar: Script finished!,Fri May 24 13:11:35 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:11:46 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:46 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:48 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:11:48 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:48 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:50 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:11:50 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:50 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:52 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:11:52 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:52 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:54 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:11:54 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:54 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:56 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:11:56 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:56 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:11:58 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:11:58 2019
+CP StatusBar: -TRUE-,Fri May 24 13:11:58 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:00 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:12:00 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:00 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:02 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:12:02 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:02 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:04 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:12:04 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:04 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:06 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:12:06 2019
+Script finished!,Fri May 24 13:12:06 2019
+CP StatusBar: Script finished!,Fri May 24 13:12:06 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:12:13 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:13 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:15 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:12:15 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:15 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:17 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:12:17 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:17 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:19 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:12:19 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:19 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:21 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:12:21 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:21 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:23 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:12:23 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:23 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:25 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:12:25 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:25 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:27 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:12:27 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:27 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:29 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:12:29 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:29 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:31 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:12:31 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:31 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:33 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:12:33 2019
+Script finished!,Fri May 24 13:12:33 2019
+CP StatusBar: Script finished!,Fri May 24 13:12:33 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:12:39 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:40 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:12:41 2019
+CP StatusBar: Triggered!,Fri May 24 13:12:54 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:55 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:12:55 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:55 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:12:57 2019
+CP StatusBar: Triggered!,Fri May 24 13:12:58 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:12:59 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:12:59 2019
+CP StatusBar: -TRUE-,Fri May 24 13:12:59 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:13:00 2019
+CP StatusBar: Triggered!,Fri May 24 13:13:01 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:13:02 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:13:02 2019
+CP StatusBar: -TRUE-,Fri May 24 13:13:02 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:13:03 2019
+CP StatusBar: Triggered!,Fri May 24 13:13:05 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:13:07 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:13:07 2019
+CP StatusBar: -TRUE-,Fri May 24 13:13:07 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:13:08 2019
+CP StatusBar: Triggered!,Fri May 24 13:13:09 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:13:10 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:13:10 2019
+CP StatusBar: -TRUE-,Fri May 24 13:13:10 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:13:11 2019
+CP StatusBar: Triggered!,Fri May 24 13:13:12 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:13:13 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:13:13 2019
+CP StatusBar: -TRUE-,Fri May 24 13:13:13 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:13:14 2019
+CP StatusBar: Triggered!,Fri May 24 13:13:15 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:13:16 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:13:16 2019
+CP StatusBar: -TRUE-,Fri May 24 13:13:16 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:13:17 2019
+CP StatusBar: Triggered!,Fri May 24 13:13:19 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:13:20 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:13:20 2019
+CP StatusBar: -TRUE-,Fri May 24 13:13:20 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:13:21 2019
+CP StatusBar: Triggered!,Fri May 24 13:13:22 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:13:23 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:13:23 2019
+CP StatusBar: -TRUE-,Fri May 24 13:13:23 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:13:24 2019
+CP StatusBar: Triggered!,Fri May 24 13:13:25 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:13:26 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:13:26 2019
+Script finished!,Fri May 24 13:13:26 2019
+CP StatusBar: Script finished!,Fri May 24 13:13:26 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:14:01 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:14:02 2019
+CP StatusBar: Triggered!,Fri May 24 13:14:20 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:14:21 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:14:21 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:14:21 2019
+CP StatusBar: Triggered!,Fri May 24 13:14:22 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:14:23 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:14:23 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:14:23 2019
+CP StatusBar: Triggered!,Fri May 24 13:14:24 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:14:25 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:14:26 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:14:26 2019
+CP StatusBar: Triggered!,Fri May 24 13:14:27 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:14:28 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:14:28 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:14:28 2019
+CP StatusBar: Triggered!,Fri May 24 13:14:29 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:14:30 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:14:30 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:14:30 2019
+CP StatusBar: Triggered!,Fri May 24 13:14:31 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:14:32 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:14:32 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:14:32 2019
+CP StatusBar: Triggered!,Fri May 24 13:14:33 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:14:34 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:14:34 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:14:34 2019
+CP StatusBar: Triggered!,Fri May 24 13:14:35 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:14:36 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:14:36 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:14:36 2019
+CP StatusBar: Triggered!,Fri May 24 13:14:37 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:14:38 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:14:38 2019
+CP StatusBar: Waiting for trigger on input R...,Fri May 24 13:14:38 2019
+CP StatusBar: Triggered!,Fri May 24 13:14:39 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:14:40 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:14:40 2019
+Script finished!,Fri May 24 13:14:40 2019
+CP StatusBar: Script finished!,Fri May 24 13:14:40 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:15:48 2019
+CP StatusBar: Scan 1waiting for trigger on input R...,Fri May 24 13:15:54 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:11 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:16:12 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:16:12 2019
+CP StatusBar: Scan 2waiting for trigger on input R...,Fri May 24 13:16:12 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:14 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:16:15 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:16:15 2019
+CP StatusBar: Scan 3waiting for trigger on input R...,Fri May 24 13:16:15 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:16 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:16:17 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:16:17 2019
+CP StatusBar: Scan 4waiting for trigger on input R...,Fri May 24 13:16:17 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:18 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:16:19 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:16:19 2019
+CP StatusBar: Scan 5waiting for trigger on input R...,Fri May 24 13:16:19 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:20 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:16:21 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:16:21 2019
+CP StatusBar: Scan 6waiting for trigger on input R...,Fri May 24 13:16:21 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:22 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:16:23 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:16:23 2019
+CP StatusBar: Scan 7waiting for trigger on input R...,Fri May 24 13:16:23 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:24 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:16:25 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:16:25 2019
+CP StatusBar: Scan 8waiting for trigger on input R...,Fri May 24 13:16:25 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:26 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:16:27 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:16:27 2019
+CP StatusBar: Scan 9waiting for trigger on input R...,Fri May 24 13:16:27 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:28 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:16:29 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:16:29 2019
+CP StatusBar: Scan 10waiting for trigger on input R...,Fri May 24 13:16:29 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:30 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:16:31 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:16:31 2019
+Script finished!,Fri May 24 13:16:31 2019
+CP StatusBar: Script finished!,Fri May 24 13:16:31 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:16:48 2019
+CP StatusBar: Scan 1waiting for trigger on input R...,Fri May 24 13:16:48 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:53 2019
+CP StatusBar: Read average 1 of 2,Fri May 24 13:16:54 2019
+CP StatusBar: Read average 2 of 2,Fri May 24 13:16:55 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:16:55 2019
+CP StatusBar: Scan 2waiting for trigger on input R...,Fri May 24 13:16:55 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:56 2019
+CP StatusBar: Read average 1 of 2,Fri May 24 13:16:57 2019
+CP StatusBar: Read average 2 of 2,Fri May 24 13:16:58 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:16:58 2019
+CP StatusBar: Scan 3waiting for trigger on input R...,Fri May 24 13:16:58 2019
+CP StatusBar: Triggered!,Fri May 24 13:16:59 2019
+CP StatusBar: Read average 1 of 2,Fri May 24 13:17:00 2019
+CP StatusBar: Read average 2 of 2,Fri May 24 13:17:01 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:17:01 2019
+CP StatusBar: Scan 4waiting for trigger on input R...,Fri May 24 13:17:01 2019
+CP StatusBar: Triggered!,Fri May 24 13:17:03 2019
+CP StatusBar: Read average 1 of 2,Fri May 24 13:17:04 2019
+CP StatusBar: Read average 2 of 2,Fri May 24 13:17:05 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:17:05 2019
+CP StatusBar: Scan 5waiting for trigger on input R...,Fri May 24 13:17:05 2019
+CP StatusBar: Triggered!,Fri May 24 13:17:06 2019
+CP StatusBar: Read average 1 of 2,Fri May 24 13:17:07 2019
+CP StatusBar: Read average 2 of 2,Fri May 24 13:17:08 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:17:08 2019
+CP StatusBar: Scan 6waiting for trigger on input R...,Fri May 24 13:17:08 2019
+CP StatusBar: Triggered!,Fri May 24 13:17:09 2019
+CP StatusBar: Read average 1 of 2,Fri May 24 13:17:10 2019
+CP StatusBar: Read average 2 of 2,Fri May 24 13:17:11 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:17:11 2019
+CP StatusBar: Scan 7waiting for trigger on input R...,Fri May 24 13:17:11 2019
+CP StatusBar: Triggered!,Fri May 24 13:17:12 2019
+CP StatusBar: Read average 1 of 2,Fri May 24 13:17:13 2019
+CP StatusBar: Read average 2 of 2,Fri May 24 13:17:14 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:17:14 2019
+CP StatusBar: Scan 8waiting for trigger on input R...,Fri May 24 13:17:14 2019
+CP StatusBar: Triggered!,Fri May 24 13:17:15 2019
+CP StatusBar: Read average 1 of 2,Fri May 24 13:17:16 2019
+CP StatusBar: Read average 2 of 2,Fri May 24 13:17:17 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:17:17 2019
+CP StatusBar: Scan 9waiting for trigger on input R...,Fri May 24 13:17:17 2019
+CP StatusBar: Triggered!,Fri May 24 13:17:18 2019
+CP StatusBar: Read average 1 of 2,Fri May 24 13:17:19 2019
+CP StatusBar: Read average 2 of 2,Fri May 24 13:17:20 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:17:20 2019
+CP StatusBar: Scan 10waiting for trigger on input R...,Fri May 24 13:17:20 2019
+CP StatusBar: Triggered!,Fri May 24 13:17:21 2019
+CP StatusBar: Read average 1 of 2,Fri May 24 13:17:22 2019
+CP StatusBar: Read average 2 of 2,Fri May 24 13:17:23 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:17:23 2019
+Script finished!,Fri May 24 13:17:23 2019
+CP StatusBar: Script finished!,Fri May 24 13:17:23 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:17:59 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:18:00 2019
+CP StatusBar: Read scan 1 of 5,Fri May 24 13:18:00 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:18:01 2019
+CP StatusBar: Read scan 2 of 5,Fri May 24 13:18:01 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:18:02 2019
+CP StatusBar: Read scan 3 of 5,Fri May 24 13:18:02 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:18:03 2019
+CP StatusBar: Read scan 4 of 5,Fri May 24 13:18:03 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:18:04 2019
+CP StatusBar: Read scan 5 of 5,Fri May 24 13:18:04 2019
+Script finished!,Fri May 24 13:18:04 2019
+CP StatusBar: Script finished!,Fri May 24 13:18:04 2019
+Control panel unloading,Fri May 24 13:18:35 2019
+Control panel loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMSne.cfg,Fri May 24 13:18:48 2019
+MIPS: Version 1.154a, April 24, 2019,Fri May 24 13:18:48 2019
+CP StatusBar: Server started!,Fri May 24 13:18:48 2019
+Control panel unloading,Fri May 24 13:19:21 2019
+Control panel loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSDMSne.cfg,Fri May 24 13:19:29 2019
+MIPS: Version 1.154a, April 24, 2019,Fri May 24 13:19:29 2019
+CP StatusBar: Server started!,Fri May 24 13:19:29 2019
+Script loaded: /Users/GAA/GAACE/Products/MIPS/MIPSapp/MIPS/DMSne.scrpt,Fri May 24 13:19:45 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:19:46 2019
+CP StatusBar: Read scan 1 of 10,Fri May 24 13:19:46 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:19:47 2019
+CP StatusBar: Read scan 2 of 10,Fri May 24 13:19:47 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:19:48 2019
+CP StatusBar: Read scan 3 of 10,Fri May 24 13:19:48 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:19:49 2019
+CP StatusBar: Read scan 4 of 10,Fri May 24 13:19:49 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:19:50 2019
+CP StatusBar: Read scan 5 of 10,Fri May 24 13:19:50 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:19:51 2019
+CP StatusBar: Read scan 6 of 10,Fri May 24 13:19:51 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:19:52 2019
+CP StatusBar: Read scan 7 of 10,Fri May 24 13:19:52 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:19:53 2019
+CP StatusBar: Read scan 8 of 10,Fri May 24 13:19:53 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:19:54 2019
+CP StatusBar: Read scan 9 of 10,Fri May 24 13:19:54 2019
+CP StatusBar: Read average 1 of 1,Fri May 24 13:19:55 2019
+CP StatusBar: Read scan 10 of 10,Fri May 24 13:19:55 2019
+Script finished!,Fri May 24 13:19:55 2019
+CP StatusBar: Script finished!,Fri May 24 13:19:55 2019
+Control panel unloading,Fri May 24 13:32:09 2019
+MIPS StatusBar: Closed!,Fri May 24 13:32:13 2019
+MIPS closing: MIPS, Version 1.52 May 19, 2019,Fri May 24 13:32:19 2019

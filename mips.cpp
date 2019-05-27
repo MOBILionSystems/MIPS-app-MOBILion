@@ -204,7 +204,7 @@
 //      2.) Added MIPS box names to the methode file.
 //      3.) Added wait for update function for scripting.
 //      4.) Added MIPS name to comm errors
-// 1.52, in process
+// 1.52, May 19, 2019
 //      1.) Added uptime to the methode file save in control panel.
 //      2.) Set RF drive to zero just before auto tune and then delay for 1 sec,
 //          likely fixes a bug when pressing auto tune when at power.
@@ -218,16 +218,20 @@
 //      7.) Added support for AMPS, the properties page allow you to enable searching
 //          for AMPS system and allows you to select baud rate. AMPS are 8 bit, even
 //          parity, 2 stop bits and Xon/Xoff flow control
-//      8.) To dos:
-//          - Add group box command to place controls in a group. This
-//            will also require an end statement. Add group name string to
-//            all control supporting this function. This allows same name controls
-//            in different groups.
+//      8.) Added group box command to place controls in a group. This
+//          will also required an end statement. Added group name string to
+//          all controls supporting this function. This allows same name controls
+//          in different groups.
+//      9.) Added Script button to control panel. The button automatically calls a script
+//          as defined in control panel config file.
+//      10.)Added Plotting capability to control panel.
+//      11.)Updated the timing generator to allow setting start and width times using other
+//          event values, supports linking
+//
+//      To dos for next release:
 //          - Resolve table not downloaded issue
 //          - Control panel to dos:
 //              - Allow data file name definition, have U1084A.data be the default
-//              - Script button
-//              - Plotting capability
 //
 // Planded updates:
 //      - Add ploting capability. Also support this through the Scripting system.
@@ -275,7 +279,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QInputDialog>
 
-QString Version = "MIPS, Version 1.52a Mar 5, 2019";
+QString Version = "MIPS, Version 1.52 May 19, 2019";
 
 MIPS::MIPS(QWidget *parent) :
     QMainWindow(parent),

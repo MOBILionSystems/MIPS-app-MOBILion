@@ -20,8 +20,8 @@ typedef struct
 {
     QString Name;
     QString Channel;
-    int     Start;
-    int     Width;
+    QString Start;
+    QString Width;
     float   Value;
     float   ValueOff;
 } Event;
@@ -71,7 +71,9 @@ public:
     QString Report(void);
     bool    SetValues(QString strVals);
     QString ProcessCommand(QString cmd);
-    bool              isTableMode(void);
+    bool    isTableMode(void);
+    int     ConvertToCount(QString val);
+    QStringList Split(QString str, QString del);
     QWidget     *p;
     QString     Title;
     QString     MIPSnm;
