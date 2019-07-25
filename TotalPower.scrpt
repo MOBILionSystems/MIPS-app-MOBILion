@@ -1,0 +1,14 @@
+while(1)
+{
+TotalPower = parseFloat(mips.Command("CH 1.Power"));
+TotalPower +=  parseFloat(mips.Command("CH 2.Power"));
+TotalPower +=  parseFloat(mips.Command("CH 3.Power"));
+TotalPower +=  parseFloat(mips.Command("CH 4.Power"));
+TotalPower +=  parseFloat(mips.Command("CH 5.Power"));
+TotalPower +=  parseFloat(mips.Command("CH 6.Power"));
+TotalPower +=  parseFloat(mips.Command("CH 7.Power"));
+TotalPower +=  parseFloat(mips.Command("CH 8.Power"));
+TotalPower = TotalPower.toPrecision(4);
+mips.Command("Total Pwr=" + TotalPower.toString());
+mips.msDelay(2000);
+}

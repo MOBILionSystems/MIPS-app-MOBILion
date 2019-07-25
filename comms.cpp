@@ -244,13 +244,13 @@ void Comms::PutMIPSfile(QString MIPSfile, QString LocalFile)
             len = 1024;
             if((dblock.count() - i) < 1024) len = dblock.count() - i;
             // Send this in chunks in case the sender is a lot faster than MIPS
-//            for(int k=0;k<len;k+=128)
-//            {
-//                if(len > (k + 128)) SendString(dblock.mid(i+k,128));
-//                else SendString(dblock.mid(i+k,len - k));
-//                msDelay(10);
-//            }
-             SendString(dblock.mid(i,len));
+            for(int k=0;k<len;k+=128)
+            {
+                if(len > (k + 128)) SendString(dblock.mid(i+k,128));
+                else SendString(dblock.mid(i+k,len - k));
+                msDelay(5);
+            }
+             //SendString(dblock.mid(i,len));
             if((len == 1024) && ((dblock.count() - i) != 1024))
             {
                 waitforline(1000);
@@ -483,7 +483,17 @@ bool Comms::SendString(QString message)
         return true;
     }
     if(client.isOpen()) keepAliveTimer->setInterval(600000);
-    if (serial->isOpen()) serial->write(message.toStdString().c_str());
+    if (serial->isOpen())
+    {
+        QString m;
+        if(message.length() > 100) for(int i=0;i<message.length();i++)
+        {
+            m = message.at(i);
+            serial->write(m.toStdString().c_str());
+            if(((i+1) % 100) == 0) msDelay(10);
+        }
+        else serial->write(message.toStdString().c_str());
+    }
     if (client.isOpen()) client.write(message.toStdString().c_str());
     return true;
 }
@@ -508,9 +518,20 @@ bool Comms::SendCommand(QString message)
     for(int i=0;i<2;i++)
     {
         rb.clear();
-        if (serial->isOpen()) serial->write(message.toStdString().c_str());
+        if (serial->isOpen())
+        {
+            QString m;
+            if(message.length() > 100) for(int j=0;j<message.length();j++)
+            {
+                m = message.at(j);
+                serial->write(m.toStdString().c_str());
+                if(((j+1) % 100) == 0) msDelay(10);
+            }
+            else serial->write(message.toStdString().c_str());
+        }
         if (client.isOpen()) client.write(message.toStdString().c_str());
-        waitforline(1000);
+        if(message.length() > 100) waitforline(3000);
+        else waitforline(1000);
         if(rb.numLines() >= 1)
         {
             res = rb.getline();
@@ -582,9 +603,20 @@ QString Comms::SendMessage(QString message)
     for(int i=0;i<2;i++)
     {
         rb.clear();
-        if (serial->isOpen()) serial->write(message.toStdString().c_str());
+        if (serial->isOpen())
+        {
+            QString m;
+            if(message.length() > 100) for(int j=0;j<message.length();j++)
+            {
+                m = message.at(j);
+                serial->write(m.toStdString().c_str());
+                if(((j+1) % 100) == 0) msDelay(10);
+            }
+            else serial->write(message.toStdString().c_str());
+        }
         if (client.isOpen()) client.write(message.toStdString().c_str());
-        waitforline(1000);
+        if(message.length() > 100) waitforline(3000);
+        else waitforline(1000);
         if(rb.numLines() >= 1)
         {
             res = rb.getline();
@@ -847,8 +879,24 @@ void Comms::handleError(QSerialPort::SerialPortError error)
 
 void Comms::writeData(const QByteArray &data)
 {
-    if(client.isOpen()) client.write(data);
-    if(serial->isOpen()) serial->write(data);
+    if(client.isOpen())
+    {
+        for(int i=0;i<data.length();i++)
+        {
+            client.putChar(data.at(i));
+            if(((i+1) % 100) == 0) msDelay(10);
+        }
+        //client.write(data);
+    }
+    if(serial->isOpen())
+    {
+        for(int i=0;i<data.length();i++)
+        {
+            serial->putChar(data.at(i));
+            if(((i+1) % 100) == 0) msDelay(10);
+        }
+        //serial->write(data);
+    }
 }
 
 void Comms::readData2RingBuffer(void)

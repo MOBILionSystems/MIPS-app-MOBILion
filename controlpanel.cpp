@@ -133,6 +133,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     Cpanels.clear();
     GroupBoxes.clear();
     ScripButtons.clear();
+    devices.clear();
     plots.clear();
     UpdateHoldOff  = 0;
     UpdateStop     = false;
@@ -195,6 +196,11 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
                 QPixmap img(resList[1]);
                 ui->lblBackground->clear();
                 ui->lblBackground->setPixmap(img);
+            }
+            if((resList[0].toUpper() == "DEVICE") && (resList.length()==6))
+            {
+                devices.append(new Device(Container,resList[1],resList[2],resList[3],resList[4].toInt(),resList[5].toInt()));
+                devices.last()->Show();
             }
             if((resList[0].toUpper() == "TEXTLABEL") && (resList.length()==5))
             {
@@ -474,6 +480,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
 ControlPanel::~ControlPanel()
 {
     if(properties != NULL) properties->Log("Control panel unloading");
+    for(int i=0;i<devices.count();i++) delete devices[i];
     for(int i=0;i<Cpanels.count();i++) delete Cpanels[i]->cp;
     delete tcp;
     delete ui;
@@ -696,6 +703,7 @@ void ControlPanel::Update(void)
    QApplication::processEvents();
    if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
    if(UpdateStop) return;
+   if(TC != NULL) if(TC->Downloading) return;
    if(StartMIPScomms)
    {
        mc = new MIPScomms(0,Systems);
@@ -719,11 +727,11 @@ void ControlPanel::Update(void)
        // Make sure all MIPS systems are in local mode
        for(i=0;i<Systems.count();i++)    Systems[i]->SendString("SMOD,LOC\n");
        msDelay(100);
-       for(i=0;i<Systems.count();i++) Systems[i]->rb.clear();
+       for(i=0;i<Systems.count();i++)    Systems[i]->rb.clear();
        for(i=0;i<ESIchans.count();i++)   ESIchans[i]->Shutdown();
        for(i=0;i<DCBenables.count();i++) DCBenables[i]->Shutdown();
        for(i=0;i<RFchans.count();i++)    RFchans[i]->Shutdown();
-       for(i=0;i<RFCchans.count();i++)    RFCchans[i]->Shutdown();
+       for(i=0;i<RFCchans.count();i++)   RFCchans[i]->Shutdown();
        for(i=0;i<Ccontrols.count();i++)  Ccontrols[i]->Shutdown();
        for(i=0;i<rfa.count();i++)        rfa[i]->Shutdown();
        if(statusBar != NULL) statusBar->showMessage("System shutdown, " + QDateTime().currentDateTime().toString());
@@ -888,12 +896,13 @@ void ControlPanel::Update(void)
        if(!TC->TG->isTableMode()) for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
    }
    else for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<ESIchans.count();i++)    {ESIchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<ARBchans.count();i++)    {ARBchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<Ccontrols.count();i++)   {Ccontrols[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<rfa.count();i++)         {rfa[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<Cpanels.count();i++)     Cpanels[i]->Update();
-   if(comp!=NULL)                     {comp->Update(); if(ProcessEvents) QApplication::processEvents();}
+   for(i=0;i<ESIchans.count();i++)         {ESIchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+   for(i=0;i<ARBchans.count();i++)         {ARBchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+   for(i=0;i<Ccontrols.count();i++)        {Ccontrols[i]->Update();if(ProcessEvents) QApplication::processEvents();}
+   for(i=0;i<rfa.count();i++)              {rfa[i]->Update();      if(ProcessEvents) QApplication::processEvents();}
+   for(i=0;i<devices.count();i++)          {devices[i]->Update();}
+   for(i=0;i<Cpanels.count();i++)          Cpanels[i]->Update();
+   if(comp!=NULL)                          {comp->Update();        if(ProcessEvents) QApplication::processEvents();}
    RequestUpdate = false;
    LogDataFile();
 }
@@ -991,6 +1000,12 @@ QString ControlPanel::Save(QString Filename)
             stream << "RFamp channels," + QString::number(rfa.count()) + "\n";
             for(int i=0; i<rfa.count(); i++) if(rfa[i] != NULL) stream << rfa[i]->Report();
             stream << "RFampEnd\n";
+        }
+        if(devices.count() > 0)
+        {
+            stream << "External devices," + QString::number(rfa.count()) + "\n";
+            for(int i=0; i<devices.count(); i++) if(devices[i] != NULL) stream << devices[i]->Report();
+            stream << "ExternalDevicesEnd\n";
         }
         if(IFT != NULL)
         {
@@ -1440,6 +1455,7 @@ QString ControlPanel::Command(QString cmd)
    for(i=0;i<ESIchans.count();i++)    if((res = ESIchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
    for(i=0;i<ARBchans.count();i++)    if((res = ARBchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
    for(i=0;i<Ccontrols.count();i++)   if((res = Ccontrols[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+   for(i=0;i<devices.count();i++)     if((res = devices[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
    if(TC != NULL) if((res = TC->TG->ProcessCommand(cmd)) != "?") return(res + "\n");
    if(comp != NULL) if((res = comp->ProcessCommand(cmd)) != "?") return(res + "\n");
    return("?\n");

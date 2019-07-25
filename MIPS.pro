@@ -57,7 +57,8 @@ SOURCES += main.cpp\
     timinggenerator.cpp \
     compressor.cpp \
     properties.cpp \
-    plot.cpp
+    plot.cpp \
+    device.cpp
 
 HEADERS  += mips.h \
     console.h \
@@ -94,7 +95,8 @@ HEADERS  += mips.h \
     timinggenerator.h \
     compressor.h \
     properties.h \
-    plot.h
+    plot.h \
+    device.h
 
 FORMS    += mips.ui \
     settingsdialog.ui \

@@ -19,6 +19,7 @@
 #include "properties.h"
 #include "scriptingconsole.h"
 #include "plot.h"
+#include "device.h"
 
 #include <QDialog>
 #include <QDebug>
@@ -328,6 +329,7 @@ private:
     QList<Ccontrol *>     Ccontrols;
     QList<QStringList *>  CSVdata;
     QList<Plot *>         plots;
+    QList<Device *>       devices;
     IFTtiming             *IFT;
     TimingControl         *TC;
     Compressor            *comp;

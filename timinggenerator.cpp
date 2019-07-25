@@ -44,7 +44,7 @@ bool DownloadTable(Comms *comms, QString Table, QString ClockSource, QString Tri
    if(res.toUpper() == "SOFTWARE") res = "SW";
    comms->SendCommand("STBLTRG," + res + "\n");
    // Send table
-   comms->SendCommand(Table);
+   comms->SendCommand(Table.trimmed());
    return true;
 }
 
@@ -298,6 +298,7 @@ TimingControl::TimingControl(QWidget *parent, QString name, QString MIPSname, in
     statusBar = NULL;
     properties = NULL;
     Acquiring = false;
+    Downloading = false;
 }
 
 void TimingControl::Show(void)
@@ -311,12 +312,16 @@ void TimingControl::Show(void)
     Trigger = new QPushButton("Trigger",gbTC); Trigger->setGeometry(20,55,100,32); Trigger->setAutoDefault(false);
     Abort = new QPushButton("Abort",gbTC);     Abort->setGeometry(20,85,100,32); Abort->setAutoDefault(false);
     // Connect to the event slots
-    connect(Edit,SIGNAL(pressed()),this,SLOT(pbEdit()));
-    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()));
-    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()));
+    connect(Edit,SIGNAL(pressed()),this,SLOT(pbEdit()),Qt::QueuedConnection);
+    connect(Trigger,SIGNAL(pressed()),this,SLOT(pbTrigger()),Qt::QueuedConnection);
+    connect(Abort,SIGNAL(pressed()),this,SLOT(pbAbort()),Qt::QueuedConnection);
     TableDownloaded = false;
     TG = new TimingGenerator(p,Title,MIPSnm);
     TG->comms = comms;
+    TG->Trigger = Trigger;
+    TG->Abort = Abort;
+    TG->Edit = Edit;
+    TG->properties = properties;
     // Create the AcquireData object and init
     AD = new class AcquireData(p);
     AD->comms = comms;
@@ -348,7 +353,9 @@ void TimingControl::pbTrigger(void)
     }
     // If the table line edit box is empty, generate table
     if(TG->ui->leTable->text() == "") TG->slotGenerate();
+    Downloading = true;
     TableDownloaded = DownloadTable(comms, TG->ui->leTable->text(),TG->ui->comboClockSource->currentText(), TG->ui->comboTriggerSource->currentText());
+    Downloading = false;
     if(properties != NULL)
     {
         if((properties->DataFilePath != "") && (properties->FileName != "")) AcquireData(properties->DataFilePath + "/" + properties->FileName);
@@ -418,6 +425,7 @@ TimingGenerator::TimingGenerator(QWidget *parent, QString name, QString MIPSname
     ui->comboSelectEvent->clear();
     ui->comboSelectEvent->addItem("");
     ui->comboSelectEvent->addItem("New event");
+    ui->comboSelectEvent->addItem("Rename event");
     ui->comboSelectEvent->addItem("Delete current");
     ui->comboEventSignal->clear();
     ui->comboEventSignal->addItem("","");
@@ -486,6 +494,7 @@ bool TimingGenerator::SetValues(QString strVals)
            ui->comboSelectEvent->clear();
            ui->comboSelectEvent->addItem("");
            ui->comboSelectEvent->addItem("New event");
+           ui->comboSelectEvent->addItem("Rename event");
            ui->comboSelectEvent->addItem("Delete current");
            connect(ui->comboSelectEvent,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventChange()));
        }
@@ -564,7 +573,6 @@ int   TimingGenerator::ConvertToCount(QString val)
     bool ok;
     int  result=0, j, sign = 1;
 
-    //reslist = val.split(" ");
     reslist = Split(val,"+-");
     for(int i=0;i<reslist.count();i++)
     {
@@ -576,24 +584,42 @@ int   TimingGenerator::ConvertToCount(QString val)
         {
             foreach(Event *evt, Events)
             {
-               if(evt->Name == reslist[i])
-               {
-                   result += sign * ConvertToCount(evt->Start);
-                   break;
-               }
+                QString evtName = evt->Name;
+                evtName.replace(" ", "");
+                if(evtName == reslist[i])
+                {
+                    result += sign * ConvertToCount(evt->Start);
+                    break;
+                }
+                else if((evtName + ".Start") == reslist[i])
+                {
+                    result += sign * ConvertToCount(evt->Start);
+                    break;
+                }
+                else if((evtName + ".Width") == reslist[i])
+                {
+                    result += sign * ConvertToCount(evt->Width);
+                    break;
+                }
             }
-            break;
         }
     }
     return(result);
 }
 
-void  TimingGenerator::slotGenerate(void)
+QString TimingGenerator::GenerateMuxSeq(QString Seq)
 {
-    int maxCount = ConvertToCount(ui->leFrameWidth->text()) + ConvertToCount(ui->leFrameStart->text());
+    int maxCount = ConvertToCount(ui->leFrameWidth->text());
     bool timeFlag;
     QString table;
+    QList<int> InjectionPoints;
 
+    if(properties != NULL) properties->Log("Mux seq: " + Seq);
+    int l = Seq.length();
+    if(l <= 0) return "";
+    // Look for 1s in the sequence and build a list of
+    // TOF counts for injections
+    for(int i=0;i<l;i++) if(Seq[i] == '1') InjectionPoints.append(i * ConvertToCount(ui->leFrameWidth->text()) / (l+1));
     slotEventUpdated();
     table.clear();
     table = "STBLDAT;0:[A:" + QString::number(ui->leAccumulations->text().toInt() + 1);
@@ -603,6 +629,80 @@ void  TimingGenerator::slotGenerate(void)
         // Search for event at this clock cycle
         foreach(Event *evt, Events)
         {
+            if(evt->Channel.isEmpty()) continue;
+            int et = ConvertToCount(evt->Start);
+            bool Matched = false;
+            if((evt->Name == "Fill time") || (evt->Name == "Trap time") || (evt->Name == "Release time"))
+            {
+                foreach(int it, InjectionPoints) if((et + it) == i) Matched = true;
+            }
+            else if(et == i) Matched = true;
+            if(Matched)
+            {
+                if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
+                table += ":" + evt->Channel + ":" + QString::number(evt->Value);
+            }
+
+            et = ConvertToCount(evt->Start) + ConvertToCount(evt->Width);
+            Matched = false;
+            if((evt->Name == "Fill time") || (evt->Name == "Trap time") || (evt->Name == "Release time"))
+            {
+                foreach(int it, InjectionPoints) if((et + it) == i) Matched = true;
+            }
+            else if(et == i) Matched = true;
+            if(Matched)
+            {
+                if(ConvertToCount(evt->Width) > 0)
+                {
+                   if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
+                   table += ":" + evt->Channel + ":" + QString::number(evt->ValueOff);
+                }
+            }
+        }
+        if(ConvertToCount(ui->leFrameStart->text()) == i)
+        {
+            if(ui->comboEnable->currentText() != "")
+            {
+                if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
+                table += ":" + ui->comboEnable->currentText() + ":1";
+            }
+        }
+        if(maxCount == i)
+        {
+            if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
+            if(ui->comboEnable->currentText() != "")
+            {
+               table += ":" +  ui->comboEnable->currentText() + ":0";
+            }
+            table += ":];";
+        }
+    }
+    return table;
+}
+
+void  TimingGenerator::slotGenerate(void)
+{
+    int maxCount = ConvertToCount(ui->leFrameWidth->text()) + ConvertToCount(ui->leFrameStart->text());
+    bool timeFlag;
+    QString table;
+
+    if(ui->comboMuxOrder->currentText() == "4 Bit") ui->leTable->setText(GenerateMuxSeq("000100110101111"));
+    else if(ui->comboMuxOrder->currentText() == "5 Bit") ui->leTable->setText(GenerateMuxSeq("0000100101100111110001101110101"));
+    else if(ui->comboMuxOrder->currentText() == "6 Bit") ui->leTable->setText(GenerateMuxSeq("000001000011000101001111010001110010010110111011001101010111111"));
+    else if(ui->comboMuxOrder->currentText() == "7 Bit") ui->leTable->setText(GenerateMuxSeq("0000001000001100001010001111001000101100111010100111110100001110001001001101101011011110110001101001011101110011001010101111111"));
+    else if(ui->comboMuxOrder->currentText() == "8 Bit") ui->leTable->setText(GenerateMuxSeq("000000010111000111011110001011001101100001111001110000101011111111001011110100101000011011101101111101011101000001100101010100011010110001100000100101101101010011010011111101110011001111011001000010000001110010010011000100111010101101000100010100100011111"));
+    else if(ui->comboMuxOrder->currentText() == "9 Bit") ui->leTable->setText(GenerateMuxSeq("0000000010000100011000010011100101010110000110111101001101110010001010000101011010011111101100100100101101111110010011010100110011000000011000110010100011010010111111101000101100011101011001011001111000111110111010000011010110110111011000001011010111110101010100000010100101011110010111011100000011100111010010011110101110101000100100001100111000010111101101100110100001110111100001111111110000011110111110001011100110010000010010100111011010001111001111100110110001010100100011100011011010101110001001100010001"));
+    if(ui->comboMuxOrder->currentText() != "None") return;
+    slotEventUpdated();
+    table.clear();
+    table = "STBLDAT;0:[A:" + QString::number(ui->leAccumulations->text().toInt() + 1);
+    for(int i=0;i <= maxCount;i++)
+    {
+        timeFlag = false;
+        // Search for event at this clock cycle
+        foreach(Event *evt, Events)
+        {
+            if(evt->Channel.isEmpty()) continue;
             if(ConvertToCount(evt->Start) == i)
             {
                 if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
@@ -695,11 +795,46 @@ void TimingGenerator::slotEventChange(void)
         ui->comboSelectEvent->setCurrentIndex(i);
         selectedEvent = event;
     }
+    else if(ui->comboSelectEvent->currentText() == "Rename event")
+    {
+       if(!ui->leEventName->text().isEmpty())
+       {
+           while(true)
+           {
+               text = QInputDialog::getText(0, "Rename event", "Enter new event name, must be unique:", QLineEdit::Normal,"", &ok );
+               if (ok && !text.isEmpty() )
+               {
+                   if(ui->comboSelectEvent->findText(text) >= 0)
+                   {
+                       QMessageBox msgBox;
+                       msgBox.setText("Name must be unique, try again!");
+                       msgBox.exec();
+                   }
+                   else break;
+               }
+               else return;
+           }
+           // Rename the event if here
+           ui->comboSelectEvent->removeItem(ui->comboSelectEvent->findText(ui->leEventName->text()));
+                   //ui->comboSelectEvent->findText(ui->leEventName->text());
+           ui->comboSelectEvent->addItem(text);
+           ui->leEventName->setText(text);
+           slotEventUpdated();
+           ui->comboSelectEvent->setCurrentIndex(0);
+           ui->leEventName->setText("");
+           ui->comboEventSignal->setCurrentIndex(0);
+           ui->leEventStart->setText("");
+           ui->leEventWidth->setText("");
+           ui->leEventValue->setText("");
+           ui->leEventValueOff->setText("");
+           selectedEvent = NULL;
+       }
+    }
     else if(ui->comboSelectEvent->currentText() == "Delete current")
     {
         int   i;
 
-        if((i=ui->comboSelectEvent->findText(ui->leEventName->text())) >= 2)
+        if((i=ui->comboSelectEvent->findText(ui->leEventName->text())) >= 3)
         {
             // Find in Event list and remove
             foreach(Event *evt, Events) if(evt->Name == ui->leEventName->text()) Events.removeOne(evt);
@@ -762,6 +897,9 @@ QString TimingGenerator::ProcessCommand(QString cmd)
     else if(resList[0].trimmed() == Title + ".Event.Signal") combo = ui->comboEventSignal;
     else if(resList[0].trimmed() == Title + ".Select event") combo = ui->comboSelectEvent;
     else if(resList[0].trimmed() == Title + ".Generate") pb = ui->pbGenerate;
+    else if(resList[0].trimmed() == Title + ".Trigger") pb = Trigger;
+    else if(resList[0].trimmed() == Title + ".Abort") pb = Abort;
+    else if(resList[0].trimmed() == Title + ".Edit") pb = Edit;
     if(le != NULL)
     {
        if(resList.count() == 1) return le->text();
@@ -801,6 +939,7 @@ void TimingGenerator::slotClearEvents(void)
    ui->comboSelectEvent->clear();
    ui->comboSelectEvent->addItem("");
    ui->comboSelectEvent->addItem("New event");
+   ui->comboSelectEvent->addItem("Rename event");
    ui->comboSelectEvent->addItem("Delete current");
 }
 
@@ -824,6 +963,12 @@ void TimingGenerator::slotLoad(void)
         } while(!line.isNull());
     }
     file.close();
+    ui->leEventName->clear();
+    ui->leEventStart->clear();
+    ui->leEventWidth->clear();
+    ui->leEventValue->clear();
+    ui->leEventValueOff->clear();
+    ui->comboEventSignal->setCurrentIndex(0);
 }
 
 void TimingGenerator::slotSave(void)

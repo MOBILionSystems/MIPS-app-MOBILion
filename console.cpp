@@ -88,7 +88,7 @@ void Console::keyPressEvent(QKeyEvent *e)
         case Qt::Key_V:
             if(e->modifiers() & 0x4000000)
             {
-                // Here is paste key combo is pressed
+                // Here if paste key combo is pressed
                 QByteArray data = clipboard->text().toStdString().c_str();
                 if (localEchoEnabled) QPlainTextEdit::appendPlainText(clipboard->text());
                 emit getData(clipboard->text().toStdString().c_str());

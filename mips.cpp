@@ -227,6 +227,21 @@
 //      10.)Added Plotting capability to control panel.
 //      11.)Updated the timing generator to allow setting start and width times using other
 //          event values, supports linking
+// 1.53, June 18, 2019
+//      1.) Updated the timing generator to support .Start and .Width selection fields
+//      2.) Added rename to timing generator event editor
+// 1.54, July 5, 2019
+//      1.) Added Hadamard multiplexing capability to the pulse sequence generator, support
+//          4, 5, and 6 bit
+//      2.) Added plot capabilities to support het maps, for the FAIMSFB work
+// 1.55, July 13, 2019
+//      1.) Added the serial device capability to control panels
+// 1.56, July 18, 2019
+//      1.) Added Mux bits 7,8, and 9
+//      2.) Added delay in sending chars to MIPS to support long tables.
+// 1.57, July 23, 2019
+//      1.) Added Socket command for the timing control, tigger, edit, and abort
+//      2.) Fixed a bug in the delay added in very 1.56. I was delaying 10mS on every command.
 //
 //      To dos for next release:
 //          - Resolve table not downloaded issue
@@ -279,7 +294,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QInputDialog>
 
-QString Version = "MIPS, Version 1.52 May 19, 2019";
+QString Version = "MIPS, Version 1.57 July 23, 2019";
 
 MIPS::MIPS(QWidget *parent) :
     QMainWindow(parent),

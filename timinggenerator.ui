@@ -202,7 +202,7 @@
    <property name="geometry">
     <rect>
      <x>465</x>
-     <y>95</y>
+     <y>80</y>
      <width>101</width>
      <height>16</height>
     </rect>
@@ -215,7 +215,7 @@
    <property name="geometry">
     <rect>
      <x>560</x>
-     <y>60</y>
+     <y>45</y>
      <width>100</width>
      <height>26</height>
     </rect>
@@ -339,7 +339,7 @@
    <property name="geometry">
     <rect>
      <x>560</x>
-     <y>90</y>
+     <y>75</y>
      <width>100</width>
      <height>26</height>
     </rect>
@@ -349,7 +349,7 @@
    <property name="geometry">
     <rect>
      <x>465</x>
-     <y>65</y>
+     <y>50</y>
      <width>91</width>
      <height>16</height>
     </rect>
@@ -453,6 +453,64 @@
    </property>
    <property name="autoDefault">
     <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboMuxOrder">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>110</y>
+     <width>100</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>None</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string extracomment="001000110101111">4 Bit</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string extracomment="0000100101100111110001101110101">5 Bit</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string extracomment="00001000011000101001111010001110010010110111011001101010111111">6 Bit</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string extracomment="0000001000001100001010001111001000101100111010100111110100001110001001001101101011011110110001101001011101110011001010101111111">7 Bit</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string extracomment="000000010111000111011110001011001101100001111001110000101011111111001011110100101000011011101101111101011101000001100101010100011010110001100000100101101101010011010011111101110011001111011001000010000001110010010011000100111010101101000100010100100011111">8 Bit</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string extracomment="0000000010000100011000010011100101010110000110111101001101110010001010000101011010011111101100100100101101111110010011010100110011000000011000110010100011010010111111101000101100011101011001011001111000111110111010000011010110110111011000001011010111110101010100000010100101011110010111011100000011100111010010011110101110101000100100001100111000010111101101100110100001110111100001111111110000011110111110001011100110010000010010100111011010001111001111100110110001010100100011100011011010101110001001100010001">9 Bit</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_15">
+   <property name="geometry">
+    <rect>
+     <x>465</x>
+     <y>115</y>
+     <width>101</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Multiplex order</string>
    </property>
   </widget>
  </widget>

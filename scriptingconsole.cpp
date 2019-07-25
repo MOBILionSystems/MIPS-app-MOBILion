@@ -141,11 +141,14 @@ void ScriptButton::Show(void)
     pbButton = new QPushButton(Title,p);
     pbButton->setGeometry(X,Y,150,32);
     pbButton->setAutoDefault(false);
-    connect(pbButton,SIGNAL(pressed()),this,SLOT(pbButtonPressed()));
-
+    connect(pbButton,SIGNAL(pressed()),this,SLOT(pbButtonPressed()),Qt::QueuedConnection);
     engine = new QScriptEngine(this);
     engine->setProcessEventsInterval(100);
-    QScriptValue mips = engine->newQObject(p->parentWidget());
+    QScriptValue mips;
+    if(p->parentWidget()->parentWidget() != NULL)
+       mips = engine->newQObject(p->parentWidget()->parentWidget());
+    else
+       mips = engine->newQObject(p->parentWidget());
     engine->globalObject().setProperty("mips",mips);
 }
 

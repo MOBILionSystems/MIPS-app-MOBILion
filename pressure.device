@@ -1,0 +1,10 @@
+#Pressure serial device
+Port,COM1
+Setting,9600,8,n,1
+EOL,CR,LF
+Init
+End Init
+Read command,R0
+Scan format,%f
+M,1
+B,0

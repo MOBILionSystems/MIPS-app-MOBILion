@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>645</width>
-    <height>463</height>
+    <width>667</width>
+    <height>470</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -47,6 +47,26 @@
    </property>
    <property name="autoDefault">
     <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QCustomPlot" name="HeatMap1" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>326</width>
+     <height>461</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QCustomPlot" name="HeatMap2" native="true">
+   <property name="geometry">
+    <rect>
+     <x>375</x>
+     <y>0</y>
+     <width>326</width>
+     <height>461</height>
+    </rect>
    </property>
   </widget>
  </widget>

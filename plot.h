@@ -6,6 +6,7 @@
 #include <QMenu>
 #include <QDebug>
 #include <QKeyEvent>
+#include "qcustomplot.h"
 
 namespace Ui {
 class Plot;
@@ -39,13 +40,19 @@ public:
     void Load(QString filename);
     void FreeAllData(void);
     void ZoomSelect(void);
+    QCPColorMap *colorMap1,*colorMap2;
+    QCPColorScale *colorScale1,*colorScale2;
     QString PlotTitle;
     QString Comments;
+    QString Label1;
+    QString Label2;
+    QString Scan;
     QStatusBar  *statusBar;
 
 private:
     Ui::Plot *ui;
     int  CurrentIndex;
+    float m,b;
     QList<PlotGraph *> plotGraphs;    // All graphs
     QMenu   *popupMenu;
     QAction *SaveOption;
@@ -55,12 +62,14 @@ private:
     QAction *TrackOption;
     QAction *ClipboardOption;
     QAction *CommentOption;
+    QAction *HeatOption;
 
 protected:
     void resizeEvent(QResizeEvent *event); // override;
 
 public slots:
     void mousePressed(QMouseEvent*);
+    void mousePressedHM(QMouseEvent*);
     void slotSaveMenu(void);
     void slotLoadMenu(void);
     void slotCommentMenu(void);
@@ -69,6 +78,7 @@ public slots:
     void slotYaxisZoomOption(void);
     void slotTrackOption(void);
     void slotClipBoard(void);
+    void slotHeatMap(void);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

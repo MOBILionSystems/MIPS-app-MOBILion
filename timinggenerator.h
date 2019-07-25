@@ -71,6 +71,7 @@ public:
     QString Report(void);
     bool    SetValues(QString strVals);
     QString ProcessCommand(QString cmd);
+    QString GenerateMuxSeq(QString Seq);
     bool    isTableMode(void);
     int     ConvertToCount(QString val);
     QStringList Split(QString str, QString del);
@@ -82,6 +83,10 @@ public:
     Event       *selectedEvent;
     QList<Event *>  Events;
     Ui::TimingGenerator *ui;
+    QPushButton  *Edit;
+    QPushButton  *Trigger;
+    QPushButton   *Abort;
+    Properties       *properties;
 
 public slots:
     void slotEventChange(void);
@@ -115,6 +120,7 @@ public:
     bool              TableDownloaded;
     bool              Acquiring;
     Properties       *properties;
+    bool              Downloading;
 
 private:
     QGroupBox        *gbTC;
