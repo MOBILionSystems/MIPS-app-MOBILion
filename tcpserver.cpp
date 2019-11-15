@@ -32,7 +32,7 @@ void TCPserver::listen(void)
 
 void TCPserver::sendMessage(QString mess)
 {
-    if(mess == "\n") return;
+    // if(mess == "\n") return; // we want empty '\n' so we don't block on receive!
     if(socket == NULL) return;
     socket->write(mess.toUtf8().constData());
     socket->flush();
@@ -47,13 +47,14 @@ void TCPserver::newConnection(void)
 {
     // need to grab the socket
     QTcpSocket *sck = server->nextPendingConnection();
-    if(socket != NULL)
+    if(socket != nullptr)
     {
-        sck->close();
-        return;
+        socket->close();
+//        sck->close();
+//        return;
     }
     socket = sck;
-    if(socket == NULL) return;
+    if(socket == nullptr) return;
 
     // connect slots to process incoming data and disconnect events
     connect(socket,SIGNAL(readyRead()),this,SLOT(readData()));

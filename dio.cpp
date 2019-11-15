@@ -348,7 +348,7 @@ QString DIOchannel::ProcessCommand(QString cmd)
     if(resList.count()==2)
     {
        if(resList[1] == "1") DIO->setChecked(true);
-       else if(resList[1] == "1") DIO->setChecked(false);
+       else if(resList[1] == "0") DIO->setChecked(false);
        else return "?";
        if(resList[1] == "1") DIO->stateChanged(1);
        else  DIO->stateChanged(0);

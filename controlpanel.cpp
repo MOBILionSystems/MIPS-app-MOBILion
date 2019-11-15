@@ -1417,7 +1417,8 @@ void ControlPanel::WaitForUpdate(void)
 void ControlPanel::tcpCommand(void)
 {
     QString cmd = tcp->readLine();
-    tcp->sendMessage(Command(cmd));
+    QString resp = Command(cmd);
+    tcp->sendMessage(resp);
 }
 
 QString ControlPanel::Command(QString cmd)
