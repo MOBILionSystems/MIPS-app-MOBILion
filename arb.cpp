@@ -514,6 +514,7 @@ ARBchannel::ARBchannel(QWidget *parent, QString name, QString MIPSname, int x, i
     comms  = NULL;
     statusBar = NULL;
     PPP = 32;
+    isShutdown = false;
 }
 
 void ARBchannel::Show(void)
@@ -574,9 +575,18 @@ QString ARBchannel::Report(void)
     title += Title;
     res = title + ",";
     res += leSWFREQ->text() + ",";
-    res += leSWFVRNG->text() + ",";
-    res += leSWFVAUX->text() + ",";
-    res += leSWFVOFF->text() + ",";
+    if(isShutdown)
+    {
+        res += activeVRNG + ",";
+        res += activeVAUX + ",";
+        res += activeVOFF + ",";
+    }
+    else
+    {
+        res += leSWFVRNG->text() + ",";
+        res += leSWFVAUX->text() + ",";
+        res += leSWFVOFF->text() + ",";
+    }
     if(SWFDIR_FWD->isChecked()) res += "FWD,";
     else res += "REV,";
     res += Waveform->currentText();
@@ -595,9 +605,18 @@ bool ARBchannel::SetValues(QString strVals)
     resList = strVals.split(",");
     if(resList.count() < 7) return false;
     leSWFREQ->setText(resList[1]);   leSWFREQ->setModified(true); leSWFREQ->editingFinished();
-    leSWFVRNG->setText(resList[2]);  leSWFVRNG->setModified(true); leSWFVRNG->editingFinished();
-    leSWFVAUX->setText(resList[3]);  leSWFVAUX->setModified(true); leSWFVAUX->editingFinished();
-    leSWFVOFF->setText(resList[4]);  leSWFVOFF->setModified(true); leSWFVOFF->editingFinished();
+    if(isShutdown)
+    {
+        activeVRNG = resList[2];
+        activeVAUX = resList[3];
+        activeVOFF = resList[4];
+    }
+    else
+    {
+        leSWFVRNG->setText(resList[2]);  leSWFVRNG->setModified(true); leSWFVRNG->editingFinished();
+        leSWFVAUX->setText(resList[3]);  leSWFVAUX->setModified(true); leSWFVAUX->editingFinished();
+        leSWFVOFF->setText(resList[4]);  leSWFVOFF->setModified(true); leSWFVOFF->editingFinished();
+    }
     if(resList[5] == "FWD")
     {
         SWFDIR_FWD->setChecked(true);
@@ -724,6 +743,39 @@ void ARBchannel::wfEdit(void)
     connect(ARBwfEdit, SIGNAL(WaveformReady()), this, SLOT(ReadWaveform()));
     ARBwfEdit->SetWaveform(Wform);
     ARBwfEdit->show();
+}
+
+void ARBchannel::Shutdown(void)
+{
+    if(isShutdown) return;
+    isShutdown = true;
+    activeVAUX = leSWFVAUX->text();
+    leSWFVAUX->setText("0");
+    leSWFVAUX->setModified(true);
+    leSWFVAUX->editingFinished();
+    activeVRNG = leSWFVRNG->text();
+    leSWFVRNG->setText("0");
+    leSWFVRNG->setModified(true);
+    leSWFVRNG->editingFinished();
+    activeVOFF = leSWFVOFF->text();
+    leSWFVOFF->setText("0");
+    leSWFVOFF->setModified(true);
+    leSWFVOFF->editingFinished();
+}
+
+void ARBchannel::Restore(void)
+{
+    if(!isShutdown) return;
+    isShutdown = false;
+    leSWFVAUX->setText(activeVAUX);
+    leSWFVAUX->setModified(true);
+    leSWFVAUX->editingFinished();
+    leSWFVRNG->setText(activeVRNG);
+    leSWFVRNG->setModified(true);
+    leSWFVRNG->editingFinished();
+    leSWFVOFF->setText(activeVOFF);
+    leSWFVOFF->setModified(true);
+    leSWFVOFF->editingFinished();
 }
 
 QString ARBchannel::ProcessCommand(QString cmd)

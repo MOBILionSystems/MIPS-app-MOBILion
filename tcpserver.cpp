@@ -49,8 +49,9 @@ void TCPserver::newConnection(void)
     QTcpSocket *sck = server->nextPendingConnection();
     if(socket != NULL)
     {
-        sck->close();
-        return;
+        socket->close();
+//      sck->close();
+//      return;
     }
     socket = sck;
     if(socket == NULL) return;

@@ -71,19 +71,22 @@ class ARBchannel : public QWidget
     Q_OBJECT
 public:
     ARBchannel(QWidget *parent, QString name, QString MIPSname, int x, int y);
-    void Show(void);
-    void Update(void);
+    void    Show(void);
+    void    Update(void);
     QString Report(void);
-    bool SetValues(QString strVals);
+    bool    SetValues(QString strVals);
+    void    Shutdown(void);
+    void    Restore(void);
     QString ProcessCommand(QString cmd);
-    QWidget *p;
-    QString Title;
-    int     X,Y;
-    QString MIPSnm;
-    int     Channel;
-    int     PPP;
-    Comms   *comms;
+    QWidget     *p;
+    QString     Title;
+    int         X,Y;
+    QString     MIPSnm;
+    int         Channel;
+    int         PPP;
+    Comms       *comms;
     QStatusBar  *statusBar;
+    bool        isShutdown;
 private:
     QGroupBox    *gbARB;
     QLineEdit    *leSWFREQ;
@@ -94,8 +97,11 @@ private:
     QRadioButton *SWFDIR_REV;
     QComboBox    *Waveform;
     QPushButton  *EditWaveform;
-    QLabel      *labels[10];
+    QLabel       *labels[10];
     ARBwaveformEdit *ARBwfEdit;
+    QString      activeVRNG;
+    QString      activeVAUX;
+    QString      activeVOFF;
 private slots:
     void leChange(void);
     void rbChange(void);

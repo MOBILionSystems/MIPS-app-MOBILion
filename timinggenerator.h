@@ -22,6 +22,8 @@ typedef struct
     QString Channel;
     QString Start;
     QString Width;
+    float   StartT;
+    float   WidthT;
     float   Value;
     float   ValueOff;
 } Event;
@@ -40,6 +42,8 @@ public:
     QWidget     *p;
     QStatusBar  *statusBar;
     QString     filePath;
+    QString     fileName;
+    QString     TriggerMode;
     bool        TableDownloaded;
     bool        Acquiring;
     QString     Acquire;
@@ -60,6 +64,34 @@ class TimingGenerator;
 
 class AcquireData;
 
+class EventControl : public QWidget
+{
+    Q_OBJECT
+signals:
+    void EventChanged(QString Ename, QString Val);
+
+public:
+    EventControl(QWidget *parent, QString name, QString Ename, int x, int y);
+    void Show(void);
+    void Update(void);
+    QString Report(void);
+    bool SetValues(QString strVals);
+    QString ProcessCommand(QString cmd);
+    QWidget *p;
+    QString Title;
+    int     X,Y;
+    QString ECname;
+    Comms   *comms;
+    QString Gcommand;
+    QString Scommand;
+    QLineEdit   *EventValue;
+private:
+    QFrame      *frmEvent;
+    QLabel      *label;
+private slots:
+    void EventChange(void);
+};
+
 class TimingGenerator : public QDialog
 {
     Q_OBJECT
@@ -68,6 +100,7 @@ public:
     explicit TimingGenerator(QWidget *parent, QString name, QString MIPSname);
     ~TimingGenerator();
     void    AddSignal(QString Title, QString Chan);
+    void    UpdateEvents(void);
     QString Report(void);
     bool    SetValues(QString strVals);
     QString ProcessCommand(QString cmd);
@@ -81,12 +114,13 @@ public:
     Comms       *comms;
     QStatusBar  *statusBar;
     Event       *selectedEvent;
-    QList<Event *>  Events;
+    QList<Event *>        Events;
+    QList<EventControl *> EC;
     Ui::TimingGenerator *ui;
-    QPushButton  *Edit;
-    QPushButton  *Trigger;
+    QPushButton   *Edit;
+    QPushButton   *Trigger;
     QPushButton   *Abort;
-    Properties       *properties;
+    Properties    *properties;
 
 public slots:
     void slotEventChange(void);
@@ -95,6 +129,7 @@ public slots:
     void slotClearEvents(void);
     void slotLoad(void);
     void slotSave(void);
+    void slotClearTable(void);
 };
 
 class TimingControl : public QWidget
@@ -113,6 +148,7 @@ public:
     int               X,Y;
     QString           MIPSnm;
     QString           filePath;
+    QString           fileName;
     Comms             *comms;
     QStatusBar        *statusBar;
     QProcess          process;
@@ -134,6 +170,7 @@ public slots:
     void pbTrigger(void);
     void pbAbort(void);
     void slotDataAcquired(QString);
+    void slotEventChanged(QString, QString);
 };
 
 class IFTtiming : public QWidget

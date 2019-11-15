@@ -1,3 +1,45 @@
+// Ion hopping script
+//
+// Rev 1.0, first release
+// Rev 2.0, added scans to the acquire 
+//
+// Gordon Anderson
+//
+mips.popupMessage("Ion Hopping, rev 2.0  2019")
+worklist = mips.SelectFile("Open","Select Ion Hopping file","csv")
+maxLines = mips.ReadCSVfile(worklist,",")
+mips.popupMessage(maxLines + " entries found in Ion Hopping file")
+PlotSetup()
+for(entry=1;entry < maxLines;entry++)
+{
+  for(i=0;i<10;i++)
+  {
+    if(mips.ReadCSVentry(0,i) != "")
+    {
+       if(mips.ReadCSVentry(entry,i) != "")
+       {
+          if(mips.ReadCSVentry(0,i) == "Delay") 
+          {
+            mips.msDelay(mips.ReadCSVentry(entry,i))
+            Scan()
+          }
+          else if(mips.ReadCSVentry(0,i) == "Step") mips.statusMessage("Step, " + mips.ReadCSVentry(entry,i))
+          else mips.Command(mips.ReadCSVentry(0,i) + "=" + mips.ReadCSVentry(entry,i))
+          //mips.popupMessage(mips.ReadCSVentry(0,i) + "=" + mips.ReadCSVentry(entry,i))
+       }
+    }
+    else break
+  }
+}
+mips.statusMessage("Ion Hopping finished!")
+
+var steps;
+var averages=1;
+var Param = "";
+var numscans;
+
+function PlotSetup()
+{
 // DMS or DMSDMS script for scanning and plotting the data
 mips.CreatePlot("CV scan","Current, pA","CV, volts",2)
 mips.PlotCommand("Plot1,Pos electrometer current pA");
@@ -25,31 +67,40 @@ Param = mips.Command("Steps per CV scan.Param").trim()
 if(Param != "")
 {
    start = mips.Command("Steps per CV scan.Start")
-   if(numscans <= 1) delta = (mips.Command("Steps per CV scan.Stop") - mips.Command("Steps per CV scan.Start"))
-   else delta = (mips.Command("Steps per CV scan.Stop") - mips.Command("Steps per CV scan.Start")) / (numscans-1)
+   delta = (mips.Command("Steps per CV scan.Stop") - mips.Command("Steps per CV scan.Start")) / (numscans-1)
 }
-for(scans=0;scans<numscans;scans++)
+}
+
+function Scan()
 {
-   if(Param != "")
+   for(scans=0;scans<numscans;scans++)
    {
-      if((scans % parseInt(mips.Command("Steps per CV scan.Step"),10)) == 0)
+      if(Param != "")
       {
-         mips.Command(Param + "=" + (parseFloat(start) + delta * (scans)).toFixed(2))
-         mips.PlotCommand(Param + "=" + (parseFloat(start) + delta * (scans)).toFixed(2))
-         mips.msDelay(mips.Command("Steps per CV scan.Delay"))
+         if((scans % parseInt(mips.Command("Steps per CV scan.Step"),10)) == 0)
+         {
+            mips.Command(Param + "=" + (parseFloat(start) + delta * (scans)).toFixed(2))
+            mips.PlotCommand(Param + "=" + (parseFloat(start) + delta * (scans)).toFixed(2))
+            mips.msDelay(mips.Command("Steps per CV scan.Delay"))
+         }
       }
+      ReadScan()
    }
-   ReadScan(averages)
 }
+
 // This function read one CV scan
-function ReadScan(averages)
+function ReadScan()
 {
+   var i
+   var avg
+   var steps
+   var dur
+   
    steps = mips.Command("DMS1.Steps")
    dur = mips.Command("Step dur")
    mips.PlotCommand("NewGraph,2," + steps.toString());
    for(avg=0;avg<averages;avg++)
    {
-      mips.statusMessage("Reading average " + (avg+1).toString() + " of " + averages.toString())
       mips.UpdateHalted(true);
       mips.SendCommand("MIPS","FBSCNSTRT,3\n")
       for(i=0;i<steps;i++)

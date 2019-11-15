@@ -331,7 +331,8 @@ private:
     QList<Plot *>         plots;
     QList<Device *>       devices;
     IFTtiming             *IFT;
-    TimingControl         *TC;
+    QList<TimingControl *> TC;
+//    TimingControl         *TC;
     Compressor            *comp;
     uint        LogStartTime;
     int         LogPeriod;

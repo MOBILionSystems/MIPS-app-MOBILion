@@ -139,9 +139,9 @@ void cmdlineapp::readProcessOutput(void)
         {
             // Here with full lines of text
             if(ploting) plotDataPoint(messlinelist[i]);
-            if(mess.contains("Plot,"))
+            if(messlinelist[i].contains("Plot,"))
             {
-                setupPlot(messlinelist[0]);
+                setupPlot(messlinelist[i]);
                 ploting = true;
             }
         }

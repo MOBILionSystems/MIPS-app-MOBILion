@@ -134,6 +134,15 @@ ScriptButton::ScriptButton(QWidget *parent, QString name, QString ScriptFile, in
     FileName = ScriptFile;
     properties = prop;
     sb = statusbar;
+    engine = NULL;
+}
+
+ScriptButton::~ScriptButton()
+{
+    if(engine != NULL)
+    {
+        engine->abortEvaluation();
+    }
 }
 
 void ScriptButton::Show(void)
@@ -144,7 +153,6 @@ void ScriptButton::Show(void)
     connect(pbButton,SIGNAL(pressed()),this,SLOT(pbButtonPressed()),Qt::QueuedConnection);
     engine = new QScriptEngine(this);
     engine->setProcessEventsInterval(100);
-    QScriptValue mips;
     if(p->parentWidget()->parentWidget() != NULL)
        mips = engine->newQObject(p->parentWidget()->parentWidget());
     else
@@ -172,6 +180,11 @@ void ScriptButton::pbButtonPressed(void)
         engine->abortEvaluation();
         if(properties != NULL) properties->Log("Script aborted");
         busy = false;
+        // Make sure the halted flag is cleared, call the mips property
+        QScriptValueList arg;
+        QScriptValue v = false;
+        arg.append(v);
+        mips.property("UpdateHalted").call(mips,arg);
         return;
     }
     // Load Script
@@ -205,3 +218,14 @@ void ScriptButton::pbButtonPressed(void)
     busy = false;
     QApplication::restoreOverrideCursor();
 }
+
+QString ScriptButton::ProcessCommand(QString cmd)
+{
+    if(Title == cmd.trimmed())
+    {
+        pbButtonPressed();
+        return("");
+    }
+    else return("?");
+}
+

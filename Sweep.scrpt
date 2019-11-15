@@ -1,0 +1,19 @@
+mips.popupMessage("ARB frequency sweep, rev 1.0 2019");
+// Get user options
+startF = mips.popupUserInput("Sweep parameters","Enter start frequency in Hz:");
+stopF = mips.popupUserInput("Sweep parameters","Enter stop frequency in Hz:");
+Duration = mips.popupUserInput("Sweep parameters","Enter sweep duration in sec:");
+// Setup the sweep parameters for channel 1 and channel 2
+mips.SendCommand("MIPS-2","STWSSTRT,1," + startF + "\n");
+mips.SendCommand("MIPS-2","STWSSTRT,2," + startF + "\n");
+mips.SendCommand("MIPS-2","STWSSTP,1," + stopF + "\n");
+mips.SendCommand("MIPS-2","STWSSTP,2," + stopF + "\n");
+mips.SendCommand("MIPS-2","STWSTM,1," + Duration + "\n");
+mips.SendCommand("MIPS-2","STWSTM,2," + Duration + "\n");
+// Setup delayed trigger to trigger sweep on R input
+mips.SendCommand("MIPS-2","SDTRIGINP,R,POS\n");
+mips.SendCommand("MIPS-2","SDTRIGDLY,0\n");
+mips.SendCommand("MIPS-2","SDTRIGRPT,1\n");
+mips.SendCommand("MIPS-2","SDTRIGMOD,SWEEP\n");
+mips.SendCommand("MIPS-2","SDTRIGENA,TRUE\n");
+status = "done";
