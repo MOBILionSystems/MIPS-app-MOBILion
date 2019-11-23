@@ -32,7 +32,6 @@ void TCPserver::listen(void)
 
 void TCPserver::sendMessage(QString mess)
 {
-    if(mess == "\n") return;
     if(socket == NULL) return;
     socket->write(mess.toUtf8().constData());
     socket->flush();
