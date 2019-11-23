@@ -49,8 +49,6 @@ void TCPserver::newConnection(void)
     if(socket != NULL)
     {
         socket->close();
-//      sck->close();
-//      return;
     }
     socket = sck;
     if(socket == NULL) return;
