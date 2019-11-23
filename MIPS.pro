@@ -19,7 +19,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = MIPS
 TEMPLATE = app
 
-CONFIG += static
+//CONFIG += static
 
 SOURCES += main.cpp\
         mips.cpp \
@@ -123,7 +123,8 @@ RESOURCES += \
     files.qrc
 
 QMAKE_LFLAGS_WINDOWS = /SUBSYSTEM:WINDOWS,5.01
-QMAKE_MAC_SDK = macosx10.14
+QMAKE_MAC_SDK = macosx10.12
+
 
 
 

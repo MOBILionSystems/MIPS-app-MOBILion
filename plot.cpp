@@ -25,6 +25,11 @@
 #include "plot.h"
 #include "ui_plot.h"
 
+SGcoeff SG[4] = {{5,35,QList<float>() << -3 << 12 << 17 << 12 << -3},
+                 {7,21,QList<float>() << -2 << 3 << 6 << 7 << 6 << 3 << -2},
+                 {9,231,QList<float>() << -21 << 14 << 39 << 54 << 59 << 54 <<39 << 14 << -21},
+                 {11,429,QList<float>() << -36 << 9 << 44 << 69 << 84 << 89 <<84 << 69 << 44 << 9 << -36}};
+
 Plot::Plot(QWidget *parent, QString Title, QString Yaxis, QString Xaxis, int NumPlots) :
     QDialog(parent),
     ui(new Ui::Plot)
@@ -35,6 +40,7 @@ Plot::Plot(QWidget *parent, QString Title, QString Yaxis, QString Xaxis, int Num
     //    this->setWindowFlags(flags | Qt::WindowStaysOnTopHint);
     m=1;
     b=0;
+    Filter = -1;
     ui->txtComments->appendPlainText("CreatePlot," + Title.replace(",","_") + "," + Yaxis.replace(",","_") + "," + Xaxis.replace(",","_") + "," + QString::number(NumPlots));
     PlotTitle = Title;
     Plot::setWindowTitle(Title);
@@ -65,6 +71,7 @@ Plot::Plot(QWidget *parent, QString Title, QString Yaxis, QString Xaxis, int Num
     }
     ui->Graph->replot();
     connect(ui->Graph, SIGNAL(mousePress(QMouseEvent*)), this, SLOT(mousePressed(QMouseEvent*)));
+    connect(ui->Graph, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseMove(QMouseEvent*)));
     connect(ui->HeatMap1, SIGNAL(mousePress(QMouseEvent*)), this, SLOT(mousePressedHM(QMouseEvent*)));
     connect(ui->HeatMap2, SIGNAL(mousePress(QMouseEvent*)), this, SLOT(mousePressedHM(QMouseEvent*)));
     connect(ui->pbCloseComments, SIGNAL(pressed()), this, SLOT(slotCloseComments()));
@@ -81,6 +88,8 @@ Plot::Plot(QWidget *parent, QString Title, QString Yaxis, QString Xaxis, int Num
     YaxisZoomOption = new QAction("Yaxis zoom", this);
     YaxisZoomOption->setCheckable(true);
     connect(YaxisZoomOption, SIGNAL(triggered()), this, SLOT(slotYaxisZoomOption()));
+    FilterOption = new QAction("Filter", this);
+    connect(FilterOption, SIGNAL(triggered()), this, SLOT(slotFilterOption()));
     TrackOption = new QAction("Track", this);
     TrackOption->setCheckable(true);
     connect(TrackOption, SIGNAL(triggered()), this, SLOT(slotTrackOption()));
@@ -169,6 +178,16 @@ void Plot::mousePressedHM(QMouseEvent* event)
     }
 }
 
+void Plot::mouseMove(QMouseEvent*event)
+{
+    if(TrackOption->isChecked())
+    {
+        double x = ui->Graph->xAxis->pixelToCoord(event->pos().x());
+        double y = ui->Graph->yAxis->pixelToCoord(event->pos().y());
+        statusBar->showMessage("X = " + QString::number(x) + ", Y = " + QString::number(y));
+    }
+}
+
 void Plot::mousePressed(QMouseEvent* event)
 {
     if (event->button() == Qt::RightButton)
@@ -178,6 +197,7 @@ void Plot::mousePressed(QMouseEvent* event)
        popupMenu->addAction(LoadOption);
        popupMenu->addAction(XaxisZoomOption);
        popupMenu->addAction(YaxisZoomOption);
+       popupMenu->addAction(FilterOption);
        popupMenu->addAction(TrackOption);
        popupMenu->addAction(ClipboardOption);
        popupMenu->addAction(CommentOption);
@@ -251,15 +271,61 @@ void Plot::slotCloseComments(void)
     ui->pbCloseComments->setVisible(false);
 }
 
+//Savitzky-Golay filter
+void Plot::SavitzkyGolayFilter(int order, QList<float> Y, QList<float> *Yf)
+{
+   float   val;
+   int     k;
+   SGcoeff sg;
+
+   (*Yf).clear();
+   if(order<0)
+   {
+       for(int i=0;i<Y.count();i++) (*Yf).append(Y[i]);
+       return;
+   }
+   sg = SG[order];
+   for(int i=0;i<Y.count();i++)
+   {
+       val = 0;
+       for(int j=-(sg.np-1)/2;j<=(sg.np-1)/2;j++)
+       {
+           k = abs(i+j);
+           if(k >= Y.count()) k = (2*Y.count()-1) -k;
+           val += Y[k] * sg.an[j+(sg.np-1)/2];
+       }
+       (*Yf).append(val/sg.h);
+   }
+}
+
 void Plot::PaintGraphs(PlotGraph *pg)
 {
     for(int i=0;i<ui->Graph->graphCount();i++) ui->Graph->graph(i)->data()->clear();
+    // Filter the data
+    QList<float> I,A,B;
+    if(ui->Graph->graphCount()>=1)
+    {
+        I.clear();
+        for(int i=0;i<pg->Vec.count();i++) I.append(*pg->Vec[i]->Y[0]/pg->NumScans);
+        SavitzkyGolayFilter(Filter,I,&A);
+    }
+    if(ui->Graph->graphCount()>1)
+    {
+        I.clear();
+        for(int i=0;i<pg->Vec.count();i++) I.append(*pg->Vec[i]->Y[1]/pg->NumScans);
+        SavitzkyGolayFilter(Filter,I,&B);
+    }
     // Add the data points from last plotGraphs
     for(int i=0;i<pg->Vec.count();i++)
     {
-        for(int j=0;j<ui->Graph->graphCount();j++)
-            ui->Graph->graph(j)->addData((pg->Vec[i]->X - pg->Vec[0]->X)*m+b, *pg->Vec[i]->Y[j]/pg->NumScans);
+        if(ui->Graph->graphCount()>=1) ui->Graph->graph(0)->addData((pg->Vec[i]->X - pg->Vec[0]->X)*m+b, A[i]);
+        if(ui->Graph->graphCount()>1) ui->Graph->graph(1)->addData((pg->Vec[i]->X - pg->Vec[0]->X)*m+b, B[i]);
     }
+//    for(int i=0;i<pg->Vec.count();i++)
+//    {
+//        for(int j=0;j<ui->Graph->graphCount();j++)
+//            ui->Graph->graph(j)->addData((pg->Vec[i]->X - pg->Vec[0]->X)*m+b, *pg->Vec[i]->Y[j]/pg->NumScans);
+//    }
 }
 
 // This function accepts plot command strings. The following commands are
@@ -336,8 +402,8 @@ void Plot::PlotCommand(QString cmd, bool PlotOnly)
     {
         ui->Graph->xAxis->setRange(reslist[3].toDouble(), reslist[4].toDouble());
         ui->Graph->replot();
-        m=(reslist[3].toFloat()-reslist[4].toFloat())/(reslist[1].toFloat()-reslist[2].toFloat());
-        b=reslist[3].toFloat() - reslist[1].toFloat()*m;
+        m = (reslist[3].toFloat() - reslist[4].toFloat())/(reslist[1].toFloat()-reslist[2].toFloat());
+        b = reslist[3].toFloat()  - reslist[1].toFloat()*m;
     }
     else if(cmd.toUpper().startsWith("YRANGE"))
     {
@@ -377,11 +443,11 @@ void Plot::PlotCommand(QString cmd, bool PlotOnly)
         if(reslist.count()==4) ui->Graph->graph(1)->addData(key, reslist[3].toDouble());
         ui->Graph->xAxis->setRangeUpper(key);
         ui->Graph->replot();
-        ui->Graph->raise();
+        this->raise();
     }
     else if((reslist[0].toUpper() == "ADDPOINT")&&(reslist.count()>=4))
     {
-        if(reslist[1].toInt()-1 < plotGraphs.last()->Vec.count())
+        if((reslist[1].toInt()-1 < plotGraphs.last()->Vec.count()) && (reslist[1].toInt() > 0))
         {
            if(reslist[1].toInt()-1 == 0) plotGraphs.last()->NumScans++;
            plotGraphs.last()->Vec[reslist[1].toInt()-1]->X = reslist[2].toFloat();
@@ -415,6 +481,44 @@ void Plot::slotYaxisZoomOption(void)
     ZoomSelect();
 }
 
+void Plot::slotFilterOption(void)
+{
+    QMessageBox msgBox;
+    bool ok;
+
+    QString res = QInputDialog::getText(this, "Savitzky-Golay filter", "Enter Savitzky-Golay filter polynomial length, 5,7,9, or 11. \nEnter 0 for no filter.", QLineEdit::Normal,QString::null, &ok);
+    if(ok && !res.isEmpty())
+    {
+        switch(res.toInt())
+        {
+           case 5:
+            Filter = 0;
+            break;
+           case 7:
+            Filter = 1;
+            break;
+           case 9:
+            Filter = 2;
+            break;
+           case 11:
+            Filter = 3;
+            break;
+           case 0:
+            Filter = -1;
+            break;
+           default:
+            msgBox.setText("Invalid entry, filter will be turned off.");
+            msgBox.setInformativeText("");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.exec();
+            Filter = -1;
+            break;
+        }
+        PaintGraphs(plotGraphs[CurrentIndex]);
+        ui->Graph->replot();
+    }
+}
+
 void Plot::ZoomSelect(void)
 {
     if(XaxisZoomOption->isChecked() && YaxisZoomOption->isChecked())
@@ -440,6 +544,8 @@ void Plot::ZoomSelect(void)
 
 void Plot::slotHeatMap(void)
 {
+   if(plotGraphs.count() <= 0) return;
+   if(plotGraphs[0]->Vec.count() <= 0) return;
    if(HeatOption->isChecked())
    {
        ui->HeatMap1->setVisible(true);
@@ -461,13 +567,24 @@ void Plot::slotHeatMap(void)
        colorMap1->data()->setSize(nx, ny); // we want the color map to have nx * ny data points
        colorMap1->data()->setRange(QCPRange(0, plotGraphs[0]->Vec.count()), QCPRange(0, plotGraphs.count())); // and span the coordinate range -4..4 in both key (x) and value (y) dimensions
        // now we assign some data, by accessing the QCPColorMapData instance of the color map:
-       for (int xIndex=0; xIndex<nx; ++xIndex)
+       QList<float> I,A;
+       for (int yIndex=0; yIndex<ny; ++yIndex)
        {
-         for (int yIndex=0; yIndex<ny; ++yIndex)
-         {
-           colorMap1->data()->setCell(xIndex, yIndex, *plotGraphs[yIndex]->Vec[xIndex]->Y[0]);
-         }
+           I.clear();
+           for (int xIndex=0; xIndex<nx; ++xIndex) I.append(*plotGraphs[yIndex]->Vec[xIndex]->Y[0]);
+           SavitzkyGolayFilter(Filter,I,&A);
+           for (int xIndex=0; xIndex<nx; ++xIndex)
+           {
+               colorMap1->data()->setCell(xIndex, yIndex, A[xIndex]);
+           }
        }
+//       for (int xIndex=0; xIndex<nx; ++xIndex)
+//       {
+//         for (int yIndex=0; yIndex<ny; ++yIndex)
+//         {
+//           colorMap1->data()->setCell(xIndex, yIndex, *plotGraphs[yIndex]->Vec[xIndex]->Y[0]);
+//         }
+//       }
        // add a color scale:
        ui->HeatMap1->plotLayout()->addElement(0, 1, colorScale1); // add it to the right of the main axis rect
        colorScale1->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
@@ -496,12 +613,14 @@ void Plot::slotHeatMap(void)
        ui->HeatMap1->xAxis->setTicker(textTickerX);
        // Label the y axis ticks
        QSharedPointer<QCPAxisTickerText> textTickerY(new QCPAxisTickerText);
-       textTickerY->addTick(0,Scan.split(",")[1]);
-       textTickerY->addTick(ny/3,QString::number(Scan.split(",")[1].toFloat() + (Scan.split(",")[2].toFloat()-Scan.split(",")[1].toFloat())/3.0));
-       textTickerY->addTick(ny*2.0/3.0,QString::number(Scan.split(",")[1].toFloat() + 2.0*(Scan.split(",")[2].toFloat()-Scan.split(",")[1].toFloat())/3.0));
-       textTickerY->addTick(ny,Scan.split(",")[2]);
-       ui->HeatMap1->yAxis->setTicker(textTickerY);
-
+       if(!Scan.isEmpty())
+       {
+          textTickerY->addTick(0,Scan.split(",")[1]);
+          textTickerY->addTick(ny/3,QString::number(Scan.split(",")[1].toFloat() + (Scan.split(",")[2].toFloat()-Scan.split(",")[1].toFloat())/3.0));
+          textTickerY->addTick(ny*2.0/3.0,QString::number(Scan.split(",")[1].toFloat() + 2.0*(Scan.split(",")[2].toFloat()-Scan.split(",")[1].toFloat())/3.0));
+          textTickerY->addTick(ny,Scan.split(",")[2]);
+          ui->HeatMap1->yAxis->setTicker(textTickerY);
+       }
        // rescale the key (x) and value (y) axes so the whole color map is visible:
        ui->HeatMap1->rescaleAxes();
        ui->HeatMap1->replot();
@@ -525,13 +644,23 @@ void Plot::slotHeatMap(void)
        colorMap2->data()->setSize(nx, ny); // we want the color map to have nx * ny data points
        colorMap2->data()->setRange(QCPRange(0, plotGraphs[0]->Vec.count()), QCPRange(0, plotGraphs.count())); // and span the coordinate range -4..4 in both key (x) and value (y) dimensions
        // now we assign some data, by accessing the QCPColorMapData instance of the color map:
-       for (int xIndex=0; xIndex<nx; ++xIndex)
+       for (int yIndex=0; yIndex<ny; ++yIndex)
        {
-         for (int yIndex=0; yIndex<ny; ++yIndex)
-         {
-           colorMap2->data()->setCell(xIndex, yIndex, *plotGraphs[yIndex]->Vec[xIndex]->Y[1]);
-         }
+           I.clear();
+           for (int xIndex=0; xIndex<nx; ++xIndex) I.append(*plotGraphs[yIndex]->Vec[xIndex]->Y[1]);
+           SavitzkyGolayFilter(Filter,I,&A);
+           for (int xIndex=0; xIndex<nx; ++xIndex)
+           {
+               colorMap2->data()->setCell(xIndex, yIndex, A[xIndex]);
+           }
        }
+//       for (int xIndex=0; xIndex<nx; ++xIndex)
+//       {
+//         for (int yIndex=0; yIndex<ny; ++yIndex)
+//         {
+//           colorMap2->data()->setCell(xIndex, yIndex, *plotGraphs[yIndex]->Vec[xIndex]->Y[1]);
+//         }
+//       }
        // add a color scale:
        ui->HeatMap2->plotLayout()->addElement(0, 1, colorScale2); // add it to the right of the main axis rect
        colorScale2->setType(QCPAxis::atRight); // scale shall be vertical bar with tick/axis labels right (actually atRight is already the default)
@@ -560,12 +689,14 @@ void Plot::slotHeatMap(void)
        ui->HeatMap2->xAxis->setTicker(textTickerX2);
        // Label the y axis ticks
        QSharedPointer<QCPAxisTickerText> textTickerY2(new QCPAxisTickerText);
-       textTickerY2->addTick(0,Scan.split(",")[1]);
-       textTickerY2->addTick(ny/3,QString::number(Scan.split(",")[1].toFloat() + (Scan.split(",")[2].toFloat()-Scan.split(",")[1].toFloat())/3.0));
-       textTickerY2->addTick(ny*2.0/3.0,QString::number(Scan.split(",")[1].toFloat() + 2.0*(Scan.split(",")[2].toFloat()-Scan.split(",")[1].toFloat())/3.0));
-       textTickerY2->addTick(ny,Scan.split(",")[2]);
-       ui->HeatMap2->yAxis->setTicker(textTickerY2);
-
+       if(!Scan.isEmpty())
+       {
+          textTickerY2->addTick(0,Scan.split(",")[1]);
+          textTickerY2->addTick(ny/3,QString::number(Scan.split(",")[1].toFloat() + (Scan.split(",")[2].toFloat()-Scan.split(",")[1].toFloat())/3.0));
+          textTickerY2->addTick(ny*2.0/3.0,QString::number(Scan.split(",")[1].toFloat() + 2.0*(Scan.split(",")[2].toFloat()-Scan.split(",")[1].toFloat())/3.0));
+          textTickerY2->addTick(ny,Scan.split(",")[2]);
+          ui->HeatMap2->yAxis->setTicker(textTickerY2);
+       }
        // rescale the key (x) and value (y) axes so the whole color map is visible:
        ui->HeatMap2->rescaleAxes();
        ui->HeatMap2->replot();

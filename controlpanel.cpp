@@ -112,11 +112,11 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     LoadedConfig = false;
     mc        = NULL;
     IFT       = NULL;
-    TC        = NULL;
     DCBgroups = NULL;
     statusBar = NULL;
     ARBcompressorButton = NULL;
     comp      = NULL;
+    TC.clear();
     TextLabels.clear();
     RFchans.clear();
     RFCchans.clear();
@@ -324,18 +324,26 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
             if(resList[0].toUpper() == "GROUPBOXEND") Container = ui->lblBackground;
             if((resList[0].toUpper() == "TIMING") && (resList.length()==5))
             {
-                TC = new TimingControl(Container,resList[1],resList[2],resList[3].toInt(),resList[4].toInt());
-                TC->comms = FindCommPort(resList[2],Systems);
-                TC->statusBar = statusBar;
-                TC->properties = properties;
-                TC->Show();
-                if(TC->TG != NULL)
-                {
-                   foreach(DCBchannel *dcb, DCBchans) if(dcb->MIPSnm == TC->MIPSnm) TC->TG->AddSignal(dcb->Title, QString::number(dcb->Channel));
-                   foreach(DIOchannel *dio, DIOchannels) if(dio->MIPSnm == TC->MIPSnm) TC->TG->AddSignal(dio->Title, dio->Channel);
-                }
-                connect(TC,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
+//                TC = new TimingControl(Container,resList[1],resList[2],resList[3].toInt(),resList[4].toInt());
+                TC.append(new TimingControl(Container,resList[1],resList[2],resList[3].toInt(),resList[4].toInt()));
+                TC.last()->comms = FindCommPort(resList[2],Systems);
+                TC.last()->statusBar = statusBar;
+                TC.last()->properties = properties;
+                TC.last()->Show();
+//                if(TC.last()->TG != NULL)
+//                {
+//                   foreach(DCBchannel *dcb, DCBchans) if(dcb->MIPSnm == TC.last()->MIPSnm) TC.last()->TG->AddSignal(dcb->Title, QString::number(dcb->Channel));
+//                   foreach(DIOchannel *dio, DIOchannels) if(dio->MIPSnm == TC.last()->MIPSnm) TC.last()->TG->AddSignal(dio->Title, dio->Channel);
+//                }
+                connect(TC.last(),SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
             }
+            if((resList[0].toUpper() == "EVENTCONTROL") && (resList.length()==5))
+            {
+                TC.last()->TG->EC.append(new EventControl(Container,resList[1],resList[2],resList[3].toInt(),resList[4].toInt()));
+                TC.last()->TG->EC.last()->Show();
+                connect(TC.last()->TG->EC.last(),SIGNAL(EventChanged(QString,QString)),TC.last(),SLOT(slotEventChanged(QString,QString)));
+            }
+            if((resList[0].toUpper() == "FILENAME") && (resList.length()==2)) if(TC.count() > 0) TC.last()->fileName = resList[1];
             if((resList[0].toUpper() == "IFT") && (resList.length()==5))
             {
                 IFT = new IFTtiming(Container,resList[1],resList[2],resList[3].toInt(),resList[4].toInt());
@@ -406,11 +414,11 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
                     if(IFT->AD->Acquire .startsWith("~")) IFT->AD->Acquire  = QDir::homePath() + "/" + IFT->AD->Acquire .mid(2);
                     #endif
                 }
-                if(TC!=NULL)
+                if(TC.count() > 0)
                 {
-                    TC->AD->Acquire = line.mid(line.indexOf(",")+1);
+                    TC.last()->AD->Acquire = line.mid(line.indexOf(",")+1);
                     #ifdef Q_OS_MAC
-                    if(TC->AD->Acquire .startsWith("~")) TC->AD->Acquire  = QDir::homePath() + "/" + TC->AD->Acquire .mid(2);
+                    if(TC.last()->AD->Acquire .startsWith("~")) TC.last()->AD->Acquire  = QDir::homePath() + "/" + TC.last()->AD->Acquire .mid(2);
                     #endif
                 }
             }
@@ -457,6 +465,11 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
         } while(!line.isNull());
     }
     file.close();
+    foreach(TimingControl *tc, TC)
+    {
+        foreach(DCBchannel *dcb, DCBchans) if(dcb->MIPSnm == tc->MIPSnm) tc->TG->AddSignal(dcb->Title, QString::number(dcb->Channel));
+        foreach(DIOchannel *dio, DIOchannels) if(dio->MIPSnm == tc->MIPSnm) tc->TG->AddSignal(dio->Title, dio->Channel);
+    }
     LoadedConfig = true;
     connect(ui->lblBackground, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(popupHelp(QPoint)));
     // Popup options menu actions
@@ -482,6 +495,10 @@ ControlPanel::~ControlPanel()
     if(properties != NULL) properties->Log("Control panel unloading");
     for(int i=0;i<devices.count();i++) delete devices[i];
     for(int i=0;i<Cpanels.count();i++) delete Cpanels[i]->cp;
+    for(int i=0;i<ScripButtons.count();i++) delete ScripButtons[i];
+    QApplication::processEvents();
+    for(int i=0;i<plots.count();i++) delete plots[i];
+    QApplication::processEvents();
     delete tcp;
     delete ui;
 }
@@ -703,7 +720,7 @@ void ControlPanel::Update(void)
    QApplication::processEvents();
    if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
    if(UpdateStop) return;
-   if(TC != NULL) if(TC->Downloading) return;
+   for(i=0;i<TC.count();i++) if(TC[i]->Downloading) return;
    if(StartMIPScomms)
    {
        mc = new MIPScomms(0,Systems);
@@ -734,6 +751,7 @@ void ControlPanel::Update(void)
        for(i=0;i<RFCchans.count();i++)   RFCchans[i]->Shutdown();
        for(i=0;i<Ccontrols.count();i++)  Ccontrols[i]->Shutdown();
        for(i=0;i<rfa.count();i++)        rfa[i]->Shutdown();
+       for(i=0;i<ARBchans.count();i++)   ARBchans[i]->Shutdown();
        if(statusBar != NULL) statusBar->showMessage("System shutdown, " + QDateTime().currentDateTime().toString());
        if(properties != NULL) properties->Log("System Shutdown");
        UpdateHoldOff = 1;
@@ -751,6 +769,7 @@ void ControlPanel::Update(void)
        for(i=0;i<RFCchans.count();i++)   {RFCchans[i]->Restore(); msDelay(250);}
        for(i=0;i<Ccontrols.count();i++)  Ccontrols[i]->Restore();
        for(i=0;i<rfa.count();i++)        rfa[i]->Restore();
+       for(i=0;i<ARBchans.count();i++)   ARBchans[i]->Restore();
        if(statusBar != NULL) statusBar->showMessage("System enabled, " + QDateTime().currentDateTime().toString());
        if(properties != NULL) properties->Log("System Restored");
        UpdateHoldOff = 1;
@@ -891,9 +910,17 @@ void ControlPanel::Update(void)
    }
    for(i=0;i<DCBoffsets.count();i++)  {DCBoffsets[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
    for(i=0;i<DCBenables.count();i++)  {DCBenables[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   if(TC != NULL)
+   if(TC.count() > 0)
    {
-       if(!TC->TG->isTableMode()) for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+       for(i=0;i<=TC.count();i++)
+       {
+           if(i==TC.count())
+           {
+              for(j=0;j<DIOchannels.count();j++) {DIOchannels[j]->Update(); if(ProcessEvents) QApplication::processEvents();}
+              break;
+           }
+           if(TC[i]->TG->isTableMode()) break;
+       }
    }
    else for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
    for(i=0;i<ESIchans.count();i++)         {ESIchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
@@ -902,6 +929,7 @@ void ControlPanel::Update(void)
    for(i=0;i<rfa.count();i++)              {rfa[i]->Update();      if(ProcessEvents) QApplication::processEvents();}
    for(i=0;i<devices.count();i++)          {devices[i]->Update();}
    for(i=0;i<Cpanels.count();i++)          Cpanels[i]->Update();
+   for(i=0;i<TC.count();i++)               for(j=0;j<TC[i]->TG->EC.count();j++) TC[i]->TG->EC[j]->Update();
    if(comp!=NULL)                          {comp->Update();        if(ProcessEvents) QApplication::processEvents();}
    RequestUpdate = false;
    LogDataFile();
@@ -1012,10 +1040,15 @@ QString ControlPanel::Save(QString Filename)
             stream << "IFT parameters\n";
             stream << IFT->Report() + "\n";
         }
-        if(TC != NULL)
+        if(TC.count() > 0)
         {
             stream << "Timing control parameters\n";
-            stream << TC->TG->Report() + "\n";
+            for(int i=0; i<TC.count(); i++)
+            {
+                stream << TC[i]->TG->Report() + "\n";
+                for(int j=0; j<TC[i]->TG->EC.count();j++) stream << TC[i]->TG->EC[j]->Report() + "\n";
+            }
+            stream << "TCparametersEnd\n";
         }
         file.close();
         UpdateHoldOff = 1;
@@ -1134,13 +1167,17 @@ QString ControlPanel::Load(QString Filename)
                 }
                 if(resList[0] == "Timing control parameters")
                 {
-                    TC->TG->Events.clear();
+                    for(int i=0;i<TC.count();i++) TC[i]->TG->Events.clear();
                     while(true)
                     {
                         line = stream.readLine();
                         if(line.isNull()) break;
                         if(line.contains("TCparametersEnd")) break;
-                        TC->TG->SetValues(line);
+                        for(int i=0;i<TC.count();i++)
+                        {
+                            TC[i]->TG->SetValues(line);
+                            for(int j=0;j<TC[i]->TG->EC.count();j++) TC[i]->TG->EC[j]->SetValues(line);
+                        }
                     }
                 }
                 if(resList[0] == "Compression parameters")
@@ -1329,14 +1366,14 @@ void ControlPanel::Acquire(QString filePath)
        return;
    }
    if(IFT != NULL) IFT->AcquireData(filePath);
-   if(TC != NULL) TC->AcquireData(filePath);
+   if(TC.count() > 0) TC.last()->AcquireData(filePath);
 }
 
 bool ControlPanel::isAcquiring(void)
 {
   QApplication::processEvents();
   if(IFT != NULL) return(IFT->AD->Acquiring);
-  if(TC != NULL) return(TC->AD->Acquiring);
+  if(TC.count() > 0) return(TC.last()->AD->Acquiring);
   return(false);
 }
 
@@ -1344,7 +1381,7 @@ void ControlPanel::DismissAcquire(void)
 {
   QApplication::processEvents();
   if(IFT != NULL)  IFT->AD->Dismiss();
-  if(TC != NULL)  TC->AD->Dismiss();
+  if(TC.count() > 0)  TC.last()->AD->Dismiss();
   QApplication::processEvents();
   QApplication::processEvents();
 }
@@ -1421,9 +1458,11 @@ void ControlPanel::tcpCommand(void)
     tcp->sendMessage(resp);
 }
 
+// This function is called by the TCPserver code to process commands and
+// also by the script engine.
 QString ControlPanel::Command(QString cmd)
 {
-   int     i;
+   int     i,j;
    QStringList resList;
    QString res;
 
@@ -1431,7 +1470,7 @@ QString ControlPanel::Command(QString cmd)
    // Process global commands first.
    // Load,Save,Shutdown,Restore
    if(cmd.toUpper() == "SHUTDOWN") { ShutdownFlag = true; return res; }
-   if(cmd.toUpper() == "RESTORE") { RestoreFlag = true; return res; }
+   if(cmd.toUpper() == "RESTORE")  { RestoreFlag  = true; return res; }
    if(cmd.toUpper().startsWith("LOAD"))
    {
        resList = cmd.split(",");
@@ -1443,6 +1482,42 @@ QString ControlPanel::Command(QString cmd)
        resList = cmd.split(",");
        if(resList.count()==2) Save(resList[1]);
        return res;
+   }
+   // Process commands that will allow communications with the MIPS hardware directly
+   if(cmd.trimmed().toUpper().startsWith("SENDMESSAGE"))
+   {
+       resList = cmd.split(",");
+       if(resList.count() > 2)
+       {
+           QString arg;
+           arg.clear();
+           for(int i=2;i<resList.count();i++)
+           {
+               if(i>2) arg += ",";
+               arg += resList[i];
+           }
+           //qDebug() << "SendMessage: " << resList[1] << "," << arg;
+           return(SendMess(resList[1],arg + "\n"));
+       }
+       else return("?\n");
+   }
+   if(cmd.trimmed().toUpper().startsWith("SENDCOMMAND"))
+   {
+       resList = cmd.split(",");
+       if(resList.count() > 2)
+       {
+           QString arg;
+           arg.clear();
+           for(int i=2;i<resList.count();i++)
+           {
+               if(i>2) arg += ",";
+               arg += resList[i];
+           }
+           //qDebug() << "SendCommand: " << resList[1] << "," << arg;
+           if(SendCommand(resList[1],arg + "\n")) return("\n");
+           else return("?\n");
+       }
+       else return("?\n");
    }
    // Send the command string to all the controls for someone to process!
    for(i=0;i<DACchans.count();i++)    if((res = DACchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
@@ -1457,7 +1532,12 @@ QString ControlPanel::Command(QString cmd)
    for(i=0;i<ARBchans.count();i++)    if((res = ARBchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
    for(i=0;i<Ccontrols.count();i++)   if((res = Ccontrols[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
    for(i=0;i<devices.count();i++)     if((res = devices[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   if(TC != NULL) if((res = TC->TG->ProcessCommand(cmd)) != "?") return(res + "\n");
+   for(i=0;i<ScripButtons.count();i++) if((res = ScripButtons[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+   for(i=0;i<TC.count();i++)
+   {
+       if((res = TC[i]->TG->ProcessCommand(cmd)) != "?") return(res + "\n");
+       for(j=0;j<TC[i]->TG->EC.count();j++) if((res = TC[i]->TG->EC[j]->ProcessCommand(cmd)) != "?") return(res + "\n");
+   }
    if(comp != NULL) if((res = comp->ProcessCommand(cmd)) != "?") return(res + "\n");
    return("?\n");
 }
@@ -1493,6 +1573,7 @@ int ControlPanel::ReadCSVfile(QString fileName, QString delimiter)
         do
         {
             line = stream.readLine();
+            //qDebug() << line;
             QStringList *qsl = new QStringList();
             *qsl = line.split(delimiter);
             CSVdata.append(qsl);
@@ -1506,8 +1587,8 @@ int ControlPanel::ReadCSVfile(QString fileName, QString delimiter)
 // Returns the selected CSV line and entry in the selected line
 QString ControlPanel::ReadCSVentry(int line, int entry)
 {
-    if(CSVdata.count() < line) return("");
-    if(CSVdata[line]->count() < entry) return("");
+    if(CSVdata.count() <= line) return("");
+    if(CSVdata[line]->count() <= entry) return("");
     return (*CSVdata[line])[entry];
 }
 
@@ -1515,6 +1596,8 @@ void ControlPanel::CreatePlot(QString Title, QString Yaxis, QString Xaxis, int N
 {
     plots.append(new Plot(0, Title, Yaxis, Xaxis, NumPlots));
     plots.last()->show();
+    plots.last()->activateWindow();
+    plots.last()->raise();
 }
 
 void ControlPanel::PlotCommand(QString cmd)

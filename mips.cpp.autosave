@@ -71,223 +71,6 @@
 //          panels that communicate to multiple MIPS systems.
 //      2.) Updated the serial port scanning
 //      3.) Changed the disconnection procedure
-// 1.14, July 24, 2017
-//      1.) Added a number of host interface commands to allow sending and receiving files
-//          to SD card as well as sending and receiving EEPROM module configureation data.
-// 1.15, August 22, 2017
-//      1.) Added the ramp up and down pulse generation to the sequence generator
-//      2.) Fixed a few minor bugs
-//      3.) Fixed bug in loop timepoint calcualtation for sequence generator
-// 1.16, November 21, 2017
-//      1.) Updated the grid fragmentor and added the plotting capability
-//      2.) Added the softlanding control panel
-// 1.17, November 25, 2017
-//      1.) Added the pulse sequence generator to the gid control panel
-// 1.18, December 12, 2017
-//      1.) Added ADC tab and data collection capability
-//      2.) Updated grid pse
-// 1.19, December 27, 2017
-//      1.) Updated the pulse sequence generator in the Grid control panel as follows:
-//             - Enabled Ts1 set to zero to stop the pulse
-//             - When pulses are stopped the outputs are now driven high
-// 1.20, January 1, 2018
-//      1.) Inverted the shutter signals in the Grid pulse sequence generator
-//      2.) Added the Ts1=Ts2 and Ts2=Ts1 check boxes
-// 1.21, February 18, 2018
-//      1.) Added scripting capability to Purdue softlanding control panel
-// 1.22, March 11, 2018
-//      1.) Added the support for programming the Flash on the ARB
-//      2.) Added up and down arrow control of values for the DB bias
-//          and Twave values. Also added limits for the Twave values
-//          specifically the pulse voltage
-// 1.23, March 12, 2018
-//      1.) Added shift+alt arrow to decrease increment by 10x.
-//      2.) Fixed limit bug in Twave freq in arrow keys
-// 1.24, May 12, 2018
-//      1.) Added the group capability for DC bias voltages
-// 1.25, August 2, 2018
-//      1.) Added the user definable control panels
-// 1.26, Sept 9,2018
-//      1.) Added documentation and updated help
-//      2.) Corrected PSG label errors and make the PSE box modal
-//      3.) Added Java Scripting
-// 1.27, Oct 5,2018
-//      1.) Fixed the start module ID issue
-//      2.) Fixed the find all MIPS system when using ethernet ports
-// 1.28, Oct 8,2018
-//      1.) Fixed a bug in the DCbias menu that caused a crash when CH 9
-//          or above were changed.
-//      2.) Added message traffic to keep ethernet connections alive
-// 1.29, Nov 1,2018
-//      1.) Added the RFamp to the Custom Control Panel
-// 1.30, Nov 17,2018
-//      1.) Added the TCP/IP socket communications with control panels
-//      2.) Added DAC channels to control panel
-//      3.) Added ADC channels to control panel
-//      4.) Fix RFamp shutdown to include DC volatges
-//      5.) fixed control panel bug that caused crash on save methode
-// 1.31, Nov 20, 2018
-//      1.) Added new timing generation
-//      2.) Fixed bugs in control panel
-//      3.) refactored controlpanel code, a little bit, needs more work
-// 1.32, Nov 27, 2018
-//      1.) Fixed bug in RFamp that was not turning off DC supplies
-//      2.) Added DC power supply enable to RFamp
-//      3.) Save the DCoffsets first when saving methode file
-// 1.33, Dec 2, 2018
-//      1.) Added new timing generator to control panel
-//      2.) Added TCP/IP updates to control panel
-//      3.) Added external trigger options to FAIMS
-// 1.34, Dec 13, 2018
-//      1.) Fixed a number of bugs in the timing generator control
-// 1.35, Dec 15, 2018
-//      1.) Added Save, Load, and Clear all events buttons to timing generator
-//      2.) Fixed bugs in timing generator
-// 1.36, Dec 26, 2018
-//      1.) Improved the control panel performance by using the read all DCbias
-//          and RF driver commands.
-//      2.) Addressed stability issues that were causing some system crashes.
-//      3.) Added the properties page with ability to set folders and startup
-//          behaivor.
-// 1.37, Jan 6, 2019
-//      1.) Added version to method file saved from control panel
-//      2.) Added control panel file name to method file saved from control panel
-//      3.) Changed signals from acquire program to be queued
-//      4.) Disable trigger button until event is complete
-//      5.) Added comm port re-open on timeout
-// 1.38, Jan 7, 2019
-//      1.) Added log file to properties and started adding log statements.
-// 1.39, Jan 11, 2019
-//      1.) Added logging of all MIPS status bar messages and control panel
-//          status bar mesages
-//      2.) Added delays in restore function in control panel
-// 1.40, Jan 12, 2019
-//      1.) Fixed a few minor bugs
-//      2.) Updated logging, added MIPS FW version to control panel logs
-//      3.) Added data log option
-// 1.41, Jan 14, 2019
-//      1.) Added serial critical error to logging
-// 1.42, Jan 16, 2019
-//      1.) Update the control panel restore function to set all voltages to 0
-//          then turn on supplies and finally reset the voltages.
-//      2.) Updated the script acquire function to abort is acquire is in progress.
-//      3.) Added code to validate the data received from MIPS before populating the
-//          text boxes.
-// 1.43, Jan 19, 2019
-//      1.) Fixed error in Compresssor dialog that causes the mode and switch radio
-//          button to fail
-// 1.44, Jan 22, 2019
-//      1.) Removed all the lock and unlock commands, they caused all kinds of issues
-// 1.45, Jan 24, 2019
-//      1.) Removed the comms return if busy code
-// 1.46, Jan 25, 2019
-//      1.) Redesiged comms code so it blocks untill transaction is complete
-//      2.) Added file path ti acquire dialog
-// 1.47, Feb 1, 2019
-//      1.) Added process events to the control panel update routine
-//      2.) Changed process events interval to 10 mS in script processor
-//      3.) Changed to non queued event processing in console window
-// 1.48, Feb 2, 2019
-//      1.) Remove lock code from control panel
-//      2.) Removed queue option from connectors in timing classes
-//      3.) Removed the use of the ringbuffer wait for line function
-// 1.49, Feb 5, 2019
-//      1.) Added wait for start to process start in cmdlineapp
-//      2.) Found memory leak in the acquire class
-//      3.) Fixed bug in ARB dir in the control panel code
-// 1.50, Feb 14, 2019
-//      1.) Fixed bug in the control panel arb waveform editor.
-//      2.) Removed the doevents from the control panel update function, if it was
-//          interrupted by the scripting engine then the update will freeze.
-// 1.51, Feb 21, 2019
-//      1.) Added update rates adjustment to properties page.
-//      2.) Added MIPS box names to the methode file.
-//      3.) Added wait for update function for scripting.
-//      4.) Added MIPS name to comm errors
-// 1.52, May 19, 2019
-//      1.) Added uptime to the methode file save in control panel.
-//      2.) Set RF drive to zero just before auto tune and then delay for 1 sec,
-//          likely fixes a bug when pressing auto tune when at power.
-//      3.) Fixed ARB edit, it depends of PPP for download. This is a temp fix
-//          need to update the editor, fixed 03/11/19 but not tested
-//      4.) Added the ability to popup a control panel from with in a control panel,
-//          a child control panel. ControlPanel,Name,config file,X,Y
-//      5.) Test for valid path when experiment starts and popup an error if invalid
-//          path is detected.
-//      6.) Added closed loop option to RF driver in control panel
-//      7.) Added support for AMPS, the properties page allow you to enable searching
-//          for AMPS system and allows you to select baud rate. AMPS are 8 bit, even
-//          parity, 2 stop bits and Xon/Xoff flow control
-//      8.) Added group box command to place controls in a group. This
-//          will also required an end statement. Added group name string to
-//          all controls supporting this function. This allows same name controls
-//          in different groups.
-//      9.) Added Script button to control panel. The button automatically calls a script
-//          as defined in control panel config file.
-//      10.)Added Plotting capability to control panel.
-//      11.)Updated the timing generator to allow setting start and width times using other
-//          event values, supports linking
-// 1.53, June 18, 2019
-//      1.) Updated the timing generator to support .Start and .Width selection fields
-//      2.) Added rename to timing generator event editor
-// 1.54, July 5, 2019
-//      1.) Added Hadamard multiplexing capability to the pulse sequence generator, support
-//          4, 5, and 6 bit
-//      2.) Added plot capabilities to support het maps, for the FAIMSFB work
-// 1.55, July 13, 2019
-//      1.) Added the serial device capability to control panels
-// 1.56, July 18, 2019
-//      1.) Added Mux bits 7,8, and 9
-//      2.) Added delay in sending chars to MIPS to support long tables.
-// 1.57, July 23, 2019
-//      1.) Added Socket command for the timing control, tigger, edit, and abort
-//      2.) Fixed a bug in the delay added in very 1.56. I was delaying 10mS on every command.
-// 1.58, August 6, 2019
-//      1.) Fixed bug the multiplexing file generation
-// 1.59, August 27, 2019
-//      1.) Fixed a bugs in the control panel CSV functions
-//      2.) Added command processing for script buttons
-// 1.60, Sept 2, 2019
-//      1.) Added -A option for Accumulations passing to acquire application
-//      2.) Save and restore the timing generator Mux state
-//
-//      To dos for next release:
-//          - Resolve table not downloaded issue
-//          - Control panel to dos:
-//              - Allow data file name definition, have U1084A.data be the default
-// 1.61, Sept 25, 2019
-//      1.) Added shutdown and restore to ARB channels in control panel
-// 1.62, Oct 17, 2019
-//      1.) Added time in mS mode to timing generator.
-//      2.) Added external trigger mode support to timing generator.
-//      3.) Fixed bug the DIO process command, found by Sunrise.
-// 1.63, Oct 18, 2019
-//      1.) Fixed but in the timing generation upgrades to time based operation.
-// 1.64, Oct 24, 2019
-//      1.) Fixed bug that caused acquire app finish to return to loc mode, in external
-//          trigger mode we need to remain in table mode.
-//      2.) Fixed bug that was intruduced in version 1.60, was not sending total tofs to acquire app
-// 1.65, Oct 25, 2019
-//      1.) Fixed the bug with enternal trigger in the control panel timing generator
-//      2.) Added support for multiple timing generators in a control panel. The last timing generator
-//          in the list is the only one that can use the acquire app.
-//      3.) Updated the TCPserver new connection methode as per Harry at Sunrise.
-//      4.) Updated the plot scripting functions.
-//      5.) Fixed a bugs in the ploting function that would cause app to crash with invalid entries
-// 1.66, Nov 1, 2019
-//      1.) Added low level MIPS comms to the TCP/IP server
-//      2.) Added EventControl to the control panel to allow editing table parameters on the fly
-//      3.) Send external clock to MIPS in timing generator
-//      4.) Added Savitzky-Golay filter to plot function
-// 1.67, Nov 7, 2019
-//      1.) Fixed bug in TCP server interface to timing control
-//      2.) Fixed the event control to update the values in the timing control
-// 1.68, Nov 10, 2019
-//      1.) Added isTblMode to timing generator
-//      2.) Changed the event control options to .Value and .ValueOff
-//
-// Planded updates:
-//      - Add ploting capability. Also support this through the Scripting system.
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -295,27 +78,20 @@
 #include "settingsdialog.h"
 #include "pse.h"
 #include "ringbuffer.h"
-#include "comms.h"
-#include "twave.h"
-#include "dcbias.h"
-#include "dio.h"
-#include "rfdriver.h"
-#include "psg.h"
-#include "program.h"
-#include "help.h"
-#include "arb.h"
-#include "faims.h"
-#include "filament.h"
+#include "Comms.h"
+#include "Twave.h"
+#include "DCbias.h"
+#include "DIO.h"
+#include "RFdriver.h"
+#include "PSG.h"
+#include "Program.h"
+#include "Help.h"
+#include "ARB.h"
+#include "FAIMS.h"
+#include "Filament.h"
 #include "singlefunnel.h"
 #include "softlanding.h"
-#include "softlanding2.h"
 #include "grid.h"
-#include "arbwaveformedit.h"
-#include "adc.h"
-#include "controlpanel.h"
-#include "scriptingconsole.h"
-#include "tcpserver.h"
-#include "properties.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
@@ -332,7 +108,7 @@
 #include <QtNetwork/QTcpSocket>
 #include <QInputDialog>
 
-QString Version = "MIPS, Version 1.68 Nov 10, 2019";
+//RingBuffer rb;
 
 MIPS::MIPS(QWidget *parent) :
     QMainWindow(parent),
@@ -341,13 +117,18 @@ MIPS::MIPS(QWidget *parent) :
     ui->setupUi(this);
     ui->tabMIPS->setElideMode(Qt::ElideNone);
     ui->tabMIPS->setUsesScrollButtons(true);
+//    ui->tabMIPS->setTabEnabled(5,false);
+//    QWidget* pWidget= ui->tabMIPS->widget(5);
+//    ui->tabMIPS->removeTab(5);
+//    ui->tabMIPS->addTab(pWidget,"back");
+
     // Make the dialog fixed size.
     this->setFixedSize(this->size());
 
+//  MIPS::setProperty("font", QFont("Times New Roman", 16));
+
     ui->comboSystems->setVisible(false);
     ui->lblSystems->setVisible(false);
-
-    MIPS::setWindowTitle(Version);
 
     #if defined(Q_OS_MAC)
     QFont font = ui->lblMIPSconnectionNotes->font();
@@ -355,19 +136,12 @@ MIPS::MIPS(QWidget *parent) :
     ui->lblMIPSconnectionNotes->setFont(font);
     #endif
 
-    properties = new Properties;
-    scriptconsole = NULL;
-    qApp->installEventFilter(this);
     sf = NULL;
     sf_deleteRequest = false;
     sl = NULL;
     sl_deleteRequest = false;
-    sl2 = NULL;
-    sl2_deleteRequest = false;
     grid = NULL;
     grid_deleteRequest = false;
-    cp = NULL;
-    cp_deleteRequest = false;
     appPath = QApplication::applicationDirPath();
     pollTimer = new QTimer;
     settings = new SettingsDialog;
@@ -384,7 +158,6 @@ MIPS::MIPS(QWidget *parent) :
     arb = new ARB(ui, comms);
     faims = new FAIMS(ui, comms);
     filament = new Filament(ui, comms);
-    adc = new ADC(ui, comms);
 
     RepeatMessage = "";
     ui->actionClear->setEnabled(true);
@@ -397,21 +170,12 @@ MIPS::MIPS(QWidget *parent) :
     ui->actionSet_bootloader_boot_flag->setEnabled(true);
     ui->actionSingle_Funnel->setEnabled(true);
     ui->actionSoft_landing->setEnabled(true);
-    ui->actionSoft_landing_Purdue->setEnabled(true);
     ui->actionGrid->setEnabled(true);
     ui->actionMessage_repeat->setEnabled(true);
     ui->actionGet_file_from_MIPS->setEnabled(true);
     ui->actionSend_file_to_MIPS->setEnabled(true);
-    ui->actionRead_EEPROM->setEnabled(true);
-    ui->actionWrite_EEPROM->setEnabled(true);
-    ui->actionRead_ARB_FLASH->setEnabled(true);
-    ui->actionWrite_ARB_FLASH->setEnabled(true);
-    ui->actionARB_upload->setEnabled(true);
-    ui->actionSelect->setEnabled(true);
-    ui->menuTerminal->setEnabled(false);
-    ui->actionScripting->setEnabled(true);
 
-    connect(ui->actionProperties,SIGNAL(triggered(bool)), this, SLOT(DisplayProperties()));
+  //   connect(app, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(setWidgets(QWidget*, QWidget*)));    connect(ui->actionClear, SIGNAL(triggered()), console, SLOT(clear()));
     connect(ui->actionOpen, SIGNAL(triggered()), this, SLOT(loadSettings()));
     connect(ui->actionSave, SIGNAL(triggered()), this, SLOT(saveSettings()));
     connect(ui->pbConfigure, SIGNAL(pressed()), settings, SLOT(show()));
@@ -426,27 +190,14 @@ MIPS::MIPS(QWidget *parent) :
     connect(ui->actionClear, SIGNAL(triggered()), this, SLOT(clearConsole()));
     connect(ui->actionSingle_Funnel, SIGNAL(triggered()), this, SLOT(Single_Funnel()));
     connect(ui->actionSoft_landing, SIGNAL(triggered()), this, SLOT(Soft_Landing()));
-    connect(ui->actionSoft_landing_Purdue, SIGNAL(triggered()), this, SLOT(Soft_Landing_Purdue()));
     connect(ui->actionGrid, SIGNAL(triggered()), this, SLOT(Grid_system()));
     connect(ui->actionMessage_repeat, SIGNAL(triggered()), this, SLOT(GetRepeatMessage()));
     connect(ui->actionGet_file_from_MIPS, SIGNAL(triggered()), this, SLOT(GetFileFromMIPS()));
     connect(ui->actionSend_file_to_MIPS, SIGNAL(triggered()), this, SLOT(PutFiletoMIPS()));
-    connect(ui->actionRead_EEPROM, SIGNAL(triggered()), this, SLOT(ReadEEPROM()));
-    connect(ui->actionWrite_EEPROM, SIGNAL(triggered()), this, SLOT(WriteEEPROM()));
-    connect(ui->actionRead_ARB_FLASH, SIGNAL(triggered()), this, SLOT(ReadARBFLASH()));
-    connect(ui->actionWrite_ARB_FLASH, SIGNAL(triggered()), this, SLOT(WriteARBFLASH()));
-    connect(ui->actionARB_upload, SIGNAL(triggered()), this, SLOT(ARBupload()));
-    connect(ui->actionSelect, SIGNAL(triggered()), this, SLOT(SelectCP()));
-    connect(ui->actionScripting, SIGNAL(triggered()), this, SLOT(slotScripting()));
-    connect(ui->statusBar,SIGNAL(messageChanged(QString)),this,SLOT(slotLogStatusBarMessage(QString)));
 
     ui->comboMIPSnetNames->installEventFilter(new DeleteHighlightedItemWhenShiftDelPressedEventFilter);
     // Sets the polling loop interval and starts the timer
-    if(properties != NULL) pollTimer->start(1000 * properties->UpdateSecs);
-    else pollTimer->start(1000);
-
-    for(int i=0;i<properties->MIPS_TCPIP.count();i++) ui->comboMIPSnetNames->addItem(properties->MIPS_TCPIP[i]);
-    if(properties != NULL) properties->Log("MIPS loaded: " + Version);
+    pollTimer->start(1000);
 }
 
 MIPS::~MIPS()
@@ -455,26 +206,16 @@ MIPS::~MIPS()
 //    if(sf != NULL) delete sf;
 //    delete settings;
 //    delete ui;
-    if(properties != NULL) properties->Log("MIPS closing: " + Version);
 }
 
 void MIPS::closeEvent(QCloseEvent *event)
 {
     if(sl != NULL) delete sl;
-    if(sl2 != NULL) delete sl2;
     if(sf != NULL) delete sf;
     if(grid != NULL) delete grid;
-    if(cp != NULL) delete cp;
     delete settings;
     delete help;
     delete ui;
-}
-
-bool MIPS::eventFilter(QObject *obj, QEvent *event)
-{
-    if(SelectedTab == "DCbias") return dcbias->myEventFilter(obj, event);
-    if(SelectedTab == "Twave") return twave->myEventFilter(obj, event);
-  return QObject::eventFilter(obj, event);
 }
 
 bool DeleteHighlightedItemWhenShiftDelPressedEventFilter::eventFilter(QObject *obj, QEvent *event)
@@ -564,11 +305,6 @@ void MIPS::GeneralHelp(void)
         help->SetTitle("Pulse Sequence Generation Help");
         help->LoadHelpText(":/PSGhelp.txt");
     }
-    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "ARB")
-    {
-        help->SetTitle("ARB Help");
-        help->LoadHelpText(":/ARBhelp.txt");
-    }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Twave")
     {
         help->SetTitle("Twave Help");
@@ -578,11 +314,6 @@ void MIPS::GeneralHelp(void)
     {
         help->SetTitle("Soft Landing Help");
         help->LoadHelpText(":/SoftLandingHelp.txt");
-    }
-    if(sl2 != NULL)
-    {
-        help->SetTitle("Soft Landing Help");
-        help->LoadHelpText(":/SoftLandingHelp2.txt");
     }
     if(sf != NULL)
     {
@@ -601,11 +332,6 @@ void MIPS::DisplayAboutMessage(void)
         tr("MIPS interface application, written by Gordon Anderson. This application allows communications with the MIPS system supporting monitoring and control as well as pulse sequence generation.") );
 }
 
-void MIPS::DisplayProperties(void)
-{
-    properties->exec();
-}
-
 void MIPS::loadSettings(void)
 {
     if(sl != NULL)
@@ -614,22 +340,10 @@ void MIPS::loadSettings(void)
         sl->Load(fileName);
         return;
     }
-    if(sl2 != NULL)
-    {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
-        sl2->Load(fileName);
-        return;
-    }
     if(sf != NULL)
     {
         QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
         sf->Load(fileName);
-        return;
-    }
-    if(grid != NULL)
-    {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("Load Settings from File"),"",tr("Settings (*.settings);;All files (*.*)"));
-        grid->Load(fileName);
         return;
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "System")
@@ -685,28 +399,10 @@ void MIPS::saveSettings(void)
         sl->Save(fileName);
         return;
     }
-    if(sl2 != NULL)
-    {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
-        sl2->Save(fileName);
-        return;
-    }
     if(sf != NULL)
     {
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
-        sf->Save(fileName);
-        return;
-    }
-    if(grid != NULL)
-    {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
-        grid->Save(fileName);
-        return;
-    }
-    if(cp != NULL)
-    {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to Settings File"),"",tr("Settings (*.settings);;All files (*.*)"));
-        cp->Save(fileName);
+        sl->Save(fileName);
         return;
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "System")
@@ -756,19 +452,10 @@ void MIPS::saveSettings(void)
 
 void MIPS::pollLoop(void)
 {
-    static  bool firstCall = true;
     QString res ="";
+    //char c;
 
-    if(firstCall)
-    {
-        if(properties->AutoConnect) MIPSsearch();
-        if(Systems.count() >= properties->MinMIPS)
-        {
-           if(properties->LoadControlPanel != "") SelectCP(properties->LoadControlPanel);
-        }
-    }
-    firstCall = false;
-    if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
+
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Pulse Sequence Generation")
     {
         /*
@@ -817,14 +504,6 @@ void MIPS::pollLoop(void)
     }
     if(sl != NULL) if(comms->isConnected()) sl->Update();
 
-    if(sl2_deleteRequest)
-    {
-      delete sl2;
-      sl2 = NULL;
-      sl2_deleteRequest = false;
-    }
-    if(sl2 != NULL) if(comms->isConnected()) sl2->Update();
-
     if(grid_deleteRequest)
     {
       delete grid;
@@ -833,15 +512,7 @@ void MIPS::pollLoop(void)
     }
     if(grid != NULL) if(comms->isConnected()) grid->Update();
 
-    if(cp_deleteRequest)
-    {
-      delete cp;
-      cp = NULL;
-      cp_deleteRequest = false;
-    }
-    //if(cp != NULL) if(comms->isConnected()) cp->Update();
-    if(cp != NULL) cp->Update();
- }
+}
 
 void MIPS::mousePressEvent(QMouseEvent * event)
 {
@@ -863,55 +534,40 @@ void MIPS::resizeEvent(QResizeEvent* event)
    QMainWindow::resizeEvent(event);
 }
 
-void delay()
-{
-    QTime dieTime= QTime::currentTime().addSecs(1);
-    while (QTime::currentTime() < dieTime)
-    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-}
-
 void MIPS::MIPSsetup(void)
 {
     QString res;
-    int numRF=0,numDCB=0;
 
     pgm->comms = comms;
+    qDebug() << comms->MIPSname;
     ui->lblMIPSconfig->setText("MIPS: ");
-    // Turn ECHO off
-    comms->SendString("\n");
-    comms->SendCommand("ECHO,FALSE\n");
-    res = comms->SendMess("GVER\n");
-    if(res=="") return;  // Exit if we timeout, no MIPS comms
+    res = comms->SendMessage("GVER\n");
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + res);
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\nModules present:");
 
-    res = comms->SendMess("GCHAN,RF\n");
-    if(res=="") return;
+    res = comms->SendMessage("GCHAN,RF\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 RF driver\n");
     if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 RF drivers\n");
-    numRF = res.toInt();
+    rfdriver->SetNumberOfChannels(res.toInt());
     if(res.contains("0")) RemoveTab("RFdriver");
     else AddTab("RFdriver");
 
-    res = comms->SendMess("GCHAN,DCB\n");
-    if(res=="") return;
-    if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text()  + "\n   1 DC bias (8 output channels)\n");
+    res = comms->SendMessage("GCHAN,DCB\n");
+    if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 DC bias (8 output channels)\n");
     if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 DC bias (16 output channels)\n");
     if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 DC bias (16 output channels)\n");
     if(res.contains("32")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   4 DC bias (16 output channels)\n");
-    numDCB = res.toInt();
+    dcbias->SetNumberOfChannels(res.toInt());
     if(res.contains("0")) RemoveTab("DCbias");
     else AddTab("DCbias");
 
-    res = comms->SendMess("GCHAN,TWAVE\n");
-    if(res=="") return;
+    res = comms->SendMessage("GCHAN,TWAVE\n");
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 TWAVE module\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 TWAVE modules\n");
     if(res.contains("0")) RemoveTab("Twave");
     else AddTab("Twave");
 
-    res = comms->SendMess("GCHAN,ARB\n");
-    if(res=="") return;
+    res = comms->SendMessage("GCHAN,ARB\n");
     if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() +  "\n   1 ARB module\n");
     if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ARB modules\n");
     if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 ARB modules\n");
@@ -920,28 +576,21 @@ void MIPS::MIPSsetup(void)
     else AddTab("ARB");
     arb->SetNumberOfChannels(res.toInt());
 
-    res = comms->SendMess("GCHAN,FAIMS\n");
-    if(res=="") return;
+    res = comms->SendMessage("GCHAN,FAIMS\n");
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   FAIMS module\n");
     if(res.contains("0")) RemoveTab("FAIMS");
     else AddTab("FAIMS");
 
-    res = comms->SendMess("GCHAN,ESI\n");
-    if(res=="") return;
+    res = comms->SendMessage("GCHAN,ESI\n");
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI module, rev 3\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI module\n");
     if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ESI modules\n");
 
-    res = comms->SendMess("GCHAN,FIL\n");
-    if(res=="") return;
+    res = comms->SendMessage("GCHAN,FIL\n");
     if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 Filament module\n");
     if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 Filament modules\n");
     if(res.contains("0")) RemoveTab("Filament");
     else AddTab("Filament");
-
-    rfdriver->SetNumberOfChannels(numRF);
-    dcbias->SetNumberOfChannels(numDCB);
-
 }
 
 // Here when the Connect push button is pressed. This function makes a connection with MIPS.
@@ -950,11 +599,9 @@ void MIPS::MIPSsetup(void)
 void MIPS::MIPSconnect(void)
 {
     comms->p = settings->settings();
-    comms->host = ui->comboMIPSnetNames->currentText();
+    comms->host = ui->comboSystems->currentText();
     if(comms->ConnectToMIPS())
     {
-       Systems.clear();
-       Systems << comms;
        console->setEnabled(true);
        console->setLocalEchoEnabled(settings->settings().localEchoEnabled);
        ui->lblMIPSconnectionNotes->setHidden(true);
@@ -978,6 +625,13 @@ void MIPS::MIPSsearch(void)
     msg->hide();
 }
 
+void delay()
+{
+    QTime dieTime= QTime::currentTime().addSecs(1);
+    while (QTime::currentTime() < dieTime)
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
 void MIPS::FindAllMIPSsystems(void)
 {
     Comms *cp;
@@ -992,8 +646,8 @@ void MIPS::FindAllMIPSsystems(void)
         {
             QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
             cp = new Comms(settings,"",ui->statusBar);
+            if(cp->isMIPS(settings->getPortName(j)))
             cp->host = ui->comboMIPSnetNames->itemText(j);
-            // if(cp->isMIPS(settings->getPortName(j)))    //Not sure why this was here?
             if(cp->ConnectToMIPS())
             {
                Systems << (cp);
@@ -1004,41 +658,19 @@ void MIPS::FindAllMIPSsystems(void)
     else
     {
         int i = settings->numberOfPorts();
-        settings->fillPortsInfo();
         for(int j=0;j<i;j++)
         {
-          ui->statusBar->showMessage("Trying: " + settings->getPortName(j));
           QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
           cp = new Comms(settings,"",ui->statusBar);
           if(cp->isMIPS(settings->getPortName(j)))
           {
             delay();
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
             cp->host = "";
-            cp->SendString("ECHO,FALSE\n");
             if(cp->ConnectToMIPS())
             {
                Systems << (cp);
-               cp = new Comms(settings,"",ui->statusBar);    // Why??
+               cp = new Comms(settings,"",ui->statusBar);
             }
-          }
-          else if(properties != NULL)
-          {
-              if(properties->SearchAMPS)
-              {
-                  if(cp->isAMPS(settings->getPortName(j),properties->AMPSbaud))
-                  {
-                    delay();
-                    QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-                    cp->host = "";
-                    //cp->SendString("RTM,ON\n");  // Port is closed here
-                    if(cp->ConnectToMIPS())
-                    {
-                       Systems << (cp);
-                       cp = new Comms(settings,"",ui->statusBar);  // Why??
-                    }
-                  }
-              }
           }
         }
     }
@@ -1046,6 +678,7 @@ void MIPS::FindAllMIPSsystems(void)
     for(int j=0;j<Systems.count();j++)
     {
         ui->comboSystems->addItem(Systems.at(j)->MIPSname);
+        qDebug() << Systems.at(j)->MIPSname;
     }
     if(ui->comboSystems->count() > 1)
     {
@@ -1071,6 +704,7 @@ void MIPS::FindMIPSandConnect(void)
   }
   else ui->statusBar->showMessage(tr("Can't find MIPS system!"));
   return;
+
 
   int i = settings->numberOfPorts();
   for(int j=0;j<i;j++)
@@ -1119,10 +753,9 @@ void MIPS::UpdateSystem(void)
 void MIPS::tabSelected()
 {
     static QString LastTab = "System";
-    if(properties != NULL) properties->Log("Tab selected, " + ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()));
+
     disconnect(comms, SIGNAL(DataReady()),0,0);
     disconnect(console, SIGNAL(getData(QByteArray)),0,0);
-    ui->menuTerminal->setEnabled(false);
     if(LastTab == "Pulse Sequence Generation")
     {
         // Abort when exiting this tab
@@ -1135,14 +768,8 @@ void MIPS::tabSelected()
         LastTab = "System";
         settings->fillPortsInfo();
     }
-    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "ADC")
-    {
-        LastTab = "ADC";
-        adc->Update(true);
-    }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
     {
-        ui->menuTerminal->setEnabled(true);
         LastTab = "Terminal";
         connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
         connect(console, SIGNAL(getData(QByteArray)), this, SLOT(writeData(QByteArray)));
@@ -1151,7 +778,6 @@ void MIPS::tabSelected()
     }
     if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Digital IO")
     {
-        ui->chkRemoteNav->setChecked(false);
         dio->comms = comms;
         LastTab = "Digital IO";
         dio->Update();
@@ -1198,7 +824,6 @@ void MIPS::tabSelected()
         LastTab = "Filament";
         filament->Update();
     }
-    SelectedTab = LastTab;
 }
 
 void MIPS::writeData(const QByteArray &data)
@@ -1223,9 +848,7 @@ void MIPS::Single_Funnel(void)
 {
    if(sf != NULL) return;
    if(sl != NULL) return;
-   if(sl2 != NULL) return;
    if(grid != NULL) return;
-   if(cp != NULL) return;
    ui->tabMIPS->setCurrentIndex(0);
    sf = new SingleFunnel(0,comms,ui->statusBar);
    if(!sf->ConfigurationCheck())
@@ -1248,9 +871,7 @@ void MIPS::Soft_Landing(void)
 {
     if(sf != NULL) return;
     if(sl != NULL) return;
-    if(sl2 != NULL) return;
     if(grid != NULL) return;
-    if(cp != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
     sl = new SoftLanding(0,comms,ui->statusBar);
     if(!sl->ConfigurationCheck())
@@ -1264,31 +885,6 @@ void MIPS::Soft_Landing(void)
     sl->Update();
 }
 
-void MIPS::CloseSoftLanding2(void)
-{
-   sl2_deleteRequest = true;
-}
-
-void MIPS::Soft_Landing_Purdue(void)
-{
-    if(sf != NULL) return;
-    if(sl != NULL) return;
-    if(sl2 != NULL) return;
-    if(grid != NULL) return;
-    if(cp != NULL) return;
-    ui->tabMIPS->setCurrentIndex(0);
-    sl2 = new SoftLanding2(0,comms,ui->statusBar);
-    if(!sl2->ConfigurationCheck())
-    {
-        delete sl2;
-        sl2 = NULL;
-        return;
-    }
-    sl2->show();
-    connect(sl2, SIGNAL(DialogClosed()), this, SLOT(CloseSoftLanding2()));
-    sl2->Update();
-}
-
 void MIPS::CloseGridSystem(void)
 {
    grid_deleteRequest = true;
@@ -1298,9 +894,7 @@ void MIPS::Grid_system(void)
 {
     if(sf != NULL) return;
     if(sl != NULL) return;
-    if(sl2 != NULL) return;
     if(grid != NULL) return;
-    if(cp != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
     grid = new Grid(0,comms,ui->statusBar);
     grid->show();
@@ -1341,287 +935,11 @@ void MIPS::GetFileFromMIPS(void)
     {
         // Let user pick detination location and file name
         QString fileName = QFileDialog::getSaveFileName(this, tr("Save to File"),"",tr("All files (*.*)"));
-        if(fileName != "")
-        {
-            // If on terminal tab then turn off the slot for received chars
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-            comms->GetMIPSfile(text,fileName);
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-            {
-                connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-                readData2Console();
-            }
-        }
-     }
+        return;
+    }
 }
 
 void MIPS::PutFiletoMIPS(void)
 {
-    bool ok;
-
-    // Let user pick source location and file name
-    QString fileName = QFileDialog::getOpenFileName(this, tr("File to MIPS"),tr("All files (*)", 0));
-    if(fileName == "") return;
-    // If on terminal tab then turn off the slot for received chars
-    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-    // Get file name from user
-    QString text = QInputDialog::getText(0, "MIPS", "File name to copy to MIPS SD card:", QLineEdit::Normal,"", &ok );
-    if ( ok && !text.isEmpty() )
-    {
-        comms->PutMIPSfile(text,fileName);
-    }
-    if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-    {
-        connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-        readData2Console();
-    }
-}
-
-void MIPS::ReadEEPROM(void)
-{
-    bool ok;
-
-    QMessageBox msgbox;
-    msgbox.setText("MIPS Module EEPROM read function");
-    msgbox.setInformativeText("Select the module A or B:");
-    msgbox.addButton(tr("B"), QMessageBox::NoRole);
-    msgbox.addButton(tr("A"), QMessageBox::NoRole);
-    msgbox.addButton(tr("Cancel"), QMessageBox::NoRole);
-    int brd = msgbox.exec();
-    if(brd == 2) return;
-    QString Address = QInputDialog::getText(this, "Read MIPS EEPROM", "Enter EEPROM address in hex:", QLineEdit::Normal,QString::null, &ok);
-    if(ok && !Address.isEmpty())
-    {
-        // Here with the EEPROM module address and physical address
-        // Selet a file to save the EEPROM contents
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save to File"),"",tr("All files (*.*)"));
-        if(fileName != "")
-        {
-            // Read the data from MIPS
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-            if(brd == 1) comms->GetEEPROM(fileName,"A",Address.toInt(0,16));
-            else comms->GetEEPROM(fileName,"B",Address.toInt(0,16));
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-            {
-                connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-                readData2Console();
-            }
-        }
-    }
-}
-
-void MIPS::WriteEEPROM(void)
-{
-    bool ok;
-
-    QMessageBox msgbox;
-    msgbox.setText("MIPS Module EEPROM write function. This function will allow you to reprogram the configuration memory of the selected module. Proceed with caution, you can render your system inoperable by entering invalid information.");
-    msgbox.setInformativeText("Select the module A or B or cancel:");
-    msgbox.addButton(tr("B"), QMessageBox::NoRole);
-    msgbox.addButton(tr("A"), QMessageBox::NoRole);
-    msgbox.addButton(tr("Cancel"), QMessageBox::NoRole);
-    int brd = msgbox.exec();
-    if(brd == 2) return;
-    QString Address = QInputDialog::getText(this, "Write MIPS EEPROM", "Enter EEPROM address in hex:", QLineEdit::Normal,QString::null, &ok);
-    if(ok && !Address.isEmpty())
-    {
-        // Here with the EEPROM module address and physical address
-        // Selet a file to write to the EEPROM
-        QString fileName = QFileDialog::getOpenFileName(this, tr("File to MIPS"),tr("All files (*)", 0));
-        if(fileName != "")
-        {
-            // Read the data from MIPS
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-            if(brd == 1) comms->PutEEPROM(fileName,"A",Address.toInt(0,16));
-            else comms->PutEEPROM(fileName,"B",Address.toInt(0,16));
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-            {
-                connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-                readData2Console();
-            }
-        }
-    }
-}
-
-void MIPS::ReadARBFLASH(void)
-{
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save to File"),"",tr("All files (*.*)"));
-    if(fileName != "")
-    {
-        // Read the data from MIPS
-        if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-        comms->GetARBFLASH(fileName);
-        if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-        {
-            connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-            readData2Console();
-        }
-    }
-}
-
-void MIPS::WriteARBFLASH(void)
-{
-    QString fileName = QFileDialog::getOpenFileName(this, tr("File to MIPS"),tr("All files (*)", 0));
-    if(fileName != "")
-    {
-        // Read the data from MIPS
-        if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-        comms->PutARBFLASH(fileName);
-        if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-        {
-            connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-            readData2Console();
-        }
-    }
-}
-
-void MIPS::ARBupload(void)
-{
-    bool ok;
-
-    QString Faddress = QInputDialog::getText(0, "ARB upload", "ARB Module FLASH write function. This function will allow\nyou to upload a file and place it in FLASH at the address\nyou select. Proceed with caution, you can render your\nsystem inoperable by entering invalid information.\n\nEnter FLASH address in hex or cancel:\nmover.bin at c0000\narb.bin at d0000", QLineEdit::Normal,"", &ok );
-    if(ok)
-    {
-        QString fileName = QFileDialog::getOpenFileName(this, tr("File to upload to ARB FLASH"),tr("All files (*)", 0));
-        if(fileName != "")
-        {
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal") disconnect(comms, SIGNAL(DataReady()),0,0);
-            comms->ARBupload(Faddress, fileName);
-            if( ui->tabMIPS->tabText(ui->tabMIPS->currentIndex()) == "Terminal")
-            {
-                connect(comms, SIGNAL(DataReady()), this, SLOT(readData2Console()));
-                readData2Console();
-            }
-        }
-    }
-}
-
-void MIPS::CloseControlPanel(void)
-{
-    cp_deleteRequest = true;
-    this->setWindowState(Qt::WindowMaximized);
-    ui->tabMIPS->setDisabled(false);
-}
-
-void MIPS::SelectCP(QString fileName)
-{
-    if(sf   != NULL) return;
-    if(sl   != NULL) return;
-    if(sl2  != NULL) return;
-    if(grid != NULL) return;
-    if(cp   != NULL) return;
-    ui->tabMIPS->setCurrentIndex(0);
-    ControlPanel *c = new ControlPanel(0,fileName,Systems,properties);
-    if(!c->LoadedConfig) return;
-//    c->show();
-    connect(c, SIGNAL(DialogClosed()), this, SLOT(CloseControlPanel()));
-    c->Update();
-    this->setWindowState(Qt::WindowMinimized);
-    cp = c;
-    cp->show();
-    ui->tabMIPS->setDisabled(true);
-    cp->raise();
-}
-
-void MIPS::slotScripting(void)
-{
-    if(!scriptconsole) scriptconsole = new ScriptingConsole(this,properties);
-    scriptconsole->show();
-}
-
-// Returns a pointer to the comm port for the MIPS system defined my its name.
-// Returns null if the MIPS system can't be found.
-Comms* MIPS::FindCommPort(QString name, QList<Comms*> Systems)
-{
-   for(int i = 0; i < Systems.length(); i++)
-   {
-       if(Systems.at(i)->MIPSname == name) return(Systems.at(i));
-   }
-   return NULL;
-}
-
-
-
-bool MIPS::SendCommand(QString message)
-{
-   return comms->SendCommand(message);
-}
-
-QString MIPS::SendMess(QString message)
-{
-   return comms->SendMess(message);
-}
-
-bool MIPS::SendCommand(QString MIPSname, QString message)
-{
-    QApplication::processEvents();
-    Comms *cp =  FindCommPort(MIPSname,Systems);
-    if(cp==NULL) return false;
-    return cp->SendCommand(message);
-}
-
-QString MIPS::SendMess(QString MIPSname, QString message)
-{
-    QApplication::processEvents();
-    Comms *cp =  FindCommPort(MIPSname,Systems);
-    if(cp==NULL) return "MIPS not found!";
-    return cp->SendMess(message);
-}
-
-void MIPS::msDelay(int ms)
-{
-    QTime timer;
-
-    timer.start();
-    while(timer.elapsed() < ms) QApplication::processEvents();
-}
-
-void MIPS::statusMessage(QString message)
-{
-    QApplication::processEvents();
-    ui->statusBar->showMessage(message);
-    QApplication::processEvents();
-}
-
-void MIPS::popupMessage(QString message)
-{
-    QMessageBox msgBox;
-
-    QApplication::processEvents();
-    msgBox.setText(message);
-    msgBox.setInformativeText("");
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.exec();
-}
-
-bool MIPS::popupYesNoMessage(QString message)
-{
-    QMessageBox msgBox;
-
-    QApplication::processEvents();
-    msgBox.setText(message);
-    msgBox.setInformativeText("Are you sure?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-    int ret = msgBox.exec();
-    if(ret == QMessageBox::No) return false;
-    return true;
-}
-
-QString MIPS::popupUserInput(QString title, QString message)
-{
-    bool ok;
-
-    QApplication::processEvents();
-    QString text = QInputDialog::getText(this, title, message, QLineEdit::Normal,QString::null, &ok);
-    if(!ok) text="";
-    QApplication::processEvents();
-    return text;
-}
-
-void MIPS::slotLogStatusBarMessage(QString statusMess)
-{
-    if(statusMess == "") return;
-    if(statusMess.isEmpty()) return;
-    if(properties != NULL) properties->Log("MIPS StatusBar: " + statusMess);
+    
 }

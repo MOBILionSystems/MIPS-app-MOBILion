@@ -12,6 +12,13 @@ namespace Ui {
 class Plot;
 }
 
+typedef struct
+{
+   int    np;
+   float  h;
+   QList<float> an;
+} SGcoeff;
+
 // This structure contains one set of data points for a graph
 typedef struct
 {
@@ -40,6 +47,7 @@ public:
     void Load(QString filename);
     void FreeAllData(void);
     void ZoomSelect(void);
+    void SavitzkyGolayFilter(int order, QList<float> Y, QList<float> *Yf);
     QCPColorMap *colorMap1,*colorMap2;
     QCPColorScale *colorScale1,*colorScale2;
     QString PlotTitle;
@@ -52,6 +60,7 @@ public:
 private:
     Ui::Plot *ui;
     int  CurrentIndex;
+    int  Filter;
     float m,b;
     QList<PlotGraph *> plotGraphs;    // All graphs
     QMenu   *popupMenu;
@@ -59,6 +68,7 @@ private:
     QAction *LoadOption;
     QAction *XaxisZoomOption;
     QAction *YaxisZoomOption;
+    QAction *FilterOption;
     QAction *TrackOption;
     QAction *ClipboardOption;
     QAction *CommentOption;
@@ -76,9 +86,11 @@ public slots:
     void slotCloseComments(void);
     void slotXaxisZoomOption(void);
     void slotYaxisZoomOption(void);
+    void slotFilterOption(void);
     void slotTrackOption(void);
     void slotClipBoard(void);
     void slotHeatMap(void);
+    void mouseMove(QMouseEvent*event);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

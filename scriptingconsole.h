@@ -46,7 +46,9 @@ class ScriptButton : public QWidget
 
 public:
     explicit ScriptButton(QWidget *parent, QString name, QString ScriptFile, int x, int y, Properties *prop, QStatusBar *statusbar);
+    ~ScriptButton();
     void             Show(void);
+    QString          ProcessCommand(QString cmd);
     QString          Title;
     QString          FileName;
     int              X,Y;
@@ -54,6 +56,7 @@ public:
     QStatusBar       *sb;
     Properties       *properties;
 private:
+    QScriptValue     mips;
     QPushButton      *pbButton;
     QScriptEngine    *engine;
 private slots:
