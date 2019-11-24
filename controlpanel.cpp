@@ -1454,7 +1454,8 @@ void ControlPanel::WaitForUpdate(void)
 void ControlPanel::tcpCommand(void)
 {
     QString cmd = tcp->readLine();
-    tcp->sendMessage(Command(cmd));
+    QString resp = Command(cmd);
+    tcp->sendMessage(resp);
 }
 
 // This function is called by the TCPserver code to process commands and
