@@ -32,8 +32,6 @@ void TCPserver::listen(void)
 
 void TCPserver::sendMessage(QString mess)
 {
-    if(mess == "\n")
-        return mess;  // we want \n to designate receipt of message
     if(socket == NULL) return;
     socket->write(mess.toUtf8().constData());
     socket->flush();
