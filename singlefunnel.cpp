@@ -2,6 +2,7 @@
 #include "ui_singlefunnel.h"
 #include <QCloseEvent>
 #include <QDebug>
+#include <QDoubleValidator>
 
 SingleFunnel::SingleFunnel(QWidget *parent, Comms *c, QStatusBar *statusbar) :
     QDialog(parent),

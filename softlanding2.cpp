@@ -2,6 +2,7 @@
 #include "ui_softlanding2.h"
 #include <QDebug>
 #include <QKeyEvent>
+#include <QDoubleValidator>
 
 SoftLanding2::SoftLanding2(QWidget *parent, Comms *c, QStatusBar *statusbar) :
     QDialog(parent),
