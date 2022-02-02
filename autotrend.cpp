@@ -1,5 +1,6 @@
 #include "autotrend.h"
 #include "ui_autotrend.h"
+#include <QDebug>
 
 AutoTrend::AutoTrend(QWidget *parent) :
     QWidget(parent),
@@ -12,3 +13,12 @@ AutoTrend::~AutoTrend()
 {
     delete ui;
 }
+
+void AutoTrend::on_pushButton_clicked()
+{
+    qDebug() << "autoTrend button clicked";
+    if(!ui->twTrenVol->text().isEmpty()){
+        qDebug() << "AutoTrend TW voltage: " << ui->twTrenVol->text();
+    }
+}
+

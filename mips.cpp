@@ -385,6 +385,8 @@ MIPS::MIPS(QWidget *parent) :
     faims = new FAIMS(ui, comms);
     filament = new Filament(ui, comms);
     adc = new ADC(ui, comms);
+    autotrend = new AutoTrend();
+    ui->tabMIPS->addTab(autotrend, "AutoTrend");
 
     RepeatMessage = "";
     ui->actionClear->setEnabled(true);
