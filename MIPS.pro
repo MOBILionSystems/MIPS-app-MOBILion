@@ -22,6 +22,7 @@ TEMPLATE = app
 //CONFIG += static
 
 SOURCES += main.cpp\
+    autotrend.cpp \
         mips.cpp \
         console.cpp \
         settingsdialog.cpp \
@@ -62,6 +63,7 @@ SOURCES += main.cpp\
     shuttertg.cpp
 
 HEADERS  += mips.h \
+    autotrend.h \
     console.h \
     settingsdialog.h \
     ringbuffer.h \
@@ -101,6 +103,7 @@ HEADERS  += mips.h \
     shuttertg.h
 
 FORMS    += mips.ui \
+    autotrend.ui \
     settingsdialog.ui \
     pse.ui \
     help.ui \

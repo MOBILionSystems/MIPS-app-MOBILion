@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>797</width>
-    <height>649</height>
+    <width>902</width>
+    <height>671</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
      <rect>
       <x>-5</x>
       <y>15</y>
-      <width>796</width>
-      <height>586</height>
+      <width>891</width>
+      <height>611</height>
      </rect>
     </property>
     <property name="tabShape">
@@ -154,9 +154,7 @@ network connected systems.</string>
       </property>
       <property name="font">
        <font>
-        <family>MS Shell Dlg 2</family>
         <pointsize>8</pointsize>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -8221,8 +8219,8 @@ number on each trigger</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>797</width>
-     <height>22</height>
+     <width>902</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuAbout">

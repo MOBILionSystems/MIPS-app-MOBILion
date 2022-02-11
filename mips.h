@@ -9,6 +9,7 @@
 #include <QProcess>
 #include <QtNetwork/QTcpSocket>
 #include <QStatusBar>
+#include "autotrend.h"
 
 
 namespace Ui {
@@ -146,6 +147,7 @@ private:
     QList<Comms*> Systems;
     ScriptingConsole *scriptconsole;
     QString NextCP;
+    AutoTrend* autotrend;
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
