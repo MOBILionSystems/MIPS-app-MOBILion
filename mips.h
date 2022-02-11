@@ -9,7 +9,6 @@
 #include <QProcess>
 #include <QtNetwork/QTcpSocket>
 #include <QStatusBar>
-#include "autotrend.h"
 
 
 namespace Ui {
@@ -53,7 +52,7 @@ class MIPS : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MIPS(QWidget *parent = 0);
+    explicit MIPS(QWidget *parent = 0, QString CPfilename = "");
     ~MIPS();
     virtual void closeEvent(QCloseEvent *event);
     virtual void resizeEvent(QResizeEvent* event);
@@ -110,7 +109,7 @@ public slots:
     void WriteARBFLASH(void);
     void ARBupload(void);
     void SelectCP(QString fileName = "");
-    void CloseControlPanel(void);
+    void CloseControlPanel(QString);
     void slotScripting(void);
     void DisplayProperties(void);
     void slotLogStatusBarMessage(QString);
@@ -146,8 +145,7 @@ private:
     QString RepeatMessage;
     QList<Comms*> Systems;
     ScriptingConsole *scriptconsole;
-
-    AutoTrend* autotrend;
+    QString NextCP;
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);

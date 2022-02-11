@@ -22,7 +22,6 @@ TEMPLATE = app
 //CONFIG += static
 
 SOURCES += main.cpp\
-    autotrend.cpp \
         mips.cpp \
         console.cpp \
         settingsdialog.cpp \
@@ -59,10 +58,10 @@ SOURCES += main.cpp\
     compressor.cpp \
     properties.cpp \
     plot.cpp \
-    device.cpp
+    device.cpp \
+    shuttertg.cpp
 
 HEADERS  += mips.h \
-    autotrend.h \
     console.h \
     settingsdialog.h \
     ringbuffer.h \
@@ -98,10 +97,10 @@ HEADERS  += mips.h \
     compressor.h \
     properties.h \
     plot.h \
-    device.h
+    device.h \
+    shuttertg.h
 
 FORMS    += mips.ui \
-    autotrend.ui \
     settingsdialog.ui \
     pse.ui \
     help.ui \
@@ -120,13 +119,17 @@ FORMS    += mips.ui \
     timinggenerator.ui \
     compressor.ui \
     properties.ui \
-    plot.ui
+    plot.ui \
+    shuttertg.ui
 
 RESOURCES += \
     files.qrc
 
 #QMAKE_LFLAGS_WINDOWS = /SUBSYSTEM:WINDOWS,5.01
+#QMAKE_CXXFLAGS *= "-Xpreprocessor -fopenmp"
 QMAKE_MAC_SDK = macosx10.12
+#QMAKE_MAC_SDK = macosx
+#!host_build:QMAKE_MAC_SDK = macosx
 
 
 

@@ -6,6 +6,10 @@ Properties::Properties(QWidget *parent) :
     ui(new Ui::Properties)
 {
     ui->setupUi(this);
+    // Set the application path used to save the properties file
+    HomePath = QDir::homePath();
+    ApplicationPath = QApplication::applicationFilePath();
+
     // Set some defaults incase we can't load the properties file
     ui->leDataFilePath->setText(QDir::currentPath());
     ui->leMethodesPath->setText(QDir::currentPath());
@@ -13,7 +17,7 @@ Properties::Properties(QWidget *parent) :
     ui->comboTCPIPlist->clear();
     // Try to load the default properties file that should be located in the
     // application home dir. Properties.mips
-    Load(QApplication::applicationDirPath() + "/Properties.mips");
+    if(~Load(ApplicationPath + "/Properties.mips")) Load(HomePath + "/Properties.mips");
     UpdateVars();
     connect(ui->pbDataFilePath, SIGNAL(pressed()), this, SLOT(slotDataFilePath()));
     connect(ui->pbMethodesPath, SIGNAL(pressed()), this, SLOT(slotMethodesPath()));
@@ -55,7 +59,7 @@ void Properties::UpdateVars(void)
     FileName = ui->leFileName->text();
     LogFile = ui->leLogFile->text();
     MinMIPS = ui->leMinMIPS->text().toInt();
-    UpdateSecs = ui->leUpdateSecs->text().toInt();
+    UpdateSecs = ui->leUpdateSecs->text().toFloat();
     AMPSbaud = ui->leAMPSbaud->text();
     if(ui->chkSearchAMPS->isChecked()) SearchAMPS = true;
     else SearchAMPS = false;
@@ -127,11 +131,11 @@ void Properties::slotOK(void)
    UpdateVars();
    // Save all the current values to default proterties file in the app home
    // dir.
-   Save(QApplication::applicationDirPath() + "/Properties.mips");
+   if(~Save(ApplicationPath + "/Properties.mips")) Save(HomePath + "/Properties.mips");
    this->hide();
 }
 
-void Properties::Save(QString fileName)
+bool Properties::Save(QString fileName)
 {
     QFile file(fileName);
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -161,10 +165,12 @@ void Properties::Save(QString fileName)
         for(int i=0; i<MIPS_TCPIP.count(); i++) stream << "," + MIPS_TCPIP[i];
         stream << "\n";
         file.close();
+        return true;
     }
+    return false;
 }
 
-void Properties::Load(QString fileName)
+bool Properties::Load(QString fileName)
 {
     QFile file(fileName);
     if(file.open(QIODevice::ReadOnly|QIODevice::Text))
@@ -200,7 +206,9 @@ void Properties::Load(QString fileName)
                 for(int i=1;i<reslist.count();i++) ui->comboTCPIPlist->addItem(reslist[i]);
             }
         } while(!line.isNull());
+        file.close();
+        return true;
     }
-    file.close();
+    return false;
 }
 

@@ -107,6 +107,8 @@ AcquireData::AcquireData(QWidget *parent)
     Acquiring = false;
     fileName = "U1084A.data";
     TriggerMode = "Software";
+    LastFrameSize = 0;
+    LastAccumulations = 0;
 }
 
 void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
@@ -145,6 +147,9 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
         StatusMessage += "System mode changed to Table.\n";
     }
     else StatusMessage += "MIPS failed to enter table mode!\n";
+    // Acquire contains the name and full path to the acquire command
+    // line application. This is set in the controlpanel startup
+    // function.
     if(Acquire != "")
     {
         QString cmd = "";
@@ -225,27 +230,47 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
                 cmd += " " + filePath + "/" + fileName;
             }
         }
+        if(cla != NULL)
+        {
+            if((LastFrameSize != FrameSize) || (LastAccumulations != Accumulations))
+            {
+                disconnect(cla,SIGNAL(Ready()),0,0);
+                disconnect(cla,SIGNAL(AppCompleted()),0,0);
+                disconnect(cla,SIGNAL(DialogClosed()),0,0);
+                delete cla;
+                cla = NULL;
+            }
+        }
         if(cla == NULL)
         {
+           // Here is the command line window has not been created or destroved by
+           // the user.
            cla = new cmdlineapp(p);
-           //           connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()),Qt::QueuedConnection);
-           //           connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()),Qt::QueuedConnection);
-           //           connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()),Qt::QueuedConnection);
+           // connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()),Qt::QueuedConnection);
+           // connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()),Qt::QueuedConnection);
+           // connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()),Qt::QueuedConnection);
            connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()));
            connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()));
            connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()));
         }
         cla->appPath = cmd;
+        fileName.remove(" -L");
+        fileName.remove(" -l");
+        cla->appPathNoOptions = filePath + "/" + fileName;
+        emit dataFileDefined(cla->appPathNoOptions);
         cla->Clear();
         cla->show();
         cla->raise();
         cla->AppendText(StatusMessage);
         cla->ReadyMessage = "Ready";
         cla->InputRequest = "? Y/N :";
+        cla->ContinueMessage = "Acquire complete, continue?: ";
         if(filePath != "") cla->fileName = filePath + "/Acquire.data";
         cla->Execute();
         Acquiring = true;
         if(properties != NULL) properties->Log("Aquire app started: " + filePath + "/Acquire.data");
+        LastFrameSize = FrameSize;
+        LastAccumulations = Accumulations;
     }
     else
     {
@@ -344,6 +369,8 @@ TimingControl::TimingControl(QWidget *parent, QString name, QString MIPSname, in
     Acquiring = false;
     Downloading = false;
     fileName = "U1084A.data";
+    FrameCtAdj = 1;
+    AlwaysGenerate = false;
 }
 
 void TimingControl::Show(void)
@@ -367,6 +394,7 @@ void TimingControl::Show(void)
     TG->Abort = Abort;
     TG->Edit = Edit;
     TG->properties = properties;
+    TG->FrameCtAdj = FrameCtAdj;
     // Create the AcquireData object and init
     AD = new class AcquireData(p);
     AD->fileName = fileName;
@@ -374,6 +402,7 @@ void TimingControl::Show(void)
     AD->statusBar = statusBar;
     AD->properties = properties;
     connect(AD,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
+    connect(AD,SIGNAL(dataFileDefined(QString)),this,SLOT(slotDataFileDefined(QString)));
 }
 
 void TimingControl::pbEdit(void)
@@ -431,6 +460,7 @@ void TimingControl::pbTrigger(void)
     AD->fileName = fileName;
     AD->TriggerMode = TG->ui->comboTriggerSource->currentText();
     if(properties != NULL) properties->Log("Trigger mode: " + AD->TriggerMode);
+    if(AlwaysGenerate) TG->ui->leTable->setText("");
     if(TG->ui->leTable->text() == "") TG->slotGenerate();
     Downloading = true;
     // Set the external clock frequency
@@ -450,6 +480,11 @@ void TimingControl::pbTrigger(void)
 void TimingControl::slotDataAcquired(QString filepath)
 {
     emit dataAcquired(filepath);
+}
+
+void TimingControl::slotDataFileDefined(QString filepath)
+{
+    emit dataFileDefined(filepath);
 }
 
 void TimingControl::slotEventChanged(QString ECname, QString Val)
@@ -472,6 +507,22 @@ void TimingControl::slotEventChanged(QString ECname, QString Val)
             {
                 e->ValueOff = Val.toFloat();
                 if(TG->ui->leEventName->text() == resList[0]) TG->ui->leEventValueOff->setText(Val);
+            }
+            if(resList[1].toUpper() == "START")
+            {
+                e->Start = Val.trimmed();
+                if(TG->ui->leEventName->text() == resList[0]) TG->ui->leEventStart->setText(Val);
+            }
+            if(resList[1].toUpper() == "WIDTH")
+            {
+                e->Width = Val.trimmed();
+                if(TG->ui->leEventName->text() == resList[0]) TG->ui->leEventWidth->setText(Val);
+            }
+            if(resList[1].toUpper() == "SIGNAL")
+            {
+                int i = TG->ui->comboEventSignal->findText(Val.trimmed());
+                e->Channel = TG->ui->comboEventSignal->itemData(i).toString();
+                if(TG->ui->leEventName->text() == resList[0]) TG->ui->comboEventSignal->setCurrentIndex(TG->ui->comboEventSignal->findData(e->Channel));
             }
         }
     }
@@ -511,7 +562,8 @@ EventControl::EventControl(QWidget *parent, QString name, QString Ename, int x, 
 void EventControl::Show(void)
 {
     frmEvent = new QFrame(p); frmEvent->setGeometry(X,Y,170,21);
-    EventValue = new QLineEdit(frmEvent); EventValue->setGeometry(70,0,70,21); EventValue->setValidator(new QDoubleValidator);
+    //EventValue = new QLineEdit(frmEvent); EventValue->setGeometry(70,0,70,21); EventValue->setValidator(new QDoubleValidator);
+    EventValue = new QLineEdit(frmEvent); EventValue->setGeometry(70,0,70,21);
     label = new QLabel(Title,frmEvent); label->setGeometry(0,0,59,16);
     EventValue->setToolTip("Timimg generator event value editor, " + ECname);
     connect(EventValue,SIGNAL(editingFinished()),this,SLOT(EventChange()));
@@ -679,16 +731,23 @@ void TimingGenerator::UpdateEvents(void)
         {
             if(resList[0].toUpper()==evt->Name.toUpper())
             {
-                if(resList[1].toUpper()=="VALUE")
+                if((resList[1].toUpper()=="VALUE") && (!evt->Channel.isEmpty()))
                 {
-                    ec->Scommand = "STBLVLT,"+QString::number((int)evt->StartT)+","+evt->Channel;
-                    ec->Gcommand = "GTBLVLT,"+QString::number((int)evt->StartT)+","+evt->Channel;
+                    if((evt->Width.toUpper() != "INIT") && (evt->Width.toUpper() != "RAMP"))
+                    {
+                        ec->Scommand = "STBLVLT,"+QString::number((int)evt->StartT)+","+evt->Channel;
+                        ec->Gcommand = "GTBLVLT,"+QString::number((int)evt->StartT)+","+evt->Channel;
+                        //qDebug() << ec->Scommand;
+                    }
                     ec->EventValue->setText(QString::number(evt->Value));
                 }
-                else if(resList[1].toUpper()=="VALUEOFF")
+                else if((resList[1].toUpper()=="VALUEOFF") && (!evt->Channel.isEmpty()))
                 {
-                    ec->Scommand = "STBLVLT,"+QString::number((int)(evt->StartT+evt->WidthT))+","+evt->Channel;
-                    ec->Gcommand = "GTBLVLT,"+QString::number((int)(evt->StartT+evt->WidthT))+","+evt->Channel;
+                    if((evt->Width.toUpper() != "INIT") && (evt->Width.toUpper() != "RAMP"))
+                    {
+                        ec->Scommand = "STBLVLT,"+QString::number((int)(evt->StartT+evt->WidthT))+","+evt->Channel;
+                        ec->Gcommand = "GTBLVLT,"+QString::number((int)(evt->StartT+evt->WidthT))+","+evt->Channel;
+                    }
                     ec->EventValue->setText(QString::number(evt->ValueOff));
                 }
                 else
@@ -854,11 +913,30 @@ QStringList TimingGenerator::Split(QString str, QString del)
     return(reslist);
 }
 
-int   TimingGenerator::ConvertToCount(QString val)
+int TimingGenerator::ConvertToCount(QString val)
+{
+    bool  ok;
+    float clock  = 0;
+    float result;
+
+    result = CalculateTime(val);
+    if(ui->chkTimeMode->isChecked())
+    {
+        clock = ui->comboClockSource->currentText().toInt(&ok);
+        if(ok) result = result * (clock/1000.0);
+        else
+        {
+            clock = ui->leExtClkFreq->text().toInt(&ok);
+            if(ok) result = result * (clock/1000.0);
+        }
+    }
+    return result;
+}
+
+float TimingGenerator::CalculateTime(QString val)
 {
     QStringList reslist;
     bool  ok;
-    float clock  = 0;
     float result = 0;
     float j      = 0;
     int   sign   = 1;
@@ -867,25 +945,9 @@ int   TimingGenerator::ConvertToCount(QString val)
     for(int i=0;i<reslist.count();i++)
     {
         j = reslist[i].toFloat(&ok);
-        if(ok)
-        {
-            result += sign * j;
-            // If we are in the time mode (mS units) and the clock is defined then convert result
-            // to clock cycles. Clock is in Hz.
-            // result = result * clock/1000
-            if(ui->chkTimeMode->isChecked())
-            {
-                clock = ui->comboClockSource->currentText().toInt(&ok);
-                if(ok) result = result * (clock/1000.0);
-                else
-                {
-                    clock = ui->leExtClkFreq->text().toInt(&ok);
-                    if(ok) result = result * (clock/1000.0);
-                }
-            }
-        }
-        else if(reslist[i] == "+") sign *=  1;
-        else if(reslist[i] == "-") sign *= -1;
+        if(ok) result += sign * j;
+        else if(reslist[i] == "+") sign =  1;
+        else if(reslist[i] == "-") sign = -1;
         else
         {
             foreach(Event *evt, Events)
@@ -894,23 +956,22 @@ int   TimingGenerator::ConvertToCount(QString val)
                 evtName.replace(" ", "");
                 if(evtName == reslist[i])
                 {
-                    result += sign * ConvertToCount(evt->Start);
+                    result += sign * CalculateTime(evt->Start);
                     break;
                 }
                 else if((evtName + ".Start") == reslist[i])
                 {
-                    result += sign * ConvertToCount(evt->Start);
+                    result += sign * CalculateTime(evt->Start);
                     break;
                 }
                 else if((evtName + ".Width") == reslist[i])
                 {
-                    result += sign * ConvertToCount(evt->Width);
+                    result += sign * CalculateTime(evt->Width);
                     break;
                 }
             }
         }
     }
-//    qDebug() << val << "," << result;
     return(result);
 }
 
@@ -929,7 +990,7 @@ QString TimingGenerator::GenerateMuxSeq(QString Seq)
     for(int i=0;i<l;i++) if(Seq[i] == '1') InjectionPoints.append((i * ConvertToCount(ui->leFrameWidth->text()) / (l))  + ConvertToCount(ui->leFrameStart->text()));
     slotEventUpdated();
     table.clear();
-    if(ui->comboTriggerSource->currentText() == "Software") table = "STBLDAT;0:[A:" + QString::number(ui->leAccumulations->text().toInt() + 1);
+    if(ui->comboTriggerSource->currentText() == "Software") table = "STBLDAT;0:[A:" + QString::number(ui->leAccumulations->text().toInt() + FrameCtAdj);
     else table = "STBLDAT;0:[A:" + QString::number(ui->leAccumulations->text().toInt());
     foreach(Event *evt, Events)
     {
@@ -937,6 +998,39 @@ QString TimingGenerator::GenerateMuxSeq(QString Seq)
         evt->StartT = ConvertToCount(evt->Start);
         evt->WidthT = ConvertToCount(evt->Width);
     }
+    // Do some validation tests, make sure the required events are defined, also make sure the sum of
+    // fill time, trap time, and release time will fit between the two closest injection points
+    int events_found=0;
+    int TotalInjectEventTime = 0;
+    int InjectTime = 0;
+    foreach(Event *evt, Events)
+    {
+        if(evt->Name == "Fill time") {events_found++; TotalInjectEventTime += ConvertToCount(evt->Width);}
+        if(evt->Name == "Trap time") {events_found++; TotalInjectEventTime += ConvertToCount(evt->Width);}
+        if(evt->Name == "Release time") {events_found++; TotalInjectEventTime += ConvertToCount(evt->Width);}
+        if(evt->Name == "Inject time") {events_found++; InjectTime = ConvertToCount(evt->Start);}
+    }
+    if((events_found != 4) || (maxCount/l < TotalInjectEventTime) || (InjectTime != 0))
+    {
+        QMessageBox msgBox;
+        QString msg = "Invalid pulse sequence! The following requirements\n";
+        msg +=        "must be met:\n";
+        msg +=        "  The following events must be defined:\n";
+        msg +=        "       Fill Time, \n";
+        msg +=        "       Trap time, \n";
+        msg +=        "       Release time, \n";
+        msg +=        "       Inject time, \n";
+        msg +=        "  Inject time Start must equal 0.\n";
+        msg +=        "  Fill time, Trap time, and Release time are relative\n";
+        msg +=        "  to Inject time.\n";
+        msg +=        "  The sum of Fill time, Trap time, and release time\n";
+        msg +=        "  widths must be less than\n";
+        msg +=        "  frame width / 2^(mux order -1).\n";
+        msgBox.setText(msg);
+        msgBox.exec();
+        return "";
+    }
+    // End of validation testing
     int FrameStartT = ConvertToCount(ui->leFrameStart->text());
     for(int i=0;i <= maxCount;i++)
     {
@@ -999,7 +1093,9 @@ void  TimingGenerator::slotGenerate(void)
     int maxCount = ConvertToCount(ui->leFrameWidth->text()) + ConvertToCount(ui->leFrameStart->text());
     bool timeFlag;
     QString table;
+    Event revt;
 
+    revt.Name.clear();
     if(ui->comboMuxOrder->currentText() == "4 Bit") ui->leTable->setText(GenerateMuxSeq("000100110101111"));
     else if(ui->comboMuxOrder->currentText() == "5 Bit") ui->leTable->setText(GenerateMuxSeq("0000100101100111110001101110101"));
     else if(ui->comboMuxOrder->currentText() == "6 Bit") ui->leTable->setText(GenerateMuxSeq("000001000011000101001111010001110010010110111011001101010111111"));
@@ -1009,47 +1105,85 @@ void  TimingGenerator::slotGenerate(void)
     if(ui->comboMuxOrder->currentText() != "None") return;
     slotEventUpdated();
     table.clear();
-    if(ui->comboTriggerSource->currentText() == "Software") table = "STBLDAT;0:[A:" + QString::number(ui->leAccumulations->text().toInt() + 1);
+    if(ui->comboTriggerSource->currentText() == "Software") table = "STBLDAT;0:[A:" + QString::number(ui->leAccumulations->text().toInt() + FrameCtAdj);
     else table = "STBLDAT;0:[A:" + QString::number(ui->leAccumulations->text().toInt());
     foreach(Event *evt, Events)
     {
+        // If this is a Repeat event then make a copy
+        if(evt->Name == "Repeat")
+        {
+            revt = *evt;
+            evt->StartT = evt->Start.toInt();
+            evt->WidthT = evt->Width.toInt();
+        }
         if(evt->Channel.isEmpty()) continue;
         evt->StartT = ConvertToCount(evt->Start);
         evt->WidthT = ConvertToCount(evt->Width);
     }
     int FrameStartT = ConvertToCount(ui->leFrameStart->text());
-    for(int i=0;i <= maxCount;i++)
+    for(int i=0;i <= abs(maxCount);i++)
     {
+
+        if((revt.Name == "Repeat") && (i>0) && (revt.Width.toInt()>0))
+        {
+            if((i % int(ConvertToCount(revt.Width))) == 0)
+            {
+                foreach(Event *evt, Events) if(evt->Name == "Repeat")
+                {
+                    if(ConvertToCount(QString::number(evt->StartT + evt->WidthT)) < abs(maxCount))
+                    {
+                        evt->StartT += evt->WidthT;
+                        evt->Start = QString::number(evt->StartT);
+                    }
+                }
+                foreach(Event *evt, Events)
+                {
+                    if(evt->Channel.isEmpty()) continue;
+                    evt->StartT = ConvertToCount(evt->Start);
+                    evt->WidthT = ConvertToCount(evt->Width);
+                }
+            }
+        }
+
         timeFlag = false;
         // Search for event at this clock cycle
         foreach(Event *evt, Events)
         {
             if(evt->Channel.isEmpty()) continue;
-            if(evt->StartT == i)
+            QString Chan = evt->Channel;
+            if(evt->Width.toUpper() == "INIT")
             {
-                if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
-                table += ":" + evt->Channel + ":" + QString::number(evt->Value);
+                Chan = QString::number(Chan.toInt() + 128 + 64);
             }
-            if((evt->StartT + evt->WidthT) == i)
+            if(evt->Width.toUpper() == "RAMP")
             {
-                if(evt->WidthT > 0)
+                Chan = QString::number(Chan.toInt() + 128);
+            }
+            if((int)abs(evt->StartT) == i)
+            {
+                if(!timeFlag) { table += "," + QString::number((int)evt->StartT); timeFlag=true; }
+                table += ":" + Chan + ":" + QString::number(evt->Value);
+            }
+            if((int)abs(evt->StartT + evt->WidthT) == i)
+            {
+                if(abs(evt->WidthT) > 0)
                 {
-                   if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
-                   table += ":" + evt->Channel + ":" + QString::number(evt->ValueOff);
+                   if(!timeFlag) { table += "," + QString::number((int)(evt->StartT + evt->WidthT)); timeFlag=true; }
+                   table += ":" + Chan + ":" + QString::number(evt->ValueOff);
                 }
             }
         }
-        if(FrameStartT == i)
+        if((int)abs(FrameStartT) == i)
         {
             if(ui->comboEnable->currentText() != "")
             {
-                if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
+                if(!timeFlag) { table += "," + QString::number((int)FrameStartT); timeFlag=true; }
                 table += ":" + ui->comboEnable->currentText() + ":1";
             }
         }
-        if(maxCount == i)
+        if(abs(maxCount) == i)
         {
-            if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
+            if(!timeFlag) { table += "," + QString::number((int)maxCount); timeFlag=true; }
             if(ui->comboEnable->currentText() != "")
             {
                table += ":" +  ui->comboEnable->currentText() + ":0";
@@ -1058,12 +1192,14 @@ void  TimingGenerator::slotGenerate(void)
         }
     }
     ui->leTable->setText(table);
+    if(revt.Name == "Repeat") foreach(Event *evt, Events) if(evt->Name == "Repeat") *evt = revt;
 }
 
 void TimingGenerator::slotEventUpdated(void)
 {
     if(selectedEvent == NULL) return;
     selectedEvent->Name = ui->leEventName->text();
+    selectedEvent->Signal = ui->comboEventSignal->currentText();
     selectedEvent->Channel = ui->comboEventSignal->currentData().toString();
     selectedEvent->Start = ui->leEventStart->text();
     selectedEvent->Width = ui->leEventWidth->text();
@@ -1192,6 +1328,7 @@ void TimingGenerator::slotEventChange(void)
         ui->leEventValue->setText(QString::number(selectedEvent->Value));
         ui->leEventValueOff->setText(QString::number(selectedEvent->ValueOff));
         int i = ui->comboEventSignal->findData(selectedEvent->Channel);
+        //int i = ui->comboEventSignal->findText(selectedEvent->Signal);
         ui->comboEventSignal->setCurrentIndex(i);
     }
 }
@@ -1204,13 +1341,31 @@ QString TimingGenerator::ProcessCommand(QString cmd)
     QPushButton  *pb    = NULL;
     QCheckBox    *chk   = NULL;
 
+    //qDebug() << cmd;
     if(!cmd.startsWith(Title)) return "?";
     if(cmd.trimmed() == Title + ".isTblMode")
     {
         if(isTableMode()) return("TRUE");
         else return("FALSE");
     }
-    QStringList resList = cmd.split("=");
+    // Handle the Value,off case, replace Value,off with Value off
+    cmd.replace("Value,off", "Value off");
+    QRegExp rx("(\,|\=)"); //RegEx for ',' or '='
+    QStringList resList = cmd.split(rx);
+    resList[0].replace("Value off", "Value,off");
+    if(resList[0].trimmed() == Title + ".Event.StartT")
+    {
+        for(int i=0;i<Events.count();i++)
+        {
+            if(Events[i]->Name == resList[1].trimmed()) return(QString::number(Events[i]->StartT));
+        }
+        return("?");
+    }
+    if(resList[0].trimmed() == Title + ".Event.Channel")
+    {
+        for(int i=0;i<Events.count();i++) if(Events[i]->Name == resList[1].trimmed()) return(Events[i]->Channel);
+        return("?");
+    }
     if(resList[0].trimmed() == Title + ".Frame.Start") le = ui->leFrameStart;
     else if(resList[0].trimmed() == Title + ".Frame.Width") le = ui->leFrameWidth;
     else if(resList[0].trimmed() == Title + ".Frame.Accumulations") le = ui->leAccumulations;

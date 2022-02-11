@@ -29,7 +29,9 @@ SGcoeff SG[4] = {{5,35,QList<float>() << -3 << 12 << 17 << 12 << -3},
                  {7,21,QList<float>() << -2 << 3 << 6 << 7 << 6 << 3 << -2},
                  {9,231,QList<float>() << -21 << 14 << 39 << 54 << 59 << 54 <<39 << 14 << -21},
                  {11,429,QList<float>() << -36 << 9 << 44 << 69 << 84 << 89 <<84 << 69 << 44 << 9 << -36}};
-
+// =(-2*A1+3*A2+6*A3+7*A4+6*A5+3*A6-2*A7)/21
+// =(-21*A1+14*A2+39*A3+54*A4+59*A5+54*A6+39*A7+14*A8-21*A9)/231
+// =(-36*A1+9*A2+44*A3+69*A4+84*A5+89*A6+84*A7+69*A8+44*A9+9*A10-39*A11)/429
 Plot::Plot(QWidget *parent, QString Title, QString Yaxis, QString Xaxis, int NumPlots) :
     QDialog(parent),
     ui(new Ui::Plot)
@@ -69,6 +71,10 @@ Plot::Plot(QWidget *parent, QString Title, QString Yaxis, QString Xaxis, int Num
         //if(i == 0) ui->Graph->graph(0)->setPen(QPen(Qt::blue));
         if(i == 1) ui->Graph->graph(1)->setPen(QPen(Qt::red));
     }
+    ui->Graph->plotLayout()->insertRow(0);
+    plotFile = new QCPTextElement(ui->Graph, "");
+    plotFile->setText("Not saved!");
+    if(plotFile != NULL) ui->Graph->plotLayout()->addElement(0, 0, plotFile);
     ui->Graph->replot();
     connect(ui->Graph, SIGNAL(mousePress(QMouseEvent*)), this, SLOT(mousePressed(QMouseEvent*)));
     connect(ui->Graph, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(mouseMove(QMouseEvent*)));
@@ -78,6 +84,8 @@ Plot::Plot(QWidget *parent, QString Title, QString Yaxis, QString Xaxis, int Num
     // Plot popup menu options
     SaveOption = new QAction("Save", this);
     connect(SaveOption, SIGNAL(triggered()), this, SLOT(slotSaveMenu()));
+    ExportOption = new QAction("Export", this);
+    connect(ExportOption, SIGNAL(triggered()), this, SLOT(slotExportMenu()));
     LoadOption = new QAction("Load", this);
     connect(LoadOption, SIGNAL(triggered()), this, SLOT(slotLoadMenu()));
     CommentOption  = new QAction("Comments", this);
@@ -124,8 +132,10 @@ Plot::~Plot()
 
 void Plot::resizeEvent(QResizeEvent *event)
 {
+    qDebug() << ui->Graph->graphCount();
     ui->Graph->setGeometry(0,0,this->width(),this->height()-18);
-    ui->HeatMap1->setGeometry(0,0,this->width()/2,this->height()-18);
+    if(ui->Graph->graphCount() < 2) ui->HeatMap1->setGeometry(0,0,this->width(),this->height()-18);
+    else  ui->HeatMap1->setGeometry(0,0,this->width()/2,this->height()-18);
     ui->HeatMap2->setGeometry(this->width()/2,0,this->width()/2,this->height()-18);
     statusBar->setGeometry(0,this->height()-18,this->width(),18);
     ui->txtComments->setGeometry(0,0,this->width()-ui->pbCloseComments->width(),this->height()-18);
@@ -140,30 +150,27 @@ bool Plot::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::KeyPress)
     {
         QKeyEvent *key = static_cast<QKeyEvent *>(event);
-        if(key->key() == 16777236)  // Right arrow
+        if(key->key() == 16777236) CurrentIndex++;
+        else if(key->key() == 16777235) CurrentIndex += 10;
+        else if(key->key() == 16777234)  CurrentIndex--;
+        else if(key->key() == 16777237)  CurrentIndex -= 10;
+        else if((key->key() == 74) && (key->modifiers() & Qt::ShiftModifier))
         {
-            CurrentIndex++;
-            if(CurrentIndex >= plotGraphs.count()) CurrentIndex = plotGraphs.count()-1;
-            if(CurrentIndex >= 0)
-            {
-                PaintGraphs(plotGraphs[CurrentIndex]);
-                Plot::setWindowTitle(PlotTitle + ", " + "number: " + QString::number(CurrentIndex+1));
-                ui->Graph->replot();
-            }
-            return true;
+            // Shift j will get you to this point, allows jump to scan
+            bool ok;
+            QString text = QInputDialog::getText(0, "MIPS", "Enter desided scan number:", QLineEdit::Normal,"", &ok );
+            if(ok && !text.isEmpty()) CurrentIndex = text.toInt() - 1;
         }
-        if(key->key() == 16777234) // Left arrow
+        else return QObject::eventFilter(obj, event);
+        if(CurrentIndex < 0) CurrentIndex = 0;
+        if(CurrentIndex >= plotGraphs.count()) CurrentIndex = plotGraphs.count()-1;
+        if(CurrentIndex >= 0)
         {
-            CurrentIndex--;
-            if(CurrentIndex < 0) CurrentIndex = 0;
-            if((CurrentIndex >= 0) && (plotGraphs.count() > 0))
-            {
-                PaintGraphs(plotGraphs[CurrentIndex]);
-                Plot::setWindowTitle(PlotTitle + ", " + "number: " + QString::number(CurrentIndex+1));
-                ui->Graph->replot();
-            }
-            return true;
+            PaintGraphs(plotGraphs[CurrentIndex]);
+            Plot::setWindowTitle(PlotTitle + ", " + "number: " + QString::number(CurrentIndex+1));
+            ui->Graph->replot();
         }
+        return true;
     }
     return QObject::eventFilter(obj, event);
 }
@@ -194,6 +201,7 @@ void Plot::mousePressed(QMouseEvent* event)
     {
        popupMenu = new QMenu(tr("Plot options"), this);
        popupMenu->addAction(SaveOption);
+       popupMenu->addAction(ExportOption);
        popupMenu->addAction(LoadOption);
        popupMenu->addAction(XaxisZoomOption);
        popupMenu->addAction(YaxisZoomOption);
@@ -218,6 +226,7 @@ void Plot::Save(QString filename)
         QTextStream stream(&file);
         stream << ui->txtComments->toPlainText();
         file.close();
+        PlotCommand("plotFile," + QDir(filename).dirName(), true);
     }
 }
 
@@ -225,6 +234,68 @@ void Plot::slotSaveMenu(void)
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Save plot data","","Plot (*.plot);;All files (*.*)");
     Save(fileName);
+}
+
+// This function will export the current data to a CSV file
+void Plot::slotExportMenu(void)
+{
+    QList<float> I,A;
+    bool ok;
+    QString rec;
+
+    if(plotGraphs.count() <= 0) return;
+    QString fileName = QFileDialog::getSaveFileName(this, "Export plot data","","Plot (*.csv);;All files (*.*)");
+    // Open file for write
+    if(fileName.isEmpty()) return;
+    QString res = QInputDialog::getText(this, "Export", "Enter plot number to export", QLineEdit::Normal,QString::null, &ok);
+    if(!ok && res.isEmpty()) return;
+    int plot = res.toInt() - 1;
+    if((plot < 0) || (plot > plotGraphs.count()-1))
+    {
+        statusBar->showMessage("Invalid plot selected!");
+        return;
+    }
+    QFile file(fileName);
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        // We're going to streaming text to the file
+        QTextStream stream(&file);
+        // Write the Xaxis data row
+        rec.clear();
+        rec = "\t" + ui->Graph->xAxis->label();
+        for(int i=0;i<plotGraphs[0]->Vec.count();i++)
+        {
+            rec += "\t" + QString::number(plotGraphs[0]->Vec[i]->X * m + b);
+        }
+        stream << rec + "\n";
+        // Output scan header
+        stream << "Scan\t";
+        if(!Scan.isEmpty()) stream << Scan.split(",")[0];
+        stream << "\n";
+        // Output each scan
+        for(int scan=0;scan<plotGraphs.count();scan++)
+        {
+            rec.clear();
+            rec = QString::number(scan+1) + "\t";
+            if(!Scan.isEmpty() && (Scan.split(",").count() == 3))
+            {
+                float sd = (Scan.split(",")[2].toFloat() - Scan.split(",")[1].toFloat())/plotGraphs.count();
+                rec += QString::number(Scan.split(",")[1].toFloat() + sd * scan);
+            }
+            I.clear();
+            for(int i=0;i<plotGraphs[0]->Vec.count();i++) I.append(*plotGraphs[scan]->Vec[i]->Y[plot]);
+            SavitzkyGolayFilter(Filter,I,&A);
+            for(int i=0;i<plotGraphs[0]->Vec.count();i++)
+            {
+                rec += "\t" + QString::number(A[i]);
+            }
+            stream << rec + "\n";
+        }
+        file.close();
+        statusBar->showMessage("Data export complete!");
+        return;
+    }
+    statusBar->showMessage("Export failed!");
 }
 
 void Plot::slotLoadMenu(void)
@@ -251,6 +322,7 @@ void Plot::Load(QString filename)
         // process the commands
         QStringList Lines = Comments.split("\n");
         for(int i=0;i<Lines.count();i++) PlotCommand(Lines[i],true);
+        PlotCommand("plotFile," + QDir(filename).dirName(), true);
     }
 }
 
@@ -352,6 +424,10 @@ void Plot::PlotCommand(QString cmd, bool PlotOnly)
     if((cmd.toUpper().startsWith("CREATEPLOT")) && (reslist.count()==5))
     {
         PlotTitle = reslist[1].replace("_",",");
+        //ui->Graph->plotLayout()->insertRow(0);
+        //plotFile = new QCPTextElement(ui->Graph, "");
+        //plotFile->setText("Not saved!");
+        //if(plotFile != NULL) ui->Graph->plotLayout()->addElement(0, 0, plotFile);
         ui->Graph->xAxis->setLabel(reslist[3].replace("_",","));
         ui->Graph->yAxis->setLabel(reslist[2].replace("_",","));
         ui->Graph->clearGraphs();
@@ -438,12 +514,13 @@ void Plot::PlotCommand(QString cmd, bool PlotOnly)
     }
     else if((reslist[0].toUpper() == "PLOTPOINT")&&(reslist.count()>=3))
     {
+        if(plotGraphs.count() < 1) return;
         double key = reslist[1].toDouble();
         ui->Graph->graph(0)->addData(key, reslist[2].toDouble());
-        if(reslist.count()==4) ui->Graph->graph(1)->addData(key, reslist[3].toDouble());
+        if((reslist.count()==4) && (plotGraphs.count() > 1)) ui->Graph->graph(1)->addData(key, reslist[3].toDouble());
         ui->Graph->xAxis->setRangeUpper(key);
         ui->Graph->replot();
-        this->raise();
+        //this->raise();
     }
     else if((reslist[0].toUpper() == "ADDPOINT")&&(reslist.count()>=4))
     {
@@ -457,6 +534,7 @@ void Plot::PlotCommand(QString cmd, bool PlotOnly)
     }
     else if(cmd.toUpper() == "PLOT")
     {
+        if(plotGraphs.count() < 1) return;
         CurrentIndex = plotGraphs.count() - 1;
         PaintGraphs(plotGraphs.last());
     }
@@ -464,6 +542,11 @@ void Plot::PlotCommand(QString cmd, bool PlotOnly)
     {
         PlotTitle = reslist[1];
         Plot::setWindowTitle(PlotTitle);
+    }
+    else if((reslist[0].toUpper() == "PLOTFILE")&&(reslist.count()==2))
+    {
+        if(plotFile != NULL) plotFile->setText(reslist[1]);
+        ui->Graph->replot();
     }
 }
 
@@ -557,8 +640,9 @@ void Plot::slotHeatMap(void)
        ui->HeatMap1->xAxis->setLabel(ui->Graph->xAxis->label());
        if(Scan.isEmpty()) ui->HeatMap1->yAxis->setLabel("Scan");
        else ui->HeatMap1->yAxis->setLabel(Scan.split(",")[0]);
-       ui->HeatMap1->xAxis->axisRect()->setRangeDrag(Qt::Orientation::Vertical);
-       ui->HeatMap1->xAxis->axisRect()->setRangeZoom(Qt::Orientation::Vertical);
+       // Arg was false, changed for Qt 5.9
+       ui->HeatMap1->xAxis->axisRect()->setRangeDrag(Qt::Horizontal);
+       ui->HeatMap1->xAxis->axisRect()->setRangeZoom(Qt::Horizontal);
 
        if(plotGraphs.isEmpty()) return;
        // set up the QCPColorMap:
@@ -635,8 +719,9 @@ void Plot::slotHeatMap(void)
        ui->HeatMap2->xAxis->setLabel(ui->Graph->xAxis->label());
        if(Scan.isEmpty()) ui->HeatMap2->yAxis->setLabel("Scan");
        else ui->HeatMap2->yAxis->setLabel(Scan.split(",")[0]);
-       ui->HeatMap2->xAxis->axisRect()->setRangeDrag(Qt::Orientation::Vertical);
-       ui->HeatMap2->xAxis->axisRect()->setRangeZoom(Qt::Orientation::Vertical);
+       // Changed for Qt version 5.9
+       ui->HeatMap2->xAxis->axisRect()->setRangeDrag(Qt::Horizontal);
+       ui->HeatMap2->xAxis->axisRect()->setRangeZoom(Qt::Horizontal);
 
        // set up the QCPColorMap:
        nx = plotGraphs[0]->Vec.count();

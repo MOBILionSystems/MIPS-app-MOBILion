@@ -32,6 +32,7 @@ void TCPserver::listen(void)
 
 void TCPserver::sendMessage(QString mess)
 {
+    if(mess == "\n") return;
     if(socket == NULL) return;
     socket->write(mess.toUtf8().constData());
     socket->flush();
@@ -49,6 +50,8 @@ void TCPserver::newConnection(void)
     if(socket != NULL)
     {
         socket->close();
+//      sck->close();
+//      return;
     }
     socket = sck;
     if(socket == NULL) return;
@@ -68,6 +71,19 @@ void TCPserver::disconnected(void)
 
 void TCPserver::readData(void)
 {
+    int space = rb.available();
+    int chars = socket->bytesAvailable();
+    if(space < chars) chars = space;
+    if(chars <= 0) return;
+    char *buffer = new char[chars];
+    int cr = socket->read(buffer,chars);
+    for(int i=0;i<cr;i++) rb.putch(buffer[i]);
+    if(rb.size() > 0) emit dataReady();
+    if(rb.numLines() > 0) emit lineReady();
+}
+/*
+void TCPserver::readData(void)
+{
     QByteArray buffer;
 
     buffer.append(socket->readAll());
@@ -75,7 +91,7 @@ void TCPserver::readData(void)
     if(rb.size() > 0) emit dataReady();
     if(rb.numLines() > 0) emit lineReady();
 }
-
+*/
 QString TCPserver::readLine(void)
 {
     if(rb.numLines() == 0) return "";

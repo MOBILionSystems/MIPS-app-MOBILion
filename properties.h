@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QDateTime>
+#include <QMessageBox>
 
 namespace Ui {
 class Properties;
@@ -19,9 +20,11 @@ public:
     explicit Properties(QWidget *parent = 0);
     ~Properties();
     void UpdateVars(void);
-    void Save(QString fileName);
-    void Load(QString fileName);
+    bool Save(QString fileName);
+    bool Load(QString fileName);
     void Log(QString Message);
+    QString ApplicationPath;
+    QString HomePath;
     QString DataFilePath;
     QString MethodesPath;
     QString ScriptPath;
@@ -34,7 +37,7 @@ public:
     bool AutoConnect;
     bool AutoRestore;
     int  MinMIPS;
-    int  UpdateSecs;
+    float  UpdateSecs;
     QStringList MIPS_TCPIP;
 
 private:

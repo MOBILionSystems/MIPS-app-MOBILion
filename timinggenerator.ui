@@ -63,6 +63,12 @@
     <property name="toolTip">
      <string>Select event signal you wish to control</string>
     </property>
+    <property name="editable">
+     <bool>false</bool>
+    </property>
+    <property name="insertPolicy">
+     <enum>QComboBox::InsertAtBottom</enum>
+    </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
@@ -194,7 +200,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Value, off</string>
+     <string>Value,off</string>
     </property>
    </widget>
   </widget>

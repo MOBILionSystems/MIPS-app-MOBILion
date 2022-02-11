@@ -1,19 +1,34 @@
 #include <QTime>
+#include <QtSerialPort/QtSerialPort>
 #include "comms.h"
 
 Comms::Comms(SettingsDialog *settings, QString Host, QStatusBar *statusbar)
 {
     p = settings->settings();
     sb = statusbar;
+    client_connected = false;
     host = Host;
+    properties = NULL;
     serial = new QSerialPort(this);
     keepAliveTimer = new QTimer;
+    reconnectTimer = new QTimer;
     connect(&client, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
     connect(serial, SIGNAL(readyRead()), this, SLOT(readData2RingBuffer()));
     connect(&client, SIGNAL(connected()),this, SLOT(connected()));
     connect(&client, SIGNAL(disconnected()),this, SLOT(disconnected()));
     connect(&client, SIGNAL(aboutToClose()),this, SLOT(slotAboutToClose()));
     connect(keepAliveTimer, SIGNAL(timeout()), this, SLOT(slotKeepAlive()));
+    connect(reconnectTimer, SIGNAL(timeout()), this, SLOT(slotReconnect()));
+    connect(&pollTimer, SIGNAL(timeout()), this, SLOT(pollLoop()));
+    //pollTimer.start(100);
+}
+
+void Comms::pollLoop(void)
+{
+   if(serial->isOpen())
+   {
+       if(serial->bytesAvailable() > 0) emit serial->readyRead();
+   }
 }
 
 char Comms::getchar(void)
@@ -84,6 +99,7 @@ void Comms::readData2ADCBuffer(void)
     static int Vlength=0,Vnum=0;
     static bool Vlast;
 
+    //qDebug() << "read data to adc buffer " << ADCstate;
     if(ADCbuf == NULL) return;
     if(client.isOpen()) data = client.readAll();
     if(serial->isOpen()) data = serial->readAll();
@@ -102,6 +118,7 @@ void Comms::readData2ADCBuffer(void)
             }
             break;
           case ReadingHeader:
+            //qDebug() << "reading header";
             // Read, 24 bit length, 16 bit vector num, 8 bit last vector flag 0xFF if last
             if(DataPtr == 0) b[0] = data[i];
             if(DataPtr == 1) b[1] = data[i];
@@ -123,6 +140,7 @@ void Comms::readData2ADCBuffer(void)
             }
             break;
           case ReadingData:
+            //qDebug() << "reading data " << DataPtr;
             // Read the data block
             b[DataPtr++] = data[i];
             if(DataPtr >= (Vlength * 2))
@@ -131,6 +149,7 @@ void Comms::readData2ADCBuffer(void)
             }
             break;
           case ReadingTrailer:
+            //qDebug() << "reading trailer";
             // look for 0xAE, 0xEA. This flags end of message
             if((last == 0xAE) && ((quint8)data[i] == 0xEA))
             {
@@ -144,6 +163,7 @@ void Comms::readData2ADCBuffer(void)
             }
             if(ADCstate != ADCdone) break;
           case ADCdone:
+            //qDebug() << "reading done";
             // ADC done so send signal
             emit ADCrecordingDone();
             return;
@@ -637,11 +657,70 @@ QString Comms::SendMess(QString message)
     return SendMessage(message);
 }
 
+// This function is called after a connection to MIPS is established. The function
+// reads the MIPS name, its version and optionally sets the MIPS time and date based
+// on version number.
+// The function also looks in the app dir for a file that contains initalization
+// commands and sends them to the MIPS system. The file name is "MIPS name".ini
+void Comms::GetMIPSnameAndVersion(void)
+{
+    MIPSname = SendMessage("GNAME\n");
+    // Get the version string
+    QStringList reslist = SendMessage("GVER\n").split(" ");
+    major = minor = 1;
+    if(reslist.count() > 2)
+    {
+        QStringList verlist = reslist[1].split(".");
+        if(verlist.count() == 2)
+        {
+            major = verlist[0].toInt();
+            bool ok;
+            for(int i=5;i>0;i--)
+            {
+                minor = verlist[1].left(i).toInt(&ok);
+                if(ok) break;
+            }
+        }
+    }
+    if((major == 1) && (minor >= 201))
+    {
+        QString str = QDateTime::currentDateTime().time().toString();
+        SendCommand("STIME," + str + "\n");
+        str = QDateTime::currentDateTime().date().toString("dd/MM/yyyy");
+        SendCommand("SDATE," + str + "\n");
+    }
+    // Open the ini file in the app dir and send data to MIPS.
+#ifdef Q_OS_MAC
+    QString ext = ".app";
+#else
+    QString ext = ".exe";
+#endif
+    int i = QApplication::applicationFilePath().indexOf(QApplication::applicationName() + ext);
+    if(i == -1) return;
+    QString FileName = QApplication::applicationFilePath().left(i) + QApplication::applicationName() + ".ini";
+    QFile file(FileName);
+    if(file.open(QIODevice::ReadOnly|QIODevice::Text))
+    {
+        QTextStream stream(&file);
+        QString line;
+        do
+        {
+            line = stream.readLine();
+            //qDebug() << line;
+            if(line.trimmed().startsWith("#")) continue;
+            if(line.trimmed() == "") continue;
+            // If here set the line to MIPS
+            SendCommand(line + "\n");
+        }while(!line.isNull());
+        file.close();
+        rb.clear();
+    }
+}
+
 // Open connection to MIPS and read its name.
 bool Comms::ConnectToMIPS()
 {
     QTime timer;
-    QString res;
 
     MIPSname = "";
     if(client.isOpen() || serial->isOpen()) return true;
@@ -659,7 +738,7 @@ bool Comms::ConnectToMIPS()
            if(client_connected)
            {
                keepAliveTimer->start(600000);
-               MIPSname = SendMessage("GNAME\n");
+               GetMIPSnameAndVersion();
                return true;
            }
        }
@@ -672,7 +751,7 @@ bool Comms::ConnectToMIPS()
     {
        openSerialPort();
        serial->setDataTerminalReady(true);
-       MIPSname = SendMessage("GNAME\n");
+       GetMIPSnameAndVersion();
     }
     return true;
 }
@@ -683,6 +762,7 @@ void Comms::DisconnectFromMIPS()
     {
        client.close();
        keepAliveTimer->stop();
+       reconnectTimer->stop();
     }
     closeSerialPort();
 }
@@ -866,14 +946,18 @@ void Comms::handleError(QSerialPort::SerialPortError error)
 {
     if (error == QSerialPort::ResourceError)
     {
-        qDebug() << "serial port error";
         QThread::sleep(1);
-//        reopenSerialPort();
-//        return;
-//        QMessageBox::critical(this, tr("Critical Error"), serial->errorString());
         closeSerialPort();
         if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + tr(" Critical Error, port closing: ") + serial->errorString());
         else sb->showMessage(tr("Critical Error, port closing: ") + serial->errorString());
+        if(properties != NULL)
+        {
+            if(properties->AutoRestore)
+            {
+                reconnectTimer->setInterval(2000);
+                reconnectTimer->start();
+            }
+        }
     }
 }
 
@@ -905,19 +989,15 @@ void Comms::readData2RingBuffer(void)
 
     if(client.isOpen())
     {
-        if(client.waitForReadyRead(1) || (client.bytesAvailable() > 0))
-        {
-           QByteArray data = client.readAll();
-           for(i=0;i<data.size();i++) rb.putch(data[i]);
-        }
+        if(client.bytesAvailable() == 0) client.waitForReadyRead(10);
+        QByteArray data = client.readAll();
+        for(i=0;i<data.size();i++) rb.putch(data[i]);
     }
     if(serial->isOpen())
     {
-        if(serial->waitForReadyRead(1) || (serial->bytesAvailable() > 0))
-        {
-           QByteArray data = serial->readAll();
-           for(i=0;i<data.size();i++) rb.putch(data[i]);
-        }
+        if(serial->bytesAvailable() == 0) serial->waitForReadyRead(10);
+        QByteArray data = serial->readAll();
+        for(i=0;i<data.size();i++) rb.putch(data[i]);
     }
     emit DataReady();
 }
@@ -967,4 +1047,20 @@ void Comms::slotAboutToClose(void)
 void Comms::slotKeepAlive(void)
 {
    SendString("\n");
+}
+
+void Comms::slotReconnect(void)
+{
+    if(!serial->isOpen())
+    {
+        serial->open(QIODevice::ReadWrite);
+        serial->setDataTerminalReady(true);
+        connect(serial, SIGNAL(error(QSerialPort::SerialPortError)), this,SLOT(handleError(QSerialPort::SerialPortError)));
+    }
+    if(serial->isOpen())
+    {
+        reconnectTimer->stop();
+        if(!MIPSname.isEmpty()) sb->showMessage(MIPSname + tr(" Serial port reconnected!"));
+        else sb->showMessage(tr("Serial port reconnected!"));
+    }
 }

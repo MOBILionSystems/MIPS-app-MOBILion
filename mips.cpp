@@ -285,9 +285,92 @@
 // 1.68, Nov 10, 2019
 //      1.) Added isTblMode to timing generator
 //      2.) Changed the event control options to .Value and .ValueOff
-//
-// Planded updates:
-//      - Add ploting capability. Also support this through the Scripting system.
+// 1.69, Nov 18, 2019
+//      1.) Updated the TCP server read routine to only remove the characters from the buffer that
+//          will fit in the ring buffer. The characters that will not fit are left in the buffer.
+// 1.70, Dec 13, 2019
+//      1.) Updated RFamp interface to properly process enable and disable for pole bias and resolving DC bias
+// 1.71, Jan 13, 2020
+//      1.) Added the SendCommand function to the control panel to allow sending commands to MIPS from the control
+//          pannel config file.
+// 1.72, Jan 23, 2020
+//      1.) Added CheckBox to custom control
+//      2.) Added arrow key to value change to DAC control
+//      3.) Allow control panel script button to be called on every update cycle
+// 1.73, Feb 5, 2020
+//      1.) Added commands to timing generator to return start time value and channel number
+// 1.74, Feb 17, 2020
+//      1.) Fix a bug in the control panel when loading settings files with overlapping names
+//      2.) Added arrow value control to ARB control in the control panel
+// 1.75, March 11, 2020
+//      1.) Added backspace capability to console, this version sends the backspace char, 0x08
+// 1.76, March 30, 2020
+//      1.) added valitity testing to the mux timing generation
+//      2.) fixed a sign bug in the timing generator
+// 1.77, April 25, 2020
+//      1.) Fixed a bug in the automatic serial port reconnection that only happened on a PC.
+//      2.) Added SerialWatchDog support.
+// 1.78, May 10, 2020
+//      1.) Added the Shutter timing control to the control panel
+// 1.79, May 14, 2020
+//      1.) Redesigned the Shutter timing control, it have many bugs!
+// 1.80, Sept 11, 2020
+//      Updates for the 2nd generation softlanding systems
+//      1.) Updated the ADC function to use the LOG output on gauges, also
+//          has low threshold that will display OFF when gauge output is below limit.
+//      2.) Disable all input of DIO input channels
+//      3.) Allow DIO disable in control panel
+//      4.) Fixed bug in run script button
+//      5.) Fixed bug in restoring RF quad enable state
+//      6.) Added On exit script button
+// 1.81, Dec 6, 2020
+//      1.) Added time sweep function to shutter timing generator
+// 1.82, Jan 26, 2021
+//      1.) Updated the device serial opject to support 57600 baud
+//      2.) Added .Update command to device serail object to support the spectrum script
+// 1.83, Feb 4, 2021
+//      1.) Update the acquire system to support an accquire app that keeps running and
+//          allows you to restart.
+// 1.84, Feb 28, 2021
+//      1.) Updated FAIMS to include auto tune options and curtain supply control.
+// 1.85, May 2, 2021
+//      1.) Added auto reconnect to the app when not running control panel
+//      2.) Read the version from MIPS and save it in comms object major.minor
+//      3.) Updated the FAIMS tab to read use the MIPS version to enable and
+//          disable options.
+//      4.) Added options for negative peak tune, and curtian supply options
+//      5.) Added Tab control to custom control panels
+// 1.86, May 7, 2021
+//      1.) Added the load control panel button option to control panel code.
+//      2.) Added the read MIPSname.ini file in app dir to serial connection.
+// 1.87, May 29, 2021
+//      1.) Cleaned up a number of minor control panel bugs
+//      2.) Added improved folder searching for control panel files
+//      3.) Numbrous UI usability improvements.
+// 1.88, July 31, 2021
+//      1.) Added features to control panel plot comment
+//      2.) Fixed a few minor bugs in custom control updating from load command
+//      3.) Update terminal serial read function
+// 1.89, Sept 10, 2021
+//      1.) Updated the properties save and load to first try app location and
+//          then use the home dir
+//      2.) Updated development evn to add deployment processing
+//      3.) Added app signing
+// 1.90, Oct 12, 2021
+//      1.) Fixed a bug in the scripting stsrem that did not do a full string compare
+//          when searching for a match. This caused CH 1 to match a search for CH 10
+//      2.) Fixed plot heat map display to use full windows when only 1 graph is selected.
+// 1.91, Nov 21, 2021
+//      1.) Added the Repeat event feature. When a timing event is named Repeat then it
+//          is repeated in the table at a period defined by the width parameter.
+// 1.92, Dec 11, 2021
+//      1.) Added support for pulse sequence ramps. Now you can add Init or Ramp to the
+//          Width parameter to signal needed actions.
+//      2.) Added functions to allow setting changing the signal name in the timing generator.
+//      3.) The documentation needs a lot of updating!
+// 1.93, Jan 15, 2022
+//      1.) Upgraded Sub control panels to inherit controls from parent for timing generators.
+//      2.) Upgraded sub control panels to save and load settings with parent save anf load.
 //
 #include "mips.h"
 #include "ui_mips.h"
@@ -332,15 +415,17 @@
 #include <QtNetwork/QTcpSocket>
 #include <QInputDialog>
 
-QString Version = "MIPS, Version 1.68 Nov 10, 2019";
+QString Version = "MIPS, Version 1.93 Jan 15, 2022";
 
-MIPS::MIPS(QWidget *parent) :
+MIPS::MIPS(QWidget *parent, QString CPfilename) :
     QMainWindow(parent),
     ui(new Ui::MIPS)
 {
     ui->setupUi(this);
     ui->tabMIPS->setElideMode(Qt::ElideNone);
     ui->tabMIPS->setUsesScrollButtons(true);
+    ui->tabMIPS->tabBar()->setStyleSheet("QTabBar::tab:selected {color: white; background-color: rgb(90,90,255);}");
+
     // Make the dialog fixed size.
     this->setFixedSize(this->size());
 
@@ -368,6 +453,7 @@ MIPS::MIPS(QWidget *parent) :
     grid_deleteRequest = false;
     cp = NULL;
     cp_deleteRequest = false;
+    NextCP.clear();
     appPath = QApplication::applicationDirPath();
     pollTimer = new QTimer;
     settings = new SettingsDialog;
@@ -385,8 +471,6 @@ MIPS::MIPS(QWidget *parent) :
     faims = new FAIMS(ui, comms);
     filament = new Filament(ui, comms);
     adc = new ADC(ui, comms);
-    autotrend = new AutoTrend();
-    ui->tabMIPS->addTab(autotrend, "AutoTrend");
 
     RepeatMessage = "";
     ui->actionClear->setEnabled(true);
@@ -840,6 +924,7 @@ void MIPS::pollLoop(void)
       delete cp;
       cp = NULL;
       cp_deleteRequest = false;
+      if(!NextCP.isEmpty()) SelectCP(NextCP);
     }
     //if(cp != NULL) if(comms->isConnected()) cp->Update();
     if(cp != NULL) cp->Update();
@@ -888,58 +973,93 @@ void MIPS::MIPSsetup(void)
     ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\nModules present:");
 
     res = comms->SendMess("GCHAN,RF\n");
-    if(res=="") return;
-    if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 RF driver\n");
-    if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 RF drivers\n");
-    numRF = res.toInt();
-    if(res.contains("0")) RemoveTab("RFdriver");
-    else AddTab("RFdriver");
+    if(res!="")
+    {
+        if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 RF driver\n");
+        if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 RF drivers\n");
+        numRF = res.toInt();
+        if(res.contains("0")) RemoveTab("RFdriver");
+        else AddTab("RFdriver");
+    }
 
     res = comms->SendMess("GCHAN,DCB\n");
-    if(res=="") return;
-    if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text()  + "\n   1 DC bias (8 output channels)\n");
-    if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 DC bias (16 output channels)\n");
-    if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 DC bias (16 output channels)\n");
-    if(res.contains("32")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   4 DC bias (16 output channels)\n");
-    numDCB = res.toInt();
-    if(res.contains("0")) RemoveTab("DCbias");
-    else AddTab("DCbias");
+    if(res!="")
+    {
+        if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text()  + "\n   1 DC bias (8 output channels)\n");
+        if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 DC bias (16 output channels)\n");
+        if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 DC bias (24 output channels)\n");
+        if(res.contains("32")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   4 DC bias (32 output channels)\n");
+        numDCB = res.toInt();
+        if(res.contains("0")) RemoveTab("DCbias");
+        else AddTab("DCbias");
+    }
 
     res = comms->SendMess("GCHAN,TWAVE\n");
-    if(res=="") return;
-    if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 TWAVE module\n");
-    if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 TWAVE modules\n");
-    if(res.contains("0")) RemoveTab("Twave");
-    else AddTab("Twave");
+    if(res!="")
+    {
+        if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 TWAVE module\n");
+        if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 TWAVE modules\n");
+        if(res.contains("0")) RemoveTab("Twave");
+        else AddTab("Twave");
+    }
 
     res = comms->SendMess("GCHAN,ARB\n");
-    if(res=="") return;
-    if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() +  "\n   1 ARB module\n");
-    if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ARB modules\n");
-    if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 ARB modules\n");
-    if(res.contains("32")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   4 ARB modules\n");
-    if(res.contains("0")) RemoveTab("ARB");
-    else AddTab("ARB");
-    arb->SetNumberOfChannels(res.toInt());
+    if(res!="")
+    {
+        if(res.contains("8")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() +  "\n   1 ARB module\n");
+        if(res.contains("16")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ARB modules\n");
+        if(res.contains("24")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   3 ARB modules\n");
+        if(res.contains("32")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   4 ARB modules\n");
+        if(res.contains("40")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   5 ARB modules\n");
+        if(res.contains("48")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   6 ARB modules\n");
+        if(res.contains("0")) RemoveTab("ARB");
+        else AddTab("ARB");
+        arb->SetNumberOfChannels(res.toInt());
+    }
 
     res = comms->SendMess("GCHAN,FAIMS\n");
-    if(res=="") return;
-    if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   FAIMS module\n");
-    if(res.contains("0")) RemoveTab("FAIMS");
-    else AddTab("FAIMS");
+    if(res!="")
+    {
+        if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   FAIMS module\n");
+        if(res.contains("0")) RemoveTab("FAIMS");
+        else AddTab("FAIMS");
+    }
 
     res = comms->SendMess("GCHAN,ESI\n");
-    if(res=="") return;
-    if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI module, rev 3\n");
-    if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI module\n");
-    if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ESI modules\n");
+    if(res!="")
+    {
+        if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI module, rev 3\n");
+        if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 ESI module\n");
+        if(res.contains("4")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 ESI modules\n");
+    }
 
     res = comms->SendMess("GCHAN,FIL\n");
-    if(res=="") return;
-    if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 Filament module\n");
-    if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 Filament modules\n");
-    if(res.contains("0")) RemoveTab("Filament");
-    else AddTab("Filament");
+    if(res!="")
+    {
+        if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 Filament module\n");
+        if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 Filament modules\n");
+        if(res.contains("0")) RemoveTab("Filament");
+        else AddTab("Filament");
+    }
+
+    res = comms->SendMess("GCHAN,FAIMSfb\n");
+    {
+        if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 FAIMSfb module\n");
+        if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 FAIMSfb modules\n");
+    }
+
+    res = comms->SendMess("GCHAN,RFamp\n");
+    if(res!="")
+    {
+        if(res.contains("1")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   1 RFamp QUAD module\n");
+        if(res.contains("2")) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   2 RFamp QUAD modules\n");
+    }
+
+    res = comms->SendMess("GCHAN,HV\n");
+    if(res!="")
+    {
+        if(res.toInt() > 0) ui->lblMIPSconfig->setText(ui->lblMIPSconfig->text() + "\n   " + QString::number(res.toInt()) + " HV power supply channels\n");
+    }
 
     rfdriver->SetNumberOfChannels(numRF);
     dcbias->SetNumberOfChannels(numDCB);
@@ -952,6 +1072,7 @@ void MIPS::MIPSsetup(void)
 void MIPS::MIPSconnect(void)
 {
     comms->p = settings->settings();
+    comms->properties = properties;
     comms->host = ui->comboMIPSnetNames->currentText();
     if(comms->ConnectToMIPS())
     {
@@ -967,7 +1088,7 @@ void MIPS::MIPSconnect(void)
 void MIPS::MIPSsearch(void)
 {
     QMessageBox *msg = new QMessageBox();
-    msg->setText("Searching for MIPS system...");
+    msg->setText("Searching for MIPS system(s)...");
     msg->setStandardButtons(0);
     msg->show();
     QApplication::processEvents();
@@ -1012,6 +1133,7 @@ void MIPS::FindAllMIPSsystems(void)
           ui->statusBar->showMessage("Trying: " + settings->getPortName(j));
           QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
           cp = new Comms(settings,"",ui->statusBar);
+          cp->properties = properties;
           if(cp->isMIPS(settings->getPortName(j)))
           {
             delay();
@@ -1498,10 +1620,13 @@ void MIPS::ARBupload(void)
     }
 }
 
-void MIPS::CloseControlPanel(void)
+void MIPS::CloseControlPanel(QString newPC)
 {
+    NextCP = newPC;
     cp_deleteRequest = true;
-    this->setWindowState(Qt::WindowMaximized);
+    if(!newPC.isEmpty()) return;
+    //this->setWindowState(Qt::WindowMaximized);
+    this->setWindowState(Qt::WindowActive);
     ui->tabMIPS->setDisabled(false);
 }
 
@@ -1516,7 +1641,7 @@ void MIPS::SelectCP(QString fileName)
     ControlPanel *c = new ControlPanel(0,fileName,Systems,properties);
     if(!c->LoadedConfig) return;
 //    c->show();
-    connect(c, SIGNAL(DialogClosed()), this, SLOT(CloseControlPanel()));
+    connect(c, SIGNAL(DialogClosed(QString)), this, SLOT(CloseControlPanel(QString)));
     c->Update();
     this->setWindowState(Qt::WindowMinimized);
     cp = c;

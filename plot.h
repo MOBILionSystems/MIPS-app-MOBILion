@@ -63,8 +63,10 @@ private:
     int  Filter;
     float m,b;
     QList<PlotGraph *> plotGraphs;    // All graphs
+    QCPTextElement *plotFile = NULL;
     QMenu   *popupMenu;
     QAction *SaveOption;
+    QAction *ExportOption;
     QAction *LoadOption;
     QAction *XaxisZoomOption;
     QAction *YaxisZoomOption;
@@ -81,6 +83,7 @@ public slots:
     void mousePressed(QMouseEvent*);
     void mousePressedHM(QMouseEvent*);
     void slotSaveMenu(void);
+    void slotExportMenu(void);
     void slotLoadMenu(void);
     void slotCommentMenu(void);
     void slotCloseComments(void);

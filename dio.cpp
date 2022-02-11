@@ -288,6 +288,7 @@ DIOchannel::DIOchannel(QWidget *parent, QString name, QString MIPSname, int x, i
     Y      = y;
     Channel = "A";
     comms  = NULL;
+    ReadOnly  = false;
 }
 
 void DIOchannel::Show(void)
@@ -296,7 +297,8 @@ void DIOchannel::Show(void)
     DIO = new QCheckBox(frmDIO); DIO->setGeometry(0,0,170,21);
     DIO->setText(Title);
     DIO->setToolTip(MIPSnm + " DIO channel " + Channel);
-    connect(DIO,SIGNAL(stateChanged(int)),this,SLOT(DIOChange()));
+    if(Channel > "P") ReadOnly = true;
+    connect(DIO,SIGNAL(clicked(bool)),this,SLOT(DIOChange(bool)));
 }
 
 QString DIOchannel::Report(void)
@@ -326,8 +328,8 @@ bool DIOchannel::SetValues(QString strVals)
     if(resList.count() < 2) return false;
     if(resList[1].contains("1")) DIO->setChecked(true);
     else DIO->setChecked(false);
-    if(resList[1].contains("1")) DIO->stateChanged(1);
-    else DIO->stateChanged(0);
+    if(resList[1].contains("1")) emit DIO->stateChanged(1);
+    else emit DIO->stateChanged(0);
     return true;
 }
 
@@ -350,8 +352,10 @@ QString DIOchannel::ProcessCommand(QString cmd)
        if(resList[1] == "1") DIO->setChecked(true);
        else if(resList[1] == "0") DIO->setChecked(false);
        else return "?";
-       if(resList[1] == "1") DIO->stateChanged(1);
-       else  DIO->stateChanged(0);
+       //if(resList[1] == "1") emit DIO->stateChanged(1);
+       //else  emit DIO->stateChanged(0);
+       if(resList[1] == "1") DIOChange(1);
+       else DIOChange(0);
        return "";
     }
     return "?";
@@ -370,10 +374,18 @@ void DIOchannel::Update(void)
     DIO->blockSignals(oldState);
 }
 
-void DIOchannel::DIOChange(void)
+void DIOchannel::DIOChange(bool  state)
 {
    QString res;
 
+   if(ReadOnly)
+   {
+      bool oldState = DIO->blockSignals(true);
+      if(state) DIO->setChecked(false);
+      else DIO->setChecked(true);
+      DIO->blockSignals(oldState);
+      return;
+   }
    if(comms == NULL) return;
    if(DIO->checkState()) res ="SDIO," + Channel + ",1\n";
    else  res ="SDIO," + Channel + ",0\n";
