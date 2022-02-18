@@ -2,6 +2,7 @@
 #define AUTOTREND_H
 
 #include <QWidget>
+#include "Broker.h"
 
 namespace Ui {
 class AutoTrend;
@@ -20,6 +21,7 @@ private slots:
 
 private:
     Ui::AutoTrend *ui;
+    Broker* _broker;
 };
 
 #endif // AUTOTREND_H

@@ -20,5 +20,7 @@ void AutoTrend::on_pushButton_clicked()
     if(!ui->twTrenVol->text().isEmpty()){
         qDebug() << "AutoTrend TW voltage: " << ui->twTrenVol->text();
     }
+    _broker = new Broker();
+    _broker->Write("ACORN-LOG", "Hello From Ding");
 }
 
