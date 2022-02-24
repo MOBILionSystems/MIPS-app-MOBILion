@@ -2,7 +2,7 @@
 #define AUTOTREND_H
 
 #include <QWidget>
-#include "Broker.h"
+#include "MEyeOn/Broker.h"
 
 namespace Ui {
 class AutoTrend;

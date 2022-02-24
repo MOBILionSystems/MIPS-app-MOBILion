@@ -27,7 +27,7 @@ LIBS += -L$$PWD\libraries\librdkafka -llibrdkafka++
 INCLUDEPATH += $$PWD\include\librdkafka\src-cpp
 
 SOURCES += main.cpp\
-    Broker.cpp \
+    MEyeOn/Broker.cpp \
     autotrend.cpp \
         mips.cpp \
         console.cpp \
@@ -69,7 +69,7 @@ SOURCES += main.cpp\
     shuttertg.cpp
 
 HEADERS  += mips.h \
-    Broker.h \
+    MEyeOn/Broker.h \
     autotrend.h \
     console.h \
     settingsdialog.h \
