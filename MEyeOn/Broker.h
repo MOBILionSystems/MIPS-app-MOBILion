@@ -40,25 +40,6 @@ public:
     }
 };
 
-class AcornEventCb : public RdKafka::EventCb {
-public:
-    /**
-     * @brief Event callback function called by Kafka to indicate various events
-     * within the Kafka Broker system.
-     *
-     * @param event The event associated with the provenance of the function call
-     * (e.g. stats, logging, errors).
-     * @note Breaking style with this method to match the RdKafka::EventCb
-     * interface.
-     */
-    void event_cb(RdKafka::Event& event){  // NOLINT: Kafka library expects non-const ref.
-        if (event.type() == RdKafka::Event::EVENT_ERROR) {
-            std::string error_message = "ERROR [" + RdKafka::err2str(event.err()) + "]: " + event.str();
-            std::cerr << error_message << std::endl;
-        }
-    }
-};
-
 class Broker : public QObject {
     Q_OBJECT
 public:
@@ -77,16 +58,13 @@ private:
     std::string _brokers;
     std::string _topic;
     std::string _errstr = "";
-    RdKafka::Conf* _producer_conf{nullptr};
+    RdKafka::Conf* _conf{nullptr};
     RdKafka::Producer* _producer;
-    //RdKafka::KafkaConsumer* _consumer;
 
     bool _config_error;
     std::string _recent_config_error;
 
     void config();
 
-    unsigned int GenerateRandomChar();
-    std::string GenerateRandomHexString(const unsigned int len);
     void SetConfigError(bool err, std::string err_msg);
 };
