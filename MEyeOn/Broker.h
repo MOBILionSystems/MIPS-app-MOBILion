@@ -9,11 +9,11 @@
 #include <string>
 #include <iomanip>
 #include <iostream>
+#include "commandGenerator.h"
 
 namespace Kafka {
 class Broker;
 class AcornDeliveryReportCb;
-class AcornEventCb;
 }
 
 
@@ -45,19 +45,13 @@ class Broker : public QObject {
 public:
     explicit Broker(QObject* parent = nullptr);
 
-    void Read();
-    void Write(std::string dest, std::string payload);
-
-    std::string _status_topic;
-    /// @brief Topic to which log messages are produced.
-    std::string _log_topic;
-    /// @brief Topic from which command messages are consumed.
-    std::vector<std::string> _command_topic;
+    void initDigitizer();
+    void startAcquire();
+    void stopAcquire();
 
 private:
+    CommandGenerator commandGen;
     std::string _brokers;
-    std::string _topic;
-    std::string _errstr = "";
     RdKafka::Conf* _conf{nullptr};
     RdKafka::Producer* _producer;
 

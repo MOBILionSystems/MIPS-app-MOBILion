@@ -1,4 +1,5 @@
 #include "Broker.h"
+#include <QJsonDocument>
 
 Broker::Broker(QObject* parent) :
     QObject(parent)
@@ -15,22 +16,49 @@ Broker::Broker(QObject* parent) :
             return;
         }
     }
-    _status_topic = "ACORN-STATUS";
-    _log_topic = "ACORN-LOG";
 }
 
-void Broker::Read()
+void Broker::initDigitizer()
 {
-}
-
-void Broker::Write(std::string dest, std::string payload)
-{
+    QString dest = "ACORN-CMD";
+    QJsonObject commandObject = commandGen.getCommand(CommandType::Initialization);
+    std::string payload = QJsonDocument(commandObject).toJson(QJsonDocument::JsonFormat::Compact).toStdString();
     char* payload_c = const_cast<char*>(payload.c_str());
-    RdKafka::ErrorCode resp = _producer->produce(dest, RdKafka::Topic::PARTITION_UA, RdKafka::Producer::RK_MSG_COPY,
+    RdKafka::ErrorCode resp = _producer->produce(dest.toStdString(), RdKafka::Topic::PARTITION_UA, RdKafka::Producer::RK_MSG_COPY,
                                                  payload_c, payload.size(), NULL, 0, 0, NULL, NULL);
 
     if (resp != RdKafka::ERR_NO_ERROR) {
-        qWarning() << "% Produce failed [" << QString::fromStdString(dest) << "]:" <<
+        qWarning() << "% Produce failed [" << dest << "]:" <<
+                      QString::fromStdString(RdKafka::err2str(resp)) << "|" << resp;
+    }
+}
+
+void Broker::startAcquire()
+{
+    QString dest = "ACORN-CMD";
+    QJsonObject commandObject = commandGen.getCommand(CommandType::Start_Acquisition);
+    std::string payload = QJsonDocument(commandObject).toJson(QJsonDocument::JsonFormat::Compact).toStdString();
+    char* payload_c = const_cast<char*>(payload.c_str());
+    RdKafka::ErrorCode resp = _producer->produce(dest.toStdString(), RdKafka::Topic::PARTITION_UA, RdKafka::Producer::RK_MSG_COPY,
+                                                 payload_c, payload.size(), NULL, 0, 0, NULL, NULL);
+
+    if (resp != RdKafka::ERR_NO_ERROR) {
+        qWarning() << "% Produce failed [" << dest << "]:" <<
+                      QString::fromStdString(RdKafka::err2str(resp)) << "|" << resp;
+    }
+}
+
+void Broker::stopAcquire()
+{
+    QString dest = "ACORN-CMD";
+    QJsonObject commandObject = commandGen.getCommand(CommandType::Stop_Acquisition);
+    std::string payload = QJsonDocument(commandObject).toJson(QJsonDocument::JsonFormat::Compact).toStdString();
+    char* payload_c = const_cast<char*>(payload.c_str());
+    RdKafka::ErrorCode resp = _producer->produce(dest.toStdString(), RdKafka::Topic::PARTITION_UA, RdKafka::Producer::RK_MSG_COPY,
+                                                 payload_c, payload.size(), NULL, 0, 0, NULL, NULL);
+
+    if (resp != RdKafka::ERR_NO_ERROR) {
+        qWarning() << "% Produce failed [" << dest << "]:" <<
                       QString::fromStdString(RdKafka::err2str(resp)) << "|" << resp;
     }
 }

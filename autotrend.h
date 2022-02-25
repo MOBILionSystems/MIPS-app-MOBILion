@@ -17,7 +17,11 @@ public:
     ~AutoTrend();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_initDigitizerButton_clicked();
+
+    void on_startAcqButton_clicked();
+
+    void on_stopAcqButton_clicked();
 
 private:
     Ui::AutoTrend *ui;
