@@ -71,13 +71,15 @@ void CommandGenerator::updateInitDigtizerCommand(QJsonObject &command)
 
 void CommandGenerator::updateStartAcqCommand(QJsonObject &command)
 {
+    talismanUUID = getUUID();
+
     QJsonArray target;
     target.append("ACORN_ACQUIRE");
     target.append("ACORN_ARCHIVE");
     command.insert("target", QJsonValue(target));
 
     command.insert("command", QJsonValue("START_ACQUISITION"));
-    command.insert("talisman", "906b3a6910d84259a810e9d8c35a564f");
+    command.insert("talisman", talismanUUID);
 
     QJsonObject data;
 
@@ -186,5 +188,10 @@ void CommandGenerator::updateStopAcqCommand(QJsonObject &command)
     target.append("ACORN_ACQUIRE");
     command.insert("target", QJsonValue(target));
     command.insert("command", QJsonValue("STOP_ACQUISITION"));
-    command.insert("talisman", "906b3a6910d84259a810e9d8c35a564f");
+    command.insert("talisman", talismanUUID);
+}
+
+QString CommandGenerator::getUUID()
+{
+    return QUuid::createUuid().toString().remove('-').remove('{').remove('}');
 }

@@ -45,11 +45,14 @@ class Broker : public QObject {
 public:
     explicit Broker(QObject* parent = nullptr);
 
+    ~Broker();
+
     void initDigitizer();
     void startAcquire();
     void stopAcquire();
 
 private:
+    bool startedAcquire = false;
     CommandGenerator commandGen;
     std::string _brokers;
     RdKafka::Conf* _conf{nullptr};

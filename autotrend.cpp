@@ -7,7 +7,7 @@ AutoTrend::AutoTrend(QWidget *parent) :
     ui(new Ui::AutoTrend)
 {
     ui->setupUi(this);
-    _broker = new Broker();
+    _broker = new Broker(this);
 }
 
 AutoTrend::~AutoTrend()

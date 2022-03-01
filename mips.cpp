@@ -471,7 +471,7 @@ MIPS::MIPS(QWidget *parent, QString CPfilename) :
     faims = new FAIMS(ui, comms);
     filament = new Filament(ui, comms);
     adc = new ADC(ui, comms);
-    autotrend = new AutoTrend();
+    autotrend = new AutoTrend(this);
     ui->tabMIPS->addTab(autotrend, "AutoTrend");
 
     RepeatMessage = "";
@@ -556,6 +556,7 @@ void MIPS::closeEvent(QCloseEvent *event)
     delete settings;
     delete help;
     delete ui;
+    delete autotrend;
 }
 
 bool MIPS::eventFilter(QObject *obj, QEvent *event)

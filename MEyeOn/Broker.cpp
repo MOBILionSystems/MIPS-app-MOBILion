@@ -1,5 +1,6 @@
 #include "Broker.h"
 #include <QJsonDocument>
+#include <QThread>
 
 Broker::Broker(QObject* parent) :
     QObject(parent)
@@ -16,6 +17,12 @@ Broker::Broker(QObject* parent) :
             return;
         }
     }
+}
+
+Broker::~Broker()
+{
+    if(startedAcquire)
+        stopAcquire();
 }
 
 void Broker::initDigitizer()
@@ -35,6 +42,11 @@ void Broker::initDigitizer()
 
 void Broker::startAcquire()
 {
+    if(startedAcquire){
+        stopAcquire();
+        QThread::sleep(2);
+    }
+
     QString dest = "ACORN-CMD";
     QJsonObject commandObject = commandGen.getCommand(CommandType::Start_Acquisition);
     std::string payload = QJsonDocument(commandObject).toJson(QJsonDocument::JsonFormat::Compact).toStdString();
@@ -45,6 +57,8 @@ void Broker::startAcquire()
     if (resp != RdKafka::ERR_NO_ERROR) {
         qWarning() << "% Produce failed [" << dest << "]:" <<
                       QString::fromStdString(RdKafka::err2str(resp)) << "|" << resp;
+    }else{
+        startedAcquire = true;
     }
 }
 
@@ -60,6 +74,8 @@ void Broker::stopAcquire()
     if (resp != RdKafka::ERR_NO_ERROR) {
         qWarning() << "% Produce failed [" << dest << "]:" <<
                       QString::fromStdString(RdKafka::err2str(resp)) << "|" << resp;
+    }else{
+        startedAcquire = false;
     }
 }
 
