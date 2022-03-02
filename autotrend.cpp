@@ -6,6 +6,8 @@ AutoTrend::AutoTrend(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AutoTrend)
 {
+//    mipsui = w;
+//    comms = c;
     ui->setupUi(this);
     _broker = new Broker(this);
 
@@ -14,19 +16,7 @@ AutoTrend::AutoTrend(QWidget *parent) :
     rightValueModel = new QStringListModel(this);
     mathOperatorsModel = new QStringListModel(this);
 
-    relationModel->setStringList(relationList);
-    leftValueModel->setStringList(electrodes);
-    rightValueModel->setStringList(electrodes);
-    mathOperatorsModel->setStringList(mathOperators);
-
-    ui->leftListView->setModel(leftValueModel);
-    ui->rightListView->setModel(rightValueModel);
-    ui->mathListView->setModel(mathOperatorsModel);
-    ui->trendComboBox->addItems(electrodes);
-    ui->relationListView->setModel(relationModel);
-
-    ui->constInRelation->setValidator(new QDoubleValidator(0, 100, 3, this));
-
+    initUI();
 }
 
 AutoTrend::~AutoTrend()
@@ -75,5 +65,25 @@ void AutoTrend::on_addRelationButton_clicked()
     }
     relationList.append(newRelation);
     relationModel->setStringList(relationList);
+}
+
+void AutoTrend::initUI()
+{
+    relationModel->setStringList(relationList);
+    leftValueModel->setStringList(electrodes);
+    rightValueModel->setStringList(electrodes);
+    mathOperatorsModel->setStringList(mathOperators);
+
+    ui->leftListView->setModel(leftValueModel);
+    ui->rightListView->setModel(rightValueModel);
+    ui->mathListView->setModel(mathOperatorsModel);
+    ui->trendComboBox->addItems(electrodes);
+    ui->relationListView->setModel(relationModel);
+
+    ui->constInRelation->setValidator(new QDoubleValidator(0, 1000, 3, this));
+    ui->trendFrom->setValidator(new QIntValidator(0, 1000, this));
+    ui->trendTo->setValidator(new QIntValidator(0, 1000, this));
+    ui->trendStepSize->setValidator(new QIntValidator(0, 10000, this));
+    ui->trendStepDuration->setValidator(new QIntValidator(0, 10000, this));
 }
 

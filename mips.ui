@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>902</width>
-    <height>671</height>
+    <width>997</width>
+    <height>680</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -8219,7 +8219,7 @@ number on each trigger</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>902</width>
+     <width>997</width>
      <height>21</height>
     </rect>
    </property>

@@ -278,7 +278,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_3">
+  <widget class="QLineEdit" name="trendFrom">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -288,7 +288,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_4">
+  <widget class="QLineEdit" name="trendTo">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -298,7 +298,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_5">
+  <widget class="QLineEdit" name="trendStepSize">
    <property name="geometry">
     <rect>
      <x>260</x>
@@ -308,7 +308,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_6">
+  <widget class="QLineEdit" name="trendStepDuration">
    <property name="geometry">
     <rect>
      <x>260</x>

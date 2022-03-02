@@ -38,6 +38,8 @@ private:
     QStringList electrodes = {"FunnelIn", "FunnelOut", "FunnelCL", "SLIMBias", "ExitCL", "QuadBias"};
     QStringList mathOperators = {"None", "+", "-", "*"};
     QStringList relationList;
+
+    void initUI();
 };
 
 #endif // AUTOTREND_H
