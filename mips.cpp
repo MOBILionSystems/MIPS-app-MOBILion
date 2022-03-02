@@ -432,6 +432,7 @@ MIPS::MIPS(QWidget *parent, QString CPfilename) :
     ui->comboSystems->setVisible(false);
     ui->lblSystems->setVisible(false);
 
+
     MIPS::setWindowTitle(Version);
 
     #if defined(Q_OS_MAC)

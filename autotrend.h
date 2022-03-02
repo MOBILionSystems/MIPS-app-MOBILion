@@ -2,6 +2,7 @@
 #define AUTOTREND_H
 
 #include <QWidget>
+#include <QStringListModel>
 #include "MEyeOn/Broker.h"
 
 namespace Ui {
@@ -23,9 +24,20 @@ private slots:
 
     void on_stopAcqButton_clicked();
 
+    void on_removeRelationButton_clicked();
+
+    void on_addRelationButton_clicked();
+
 private:
     Ui::AutoTrend *ui;
     Broker* _broker;
+    QStringListModel* relationModel;
+    QStringListModel* leftValueModel;
+    QStringListModel* rightValueModel;
+    QStringListModel* mathOperatorsModel;
+    QStringList electrodes = {"FunnelIn", "FunnelOut", "FunnelCL", "SLIMBias", "ExitCL", "QuadBias"};
+    QStringList mathOperators = {"None", "+", "-", "*"};
+    QStringList relationList;
 };
 
 #endif // AUTOTREND_H

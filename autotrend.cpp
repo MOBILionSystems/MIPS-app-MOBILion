@@ -8,6 +8,25 @@ AutoTrend::AutoTrend(QWidget *parent) :
 {
     ui->setupUi(this);
     _broker = new Broker(this);
+
+    relationModel = new QStringListModel(this);
+    leftValueModel = new QStringListModel(this);
+    rightValueModel = new QStringListModel(this);
+    mathOperatorsModel = new QStringListModel(this);
+
+    relationModel->setStringList(relationList);
+    leftValueModel->setStringList(electrodes);
+    rightValueModel->setStringList(electrodes);
+    mathOperatorsModel->setStringList(mathOperators);
+
+    ui->leftListView->setModel(leftValueModel);
+    ui->rightListView->setModel(rightValueModel);
+    ui->mathListView->setModel(mathOperatorsModel);
+    ui->trendComboBox->addItems(electrodes);
+    ui->relationListView->setModel(relationModel);
+
+    ui->constInRelation->setValidator(new QDoubleValidator(0, 100, 3, this));
+
 }
 
 AutoTrend::~AutoTrend()
@@ -17,30 +36,44 @@ AutoTrend::~AutoTrend()
 
 void AutoTrend::on_initDigitizerButton_clicked()
 {
-    qDebug() << "initDigitizer button clicked";
-    if(!ui->twTrenVol->text().isEmpty()){
-        qDebug() << "AutoTrend TW voltage: " << ui->twTrenVol->text();
-    }
     _broker->initDigitizer();
 }
 
 
 void AutoTrend::on_startAcqButton_clicked()
 {
-    qDebug() << "startAcqButton button clicked";
-    if(!ui->twTrenVol->text().isEmpty()){
-        qDebug() << "AutoTrend TW voltage: " << ui->twTrenVol->text();
-    }
     _broker->startAcquire();
 }
 
 
 void AutoTrend::on_stopAcqButton_clicked()
 {
-    qDebug() << "stopAcqButton button clicked";
-    if(!ui->twTrenVol->text().isEmpty()){
-        qDebug() << "AutoTrend TW voltage: " << ui->twTrenVol->text();
-    }
     _broker->stopAcquire();
+}
+
+
+void AutoTrend::on_removeRelationButton_clicked()
+{
+    relationModel->removeRows(ui->relationListView->currentIndex().row(), 1);
+    relationList = relationModel->stringList();
+}
+
+
+void AutoTrend::on_addRelationButton_clicked()
+{
+    int leftIndex = ui->leftListView->currentIndex().row();
+    int rightIndex = ui->rightListView->currentIndex().row();
+    if( leftIndex < 0 || rightIndex < 0 || leftIndex == rightIndex) return;
+
+    QString newRelation;
+    newRelation = electrodes.at(leftIndex) + "=" + electrodes.at(rightIndex);
+
+    int mathOperatorIndex = ui->mathListView->currentIndex().row();
+    QString constString = ui->constInRelation->text();
+    if(mathOperatorIndex > 0 && !constString.isEmpty()){
+        newRelation += mathOperators.at(mathOperatorIndex) + constString;
+    }
+    relationList.append(newRelation);
+    relationModel->setStringList(relationList);
 }
 
