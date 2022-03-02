@@ -2,12 +2,11 @@
 #include "ui_autotrend.h"
 #include <QDebug>
 
-AutoTrend::AutoTrend(QWidget *parent) :
+AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AutoTrend)
 {
-//    mipsui = w;
-//    comms = c;
+    mipsui = w;
     ui->setupUi(this);
     _broker = new Broker(this);
 
@@ -85,5 +84,14 @@ void AutoTrend::initUI()
     ui->trendTo->setValidator(new QIntValidator(0, 1000, this));
     ui->trendStepSize->setValidator(new QIntValidator(0, 10000, this));
     ui->trendStepDuration->setValidator(new QIntValidator(0, 10000, this));
+}
+
+
+void AutoTrend::on_pushButton_6_clicked()
+{
+    QLineEdit *leDCB = mipsui->gbDCbias1->findChild<QLineEdit *>("leSDCB_1");
+    leDCB->setText(QString::number(1234));
+    leDCB->setModified(true);
+    emit leDCB->editingFinished();
 }
 

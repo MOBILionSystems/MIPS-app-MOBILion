@@ -242,7 +242,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Stop AutoTrend</string>
+    <string>Stop AutoTrend (TEST)</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_7">

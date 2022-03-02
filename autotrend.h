@@ -5,6 +5,10 @@
 #include <QStringListModel>
 #include "MEyeOn/Broker.h"
 
+#include "ui_mips.h"
+#include "mips.h"
+
+
 namespace Ui {
 class AutoTrend;
 }
@@ -14,7 +18,7 @@ class AutoTrend : public QWidget
     Q_OBJECT
 
 public:
-    explicit AutoTrend(QWidget *parent = nullptr);
+    explicit AutoTrend(Ui::MIPS *w, QWidget *parent = nullptr);
     ~AutoTrend();
 
 private slots:
@@ -28,7 +32,10 @@ private slots:
 
     void on_addRelationButton_clicked();
 
+    void on_pushButton_6_clicked();
+
 private:
+    Ui::MIPS *mipsui;
     Ui::AutoTrend *ui;
     Broker* _broker;
     QStringListModel* relationModel;

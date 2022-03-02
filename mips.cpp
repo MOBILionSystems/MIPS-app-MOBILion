@@ -399,6 +399,7 @@
 #include "scriptingconsole.h"
 #include "tcpserver.h"
 #include "properties.h"
+#include "autotrend.h"
 
 #include <QMessageBox>
 #include <QtSerialPort/QSerialPort>
@@ -472,7 +473,7 @@ MIPS::MIPS(QWidget *parent, QString CPfilename) :
     faims = new FAIMS(ui, comms);
     filament = new Filament(ui, comms);
     adc = new ADC(ui, comms);
-    autotrend = new AutoTrend(this);
+    autotrend = new AutoTrend(ui, this);
     ui->tabMIPS->addTab(autotrend, "AutoTrend");
 
     RepeatMessage = "";

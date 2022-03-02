@@ -9,7 +9,6 @@
 #include <QProcess>
 #include <QtNetwork/QTcpSocket>
 #include <QStatusBar>
-#include "autotrend.h"
 
 
 namespace Ui {
@@ -40,6 +39,7 @@ class ADC;
 class ControlPanel;
 class ScriptingConsole;
 class Properties;
+class AutoTrend;
 
 class DeleteHighlightedItemWhenShiftDelPressedEventFilter : public QObject
 {
