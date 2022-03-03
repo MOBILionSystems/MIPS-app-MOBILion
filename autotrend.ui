@@ -23,7 +23,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radioButton">
+  <widget class="QRadioButton" name="relationRatioButton">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -62,7 +62,7 @@
     <string>Remove RelationShip &lt;&lt;&lt;</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_3">
+  <widget class="QPushButton" name="initDigitizerButton">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -72,10 +72,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Reset Digitizer</string>
+    <string>Init Digitizer</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_4">
+  <widget class="QPushButton" name="initDCBiasButton">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -111,7 +111,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_5">
+  <widget class="QPushButton" name="runTrendButton">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -232,7 +232,7 @@
     <string>SBC IP:</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_6">
+  <widget class="QPushButton" name="stopTrendButton">
    <property name="geometry">
     <rect>
      <x>420</x>
@@ -242,7 +242,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Stop AutoTrend (TEST)</string>
+    <string>Stop AutoTrend</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_7">
