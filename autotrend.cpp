@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QDate>
 #include <QTime>
+#include <cstdlib>
 
 AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     QWidget(parent),
@@ -49,7 +50,7 @@ void AutoTrend::on_initDigitizerButton_clicked()
 
 void AutoTrend::on_startAcqButton_clicked()
 {
-    //_broker->startAcquire("20220228/b.mbi");
+    _broker->startAcquire("20220228/b.mbi");
 }
 
 
@@ -102,6 +103,7 @@ void AutoTrend::initUI()
     ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendStepSize->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendStepDuration->setValidator(new QIntValidator(0, 10000, this));
+
 }
 
 void AutoTrend::updateDCBias(QString name, double value)
@@ -185,7 +187,7 @@ void AutoTrend::buildTrendSM()
         currentStep = trendFrom;
         relationEnabled = ui->relationRatioButton->isChecked();
         fileFolder = QDate::currentDate().toString("yyyyMMdd") + "/" + QTime::currentTime().toString("hhmmss") + trendName + "Trend";
-        qDebug() << fileFolder;
+        ui->trendProgressBar->setValue(0);
         emit nextState();
     });
     initState->addTransition(this, &AutoTrend::nextState, updateTrendState);
@@ -213,11 +215,15 @@ void AutoTrend::buildTrendSM()
     connect(stopAcqState, &QState::entered, this, [=](){_broker->stopAcquire(); emit nextState();});
     stopAcqState->addTransition(this, &AutoTrend::nextState, nextStepState);
 
-    connect(nextStepState, &QState::entered, this, [=](){currentStep += trendStepSize; currentStep <= trendTo && !toStopTrend ? emit nextState() : emit doneAllStates();});
+    connect(nextStepState, &QState::entered, this, [=](){
+        currentStep += trendStepSize;
+        if(abs(trendTo - trendFrom) > 0)
+            ui->trendProgressBar->setValue( (100 * abs(currentStep - trendFrom)) / (abs(trendTo - trendFrom) + abs(trendStepSize)));
+        currentStep <= trendTo && !toStopTrend ? emit nextState() : emit doneAllStates();});
     nextStepState->addTransition(this, &AutoTrend::nextState, updateTrendState);
     nextStepState->addTransition(this, &AutoTrend::doneAllStates, finishState);
 
-    connect(trendSM, &QStateMachine::finished, this, [](){qDebug() << "Trend State Machine finished";});
+    connect(trendSM, &QStateMachine::finished, this, [=](){ui->trendProgressBar->setValue(100);});
 }
 
 
