@@ -8,6 +8,7 @@
 #include <QDate>
 #include <QTime>
 #include <cstdlib>
+#include <QMessageBox>
 
 AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     QWidget(parent),
@@ -108,8 +109,8 @@ void AutoTrend::initUI()
 
 void AutoTrend::updateDCBias(QString name, double value)
 {
-    QLineEdit *leDCB = mipsui->gbDCbias1->findChild<QLineEdit *>(name); // name "leSDCB_1"
-    leDCB->setText(QString::number(value)); // value 1234
+    QLineEdit *leDCB = mipsui->gbDCbias1->findChild<QLineEdit *>(name);
+    leDCB->setText(QString::number(value));
     leDCB->setModified(true);
     emit leDCB->editingFinished();
 }
@@ -131,8 +132,7 @@ bool AutoTrend::applyRelations(QString startWith, double startValue)
             if(mathList.size() != 2) continue;
             QString leftString = mathList.at(0);
             QString rightString = mathList.at(1);
-            if(rightString.contains(currentName)){ // Assume NameX=NameY+3
-                qDebug() << "applying " << current;
+            if(rightString.contains(currentName)){
                 if(rightString.contains('+')){
                     QStringList rightList = rightString.split('+');
                     if(rightList.size() == 2){
@@ -156,7 +156,7 @@ bool AutoTrend::applyRelations(QString startWith, double startValue)
                 calQueue.enqueue(QPair<QString, double>(leftString, currentValue));
                 appliedRelations++;
                 if(appliedRelations > totalRelationsInList){
-                    qWarning() << "Loop detected in Relations";
+                    QMessageBox::warning(this, "Loop in RelationShip", "Loop is detected in relationship and autotrend is stoped");
                     return false;
                 }
             }
@@ -200,8 +200,17 @@ void AutoTrend::buildTrendSM()
     });
     updateTrendState->addTransition(this, &AutoTrend::nextState, applyRelationState);
 
-    connect(applyRelationState, &QState::entered, this, [=](){if(relationEnabled) applyRelations(trendName, currentStep); emit nextState();});
+    connect(applyRelationState, &QState::entered, this, [=](){
+        if(relationEnabled){
+            if(!applyRelations(trendName, currentStep)){
+                emit abortTrend();
+                return;
+            }
+        }
+        emit nextState();
+    });
     applyRelationState->addTransition(this, &AutoTrend::nextState, waitBeforeAcqState);
+    applyRelationState->addTransition(this, &AutoTrend::abortTrend, finishState);
 
     connect(waitBeforeAcqState, &QState::entered, this, [=](){QTimer::singleShot(2000, this, [=](){emit nextState();});});
     waitBeforeAcqState->addTransition(this, &AutoTrend::nextState, startAcqState);

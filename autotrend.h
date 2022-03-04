@@ -26,6 +26,7 @@ public:
 signals:
     void nextState();
     void doneAllStates();
+    void abortTrend();
 
 private slots:
     void on_initDigitizerButton_clicked();
