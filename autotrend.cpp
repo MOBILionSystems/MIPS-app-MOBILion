@@ -5,6 +5,8 @@
 #include <QPair>
 #include <QFinalState>
 #include <QTimer>
+#include <QDate>
+#include <QTime>
 
 AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     QWidget(parent),
@@ -47,7 +49,7 @@ void AutoTrend::on_initDigitizerButton_clicked()
 
 void AutoTrend::on_startAcqButton_clicked()
 {
-    _broker->startAcquire();
+    //_broker->startAcquire("20220228/b.mbi");
 }
 
 
@@ -95,10 +97,10 @@ void AutoTrend::initUI()
     ui->trendComboBox->addItems(electrodes);
     ui->relationListView->setModel(relationModel);
 
-    ui->constInRelation->setValidator(new QDoubleValidator(0, 1000, 3, this));
-    ui->trendFrom->setValidator(new QIntValidator(0, 1000, this));
-    ui->trendTo->setValidator(new QIntValidator(0, 1000, this));
-    ui->trendStepSize->setValidator(new QIntValidator(0, 10000, this));
+    ui->constInRelation->setValidator(new QDoubleValidator(0, 10000, 3, this));
+    ui->trendFrom->setValidator(new QIntValidator(-10000, 10000, this));
+    ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
+    ui->trendStepSize->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendStepDuration->setValidator(new QIntValidator(0, 10000, this));
 }
 
@@ -179,13 +181,11 @@ void AutoTrend::buildTrendSM()
 
     trendSM->setInitialState(initState);
     connect(initState, &QState::entered, this, [=](){
-        trendName = ui->trendComboBox->currentText();
-        trendFrom = ui->trendFrom->text().toInt();
-        trendTo = ui->trendTo->text().toInt();
-        trendStepSize = ui->trendStepSize->text().toInt();
-        stepDuration = ui->trendStepDuration->text().toInt();
+        toStopTrend = false;
         currentStep = trendFrom;
         relationEnabled = ui->relationRatioButton->isChecked();
+        fileFolder = QDate::currentDate().toString("yyyyMMdd") + "/" + QTime::currentTime().toString("hhmmss") + trendName + "Trend";
+        qDebug() << fileFolder;
         emit nextState();
     });
     initState->addTransition(this, &AutoTrend::nextState, updateTrendState);
@@ -204,7 +204,7 @@ void AutoTrend::buildTrendSM()
     connect(waitBeforeAcqState, &QState::entered, this, [=](){QTimer::singleShot(2000, this, [=](){emit nextState();});});
     waitBeforeAcqState->addTransition(this, &AutoTrend::nextState, startAcqState);
 
-    connect(startAcqState, &QState::entered, this, [=](){_broker->startAcquire(); emit nextState();});
+    connect(startAcqState, &QState::entered, this, [=](){_broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi"); emit nextState();});
     startAcqState->addTransition(this, &AutoTrend::nextState, waitDuringAcqState);
 
     connect(waitDuringAcqState, &QState::entered, this, [=](){QTimer::singleShot(stepDuration, this, [=](){emit nextState();});});
@@ -213,7 +213,7 @@ void AutoTrend::buildTrendSM()
     connect(stopAcqState, &QState::entered, this, [=](){_broker->stopAcquire(); emit nextState();});
     stopAcqState->addTransition(this, &AutoTrend::nextState, nextStepState);
 
-    connect(nextStepState, &QState::entered, this, [=](){currentStep += trendStepSize; currentStep <= trendTo ? emit nextState() : emit doneAllStates();});
+    connect(nextStepState, &QState::entered, this, [=](){currentStep += trendStepSize; currentStep <= trendTo && !toStopTrend ? emit nextState() : emit doneAllStates();});
     nextStepState->addTransition(this, &AutoTrend::nextState, updateTrendState);
     nextStepState->addTransition(this, &AutoTrend::doneAllStates, finishState);
 
@@ -223,12 +223,26 @@ void AutoTrend::buildTrendSM()
 
 void AutoTrend::on_runTrendButton_clicked()
 {
+    if( ui->trendComboBox->currentText().isEmpty() ||
+            ui->trendFrom->text().isEmpty() ||
+            ui->trendTo->text().isEmpty() ||
+            ui->trendStepSize->text().isEmpty() ||
+            ui->trendStepDuration->text().isEmpty()){
+        qWarning() << "Invalid setting for autotrend.";
+        return;
+    }
+
+    trendName = ui->trendComboBox->currentText();
+    trendFrom = ui->trendFrom->text().toInt();
+    trendTo = ui->trendTo->text().toInt();
+    trendStepSize = ui->trendStepSize->text().toInt();
+    stepDuration = ui->trendStepDuration->text().toInt();
     trendSM->start();
 }
 
 
 void AutoTrend::on_stopTrendButton_clicked()
 {
-
+    toStopTrend = true;
 }
 

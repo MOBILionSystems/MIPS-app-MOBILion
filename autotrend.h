@@ -55,6 +55,7 @@ private:
     QStringList mathOperators = {"None", "+", "-", "*"};
     QStringList relationList;
     QHash<QString, QString> electrodeChannelHash;
+    QString fileFolder;
 
 
     QString trendName;
@@ -64,6 +65,7 @@ private:
     int stepDuration = 1;
     int currentStep = 0;
     bool relationEnabled = false;
+    bool toStopTrend = false;
 
     void initUI();
     void updateDCBias(QString name, double value);

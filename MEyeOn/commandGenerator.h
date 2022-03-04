@@ -11,7 +11,7 @@ class CommandGenerator : public QObject
     Q_OBJECT
 public:
     explicit CommandGenerator(QObject *parent = nullptr);
-    QJsonObject getCommand(CommandType type);
+    QJsonObject getCommand(CommandType type, QString fileName = "");
 
 signals:
 
@@ -20,7 +20,7 @@ private:
     unsigned int sequence = 1;
     void initCommand(QJsonObject& command);
     void updateInitDigtizerCommand(QJsonObject& command);
-    void updateStartAcqCommand(QJsonObject& command);
+    void updateStartAcqCommand(QJsonObject& command, QString fileName);
     void updateStopAcqCommand(QJsonObject& command);
 
     QString getUUID();

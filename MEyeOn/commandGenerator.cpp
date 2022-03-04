@@ -8,7 +8,7 @@ CommandGenerator::CommandGenerator(QObject *parent)
 
 }
 
-QJsonObject CommandGenerator::getCommand(CommandType type)
+QJsonObject CommandGenerator::getCommand(CommandType type, QString fileName)
 {
     QJsonObject command;
     initCommand(command);
@@ -17,7 +17,7 @@ QJsonObject CommandGenerator::getCommand(CommandType type)
         updateInitDigtizerCommand(command);
         break;
     case CommandType::Start_Acquisition:
-        updateStartAcqCommand(command);
+        updateStartAcqCommand(command, fileName);
         break;
     case CommandType::Stop_Acquisition:
         updateStopAcqCommand(command);
@@ -69,7 +69,7 @@ void CommandGenerator::updateInitDigtizerCommand(QJsonObject &command)
     command.insert("data", initDigitizer);
 }
 
-void CommandGenerator::updateStartAcqCommand(QJsonObject &command)
+void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileName)
 {
     talismanUUID = getUUID();
 
@@ -83,7 +83,7 @@ void CommandGenerator::updateStartAcqCommand(QJsonObject &command)
 
     QJsonObject data;
 
-    data.insert("filename", QJsonValue("/acorn/data/20220228/b.mbi"));
+    data.insert("filename", QJsonValue("/acorn/data/" + fileName)); // "/acorn/data/20220228/b.mbi"
 
     QJsonObject frameObject;
     frameObject.insert("frm-metadata-id",  QJsonValue("1"));

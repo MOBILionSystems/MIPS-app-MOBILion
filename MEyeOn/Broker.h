@@ -48,7 +48,7 @@ public:
     ~Broker();
 
     void initDigitizer();
-    void startAcquire();
+    void startAcquire(QString fileName);
     void stopAcquire();
 
 private:
