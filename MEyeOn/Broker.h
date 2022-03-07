@@ -43,15 +43,17 @@ public:
 class Broker : public QObject {
     Q_OBJECT
 public:
-    explicit Broker(QObject* parent = nullptr);
+    explicit Broker(QString ipaddress, QObject* parent = nullptr);
 
     ~Broker();
 
     void initDigitizer();
     void startAcquire(QString fileName);
     void stopAcquire();
+    bool isAcqiring();
 
 private:
+    QString _ipaddress;
     bool startedAcquire = false;
     CommandGenerator commandGen;
     std::string _brokers;

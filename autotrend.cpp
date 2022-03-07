@@ -18,7 +18,6 @@ AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     buildTrendSM();
     mipsui = w;
     ui->setupUi(this);
-    _broker = new Broker(this);
 
     relationModel = new QStringListModel(this);
     leftValueModel = new QStringListModel(this);
@@ -50,22 +49,34 @@ AutoTrend::~AutoTrend()
     }
 }
 
-void AutoTrend::on_initDigitizerButton_clicked()
-{
-    _broker->initDigitizer();
-}
+//void AutoTrend::on_initDigitizerButton_clicked()
+//{
+//    if(!_broker){
+//        QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
+//        return;
+//    }
+//    _broker->initDigitizer();
+//}
 
 
-void AutoTrend::on_startAcqButton_clicked()
-{
-    _broker->startAcquire("20220228/b.mbi");
-}
+//void AutoTrend::on_startAcqButton_clicked()
+//{
+//    if(!_broker){
+//        QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
+//        return;
+//    }
+//    _broker->startAcquire("20220228/b.mbi");
+//}
 
 
-void AutoTrend::on_stopAcqButton_clicked()
-{
-    _broker->stopAcquire();
-}
+//void AutoTrend::on_stopAcqButton_clicked()
+//{
+//    if(!_broker){
+//        QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
+//        return;
+//    }
+//    _broker->stopAcquire();
+//}
 
 
 void AutoTrend::on_removeRelationButton_clicked()
@@ -242,15 +253,35 @@ void AutoTrend::buildTrendSM()
     connect(trendSM, &QStateMachine::finished, this, [=](){ui->trendProgressBar->setValue(100);});
 }
 
+void AutoTrend::setupBroker(bool connected)
+{
+    if(_broker && trendSM->isRunning()){
+        QMessageBox::warning(this, "Warning", "Current SBC is running for Acquisition.");
+        return;
+    }
+    if(connected){
+        delete _broker;
+        _broker = new Broker(_sbcIpAddress, this);
+        _broker->initDigitizer();
+    }else{
+        _broker = nullptr;
+    }
+}
+
 
 void AutoTrend::on_runTrendButton_clicked()
 {
+    if(!_broker){
+        QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
+        return;
+    }
     if( ui->trendComboBox->currentText().isEmpty() ||
             ui->trendFrom->text().isEmpty() ||
             ui->trendTo->text().isEmpty() ||
             ui->trendStepSize->text().isEmpty() ||
             ui->trendStepDuration->text().isEmpty()){
         qWarning() << "Invalid setting for autotrend.";
+        QMessageBox::warning(this, "Autotrend Failed", "Invalid settings for autotrend.");
         return;
     }
 
@@ -265,15 +296,16 @@ void AutoTrend::on_runTrendButton_clicked()
 
 void AutoTrend::on_stopTrendButton_clicked()
 {
+    if(!_broker){
+        QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
+        return;
+    }
     toStopTrend = true;
 }
 
 
 void AutoTrend::on_initDCBiasButton_clicked()
 {
-    QLabel* firstLabel = mipsui->gbDCbias1->findChild<QLabel *>("label");
-    firstLabel->setText("HAHA");
-
     QMap<QString, QPair<QString, int>>::iterator i;
     for(i = electrodeLabelValueMap.begin(); i != electrodeLabelValueMap.end(); i++){
         QLabel* firstLabel = mipsui->gbDCbias1->findChild<QLabel *>(i.key());
@@ -283,6 +315,46 @@ void AutoTrend::on_initDCBiasButton_clicked()
         leDCB->setText(QString::number(i.value().second));
         leDCB->setModified(true);
         emit leDCB->editingFinished();
+    }
+}
+
+// https://www.qtcentre.org/threads/23723-check-IPAddress-existence
+void AutoTrend::on_testSBCButton_clicked()
+{
+    QLineEdit *sbcIp = ui->sbcIPEdit;
+    sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
+    setupBroker(false);
+
+    _sbcIpAddress = ui->sbcIPEdit->text();
+    QProcess *ping = new QProcess(this);
+    connect(ping, SIGNAL(readyReadStandardOutput()), SLOT(readResult()));
+    ping->start("ping.exe", QStringList() << ui->sbcIPEdit->text());
+}
+
+void AutoTrend::readResult()
+{
+    QProcess *ping = qobject_cast<QProcess *>(sender());
+    if (!ping)
+        return;
+    QString res = ping->readAllStandardOutput();
+    if (!res.contains('%'))
+        return;
+    const int percentLost = res.section('(', -1).section('%', 0, 0).toInt();
+    QLineEdit *sbcIp = ui->sbcIPEdit;
+    if (percentLost == 100) {
+        qDebug() << "host not found.";
+        sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 0, 0);}");
+        setupBroker(false);
+    } else {
+        if ( res.contains(QRegExp("=\\d+ms")) ) {
+            qDebug() << "host found." << res; 		// actual response time from IP
+            sbcIp->setStyleSheet("QLineEdit { background: rgb(0, 255, 0);}");
+            setupBroker(true);
+        } else {
+            qDebug() << "host not found." << res; 	// TTL expired in transit
+            sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 0, 0);}");
+            setupBroker(false);
+        }
     }
 }
 

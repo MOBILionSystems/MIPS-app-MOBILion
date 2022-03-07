@@ -2,9 +2,10 @@
 #include <QJsonDocument>
 #include <QThread>
 
-Broker::Broker(QObject* parent) :
+Broker::Broker(QString ipaddress, QObject* parent) :
     QObject(parent)
 {
+    _ipaddress = ipaddress;
     SetConfigError(false, std::string());
     config();
 
@@ -79,6 +80,11 @@ void Broker::stopAcquire()
     }
 }
 
+bool Broker::isAcqiring()
+{
+    return startedAcquire;
+}
+
 
 void Broker::config()
 {
@@ -87,7 +93,7 @@ void Broker::config()
     std::string err_msg;
     AcornDeliveryReportCb ac_dr_cb;
 
-    if (_conf->set("bootstrap.servers", "192.168.1.212:9092", err_msg) != RdKafka::Conf::CONF_OK) {
+    if (_conf->set("bootstrap.servers", _ipaddress.toStdString(), err_msg) != RdKafka::Conf::CONF_OK) {
         SetConfigError(true, err_msg);
         return;
     }

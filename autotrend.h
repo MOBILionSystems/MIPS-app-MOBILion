@@ -9,6 +9,7 @@
 #include "ui_mips.h"
 #include "mips.h"
 #include <QHash>
+#include <QHostInfo>
 
 
 namespace Ui {
@@ -29,11 +30,11 @@ signals:
     void abortTrend();
 
 private slots:
-    void on_initDigitizerButton_clicked();
+//    void on_initDigitizerButton_clicked();
 
-    void on_startAcqButton_clicked();
+//    void on_startAcqButton_clicked();
 
-    void on_stopAcqButton_clicked();
+//    void on_stopAcqButton_clicked();
 
     void on_removeRelationButton_clicked();
 
@@ -45,11 +46,16 @@ private slots:
 
     void on_initDCBiasButton_clicked();
 
+    void on_testSBCButton_clicked();
+
+    void readResult();
+
 private:
+    QString _sbcIpAddress;
     QStateMachine* trendSM;
     Ui::MIPS *mipsui;
     Ui::AutoTrend *ui;
-    Broker* _broker;
+    Broker* _broker{nullptr};
     QStringListModel* relationModel;
     QStringListModel* leftValueModel;
     QStringListModel* rightValueModel;
@@ -75,6 +81,8 @@ private:
     void updateDCBias(QString name, double value);
     bool applyRelations(QString startWith, double startValue);
     void buildTrendSM();
+
+    void setupBroker(bool connected);
 };
 
 #endif // AUTOTREND_H
