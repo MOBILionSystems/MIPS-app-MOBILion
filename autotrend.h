@@ -43,6 +43,8 @@ private slots:
 
     void on_stopTrendButton_clicked();
 
+    void on_initDCBiasButton_clicked();
+
 private:
     QStateMachine* trendSM;
     Ui::MIPS *mipsui;
@@ -56,6 +58,7 @@ private:
     QStringList mathOperators = {"None", "+", "-", "*"};
     QStringList relationList;
     QHash<QString, QString> electrodeChannelHash;
+    QMap<QString, QPair<QString, int>> electrodeLabelValueMap;
     QString fileFolder;
 
 

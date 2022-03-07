@@ -537,6 +537,10 @@ MIPS::MIPS(QWidget *parent, QString CPfilename) :
 
     for(int i=0;i<properties->MIPS_TCPIP.count();i++) ui->comboMIPSnetNames->addItem(properties->MIPS_TCPIP[i]);
     if(properties != NULL) properties->Log("MIPS loaded: " + Version);
+
+    RemoveTab("FAIMS");
+    RemoveTab("Filament");
+    RemoveTab("ARB");
 }
 
 MIPS::~MIPS()

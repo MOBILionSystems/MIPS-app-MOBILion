@@ -32,6 +32,13 @@ AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     electrodeChannelHash.insert("ExitCL", "leSDCB_5");
     electrodeChannelHash.insert("QuadBias", "leSDCB_6");
 
+    electrodeLabelValueMap.insert("label", QPair<QString, int>("FunnelIn", 10));
+    electrodeLabelValueMap.insert("label_2", QPair<QString, int>("FunnelOut", 10));
+    electrodeLabelValueMap.insert("label_3", QPair<QString, int>("FunnelCL", 10));
+    electrodeLabelValueMap.insert("label_4", QPair<QString, int>("SLIMBias", 10));
+    electrodeLabelValueMap.insert("label_5", QPair<QString, int>("ExitCL", 10));
+    electrodeLabelValueMap.insert("label_6", QPair<QString, int>("QuadBias", 10));
+
     initUI();
 }
 
@@ -259,5 +266,23 @@ void AutoTrend::on_runTrendButton_clicked()
 void AutoTrend::on_stopTrendButton_clicked()
 {
     toStopTrend = true;
+}
+
+
+void AutoTrend::on_initDCBiasButton_clicked()
+{
+    QLabel* firstLabel = mipsui->gbDCbias1->findChild<QLabel *>("label");
+    firstLabel->setText("HAHA");
+
+    QMap<QString, QPair<QString, int>>::iterator i;
+    for(i = electrodeLabelValueMap.begin(); i != electrodeLabelValueMap.end(); i++){
+        QLabel* firstLabel = mipsui->gbDCbias1->findChild<QLabel *>(i.key());
+        firstLabel->setText(i.value().first);
+
+        QLineEdit *leDCB = mipsui->gbDCbias1->findChild<QLineEdit *>(electrodeChannelHash.value(i.value().first));
+        leDCB->setText(QString::number(i.value().second));
+        leDCB->setModified(true);
+        emit leDCB->editingFinished();
+    }
 }
 
