@@ -123,6 +123,11 @@ void AutoTrend::initUI()
     ui->trendStepSize->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendStepDuration->setValidator(new QIntValidator(0, 10000, this));
 
+    connect(ui->sbcIPEdit, &QLineEdit::textChanged, this, [=](){
+        QLineEdit *sbcIp = ui->sbcIPEdit;
+        sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
+    });
+
 }
 
 void AutoTrend::updateDCBias(QString name, double value)
@@ -206,6 +211,7 @@ void AutoTrend::buildTrendSM()
         relationEnabled = ui->relationRatioButton->isChecked();
         fileFolder = QDate::currentDate().toString("yyyyMMdd") + "/" + QTime::currentTime().toString("hhmmss") + trendName + "Trend";
         ui->trendProgressBar->setValue(0);
+        mipsui->chkPowerEnable->setChecked(true);
         emit nextState();
     });
     initState->addTransition(this, &AutoTrend::nextState, updateTrendState);
@@ -321,8 +327,6 @@ void AutoTrend::on_initDCBiasButton_clicked()
 // https://www.qtcentre.org/threads/23723-check-IPAddress-existence
 void AutoTrend::on_testSBCButton_clicked()
 {
-    QLineEdit *sbcIp = ui->sbcIPEdit;
-    sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
     setupBroker(false);
 
     _sbcIpAddress = ui->sbcIPEdit->text();
