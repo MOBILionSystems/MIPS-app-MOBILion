@@ -9,6 +9,8 @@
 #include <QTime>
 #include <cstdlib>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QDir>
 
 AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     QWidget(parent),
@@ -360,5 +362,38 @@ void AutoTrend::readResult()
             setupBroker(false);
         }
     }
+}
+
+
+void AutoTrend::on_loadRelationButton_clicked()
+{
+    QString filter = "Text File (*.txt);; All File (*.*)";
+    QString file_name = QFileDialog::getOpenFileName(this, "Open file", QDir::homePath(), filter);
+    QFile file(file_name);
+
+    if(!file.open(QFile::ReadOnly | QFile::Text)){
+        return;
+    }
+
+    relationList.clear();
+    relationList = QString(file.readAll()).split('\n');
+    relationModel->setStringList(relationList);
+    file.close();
+}
+
+
+void AutoTrend::on_saveRelationButton_clicked()
+{
+    QString filter = "Text File (*.txt);; All File (*.*)";
+    QString file_name = QFileDialog::getSaveFileName(this, "Save file", QDir::homePath(), filter);
+    QFile file(file_name);
+
+    if(!file.open(QFile::WriteOnly | QFile::Text)){
+        return;
+    }
+
+    QTextStream out(&file);
+    out << relationList.join('\n');
+    file.close();
 }
 

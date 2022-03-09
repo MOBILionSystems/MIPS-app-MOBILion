@@ -50,6 +50,10 @@ private slots:
 
     void readResult();
 
+    void on_loadRelationButton_clicked();
+
+    void on_saveRelationButton_clicked();
+
 private:
     QString _sbcIpAddress;
     QStateMachine* trendSM;
