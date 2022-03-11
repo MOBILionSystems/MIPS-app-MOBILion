@@ -345,22 +345,18 @@ void AutoTrend::readResult()
     QString res = ping->readAllStandardOutput();
     if (!res.contains('%'))
         return;
+
     const int percentLost = res.section('(', -1).section('%', 0, 0).toInt();
     QLineEdit *sbcIp = ui->sbcIPEdit;
-    if (percentLost == 100) {
+
+    if (res.contains("unreachable") || percentLost == 100) {
         qDebug() << "host not found.";
         sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 0, 0);}");
         setupBroker(false);
     } else {
-        if ( res.contains(QRegExp("=\\d+ms")) ) {
-            qDebug() << "host found." << res; 		// actual response time from IP
-            sbcIp->setStyleSheet("QLineEdit { background: rgb(0, 255, 0);}");
-            setupBroker(true);
-        } else {
-            qDebug() << "host not found." << res; 	// TTL expired in transit
-            sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 0, 0);}");
-            setupBroker(false);
-        }
+        qDebug() << "host found." << res;
+        sbcIp->setStyleSheet("QLineEdit { background: rgb(0, 255, 0);}");
+        setupBroker(true);
     }
 }
 
