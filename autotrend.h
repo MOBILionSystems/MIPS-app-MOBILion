@@ -10,7 +10,7 @@
 #include "mips.h"
 #include <QHash>
 #include <QHostInfo>
-#include <QTcpSocket>
+#include <QtWebSockets/QWebSocket>
 
 
 namespace Ui {
@@ -58,13 +58,13 @@ private slots:
     void on_pushButton_clicked();
 
     // test tcp
-    void connected();
-    void disconnected();
+    void OnConnected();
+    void onDisconnected();
     void bytesWritten(qint64 bytes);
-    void readyRead();
+    void readyRead(QString message);
 
 private:
-    QTcpSocket* socket;
+    QWebSocket* m_webSocket;
     QString _sbcIpAddress;
     QStateMachine* trendSM;
     Ui::MIPS *mipsui;

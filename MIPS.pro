@@ -10,6 +10,7 @@ QT       += serialport
 QT       += network
 QT       += widgets printsupport
 QT       += script
+QT       += websockets
 
 win32:RC_ICONS += GAACElogo.ico
 ICON = GAACElogo.icns

@@ -397,34 +397,19 @@ void AutoTrend::on_saveRelationButton_clicked()
 
 void AutoTrend::on_pushButton_clicked()
 {
-    socket = new QTcpSocket(this);
-    connect(socket, SIGNAL(connected()), this, SLOT(connected()));
-    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
-    connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(bytesWritten(qint64)));
-    qDebug() << "connecting...";
-
-    // this is not blocking call
-    socket->connectToHost("192.168.1.212", 4001);
-
-    socket->waitForConnected(3000);
-    socket->waitForReadyRead(3000);
-    qDebug() << socket->readAll();
-
-    // we need to wait...
-    if(!socket->waitForConnected(5000))
-    {
-        qDebug() << "Error: " << socket->errorString();
-    }
-    //socket->close();
+    m_webSocket = new QWebSocket();
+    connect(m_webSocket, &QWebSocket::connected, this, &AutoTrend::OnConnected);
+    connect(m_webSocket, &QWebSocket::disconnected, this, &AutoTrend::onDisconnected);
+    m_webSocket->open(QUrl(QStringLiteral("ws://192.168.1.212:4001")));
 }
 
-void AutoTrend::connected()
+void AutoTrend::OnConnected()
 {
     qDebug() << "Connected!";
+    connect(m_webSocket, &QWebSocket::textMessageReceived, this,&AutoTrend::readyRead);
 }
 
-void AutoTrend::disconnected()
+void AutoTrend::onDisconnected()
 {
     qDebug() << "Disconnected!";
 }
@@ -434,9 +419,9 @@ void AutoTrend::bytesWritten(qint64 bytes)
     qDebug() << "We wrote: " << bytes;
 }
 
-void AutoTrend::readyRead()
+void AutoTrend::readyRead(QString message)
 {
     qDebug() << "Reading...";
-    qDebug() << socket->readAll();
+    qDebug() << message;
 }
 
