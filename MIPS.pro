@@ -19,6 +19,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = MIPS
 TEMPLATE = app
 
+
 //CONFIG += static
 
 LIBS += -L$$PWD\libraries\librdkafka -llibrdkafka

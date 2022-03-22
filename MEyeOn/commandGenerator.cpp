@@ -76,6 +76,7 @@ void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileN
     QJsonArray target;
     target.append("ACORN_ACQUIRE");
     target.append("ACORN_ARCHIVE");
+    target.append("ACORN_STREAM");
     command.insert("target", QJsonValue(target));
 
     command.insert("command", QJsonValue("START_ACQUISITION"));

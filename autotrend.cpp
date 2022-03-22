@@ -41,6 +41,7 @@ AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     electrodeLabelValueMap.insert("label_6", QPair<QString, int>("QuadBias", 10));
 
     initUI();
+
 }
 
 AutoTrend::~AutoTrend()
@@ -391,5 +392,51 @@ void AutoTrend::on_saveRelationButton_clicked()
     QTextStream out(&file);
     out << relationList.join('\n');
     file.close();
+}
+
+
+void AutoTrend::on_pushButton_clicked()
+{
+    socket = new QTcpSocket(this);
+    connect(socket, SIGNAL(connected()), this, SLOT(connected()));
+    connect(socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+    connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(bytesWritten(qint64)));
+    qDebug() << "connecting...";
+
+    // this is not blocking call
+    socket->connectToHost("192.168.1.212", 4001);
+
+    socket->waitForConnected(3000);
+    socket->waitForReadyRead(3000);
+    qDebug() << socket->readAll();
+
+    // we need to wait...
+    if(!socket->waitForConnected(5000))
+    {
+        qDebug() << "Error: " << socket->errorString();
+    }
+    //socket->close();
+}
+
+void AutoTrend::connected()
+{
+    qDebug() << "Connected!";
+}
+
+void AutoTrend::disconnected()
+{
+    qDebug() << "Disconnected!";
+}
+
+void AutoTrend::bytesWritten(qint64 bytes)
+{
+    qDebug() << "We wrote: " << bytes;
+}
+
+void AutoTrend::readyRead()
+{
+    qDebug() << "Reading...";
+    qDebug() << socket->readAll();
 }
 

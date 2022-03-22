@@ -344,6 +344,19 @@
     <string>Save</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>200</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Test Streamer</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

@@ -10,6 +10,7 @@
 #include "mips.h"
 #include <QHash>
 #include <QHostInfo>
+#include <QTcpSocket>
 
 
 namespace Ui {
@@ -54,7 +55,16 @@ private slots:
 
     void on_saveRelationButton_clicked();
 
+    void on_pushButton_clicked();
+
+    // test tcp
+    void connected();
+    void disconnected();
+    void bytesWritten(qint64 bytes);
+    void readyRead();
+
 private:
+    QTcpSocket* socket;
     QString _sbcIpAddress;
     QStateMachine* trendSM;
     Ui::MIPS *mipsui;
