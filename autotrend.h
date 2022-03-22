@@ -5,12 +5,12 @@
 #include <QStringListModel>
 #include <QStateMachine>
 #include "MEyeOn/Broker.h"
+#include "MEyeOn/streamerclient.h"
 
 #include "ui_mips.h"
 #include "mips.h"
 #include <QHash>
 #include <QHostInfo>
-#include <QtWebSockets/QWebSocket>
 
 
 namespace Ui {
@@ -57,14 +57,10 @@ private slots:
 
     void on_pushButton_clicked();
 
-    // test tcp
-    void OnConnected();
-    void onDisconnected();
-    void bytesWritten(qint64 bytes);
-    void readyRead(QString message);
+    void on_requestButton_clicked();
 
 private:
-    QWebSocket* m_webSocket;
+    StreamerClient* _streamerClient;
     QString _sbcIpAddress;
     QStateMachine* trendSM;
     Ui::MIPS *mipsui;

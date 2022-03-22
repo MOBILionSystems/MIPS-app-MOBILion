@@ -31,6 +31,7 @@ INCLUDEPATH += $$PWD\include\librdkafka\src-cpp
 SOURCES += main.cpp\
     MEyeOn/Broker.cpp \
     MEyeOn/commandGenerator.cpp \
+    MEyeOn/streamerclient.cpp \
     autotrend.cpp \
         mips.cpp \
         console.cpp \
@@ -75,6 +76,7 @@ HEADERS  += mips.h \
     MEyeOn/Broker.h \
     MEyeOn/commandGenerator.h \
     MEyeOn/common.h \
+    MEyeOn/streamerclient.h \
     autotrend.h \
     console.h \
     settingsdialog.h \

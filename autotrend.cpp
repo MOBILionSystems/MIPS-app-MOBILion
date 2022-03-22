@@ -397,31 +397,15 @@ void AutoTrend::on_saveRelationButton_clicked()
 
 void AutoTrend::on_pushButton_clicked()
 {
-    m_webSocket = new QWebSocket();
-    connect(m_webSocket, &QWebSocket::connected, this, &AutoTrend::OnConnected);
-    connect(m_webSocket, &QWebSocket::disconnected, this, &AutoTrend::onDisconnected);
-    m_webSocket->open(QUrl(QStringLiteral("ws://192.168.1.212:4001")));
+    _streamerClient = new StreamerClient(this);
+    _streamerClient->connectTo();
 }
 
-void AutoTrend::OnConnected()
-{
-    qDebug() << "Connected!";
-    connect(m_webSocket, &QWebSocket::textMessageReceived, this,&AutoTrend::readyRead);
-}
 
-void AutoTrend::onDisconnected()
-{
-    qDebug() << "Disconnected!";
-}
 
-void AutoTrend::bytesWritten(qint64 bytes)
-{
-    qDebug() << "We wrote: " << bytes;
-}
 
-void AutoTrend::readyRead(QString message)
+void AutoTrend::on_requestButton_clicked()
 {
-    qDebug() << "Reading...";
-    qDebug() << message;
+    _streamerClient->request("");
 }
 
