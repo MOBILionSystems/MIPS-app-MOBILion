@@ -8,14 +8,13 @@ QT       += core
 QT       += gui
 QT       += serialport
 QT       += network
-QT       += widgets printsupport
 QT       += script
 QT       += websockets
 
 win32:RC_ICONS += GAACElogo.ico
 ICON = GAACElogo.icns
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = MIPS
 TEMPLATE = app
@@ -32,6 +31,7 @@ SOURCES += main.cpp\
     MEyeOn/Broker.cpp \
     MEyeOn/commandGenerator.cpp \
     MEyeOn/streamerclient.cpp \
+    MEyeOn/trendrealtimedialog.cpp \
     autotrend.cpp \
         mips.cpp \
         console.cpp \
@@ -77,6 +77,7 @@ HEADERS  += mips.h \
     MEyeOn/commandGenerator.h \
     MEyeOn/common.h \
     MEyeOn/streamerclient.h \
+    MEyeOn/trendrealtimedialog.h \
     autotrend.h \
     console.h \
     settingsdialog.h \
@@ -117,6 +118,7 @@ HEADERS  += mips.h \
     shuttertg.h
 
 FORMS    += mips.ui \
+    MEyeOn/trendrealtimedialog.ui \
     autotrend.ui \
     settingsdialog.ui \
     pse.ui \

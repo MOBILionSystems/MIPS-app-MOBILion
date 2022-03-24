@@ -409,3 +409,10 @@ void AutoTrend::on_requestButton_clicked()
     _streamerClient->request("");
 }
 
+
+void AutoTrend::on_plotButton_clicked()
+{
+    trendRealTimeDialog = new TrendRealTimeDialog(this);
+    trendRealTimeDialog->show();
+}
+

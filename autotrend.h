@@ -6,6 +6,7 @@
 #include <QStateMachine>
 #include "MEyeOn/Broker.h"
 #include "MEyeOn/streamerclient.h"
+#include "MEyeOn/trendrealtimedialog.h"
 
 #include "ui_mips.h"
 #include "mips.h"
@@ -59,7 +60,10 @@ private slots:
 
     void on_requestButton_clicked();
 
+    void on_plotButton_clicked();
+
 private:
+    TrendRealTimeDialog* trendRealTimeDialog;
     StreamerClient* _streamerClient;
     QString _sbcIpAddress;
     QStateMachine* trendSM;

@@ -347,7 +347,7 @@
   <widget class="QPushButton" name="pushButton">
    <property name="geometry">
     <rect>
-     <x>80</x>
+     <x>10</x>
      <y>200</y>
      <width>131</width>
      <height>31</height>
@@ -360,7 +360,7 @@
   <widget class="QPushButton" name="requestButton">
    <property name="geometry">
     <rect>
-     <x>230</x>
+     <x>150</x>
      <y>200</y>
      <width>80</width>
      <height>24</height>
@@ -368,6 +368,19 @@
    </property>
    <property name="text">
     <string>request</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="plotButton">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>200</y>
+     <width>80</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Plot</string>
    </property>
   </widget>
  </widget>
