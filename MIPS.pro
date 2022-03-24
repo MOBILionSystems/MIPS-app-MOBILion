@@ -30,6 +30,7 @@ INCLUDEPATH += $$PWD\include\librdkafka\src-cpp
 SOURCES += main.cpp\
     MEyeOn/Broker.cpp \
     MEyeOn/commandGenerator.cpp \
+    MEyeOn/dataprocess.cpp \
     MEyeOn/streamerclient.cpp \
     MEyeOn/trendrealtimedialog.cpp \
     autotrend.cpp \
@@ -76,6 +77,7 @@ HEADERS  += mips.h \
     MEyeOn/Broker.h \
     MEyeOn/commandGenerator.h \
     MEyeOn/common.h \
+    MEyeOn/dataprocess.h \
     MEyeOn/streamerclient.h \
     MEyeOn/trendrealtimedialog.h \
     autotrend.h \

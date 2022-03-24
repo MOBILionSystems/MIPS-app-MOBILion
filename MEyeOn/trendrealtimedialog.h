@@ -14,10 +14,14 @@ class TrendRealTimeDialog : public QDialog
 public:
     explicit TrendRealTimeDialog(QWidget *parent = nullptr);
     ~TrendRealTimeDialog();
+    void addPoint(double x, double y);
+    void resetPlot();
 
 private:
     Ui::TrendRealTimeDialog *ui;
     void initPlot();
+    QVector<double> xPoints, yPoints;
+    void replot();
 };
 
 #endif // TRENDREALTIMEDIALOG_H

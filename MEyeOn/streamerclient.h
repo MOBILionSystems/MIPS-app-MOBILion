@@ -25,6 +25,7 @@ private:
 
 
 signals:
+    void messageReady(QString message);
 
 };
 

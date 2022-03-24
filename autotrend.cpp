@@ -16,6 +16,7 @@ AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AutoTrend)
 {
+    trendRealTimeDialog = new TrendRealTimeDialog(this);
     trendSM = new QStateMachine(this);
     buildTrendSM();
     mipsui = w;
@@ -41,6 +42,7 @@ AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     electrodeLabelValueMap.insert("label_6", QPair<QString, int>("QuadBias", 10));
 
     initUI();
+    dataProcess = new DataProcess(this);
 
 }
 
@@ -209,6 +211,8 @@ void AutoTrend::buildTrendSM()
 
     trendSM->setInitialState(initState);
     connect(initState, &QState::entered, this, [=](){
+        trendRealTimeDialog->show();
+        trendRealTimeDialog->resetPlot();
         toStopTrend = false;
         currentStep = trendFrom;
         relationEnabled = ui->relationRatioButton->isChecked();
@@ -272,6 +276,8 @@ void AutoTrend::setupBroker(bool connected)
         delete _broker;
         _broker = new Broker(_sbcIpAddress, this);
         _broker->initDigitizer();
+
+        connectStreamer();
     }else{
         _broker = nullptr;
     }
@@ -395,24 +401,26 @@ void AutoTrend::on_saveRelationButton_clicked()
 }
 
 
-void AutoTrend::on_pushButton_clicked()
+void AutoTrend::connectStreamer()
 {
     _streamerClient = new StreamerClient(this);
+    connect(_streamerClient, &StreamerClient::messageReady, this, &AutoTrend::onMessageReady);
     _streamerClient->connectTo();
+    QTimer::singleShot(500, [=](){_streamerClient->request("");});
 }
 
 
-
-
-void AutoTrend::on_requestButton_clicked()
+void AutoTrend::onMessageReady(QString message)
 {
-    _streamerClient->request("");
-}
-
-
-void AutoTrend::on_plotButton_clicked()
-{
-    trendRealTimeDialog = new TrendRealTimeDialog(this);
-    trendRealTimeDialog->show();
+    QJsonDocument document = QJsonDocument::fromJson(message.toLocal8Bit());
+    QJsonObject object = document.object();
+    if(object.value("id").toString() == "STREAM_FRAME"){
+        QJsonObject payload = object.value("payload").toObject();
+        double trendValue = 0;
+        if(payload.value("chartType").toString() == "MASS"){
+            trendValue = dataProcess->process(payload.value("dataPoints").toArray());
+        }
+        trendRealTimeDialog->addPoint(currentStep, trendValue);
+    }
 }
 

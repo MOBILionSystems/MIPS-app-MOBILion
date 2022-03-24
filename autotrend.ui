@@ -264,6 +264,9 @@
      <height>24</height>
     </rect>
    </property>
+   <property name="text">
+    <string>192.168.1.212</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="trendFrom">
    <property name="geometry">
@@ -342,45 +345,6 @@
    </property>
    <property name="text">
     <string>Save</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>200</y>
-     <width>131</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Test Streamer</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="requestButton">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>200</y>
-     <width>80</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>request</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="plotButton">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>200</y>
-     <width>80</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Plot</string>
    </property>
   </widget>
  </widget>

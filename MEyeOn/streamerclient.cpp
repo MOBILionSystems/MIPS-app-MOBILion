@@ -13,6 +13,7 @@ StreamerClient::StreamerClient(QObject *parent)
     connect(m_webSocket, &QWebSocket::disconnected, this, &StreamerClient::onDisconnected);
     connect(m_webSocket, &QWebSocket::textMessageReceived, this,&StreamerClient::readyRead);
     connect(m_webSocket, &QWebSocket::bytesWritten, this, &StreamerClient::onBytesWritten);
+    connect(m_webSocket, &QWebSocket::textMessageReceived, this, &StreamerClient::messageReady);
 }
 
 void StreamerClient::connectTo()

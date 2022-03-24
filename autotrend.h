@@ -7,11 +7,16 @@
 #include "MEyeOn/Broker.h"
 #include "MEyeOn/streamerclient.h"
 #include "MEyeOn/trendrealtimedialog.h"
+#include "MEyeOn/dataprocess.h"
 
 #include "ui_mips.h"
 #include "mips.h"
 #include <QHash>
 #include <QHostInfo>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonArray>
 
 
 namespace Ui {
@@ -56,13 +61,13 @@ private slots:
 
     void on_saveRelationButton_clicked();
 
-    void on_pushButton_clicked();
+    void connectStreamer();
 
-    void on_requestButton_clicked();
 
-    void on_plotButton_clicked();
+    void onMessageReady(QString message);
 
 private:
+    DataProcess* dataProcess;
     TrendRealTimeDialog* trendRealTimeDialog;
     StreamerClient* _streamerClient;
     QString _sbcIpAddress;
