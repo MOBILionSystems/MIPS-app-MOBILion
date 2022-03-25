@@ -418,9 +418,18 @@ void AutoTrend::onMessageReady(QString message)
         QJsonObject payload = object.value("payload").toObject();
         double trendValue = 0;
         if(payload.value("chartType").toString() == "MASS"){
-            trendValue = dataProcess->process(payload.value("dataPoints").toArray());
+            QJsonArray dataPointsArray = payload.value("dataPoints").toArray();
+            QVector<double> xVector, yVector;
+            QJsonArray::Iterator i = dataPointsArray.begin();
+            while (i != dataPointsArray.end()) {
+                xVector.append(i->toArray().at(0).toDouble());
+                yVector.append(i->toArray().at(1).toDouble());
+                i++;
+            }
+            trendRealTimeDialog->msPlot(xVector, yVector);
+            trendValue = dataProcess->sumProcess(dataPointsArray);
+            trendRealTimeDialog->addPoint(currentStep, trendValue);
         }
-        trendRealTimeDialog->addPoint(currentStep, trendValue);
     }
 }
 

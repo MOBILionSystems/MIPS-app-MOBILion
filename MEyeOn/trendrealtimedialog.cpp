@@ -23,6 +23,14 @@ void TrendRealTimeDialog::addPoint(double x, double y)
     replot();
 }
 
+void TrendRealTimeDialog::msPlot(QVector<double> xVector, QVector<double> yVector)
+{
+    ui->msRealTimePlot->graph(0)->setData(xVector, yVector);
+    ui->msRealTimePlot->yAxis->rescale(true);
+    ui->msRealTimePlot->xAxis->rescale(true);
+    ui->msRealTimePlot->replot();
+}
+
 void TrendRealTimeDialog::resetPlot()
 {
     xPoints.clear();
@@ -36,6 +44,10 @@ void TrendRealTimeDialog::initPlot()
     ui->trendRealTimePlot->xAxis->setLabel("voltages");
     ui->trendRealTimePlot->yAxis->setLabel("Summed weighted heights");
     ui->trendRealTimePlot->addGraph();
+
+    ui->msRealTimePlot->xAxis->setLabel("m/z");
+    ui->msRealTimePlot->yAxis->setLabel("Intensity");
+    ui->msRealTimePlot->addGraph();
 }
 
 void TrendRealTimeDialog::replot()

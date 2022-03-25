@@ -21,10 +21,12 @@ void StreamerClient::connectTo()
     m_webSocket->open(QUrl(QStringLiteral("ws://192.168.1.212:4001")));
 }
 
-// REQUEST_FULL_SPECTRUM, REQUEST_DATA_STREAM
+// REQUEST_FULL_SPECTRUM, REQUEST_DATA_STREAM(MASS),
 void StreamerClient::request(QString message)
 {
-    message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"GUID-4b5d4bce081e365cd2eb848e3b41e31b56d16bc780f7d559a3ae629edd2e1000\", \"type\": \"MASS\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
+    //message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + heatmapGUID + "\", \"type\": \"HEATMAP\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
+    //message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + mobilityGUID + "\", \"type\": \"MOBILITY\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
+    message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + streamGUID + "\", \"type\": \"MASS\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
     qDebug() << "sending: " << message;
     m_webSocket->sendTextMessage(message);
     //m_webSocket->sendTextMessage(message);

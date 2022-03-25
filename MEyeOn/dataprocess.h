@@ -12,7 +12,7 @@ class DataProcess : public QObject
 public:
     explicit DataProcess(QObject *parent = nullptr);
 
-    double process(QJsonArray data);
+    double sumProcess(QJsonArray data);
 
 signals:
 

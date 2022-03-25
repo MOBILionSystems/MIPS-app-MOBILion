@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>776</width>
-    <height>504</height>
+    <width>1317</width>
+    <height>493</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,19 @@
   <widget class="QCustomPlot" name="trendRealTimePlot" native="true">
    <property name="geometry">
     <rect>
-     <x>60</x>
+     <x>10</x>
      <y>20</y>
-     <width>651</width>
+     <width>631</width>
+     <height>411</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QCustomPlot" name="msRealTimePlot" native="true">
+   <property name="geometry">
+    <rect>
+     <x>690</x>
+     <y>20</y>
+     <width>611</width>
      <height>411</height>
     </rect>
    </property>

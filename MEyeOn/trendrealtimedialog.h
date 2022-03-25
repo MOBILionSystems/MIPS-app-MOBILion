@@ -15,6 +15,7 @@ public:
     explicit TrendRealTimeDialog(QWidget *parent = nullptr);
     ~TrendRealTimeDialog();
     void addPoint(double x, double y);
+    void msPlot(QVector<double> xVector, QVector<double> yVector);
     void resetPlot();
 
 private:
