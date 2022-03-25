@@ -246,7 +246,7 @@ void AutoTrend::buildTrendSM()
     connect(waitBeforeAcqState, &QState::entered, this, [=](){QTimer::singleShot(2000, this, [=](){emit nextState();});});
     waitBeforeAcqState->addTransition(this, &AutoTrend::nextState, startAcqState);
 
-    connect(startAcqState, &QState::entered, this, [=](){_broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi"); emit nextState();});
+    connect(startAcqState, &QState::entered, this, [=](){currentParameter = currentStep; _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi"); emit nextState();});
     startAcqState->addTransition(this, &AutoTrend::nextState, waitDuringAcqState);
 
     connect(waitDuringAcqState, &QState::entered, this, [=](){QTimer::singleShot(stepDuration, this, [=](){emit nextState();});});
@@ -257,9 +257,15 @@ void AutoTrend::buildTrendSM()
 
     connect(nextStepState, &QState::entered, this, [=](){
         currentStep += trendStepSize;
-        if(abs(trendTo - trendFrom) > 0)
+        if(abs(trendTo - trendFrom) > 0){
             ui->trendProgressBar->setValue( (100 * abs(currentStep - trendFrom)) / (abs(trendTo - trendFrom) + abs(trendStepSize)));
-        currentStep <= trendTo && !toStopTrend ? emit nextState() : emit doneAllStates();});
+        }
+        if(currentStep <= trendTo && !toStopTrend){
+            emit nextState();
+        }else{
+            emit doneAllStates();
+        }
+    });
     nextStepState->addTransition(this, &AutoTrend::nextState, updateTrendState);
     nextStepState->addTransition(this, &AutoTrend::doneAllStates, finishState);
 
@@ -417,7 +423,7 @@ void AutoTrend::onMessageReady(QString message)
     if(object.value("id").toString() == "STREAM_FRAME"){
         QJsonObject payload = object.value("payload").toObject();
         double trendValue = 0;
-        if(payload.value("chartType").toString() == "MASS"){
+        if(payload.value("chartType").toString() == "MASS" || payload.value("chartType").toString() == "MOBILITY"){
             QJsonArray dataPointsArray = payload.value("dataPoints").toArray();
             QVector<double> xVector, yVector;
             QJsonArray::Iterator i = dataPointsArray.begin();
@@ -428,7 +434,7 @@ void AutoTrend::onMessageReady(QString message)
             }
             trendRealTimeDialog->msPlot(xVector, yVector);
             trendValue = dataProcess->sumProcess(dataPointsArray);
-            trendRealTimeDialog->addPoint(currentStep, trendValue);
+            trendRealTimeDialog->addPoint(currentParameter, trendValue);
         }
     }
 }
