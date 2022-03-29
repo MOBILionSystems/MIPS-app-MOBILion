@@ -32,6 +32,11 @@ void StreamerClient::request(QString message)
     //m_webSocket->sendTextMessage(message);
 }
 
+void StreamerClient::resetFrameIndex()
+{
+    frameindex = 0;
+}
+
 void StreamerClient::OnConnected()
 {
     qDebug() << "Connected!";

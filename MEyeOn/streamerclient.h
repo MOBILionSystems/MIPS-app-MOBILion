@@ -11,6 +11,7 @@ public:
     explicit StreamerClient(QObject *parent = nullptr);
     void connectTo();
     void request(QString message);
+    void resetFrameIndex();
 
 private slots:
     void OnConnected();

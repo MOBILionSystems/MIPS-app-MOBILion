@@ -246,7 +246,11 @@ void AutoTrend::buildTrendSM()
     connect(waitBeforeAcqState, &QState::entered, this, [=](){QTimer::singleShot(2000, this, [=](){emit nextState();});});
     waitBeforeAcqState->addTransition(this, &AutoTrend::nextState, startAcqState);
 
-    connect(startAcqState, &QState::entered, this, [=](){currentParameter = currentStep; _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi"); emit nextState();});
+    connect(startAcqState, &QState::entered, this, [=](){
+        currentParameter = currentStep;
+        _streamerClient->resetFrameIndex();
+        _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi"); emit nextState();
+    });
     startAcqState->addTransition(this, &AutoTrend::nextState, waitDuringAcqState);
 
     connect(waitDuringAcqState, &QState::entered, this, [=](){QTimer::singleShot(stepDuration, this, [=](){emit nextState();});});
