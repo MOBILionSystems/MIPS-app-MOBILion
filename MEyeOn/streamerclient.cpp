@@ -26,7 +26,8 @@ void StreamerClient::request(QString message)
 {
     //message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + heatmapGUID + "\", \"type\": \"HEATMAP\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
     //message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + mobilityGUID + "\", \"type\": \"MOBILITY\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
-    message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + streamGUID + "\", \"type\": \"MASS\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
+    //message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + streamGUID + "\", \"type\": \"MASS\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
+    message = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + streamGUID + "\", \"type\": \"MASS\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
     qDebug() << "sending: " << message;
     m_webSocket->sendTextMessage(message);
     //m_webSocket->sendTextMessage(message);
