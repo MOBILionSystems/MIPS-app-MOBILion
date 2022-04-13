@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDir>
+#include <QtMath>
 
 AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     QWidget(parent),
@@ -42,7 +43,7 @@ AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
     electrodeLabelValueMap.insert("label_6", QPair<QString, int>("QuadBias", 10));
 
     initUI();
-    dataProcess = new DataProcess(this);
+
 
 }
 
@@ -293,7 +294,6 @@ void AutoTrend::setupBroker(bool connected)
     }
 }
 
-
 void AutoTrend::on_runTrendButton_clicked()
 {
     if(!_broker){
@@ -426,20 +426,19 @@ void AutoTrend::onMessageReady(QString message)
     QJsonObject object = document.object();
     if(object.value("id").toString() == "STREAM_FRAME"){
         QJsonObject payload = object.value("payload").toObject();
-        double trendValue = 0;
-        if(payload.value("chartType").toString() == "MASS" || payload.value("chartType").toString() == "MOBILITY"){
+        if(payload.value("chartType").toString() == "MASS"){
             QJsonArray dataPointsArray = payload.value("dataPoints").toArray();
-            QVector<double> xVector, yVector;
-            QJsonArray::Iterator i = dataPointsArray.begin();
-            while (i != dataPointsArray.end()) {
-                xVector.append(i->toArray().at(0).toDouble());
-                yVector.append(i->toArray().at(1).toDouble());
-                i++;
-            }
-            trendRealTimeDialog->msPlot(xVector, yVector);
-            trendValue = dataProcess->sumProcess(dataPointsArray);
-            trendRealTimeDialog->addPoint(currentParameter, trendValue);
+            trendRealTimeDialog->msPlot(dataPointsArray);
+        }else if(payload.value("chartType").toString() == "MOBILITY"){
+            QJsonArray dataPointsArray = payload.value("dataPoints").toArray();
+            trendRealTimeDialog->mobilityPlot(dataPointsArray);
+        }else if(payload.value("chartType").toString() == "HEATMAP"){
+            QJsonArray dataPointsArray = payload.value("dataPoints").toArray();
+            trendRealTimeDialog->heatmapPlot(dataPointsArray);
         }
+    }else if(object.value("id").toString() == "SPECTRUM_RANGES"){
+        QJsonObject payload = object.value("payload").toObject();
+        trendRealTimeDialog->setRange(payload);
     }
 }
 

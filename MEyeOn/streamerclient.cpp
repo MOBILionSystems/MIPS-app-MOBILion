@@ -25,12 +25,18 @@ void StreamerClient::connectTo()
 void StreamerClient::request(QString message)
 {
     //message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + heatmapGUID + "\", \"type\": \"HEATMAP\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
+    //message = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + heatmapGUID + "\", \"type\": \"HEATMAP\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
     //message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + mobilityGUID + "\", \"type\": \"MOBILITY\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
     //message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + streamGUID + "\", \"type\": \"MASS\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
-    message = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + streamGUID + "\", \"type\": \"MASS\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
-    qDebug() << "sending: " << message;
-    m_webSocket->sendTextMessage(message);
-    //m_webSocket->sendTextMessage(message);
+    QString message1 = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + streamGUID + "\", \"type\": \"MASS\", \"xAxisPixels\": 1000, \"yAxisPixels\": 500}";
+    QString message2 = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + mobilityGUID + "\", \"type\": \"MOBILITY\", \"xAxisPixels\": 1000, \"yAxisPixels\": 500}";
+    QString message3 = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + heatmapGUID + "\", \"type\": \"HEATMAP\", \"xAxisPixels\": 1000, \"yAxisPixels\": 500}";
+    qDebug() << "sending: " << message1;
+    m_webSocket->sendTextMessage(message1);
+    qDebug() << "sending: " << message2;
+    m_webSocket->sendTextMessage(message2);
+    qDebug() << "sending: " << message3;
+    m_webSocket->sendTextMessage(message3);
 }
 
 void StreamerClient::resetFrameIndex()
@@ -55,7 +61,7 @@ void StreamerClient::onBytesWritten(qint64 bytes)
 
 void StreamerClient::readyRead(QString message)
 {
-    qDebug() << "Reading..." << ++frameindex;
+    //qDebug() << "Reading..." << ++frameindex;
     QJsonDocument document = QJsonDocument::fromJson(message.toLocal8Bit());
     qDebug() << document;
     QJsonObject object = document.object();

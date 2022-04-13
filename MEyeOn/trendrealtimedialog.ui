@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1317</width>
-    <height>493</height>
+    <width>1297</width>
+    <height>786</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,21 +16,47 @@
   <widget class="QCustomPlot" name="trendRealTimePlot" native="true">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>20</y>
+     <x>0</x>
+     <y>0</y>
      <width>631</width>
-     <height>411</height>
+     <height>381</height>
     </rect>
    </property>
   </widget>
   <widget class="QCustomPlot" name="msRealTimePlot" native="true">
    <property name="geometry">
     <rect>
-     <x>690</x>
-     <y>20</y>
-     <width>611</width>
-     <height>411</height>
+     <x>650</x>
+     <y>0</y>
+     <width>631</width>
+     <height>381</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QCustomPlot" name="mobilityRealTimePlot" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>390</y>
+     <width>631</width>
+     <height>381</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QGraphicsView" name="heatmapView">
+   <property name="geometry">
+    <rect>
+     <x>730</x>
+     <y>390</y>
+     <width>541</width>
+     <height>341</height>
+    </rect>
+   </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
    </property>
   </widget>
  </widget>

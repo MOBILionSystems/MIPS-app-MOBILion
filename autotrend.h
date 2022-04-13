@@ -7,7 +7,6 @@
 #include "MEyeOn/Broker.h"
 #include "MEyeOn/streamerclient.h"
 #include "MEyeOn/trendrealtimedialog.h"
-#include "MEyeOn/dataprocess.h"
 
 #include "ui_mips.h"
 #include "mips.h"
@@ -67,7 +66,7 @@ private slots:
     void onMessageReady(QString message);
 
 private:
-    DataProcess* dataProcess;
+
     TrendRealTimeDialog* trendRealTimeDialog;
     StreamerClient* _streamerClient;
     QString _sbcIpAddress;
