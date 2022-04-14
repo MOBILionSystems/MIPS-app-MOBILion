@@ -33,8 +33,12 @@ private:
 
     double massL = 0;
     double massH = 0;
+    double massIntensityL = 0;
+    double massIntensityH = 0;
     double mobilityL = 0;
     double mobilityH = 0;
+    double mobilityIntensityL = 0;
+    double mobilityIntensityH = 0;
     double heatmapMassL = 0;
     double heatmapMassH = 0;
     double heatmapMobilityL = 0;

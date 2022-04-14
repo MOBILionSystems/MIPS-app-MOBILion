@@ -36,6 +36,7 @@ void TrendRealTimeDialog::msPlot(QJsonArray dataPointsArray)
     ui->msRealTimePlot->graph(0)->setData(xVector, yVector);
     ui->msRealTimePlot->yAxis->rescale(true);
     ui->msRealTimePlot->xAxis->setRange(0, massH);
+    ui->msRealTimePlot->yAxis->setRange(0, massIntensityH);
     ui->msRealTimePlot->replot();
 
     //    double trendValue = 0;
@@ -55,6 +56,7 @@ void TrendRealTimeDialog::mobilityPlot(QJsonArray dataPointsArray)
     ui->mobilityRealTimePlot->graph(0)->setData(xVector, yVector);
     ui->mobilityRealTimePlot->xAxis->rescale(true);
     ui->mobilityRealTimePlot->yAxis->setRange(0, mobilityH);
+    ui->mobilityRealTimePlot->xAxis->setRange(0, mobilityIntensityH);
     ui->mobilityRealTimePlot->replot();
 }
 
@@ -116,10 +118,22 @@ void TrendRealTimeDialog::setRange(QJsonObject payload)
         massH = massRange.last().toDouble();
     }
 
+    QJsonArray massIntensityRange = payload.value("massIntensityRange").toArray();
+    if(massIntensityRange.size() == 2){
+        massIntensityL = 0;
+        massIntensityH = massIntensityRange.last().toDouble() * 1.05;
+    }
+
     QJsonArray mobilityRange = payload.value("mobilityRange").toArray();
     if(mobilityRange.size() == 2){
         mobilityL = 0;
         mobilityH = mobilityRange.last().toDouble();
+    }
+
+    QJsonArray mobilityIntensityRange = payload.value("mobilityIntensityRange").toArray();
+    if(mobilityIntensityRange.size() == 2){
+        mobilityIntensityL = 0;
+        mobilityIntensityH = mobilityIntensityRange.last().toDouble() * 1.05;
     }
 
 //        QJsonArray::Iterator i = ranges.begin();
