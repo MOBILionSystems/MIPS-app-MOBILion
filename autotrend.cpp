@@ -1,5 +1,6 @@
 #include "autotrend.h"
 #include "ui_autotrend.h"
+#include "ui_controlpanel.h"
 #include <QDebug>
 #include <QQueue>
 #include <QPair>
@@ -13,14 +14,16 @@
 #include <QDir>
 #include <QtMath>
 
-AutoTrend::AutoTrend(Ui::MIPS *w, QWidget *parent) :
+AutoTrend::AutoTrend(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AutoTrend)
 {
+    engine = new QScriptEngine(this);
+    mips = engine->newQObject(parent);
+    engine->globalObject().setProperty("mips", mips);
     trendRealTimeDialog = new TrendRealTimeDialog(this);
     trendSM = new QStateMachine(this);
     buildTrendSM();
-    mipsui = w;
     ui->setupUi(this);
 
     relationModel = new QStringListModel(this);
@@ -138,10 +141,7 @@ void AutoTrend::initUI()
 
 void AutoTrend::updateDCBias(QString name, double value)
 {
-    QLineEdit *leDCB = mipsui->gbDCbias1->findChild<QLineEdit *>(name);
-    leDCB->setText(QString::number(value));
-    leDCB->setModified(true);
-    emit leDCB->editingFinished();
+// update according dv voltage on configuration panel
 }
 
 bool AutoTrend::applyRelations(QString startWith, double startValue)
@@ -219,7 +219,7 @@ void AutoTrend::buildTrendSM()
         relationEnabled = ui->relationRatioButton->isChecked();
         fileFolder = QDate::currentDate().toString("yyyyMMdd") + "/" + QTime::currentTime().toString("hhmmss") + trendName + "Trend";
         ui->trendProgressBar->setValue(0);
-        mipsui->chkPowerEnable->setChecked(true);
+        //mipsui->chkPowerEnable->setChecked(true);
         emit nextState();
     });
     initState->addTransition(this, &AutoTrend::nextState, updateTrendState);
@@ -328,21 +328,6 @@ void AutoTrend::on_stopTrendButton_clicked()
     toStopTrend = true;
 }
 
-
-void AutoTrend::on_initDCBiasButton_clicked()
-{
-    QMap<QString, QPair<QString, int>>::iterator i;
-    for(i = electrodeLabelValueMap.begin(); i != electrodeLabelValueMap.end(); i++){
-        QLabel* firstLabel = mipsui->gbDCbias1->findChild<QLabel *>(i.key());
-        firstLabel->setText(i.value().first);
-
-        QLineEdit *leDCB = mipsui->gbDCbias1->findChild<QLineEdit *>(electrodeChannelHash.value(i.value().first));
-        leDCB->setText(QString::number(i.value().second));
-        leDCB->setModified(true);
-        emit leDCB->editingFinished();
-    }
-}
-
 // https://www.qtcentre.org/threads/23723-check-IPAddress-existence
 void AutoTrend::on_testSBCButton_clicked()
 {
@@ -440,5 +425,13 @@ void AutoTrend::onMessageReady(QString message)
         QJsonObject payload = object.value("payload").toObject();
         trendRealTimeDialog->setRange(payload);
     }
+}
+
+
+void AutoTrend::on_pushButton_clicked()
+{
+    qDebug() << "test button";
+    QScriptValue result = engine->evaluate("mips.Command(\"Funnel.Switch 1.State=OBA1\")");
+    qDebug() << result.toString();
 }
 

@@ -16,6 +16,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
+#include <QScriptEngine>
 
 
 namespace Ui {
@@ -27,7 +28,7 @@ class AutoTrend : public QWidget
     Q_OBJECT
 
 public:
-    explicit AutoTrend(Ui::MIPS *w, QWidget *parent = nullptr);
+    explicit AutoTrend(QWidget *parent = nullptr);
     ~AutoTrend();
 
 signals:
@@ -50,8 +51,6 @@ private slots:
 
     void on_stopTrendButton_clicked();
 
-    void on_initDCBiasButton_clicked();
-
     void on_testSBCButton_clicked();
 
     void readResult();
@@ -65,13 +64,15 @@ private slots:
 
     void onMessageReady(QString message);
 
-private:
+    void on_pushButton_clicked();
 
+private:
+    QScriptValue mips; // Actually configuration panel instead of mips
+    QScriptEngine *engine;
     TrendRealTimeDialog* trendRealTimeDialog;
     StreamerClient* _streamerClient;
     QString _sbcIpAddress;
     QStateMachine* trendSM;
-    Ui::MIPS *mipsui;
     Ui::AutoTrend *ui;
     Broker* _broker{nullptr};
     QStringListModel* relationModel;

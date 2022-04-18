@@ -473,8 +473,6 @@ MIPS::MIPS(QWidget *parent, QString CPfilename) :
     faims = new FAIMS(ui, comms);
     filament = new Filament(ui, comms);
     adc = new ADC(ui, comms);
-    autotrend = new AutoTrend(ui, this);
-    ui->tabMIPS->addTab(autotrend, "AutoTrend");
 
     RepeatMessage = "";
     ui->actionClear->setEnabled(true);
@@ -558,7 +556,6 @@ void MIPS::closeEvent(QCloseEvent *event)
     delete settings;
     delete help;
     delete ui;
-    delete autotrend;
 }
 
 bool MIPS::eventFilter(QObject *obj, QEvent *event)
@@ -1643,7 +1640,7 @@ void MIPS::SelectCP(QString fileName)
     if(grid != NULL) return;
     if(cp   != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
-    ControlPanel *c = new ControlPanel(0,fileName,Systems,properties);
+    ControlPanel *c = new ControlPanel(this,fileName,Systems,properties);
     if(!c->LoadedConfig) return;
 //    c->show();
     connect(c, SIGNAL(DialogClosed(QString)), this, SLOT(CloseControlPanel(QString)));

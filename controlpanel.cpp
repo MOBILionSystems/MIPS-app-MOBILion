@@ -165,10 +165,10 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     MIPSnames.clear();
     for(int i=0;i<Systems.count();i++)
     {
-       QString res = Systems[i]->MIPSname + ": " + Systems[i]->SendMess("GVER\n");
-       // Add MIPS firmware version to log file
-       if(properties != NULL) properties->Log(Systems[i]->MIPSname + ": " + Systems[i]->SendMess("GVER\n"));
-       MIPSnames += "# " + res + "\n";
+        QString res = Systems[i]->MIPSname + ": " + Systems[i]->SendMess("GVER\n");
+        // Add MIPS firmware version to log file
+        if(properties != NULL) properties->Log(Systems[i]->MIPSname + ": " + Systems[i]->SendMess("GVER\n"));
+        MIPSnames += "# " + res + "\n";
     }
     // Open UDP socket to send commands to reader app
     udpSocket = new QUdpSocket(this);
@@ -202,9 +202,9 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
             }
             if((resList[0].toUpper() == "IMAGE") && (resList.length()==2))
             {
-                #ifdef Q_OS_MAC
+#ifdef Q_OS_MAC
                 if(resList[1].startsWith("~")) resList[1] = QDir::homePath() + "/" + resList[1].mid(2);
-                #endif
+#endif
                 QPixmap img(findFile(resList[1],QFileInfo(ControlPanelFile).canonicalPath()));
                 ui->lblBackground->clear();
                 ui->lblBackground->setPixmap(img);
@@ -343,13 +343,13 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
             }
             if((resList[0].toUpper() == "CALLONUPDATE") && (resList.length()==2))
             {
-               if(ScripButtons.count() >= 1)
-                  if(resList[1].toUpper().trimmed() == "TRUE") ScripButtons.last()->CallOnUpdate = true;
+                if(ScripButtons.count() >= 1)
+                    if(resList[1].toUpper().trimmed() == "TRUE") ScripButtons.last()->CallOnUpdate = true;
             }
             if((resList[0].toUpper() == "CALLONSTART") && (resList.length()==2))
             {
-               if(ScripButtons.count() >= 1)
-                  if(resList[1].toUpper().trimmed() == "TRUE") ScripButtons.last()->CallOnStart = true;
+                if(ScripButtons.count() >= 1)
+                    if(resList[1].toUpper().trimmed() == "TRUE") ScripButtons.last()->CallOnStart = true;
             }
             if((resList[0].toUpper() == "CPBUTTON") && (resList.length()==5))
             {
@@ -370,7 +370,12 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
                 Tabs.last()->tabBar()->setStyleSheet("QTabBar::tab:selected {color: white; background-color: rgb(90,90,255);}");
                 for(int i=6; i<resList.length(); i++)
                 {
-                    Tabs.last()->addTab(new QWidget(),resList[i]);
+                    if(resList[i] == "AutoTrend"){
+                        QWidget* autotrend = new AutoTrend(this);
+                        Tabs.last()->addTab(autotrend,resList[i]);
+                    }else{
+                        Tabs.last()->addTab(new QWidget(),resList[i]);
+                    }
                     Tabs.last()->widget(i-6)->setObjectName(resList[i]);
                 }
                 if(Containers.last()->objectName() != "") Tabs.last()->setObjectName(Containers.last()->objectName() + "." + resList[1]);
@@ -525,16 +530,16 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
                 if(IFT!=NULL)
                 {
                     IFT->AD->Acquire = line.mid(line.indexOf(",")+1);
-                    #ifdef Q_OS_MAC
+#ifdef Q_OS_MAC
                     if(IFT->AD->Acquire .startsWith("~")) IFT->AD->Acquire  = QDir::homePath() + "/" + IFT->AD->Acquire .mid(2);
-                    #endif
+#endif
                 }
                 if(TC.count() > 0)
                 {
                     TC.last()->AD->Acquire = line.mid(line.indexOf(",")+1);
-                    #ifdef Q_OS_MAC
+#ifdef Q_OS_MAC
                     if(TC.last()->AD->Acquire .startsWith("~")) TC.last()->AD->Acquire  = QDir::homePath() + "/" + TC.last()->AD->Acquire .mid(2);
-                    #endif
+#endif
                 }
             }
             if((resList[0].toUpper() == "SCRIPT") && (resList.length()==3))
@@ -557,9 +562,9 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
             if((resList[0].toUpper() == "INITPARMS") && (resList.length()==2))
             {
                 // Load the file and apply the initialization MIPS commands
-                #ifdef Q_OS_MAC
+#ifdef Q_OS_MAC
                 if(resList[1].startsWith("~")) resList[1] = QDir::homePath() + "/" + resList[1].mid(2);
-                #endif
+#endif
                 InitMIPSsystems(findFile(resList[1],QFileInfo(ControlPanelFile).canonicalPath()));
             }
             if((resList[0].toUpper() == "SENDCOMMAND") && (resList.length()>2))
@@ -570,9 +575,9 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
             if((resList[0].toUpper() == "HELP") && (resList.length()==2))
             {
                 HelpFile = resList[1];
-                #ifdef Q_OS_MAC
+#ifdef Q_OS_MAC
                 if(HelpFile.startsWith("~")) HelpFile = QDir::homePath() + "/" + HelpFile.mid(2);
-                #endif
+#endif
             }
             if((resList[0].toUpper() == "TCPSERVER") && (resList.length()==2))
             {
@@ -630,7 +635,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
         if(properties != NULL) properties->Log("Enabling serial watch dog on MIPS system(s)");
         for(int i=0;i<Systems.count();i++)
         {
-           Systems[i]->SendCommand("SSERWD," + QString::number(SerialWatchDog) + "\n");
+            Systems[i]->SendCommand("SSERWD," + QString::number(SerialWatchDog) + "\n");
         }
     }
 }
@@ -645,7 +650,7 @@ ControlPanel::~ControlPanel()
         if(properties != NULL) properties->Log("Disabling serial watch dog on MIPS system(s)");
         for(int i=0;i<Systems.count();i++)
         {
-           Systems[i]->SendCommand("SSERWD,0\n");
+            Systems[i]->SendCommand("SSERWD,0\n");
         }
     }
     if(properties != NULL) properties->Log("Control panel unloading");
@@ -804,75 +809,75 @@ void ControlPanel::slotCloseLogFile(void)
 
 void ControlPanel::LogDataFile(void)
 {
-   QStringList vals;
-   QString     header;
-   QString     record;
-   int         i;
-   QDateTime   qt;
-   static uint NextSampleTime;
+    QStringList vals;
+    QString     header;
+    QString     record;
+    int         i;
+    QDateTime   qt;
+    static uint NextSampleTime;
 
-   if(LogFile.isEmpty()) return;
-   header.clear();
-   record.clear();
-   if(LogStartTime == 0)
-   {
-       LogStartTime = qt.currentDateTime().toTime_t();
-       NextSampleTime = LogStartTime;
-       // Write the file header
-       header = QDateTime().currentDateTime().toString() + "\n";
-       // Build the CSV header record
-       header += "Seconds";
-       for(i=0;i<DCBchans.count();i++)
-       {
-           vals = DCBchans[i]->Report().split(",");
-           header += "," + vals[0] + ".SP," + vals[0] + ".RP";
-       }
-       for(i=0;i<RFchans.count();i++)
-       {
-           vals = RFchans[i]->Report().split(",");
-           header += "," + vals[0] + ".DRV," + vals[0] + ".FREQ," + vals[0] + ".RF+," + vals[0] + ".RF-," + vals[0] + ".PWR";
-       }
-       for(i=0;i<RFCchans.count();i++)
-       {
-           vals = RFCchans[i]->Report().split(",");
-           header += "," + vals[0] + ".DRV," + vals[0] + ".STP," + vals[0] + ".FREQ," + vals[0] + ".RF+," + vals[0] + ".RF-," + vals[0] + ".PWR";
-       }
-       header += "\n";
-   }
-   if(qt.currentDateTime().toTime_t() >= NextSampleTime)
-   {
-       while(NextSampleTime <= qt.currentDateTime().toTime_t()) NextSampleTime += LogPeriod;
-       record = QString::number(qt.currentDateTime().toTime_t() - LogStartTime);
-       // Build the data string to write to the log file
-       for(i=0;i<DCBchans.count();i++)
-       {
-           vals = DCBchans[i]->Report().split(",");
-           record += "," + vals[1] + "," + vals[2];
-       }
-       for(i=0;i<RFchans.count();i++)
-       {
-           vals = RFchans[i]->Report().split(",");
-           record += "," + vals[1] + "," + vals[2] + "," + vals[3] + "," + vals[4] + "," + vals[5];
-       }
-       for(i=0;i<RFCchans.count();i++)
-       {
-           vals = RFCchans[i]->Report().split(",");
-           record += "," + vals[1] + "," + vals[2] + "," + vals[3] + "," + vals[4] + "," + vals[5] + "," + vals[6];
-       }
-       record += "\n";
-   }
-   if(!header.isEmpty() || !record.isEmpty())
-   {
-       // Open file for append and save log results
-       QFile file(LogFile);
-       if(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
-       {
-           QTextStream stream(&file);
-           if(!header.isEmpty()) stream << header;
-           if(!record.isEmpty()) stream << record;
-           file.close();
-       }
-   }
+    if(LogFile.isEmpty()) return;
+    header.clear();
+    record.clear();
+    if(LogStartTime == 0)
+    {
+        LogStartTime = qt.currentDateTime().toTime_t();
+        NextSampleTime = LogStartTime;
+        // Write the file header
+        header = QDateTime().currentDateTime().toString() + "\n";
+        // Build the CSV header record
+        header += "Seconds";
+        for(i=0;i<DCBchans.count();i++)
+        {
+            vals = DCBchans[i]->Report().split(",");
+            header += "," + vals[0] + ".SP," + vals[0] + ".RP";
+        }
+        for(i=0;i<RFchans.count();i++)
+        {
+            vals = RFchans[i]->Report().split(",");
+            header += "," + vals[0] + ".DRV," + vals[0] + ".FREQ," + vals[0] + ".RF+," + vals[0] + ".RF-," + vals[0] + ".PWR";
+        }
+        for(i=0;i<RFCchans.count();i++)
+        {
+            vals = RFCchans[i]->Report().split(",");
+            header += "," + vals[0] + ".DRV," + vals[0] + ".STP," + vals[0] + ".FREQ," + vals[0] + ".RF+," + vals[0] + ".RF-," + vals[0] + ".PWR";
+        }
+        header += "\n";
+    }
+    if(qt.currentDateTime().toTime_t() >= NextSampleTime)
+    {
+        while(NextSampleTime <= qt.currentDateTime().toTime_t()) NextSampleTime += LogPeriod;
+        record = QString::number(qt.currentDateTime().toTime_t() - LogStartTime);
+        // Build the data string to write to the log file
+        for(i=0;i<DCBchans.count();i++)
+        {
+            vals = DCBchans[i]->Report().split(",");
+            record += "," + vals[1] + "," + vals[2];
+        }
+        for(i=0;i<RFchans.count();i++)
+        {
+            vals = RFchans[i]->Report().split(",");
+            record += "," + vals[1] + "," + vals[2] + "," + vals[3] + "," + vals[4] + "," + vals[5];
+        }
+        for(i=0;i<RFCchans.count();i++)
+        {
+            vals = RFCchans[i]->Report().split(",");
+            record += "," + vals[1] + "," + vals[2] + "," + vals[3] + "," + vals[4] + "," + vals[5] + "," + vals[6];
+        }
+        record += "\n";
+    }
+    if(!header.isEmpty() || !record.isEmpty())
+    {
+        // Open file for append and save log results
+        QFile file(LogFile);
+        if(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+        {
+            QTextStream stream(&file);
+            if(!header.isEmpty()) stream << header;
+            if(!record.isEmpty()) stream << record;
+            file.close();
+        }
+    }
 }
 
 void ControlPanel::InitMIPSsystems(QString initFilename)
@@ -899,244 +904,244 @@ void ControlPanel::InitMIPSsystems(QString initFilename)
 // Returns null if the MIPS system can't be found.
 Comms* ControlPanel::FindCommPort(QString name, QList<Comms*> Systems)
 {
-   for(int i = 0; i < Systems.length(); i++) if(Systems.at(i)->MIPSname == name) return(Systems.at(i));
-   return NULL;
+    for(int i = 0; i < Systems.length(); i++) if(Systems.at(i)->MIPSname == name) return(Systems.at(i));
+    return NULL;
 }
 
 void ControlPanel::Update(void)
 {
-   QMessageBox msgBox;
-   int i,j,k;
+    QMessageBox msgBox;
+    int i,j,k;
 
-   // If the watch dog is enabled send a \n to MIPS to keep them
-   // alive.
-   if(SerialWatchDog > 0)
-   {
-       for(i=0;i<Systems.count();i++)
-       {
-          Systems[i]->SendString("\n");
-       }
-   }
-   if(tcp != NULL) if(tcp->bytesAvailable() > 0) tcp->readData();
-   QApplication::processEvents();
-   if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
-   if(UpdateStop) return;
-   for(i=0;i<TC.count();i++) if(TC[i]->Downloading) return;
-   if(StartMIPScomms)
-   {
-       mc = new MIPScomms(0,Systems);
-       mc->show();
-       UpdateStop = true;
-       connect(mc, SIGNAL(DialogClosed()), this, SLOT(CloseMIPScomms()));
-       StartMIPScomms = false;
-       UpdateStop = true;
-       return;
-   }
-   if(UpdateHoldOff > 0)
-   {
-       UpdateHoldOff--;
-       return;
-   }
-   if(ShutdownFlag)
-   {
-       ShutdownFlag = false;
-       SystemIsShutdown = true;
-       UpdateHoldOff = 1000;
-       // Make sure all MIPS systems are in local mode
-       for(i=0;i<Systems.count();i++)    Systems[i]->SendString("SMOD,LOC\n");
-       msDelay(100);
-       for(i=0;i<Systems.count();i++)    Systems[i]->rb.clear();
-       for(i=0;i<ESIchans.count();i++)   ESIchans[i]->Shutdown();
-       for(i=0;i<DCBenables.count();i++) DCBenables[i]->Shutdown();
-       for(i=0;i<RFchans.count();i++)    RFchans[i]->Shutdown();
-       for(i=0;i<RFCchans.count();i++)   RFCchans[i]->Shutdown();
-       for(i=0;i<Ccontrols.count();i++)  Ccontrols[i]->Shutdown();
-       for(i=0;i<rfa.count();i++)        rfa[i]->Shutdown();
-       for(i=0;i<ARBchans.count();i++)   ARBchans[i]->Shutdown();
-       if(statusBar != NULL) statusBar->showMessage("System shutdown, " + QDateTime().currentDateTime().toString());
-       if(properties != NULL) properties->Log("System Shutdown");
-       UpdateHoldOff = 1;
-       return;
-   }
-   if(RestoreFlag)
-   {
-       RestoreFlag = false;
-       SystemIsShutdown = false;
-       UpdateHoldOff = 1000;
-       for(i=0;i<ESIchans.count();i++)   ESIchans[i]->Restore();
-       msDelay(100);
-       for(i=0;i<DCBenables.count();i++) {DCBenables[i]->Restore(); msDelay(250);}
-       for(i=0;i<RFchans.count();i++)    {RFchans[i]->Restore(); msDelay(250);}
-       for(i=0;i<RFCchans.count();i++)   {RFCchans[i]->Restore(); msDelay(250);}
-       for(i=0;i<Ccontrols.count();i++)  Ccontrols[i]->Restore();
-       for(i=0;i<rfa.count();i++)        rfa[i]->Restore();
-       for(i=0;i<ARBchans.count();i++)   ARBchans[i]->Restore();
-       if(statusBar != NULL) statusBar->showMessage("System enabled, " + QDateTime().currentDateTime().toString());
-       if(properties != NULL) properties->Log("System Restored");
-       UpdateHoldOff = 1;
-       return;
-   }
-   // Look for any broken connections and warn the user.
-   // Also allow user to try and reconnect.
-   QString res;
-   res.clear();
-   for(i=0;i<Systems.count();i++)
-   {
-       QApplication::processEvents();  // Not sure why this is needed?
-       if(!Systems[i]->isConnected())
-       {
-           res += Systems[i]->MIPSname + ",";
-       }
-   }
-   if(!res.isEmpty())
-   {
-       int ret;
-       bool AutoR = false;
-       if(properties != NULL) if(properties->AutoRestore) AutoR = true;
-       if(!AutoR)
-       {
-           QString msg = "Connection(s) have been lost to " + res;
-           msg += "would you like to try and reestablish the connection(s)";
-           msg += "or exit this control panel.";
-           msgBox.setText(msg);
-           msgBox.setInformativeText("Select Yes to reestablish connection(s)?");
-           msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-           msgBox.setDefaultButton(QMessageBox::Yes);
-           ret = msgBox.exec();
-       }
-       else
-       {
-           if(statusBar != NULL) statusBar->showMessage("Attempting to reestablish connection(s).",2000);
-           msDelay(2000);
-           ret = QMessageBox::Yes;
-       }
-       if(ret == QMessageBox::Yes)
-       {
-           for(i=0;i<Systems.count();i++) if(!Systems[i]->isConnected()) Systems[i]->reopenPort();
-       }
-       else reject();
-   }
+    // If the watch dog is enabled send a \n to MIPS to keep them
+    // alive.
+    if(SerialWatchDog > 0)
+    {
+        for(i=0;i<Systems.count();i++)
+        {
+            Systems[i]->SendString("\n");
+        }
+    }
+    if(tcp != NULL) if(tcp->bytesAvailable() > 0) tcp->readData();
+    QApplication::processEvents();
+    if(scriptconsole!=NULL) scriptconsole->UpdateStatus();
+    if(UpdateStop) return;
+    for(i=0;i<TC.count();i++) if(TC[i]->Downloading) return;
+    if(StartMIPScomms)
+    {
+        mc = new MIPScomms(0,Systems);
+        mc->show();
+        UpdateStop = true;
+        connect(mc, SIGNAL(DialogClosed()), this, SLOT(CloseMIPScomms()));
+        StartMIPScomms = false;
+        UpdateStop = true;
+        return;
+    }
+    if(UpdateHoldOff > 0)
+    {
+        UpdateHoldOff--;
+        return;
+    }
+    if(ShutdownFlag)
+    {
+        ShutdownFlag = false;
+        SystemIsShutdown = true;
+        UpdateHoldOff = 1000;
+        // Make sure all MIPS systems are in local mode
+        for(i=0;i<Systems.count();i++)    Systems[i]->SendString("SMOD,LOC\n");
+        msDelay(100);
+        for(i=0;i<Systems.count();i++)    Systems[i]->rb.clear();
+        for(i=0;i<ESIchans.count();i++)   ESIchans[i]->Shutdown();
+        for(i=0;i<DCBenables.count();i++) DCBenables[i]->Shutdown();
+        for(i=0;i<RFchans.count();i++)    RFchans[i]->Shutdown();
+        for(i=0;i<RFCchans.count();i++)   RFCchans[i]->Shutdown();
+        for(i=0;i<Ccontrols.count();i++)  Ccontrols[i]->Shutdown();
+        for(i=0;i<rfa.count();i++)        rfa[i]->Shutdown();
+        for(i=0;i<ARBchans.count();i++)   ARBchans[i]->Shutdown();
+        if(statusBar != NULL) statusBar->showMessage("System shutdown, " + QDateTime().currentDateTime().toString());
+        if(properties != NULL) properties->Log("System Shutdown");
+        UpdateHoldOff = 1;
+        return;
+    }
+    if(RestoreFlag)
+    {
+        RestoreFlag = false;
+        SystemIsShutdown = false;
+        UpdateHoldOff = 1000;
+        for(i=0;i<ESIchans.count();i++)   ESIchans[i]->Restore();
+        msDelay(100);
+        for(i=0;i<DCBenables.count();i++) {DCBenables[i]->Restore(); msDelay(250);}
+        for(i=0;i<RFchans.count();i++)    {RFchans[i]->Restore(); msDelay(250);}
+        for(i=0;i<RFCchans.count();i++)   {RFCchans[i]->Restore(); msDelay(250);}
+        for(i=0;i<Ccontrols.count();i++)  Ccontrols[i]->Restore();
+        for(i=0;i<rfa.count();i++)        rfa[i]->Restore();
+        for(i=0;i<ARBchans.count();i++)   ARBchans[i]->Restore();
+        if(statusBar != NULL) statusBar->showMessage("System enabled, " + QDateTime().currentDateTime().toString());
+        if(properties != NULL) properties->Log("System Restored");
+        UpdateHoldOff = 1;
+        return;
+    }
+    // Look for any broken connections and warn the user.
+    // Also allow user to try and reconnect.
+    QString res;
+    res.clear();
+    for(i=0;i<Systems.count();i++)
+    {
+        QApplication::processEvents();  // Not sure why this is needed?
+        if(!Systems[i]->isConnected())
+        {
+            res += Systems[i]->MIPSname + ",";
+        }
+    }
+    if(!res.isEmpty())
+    {
+        int ret;
+        bool AutoR = false;
+        if(properties != NULL) if(properties->AutoRestore) AutoR = true;
+        if(!AutoR)
+        {
+            QString msg = "Connection(s) have been lost to " + res;
+            msg += "would you like to try and reestablish the connection(s)";
+            msg += "or exit this control panel.";
+            msgBox.setText(msg);
+            msgBox.setInformativeText("Select Yes to reestablish connection(s)?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            msgBox.setDefaultButton(QMessageBox::Yes);
+            ret = msgBox.exec();
+        }
+        else
+        {
+            if(statusBar != NULL) statusBar->showMessage("Attempting to reestablish connection(s).",2000);
+            msDelay(2000);
+            ret = QMessageBox::Yes;
+        }
+        if(ret == QMessageBox::Yes)
+        {
+            for(i=0;i<Systems.count();i++) if(!Systems[i]->isConnected()) Systems[i]->reopenPort();
+        }
+        else reject();
+    }
 
-   for(i=0;i<ScripButtons.count();i++) {ScripButtons[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   //for(i=0;i<ScripButtons.count();i++) {if(ScripButtons[i]->CallOnStart || ScripButtons[i]->CallOnUpdate) ScripButtons[i]->Update();}
-   // For each MIPS system present if there are RF channels for the selected
-   // MIPS system then read all values using the read all commands to speed up the process.
-   for(i=0;i<Systems.count();i++)
-   {
-       for(j=0;j<RFchans.count();j++) if(RFchans[j]->comms == Systems[i])
-       {
-           // Read all the RF parameters
-           QString RFallRes = Systems[i]->SendMess("GRFALL\n");
-           if(ProcessEvents) QApplication::processEvents();
-           QStringList RFallResList = RFallRes.split(",");
-           if(RFallResList.count() < 1)
-           {
-               // Here with group read error so process one at a time
-               for(k=0;k<RFchans.count();k++) if(RFchans[k]->comms == Systems[i]) { RFchans[k]->Update(); /*QApplication::processEvents();*/ }
-           }
-           else
-           {
-               // build strings and update all channels that use this comm port
-               for(k=0;k<RFchans.count();k++) if(RFchans[k]->comms == Systems[i])
-               {
-                   if(RFallResList.count() < (RFchans[k]->Channel * 4)) RFchans[k]->Update();
-                   else RFchans[k]->Update(RFallResList[(RFchans[k]->Channel - 1) * 4 + 0] + "," + \
-                                           RFallResList[(RFchans[k]->Channel - 1) * 4 + 1] + "," + \
-                                           RFallResList[(RFchans[k]->Channel - 1) * 4 + 2] + "," + \
-                                           RFallResList[(RFchans[k]->Channel - 1) * 4 + 3]);
-                   if(ProcessEvents) QApplication::processEvents();
-               }
-           }
-           break;
-       }
-   }
-   for(i=0;i<Systems.count();i++)
-   {
-       for(j=0;j<RFCchans.count();j++) if(RFCchans[j]->comms == Systems[i])
-       {
-           // Read all the RF parameters
-           QString RFallRes = Systems[i]->SendMess("GRFALL\n");
-           if(ProcessEvents) QApplication::processEvents();
-           QStringList RFallResList = RFallRes.split(",");
-           if(RFallResList.count() < 1)
-           {
-               // Here with group read error so process one at a time
-               for(k=0;k<RFCchans.count();k++) if(RFCchans[k]->comms == Systems[i]) { RFCchans[k]->Update(); /*QApplication::processEvents();*/ }
-           }
-           else
-           {
-               // build strings and update all channels that use this comm port
-               for(k=0;k<RFCchans.count();k++) if(RFCchans[k]->comms == Systems[i])
-               {
-                   if(RFallResList.count() < (RFCchans[k]->Channel * 4)) RFCchans[k]->Update();
-                   else RFCchans[k]->Update(RFallResList[(RFCchans[k]->Channel - 1) * 4 + 0] + "," + \
-                                           RFallResList[(RFCchans[k]->Channel - 1) * 4 + 1] + "," + \
-                                           RFallResList[(RFCchans[k]->Channel - 1) * 4 + 2] + "," + \
-                                           RFallResList[(RFCchans[k]->Channel - 1) * 4 + 3]);
-                   if(ProcessEvents) QApplication::processEvents();
-               }
-           }
-           break;
-       }
-   }
-   for(i=0;i<ADCchans.count();i++)    {ADCchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<DACchans.count();i++)    {DACchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   // For each MIPS system present if there are DCBchannels for the selected
-   // MIPS system then read all setpoints and values using the read all
-   // commands to speed up the process.
-   for(i=0;i<Systems.count();i++)
-   {
-       for(j=0;j<DCBchans.count();j++) if(DCBchans[j]->comms == Systems[i])
-       {
-           // Read all the setpoints and readbacks and parse the strings
-           QString VspRes = Systems[i]->SendMess("GDCBALL\n");
-           if(ProcessEvents) QApplication::processEvents();
-           QStringList VspResList = VspRes.split(",");
-           QString VrbRes = Systems[i]->SendMess("GDCBALLV\n");
-           if(ProcessEvents) QApplication::processEvents();
-           QStringList VrbResList = VrbRes.split(",");
-           if((VspResList.count() != VrbResList.count()) || (VspResList.count() < 1))
-           {
-               // Here with group read error so process one at a time
-               for(k=0;k<DCBchans.count();k++) if(DCBchans[k]->comms == Systems[i]) {DCBchans[k]->Update(); /*QApplication::processEvents();*/}
-           }
-           else
-           {
-               // build strings and update all channels that use this comm port
-               for(k=0;k<DCBchans.count();k++) if(DCBchans[k]->comms == Systems[i])
-               {
-                   if(VspResList.count() < (DCBchans[k]->Channel)) DCBchans[k]->Update();
-                   else DCBchans[k]->Update(VspResList[DCBchans[k]->Channel - 1] + "," + VrbResList[DCBchans[k]->Channel - 1]);
-               }
-           }
-           break;  //??
-       }
-   }
-   for(i=0;i<DCBoffsets.count();i++)  {DCBoffsets[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<DCBenables.count();i++)  {DCBenables[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   if(TC.count() > 0)
-   {
-       for(i=0;i<=TC.count();i++)
-       {
-           if(i==TC.count())
-           {
-              for(j=0;j<DIOchannels.count();j++) {DIOchannels[j]->Update(); if(ProcessEvents) QApplication::processEvents();}
-              break;
-           }
-           if(TC[i]->TG->isTableMode()) break;
-       }
-   }
-   else for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<ESIchans.count();i++)         {ESIchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<ARBchans.count();i++)         {ARBchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<Ccontrols.count();i++)        {Ccontrols[i]->Update();if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<rfa.count();i++)              {rfa[i]->Update();      if(ProcessEvents) QApplication::processEvents();}
-   for(i=0;i<devices.count();i++)          {devices[i]->Update();}
-   for(i=0;i<Cpanels.count();i++)          Cpanels[i]->Update();
-   for(i=0;i<TC.count();i++)               for(j=0;j<TC[i]->TG->EC.count();j++) TC[i]->TG->EC[j]->Update();
-   for(i=0;i<comp.count();i++)             {comp[i]->Update();     if(ProcessEvents) QApplication::processEvents();}
-   RequestUpdate = false;
-   LogDataFile();
+    for(i=0;i<ScripButtons.count();i++) {ScripButtons[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+    //for(i=0;i<ScripButtons.count();i++) {if(ScripButtons[i]->CallOnStart || ScripButtons[i]->CallOnUpdate) ScripButtons[i]->Update();}
+    // For each MIPS system present if there are RF channels for the selected
+    // MIPS system then read all values using the read all commands to speed up the process.
+    for(i=0;i<Systems.count();i++)
+    {
+        for(j=0;j<RFchans.count();j++) if(RFchans[j]->comms == Systems[i])
+        {
+            // Read all the RF parameters
+            QString RFallRes = Systems[i]->SendMess("GRFALL\n");
+            if(ProcessEvents) QApplication::processEvents();
+            QStringList RFallResList = RFallRes.split(",");
+            if(RFallResList.count() < 1)
+            {
+                // Here with group read error so process one at a time
+                for(k=0;k<RFchans.count();k++) if(RFchans[k]->comms == Systems[i]) { RFchans[k]->Update(); /*QApplication::processEvents();*/ }
+            }
+            else
+            {
+                // build strings and update all channels that use this comm port
+                for(k=0;k<RFchans.count();k++) if(RFchans[k]->comms == Systems[i])
+                {
+                    if(RFallResList.count() < (RFchans[k]->Channel * 4)) RFchans[k]->Update();
+                    else RFchans[k]->Update(RFallResList[(RFchans[k]->Channel - 1) * 4 + 0] + "," + \
+                            RFallResList[(RFchans[k]->Channel - 1) * 4 + 1] + "," + \
+                            RFallResList[(RFchans[k]->Channel - 1) * 4 + 2] + "," + \
+                            RFallResList[(RFchans[k]->Channel - 1) * 4 + 3]);
+                    if(ProcessEvents) QApplication::processEvents();
+                }
+            }
+            break;
+        }
+    }
+    for(i=0;i<Systems.count();i++)
+    {
+        for(j=0;j<RFCchans.count();j++) if(RFCchans[j]->comms == Systems[i])
+        {
+            // Read all the RF parameters
+            QString RFallRes = Systems[i]->SendMess("GRFALL\n");
+            if(ProcessEvents) QApplication::processEvents();
+            QStringList RFallResList = RFallRes.split(",");
+            if(RFallResList.count() < 1)
+            {
+                // Here with group read error so process one at a time
+                for(k=0;k<RFCchans.count();k++) if(RFCchans[k]->comms == Systems[i]) { RFCchans[k]->Update(); /*QApplication::processEvents();*/ }
+            }
+            else
+            {
+                // build strings and update all channels that use this comm port
+                for(k=0;k<RFCchans.count();k++) if(RFCchans[k]->comms == Systems[i])
+                {
+                    if(RFallResList.count() < (RFCchans[k]->Channel * 4)) RFCchans[k]->Update();
+                    else RFCchans[k]->Update(RFallResList[(RFCchans[k]->Channel - 1) * 4 + 0] + "," + \
+                            RFallResList[(RFCchans[k]->Channel - 1) * 4 + 1] + "," + \
+                            RFallResList[(RFCchans[k]->Channel - 1) * 4 + 2] + "," + \
+                            RFallResList[(RFCchans[k]->Channel - 1) * 4 + 3]);
+                    if(ProcessEvents) QApplication::processEvents();
+                }
+            }
+            break;
+        }
+    }
+    for(i=0;i<ADCchans.count();i++)    {ADCchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+    for(i=0;i<DACchans.count();i++)    {DACchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+    // For each MIPS system present if there are DCBchannels for the selected
+    // MIPS system then read all setpoints and values using the read all
+    // commands to speed up the process.
+    for(i=0;i<Systems.count();i++)
+    {
+        for(j=0;j<DCBchans.count();j++) if(DCBchans[j]->comms == Systems[i])
+        {
+            // Read all the setpoints and readbacks and parse the strings
+            QString VspRes = Systems[i]->SendMess("GDCBALL\n");
+            if(ProcessEvents) QApplication::processEvents();
+            QStringList VspResList = VspRes.split(",");
+            QString VrbRes = Systems[i]->SendMess("GDCBALLV\n");
+            if(ProcessEvents) QApplication::processEvents();
+            QStringList VrbResList = VrbRes.split(",");
+            if((VspResList.count() != VrbResList.count()) || (VspResList.count() < 1))
+            {
+                // Here with group read error so process one at a time
+                for(k=0;k<DCBchans.count();k++) if(DCBchans[k]->comms == Systems[i]) {DCBchans[k]->Update(); /*QApplication::processEvents();*/}
+            }
+            else
+            {
+                // build strings and update all channels that use this comm port
+                for(k=0;k<DCBchans.count();k++) if(DCBchans[k]->comms == Systems[i])
+                {
+                    if(VspResList.count() < (DCBchans[k]->Channel)) DCBchans[k]->Update();
+                    else DCBchans[k]->Update(VspResList[DCBchans[k]->Channel - 1] + "," + VrbResList[DCBchans[k]->Channel - 1]);
+                }
+            }
+            break;  //??
+        }
+    }
+    for(i=0;i<DCBoffsets.count();i++)  {DCBoffsets[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+    for(i=0;i<DCBenables.count();i++)  {DCBenables[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+    if(TC.count() > 0)
+    {
+        for(i=0;i<=TC.count();i++)
+        {
+            if(i==TC.count())
+            {
+                for(j=0;j<DIOchannels.count();j++) {DIOchannels[j]->Update(); if(ProcessEvents) QApplication::processEvents();}
+                break;
+            }
+            if(TC[i]->TG->isTableMode()) break;
+        }
+    }
+    else for(i=0;i<DIOchannels.count();i++) {DIOchannels[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+    for(i=0;i<ESIchans.count();i++)         {ESIchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+    for(i=0;i<ARBchans.count();i++)         {ARBchans[i]->Update(); if(ProcessEvents) QApplication::processEvents();}
+    for(i=0;i<Ccontrols.count();i++)        {Ccontrols[i]->Update();if(ProcessEvents) QApplication::processEvents();}
+    for(i=0;i<rfa.count();i++)              {rfa[i]->Update();      if(ProcessEvents) QApplication::processEvents();}
+    for(i=0;i<devices.count();i++)          {devices[i]->Update();}
+    for(i=0;i<Cpanels.count();i++)          Cpanels[i]->Update();
+    for(i=0;i<TC.count();i++)               for(j=0;j<TC[i]->TG->EC.count();j++) TC[i]->TG->EC[j]->Update();
+    for(i=0;i<comp.count();i++)             {comp[i]->Update();     if(ProcessEvents) QApplication::processEvents();}
+    RequestUpdate = false;
+    LogDataFile();
 }
 
 // Save methode function
@@ -1145,9 +1150,9 @@ QString ControlPanel::Save(QString Filename)
     QString res;
     ControlPanel *cp;
 
-    #ifdef Q_OS_MAC
+#ifdef Q_OS_MAC
     if(Filename.startsWith("~")) Filename = QDir::homePath() + "/" + Filename.mid(2);
-    #endif
+#endif
     if(Filename == "") return "No file defined!";
     UpdateHoldOff = 1000;
     if(properties != NULL) properties->Log("Save method file: " + Filename);
@@ -1164,8 +1169,8 @@ QString ControlPanel::Save(QString Filename)
         // Add uptime if MIPS systems are connected
         for(int i=0;i<Systems.count();i++)
         {
-           QString res = Systems[i]->SendMess("UPTIME\n");
-           if(res!="" && !res.contains("?")) stream << "# " + Systems[i]->MIPSname + ": " + res + "\n";
+            QString res = Systems[i]->SendMess("UPTIME\n");
+            if(res!="" && !res.contains("?")) stream << "# " + Systems[i]->MIPSname + ": " + res + "\n";
         }
         for(int cpnum = -1; cpnum < Cpanels.count(); cpnum++)
         {
@@ -1286,9 +1291,9 @@ QString ControlPanel::Load(QString Filename)
     // Test is Filename ends in .settings, if not add .settings
     if(!Filename.toUpper().endsWith(".SETTINGS")) Filename += ".settings";
     if(properties != NULL) QDir().setCurrent(properties->MethodesPath);
-    #ifdef Q_OS_MAC
+#ifdef Q_OS_MAC
     if(Filename.startsWith("~")) Filename = QDir::homePath() + "/" + Filename.mid(2);
-    #endif
+#endif
     if(Filename == "") return "No file defined!";
     UpdateHoldOff = 1000;
     QFile file(Filename);
@@ -1318,72 +1323,72 @@ QString ControlPanel::Load(QString Filename)
                 }
                 if(resList[0] == "RF channels") for(int i=0;i<resList[1].toInt();i++)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     for(int j=0;j<cp->RFchans.count();j++) if(cp->RFchans[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    for(int j=0;j<cp->RFchans.count();j++) if(cp->RFchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "RFC channels") for(int i=0;i<resList[1].toInt();i++)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     for(int j=0;j<cp->RFCchans.count();j++) if(cp->RFCchans[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    for(int j=0;j<cp->RFCchans.count();j++) if(cp->RFCchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DCB channels") for(int i=0;i<resList[1].toInt();i++)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     //if(i >= DCBchans.count()) break;
-                     //if(DCBchans[i]->SetValues(line)) continue;
-                     for(int j=0;j<cp->DCBchans.count();j++) if(cp->DCBchans[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    //if(i >= DCBchans.count()) break;
+                    //if(DCBchans[i]->SetValues(line)) continue;
+                    for(int j=0;j<cp->DCBchans.count();j++) if(cp->DCBchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DAC channels") for(int i=0;i<resList[1].toInt();i++)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     for(int j=0;j<cp->DACchans.count();j++) if(cp->DACchans[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    for(int j=0;j<cp->DACchans.count();j++) if(cp->DACchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DCB offsets") for(int i=0;i<resList[1].toInt();i++)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     for(int j=0;j<cp->DCBoffsets.count();j++) if(cp->DCBoffsets[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    for(int j=0;j<cp->DCBoffsets.count();j++) if(cp->DCBoffsets[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DCB enables") for(int i=0;i<resList[1].toInt();i++)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     for(int j=0;j<cp->DCBenables.count();j++) if(cp->DCBenables[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    for(int j=0;j<cp->DCBenables.count();j++) if(cp->DCBenables[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "DIO channels") for(int i=0;i<resList[1].toInt();i++)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     for(int j=0;j<cp->DIOchannels.count();j++) if(cp->DIOchannels[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    for(int j=0;j<cp->DIOchannels.count();j++) if(cp->DIOchannels[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "ESI channels") for(int i=0;i<resList[1].toInt();i++)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     for(int j=0;j<cp->ESIchans.count();j++) if(cp->ESIchans[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    for(int j=0;j<cp->ESIchans.count();j++) if(cp->ESIchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "ARB channels") for(int i=0;i<resList[1].toInt();i++)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     for(int j=0;j<cp->ARBchans.count();j++) if(cp->ARBchans[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    for(int j=0;j<cp->ARBchans.count();j++) if(cp->ARBchans[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "Custom control channels") for(int i=0;i<resList[1].toInt();i++)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     for(int j=0;j<cp->Ccontrols.count();j++) if(cp->Ccontrols[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    for(int j=0;j<cp->Ccontrols.count();j++) if(cp->Ccontrols[j]->SetValues(line)) break;
                 }
                 if(resList[0] == "RFamp channels") while(true)
                 {
-                     line = stream.readLine();
-                     if(line.isNull()) break;
-                     if(line.contains("RFampEnd")) break;
-                     for(int j=0;j<cp->rfa.count();j++) if(cp->rfa[j]->SetValues(line)) break;
+                    line = stream.readLine();
+                    if(line.isNull()) break;
+                    if(line.contains("RFampEnd")) break;
+                    for(int j=0;j<cp->rfa.count();j++) if(cp->rfa[j]->SetValues(line)) break;
                 }
             }
             else if(resList.count() == 1)
@@ -1505,7 +1510,7 @@ void ControlPanel::CloseMIPScomms(void)
 
 void ControlPanel::pbMIPScomms(void)
 {
-   StartMIPScomms = true;
+    StartMIPScomms = true;
 }
 
 void ControlPanel::pbARBcompressor(void)
@@ -1558,8 +1563,8 @@ void ControlPanel::DCBgroupEnable(void)
         {
             if(DCBs.contains(DCBchans[j]))
             {
-               DCBchans[j]->DCBs = DCBs;
-               DCBchans[j]->LinkEnable = true;
+                DCBchans[j]->DCBs = DCBs;
+                DCBchans[j]->LinkEnable = true;
             }
         }
     }
@@ -1576,19 +1581,19 @@ void ControlPanel::pbScript(void)
 // The following functions are for the scripting system
 QString ControlPanel::GetLine(QString MIPSname)
 {
-   QApplication::processEvents();
-   Comms *cp =  FindCommPort(MIPSname,Systems);
-   if(cp==NULL) return "";
-   cp->waitforline(500);
-   return cp->getline();
+    QApplication::processEvents();
+    Comms *cp =  FindCommPort(MIPSname,Systems);
+    if(cp==NULL) return "";
+    cp->waitforline(500);
+    return cp->getline();
 }
 
 bool ControlPanel::SendCommand(QString MIPSname, QString message)
 {
-   QApplication::processEvents();
-   Comms *cp =  FindCommPort(MIPSname,Systems);
-   if(cp==NULL) return false;
-   return cp->SendCommand(message);
+    QApplication::processEvents();
+    Comms *cp =  FindCommPort(MIPSname,Systems);
+    if(cp==NULL) return false;
+    return cp->SendCommand(message);
 }
 
 QString ControlPanel::SendMess(QString MIPSname, QString message)
@@ -1618,36 +1623,36 @@ bool ControlPanel::isShutDown(void)
 
 void ControlPanel::Acquire(QString filePath)
 {
-   QApplication::processEvents();
-   filePath.replace("\\","/");
-   if(isAcquiring())
-   {
-       // If here the system is in the acquire state so create the
-       // empty folder and log error
-       if(properties->AutoFileName) filePath = MakePathUnique(filePath);
-       QDir().mkdir(filePath);
-       statusBar->showMessage("Already acquiring, request ignored but attempted folder creation!");
-       return;
-   }
-   if(IFT != NULL) IFT->AcquireData(filePath);
-   if(TC.count() > 0) TC.last()->AcquireData(filePath);
+    QApplication::processEvents();
+    filePath.replace("\\","/");
+    if(isAcquiring())
+    {
+        // If here the system is in the acquire state so create the
+        // empty folder and log error
+        if(properties->AutoFileName) filePath = MakePathUnique(filePath);
+        QDir().mkdir(filePath);
+        statusBar->showMessage("Already acquiring, request ignored but attempted folder creation!");
+        return;
+    }
+    if(IFT != NULL) IFT->AcquireData(filePath);
+    if(TC.count() > 0) TC.last()->AcquireData(filePath);
 }
 
 bool ControlPanel::isAcquiring(void)
 {
-  QApplication::processEvents();
-  if(IFT != NULL) return(IFT->AD->Acquiring);
-  if(TC.count() > 0) return(TC.last()->AD->Acquiring);
-  return(false);
+    QApplication::processEvents();
+    if(IFT != NULL) return(IFT->AD->Acquiring);
+    if(TC.count() > 0) return(TC.last()->AD->Acquiring);
+    return(false);
 }
 
 void ControlPanel::DismissAcquire(void)
 {
-  QApplication::processEvents();
-  if(IFT != NULL)  IFT->AD->Dismiss();
-  if(TC.count() > 0)  TC.last()->AD->Dismiss();
-  QApplication::processEvents();
-  QApplication::processEvents();
+    QApplication::processEvents();
+    if(IFT != NULL)  IFT->AD->Dismiss();
+    if(TC.count() > 0)  TC.last()->AD->Dismiss();
+    QApplication::processEvents();
+    QApplication::processEvents();
 }
 
 void ControlPanel::msDelay(int ms)
@@ -1726,96 +1731,96 @@ void ControlPanel::tcpCommand(void)
 // also by the script engine.
 QString ControlPanel::Command(QString cmd)
 {
-   int     i,j;
-   QStringList resList;
-   QString res;
+    int     i,j;
+    QStringList resList;
+    QString res;
 
-   res.clear();
-   // Process global commands first.
-   // Load,Save,Shutdown,Restore
-   if(cmd.toUpper() == "SHUTDOWN")
-   {
-       ShutdownFlag = true;
-       if(SD != NULL) SD->SetState(true);
-       return res;
-   }
-   if(cmd.toUpper() == "RESTORE")
-   {
-       RestoreFlag  = true;
-       if(SD != NULL) SD->SetState(false);
-       return res;
-   }
-   if(cmd.toUpper().startsWith("LOAD"))
-   {
-       resList = cmd.split(",");
-       if(resList.count()==2) Load(findFile(resList[1],QFileInfo(ControlPanelFile).canonicalPath()));
-       return res;
-   }
-   if(cmd.toUpper().startsWith("SAVE"))
-   {
-       resList = cmd.split(",");
-       if(resList.count()==2) Save(resList[1]);
-       return res;
-   }
-   // Process commands that will allow communications with the MIPS hardware directly
-   if(cmd.trimmed().toUpper().startsWith("SENDMESSAGE"))
-   {
-       resList = cmd.split(",");
-       if(resList.count() > 2)
-       {
-           QString arg;
-           arg.clear();
-           for(int i=2;i<resList.count();i++)
-           {
-               if(i>2) arg += ",";
-               arg += resList[i];
-           }
-           //qDebug() << "SendMessage: " << resList[1] << "," << arg;
-           return(SendMess(resList[1],arg + "\n"));
-       }
-       else return("?\n");
-   }
-   if(cmd.trimmed().toUpper().startsWith("SENDCOMMAND"))
-   {
-       resList = cmd.split(",");
-       if(resList.count() > 2)
-       {
-           QString arg;
-           arg.clear();
-           for(int i=2;i<resList.count();i++)
-           {
-               if(i>2) arg += ",";
-               arg += resList[i];
-           }
-           //qDebug() << "SendCommand: " << resList[1] << "," << arg;
-           if(SendCommand(resList[1],arg + "\n")) return("\n");
-           else return("?\n");
-       }
-       else return("?\n");
-   }
-   // Send the command string to all the controls for someone to process!
-   if(sl != NULL) if((res = sl->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<DACchans.count();i++)    if((res = DACchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<ADCchans.count();i++)    if((res = ADCchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<DCBchans.count();i++)    if((res = DCBchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<RFchans.count();i++)     if((res = RFchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<RFCchans.count();i++)    if((res = RFCchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<DCBoffsets.count();i++)  if((res = DCBoffsets[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<DCBenables.count();i++)  if((res = DCBenables[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<DIOchannels.count();i++) if((res = DIOchannels[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<ESIchans.count();i++)    if((res = ESIchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<ARBchans.count();i++)    if((res = ARBchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<Ccontrols.count();i++)   if((res = Ccontrols[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<devices.count();i++)     if((res = devices[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<ScripButtons.count();i++) if((res = ScripButtons[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<Cpanels.count();i++) if((res = Cpanels[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   for(i=0;i<TC.count();i++)
-   {
-       if((res = TC[i]->TG->ProcessCommand(cmd)) != "?") return(res + "\n");
-       for(j=0;j<TC[i]->TG->EC.count();j++) if((res = TC[i]->TG->EC[j]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   }
-   for(i=0;i<comp.count();i++) if((res = comp[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
-   return("?\n");
+    res.clear();
+    // Process global commands first.
+    // Load,Save,Shutdown,Restore
+    if(cmd.toUpper() == "SHUTDOWN")
+    {
+        ShutdownFlag = true;
+        if(SD != NULL) SD->SetState(true);
+        return res;
+    }
+    if(cmd.toUpper() == "RESTORE")
+    {
+        RestoreFlag  = true;
+        if(SD != NULL) SD->SetState(false);
+        return res;
+    }
+    if(cmd.toUpper().startsWith("LOAD"))
+    {
+        resList = cmd.split(",");
+        if(resList.count()==2) Load(findFile(resList[1],QFileInfo(ControlPanelFile).canonicalPath()));
+        return res;
+    }
+    if(cmd.toUpper().startsWith("SAVE"))
+    {
+        resList = cmd.split(",");
+        if(resList.count()==2) Save(resList[1]);
+        return res;
+    }
+    // Process commands that will allow communications with the MIPS hardware directly
+    if(cmd.trimmed().toUpper().startsWith("SENDMESSAGE"))
+    {
+        resList = cmd.split(",");
+        if(resList.count() > 2)
+        {
+            QString arg;
+            arg.clear();
+            for(int i=2;i<resList.count();i++)
+            {
+                if(i>2) arg += ",";
+                arg += resList[i];
+            }
+            //qDebug() << "SendMessage: " << resList[1] << "," << arg;
+            return(SendMess(resList[1],arg + "\n"));
+        }
+        else return("?\n");
+    }
+    if(cmd.trimmed().toUpper().startsWith("SENDCOMMAND"))
+    {
+        resList = cmd.split(",");
+        if(resList.count() > 2)
+        {
+            QString arg;
+            arg.clear();
+            for(int i=2;i<resList.count();i++)
+            {
+                if(i>2) arg += ",";
+                arg += resList[i];
+            }
+            //qDebug() << "SendCommand: " << resList[1] << "," << arg;
+            if(SendCommand(resList[1],arg + "\n")) return("\n");
+            else return("?\n");
+        }
+        else return("?\n");
+    }
+    // Send the command string to all the controls for someone to process!
+    if(sl != NULL) if((res = sl->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<DACchans.count();i++)    if((res = DACchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<ADCchans.count();i++)    if((res = ADCchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<DCBchans.count();i++)    if((res = DCBchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<RFchans.count();i++)     if((res = RFchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<RFCchans.count();i++)    if((res = RFCchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<DCBoffsets.count();i++)  if((res = DCBoffsets[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<DCBenables.count();i++)  if((res = DCBenables[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<DIOchannels.count();i++) if((res = DIOchannels[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<ESIchans.count();i++)    if((res = ESIchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<ARBchans.count();i++)    if((res = ARBchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<Ccontrols.count();i++)   if((res = Ccontrols[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<devices.count();i++)     if((res = devices[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<ScripButtons.count();i++) if((res = ScripButtons[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<Cpanels.count();i++) if((res = Cpanels[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<TC.count();i++)
+    {
+        if((res = TC[i]->TG->ProcessCommand(cmd)) != "?") return(res + "\n");
+        for(j=0;j<TC[i]->TG->EC.count();j++) if((res = TC[i]->TG->EC[j]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    }
+    for(i=0;i<comp.count();i++) if((res = comp[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    return("?\n");
 }
 
 // This function allows the script system to popup a file selection dalog for file open
@@ -1830,7 +1835,7 @@ QString ControlPanel::SelectFile(QString fType, QString Title, QString Ext)
     }
     if(fType.toUpper() == "SAVE")
     {
-       fileName = QFileDialog::getSaveFileName(this, Title,"",Ext + " (*." + Ext + ");;All files (*.*)");
+        fileName = QFileDialog::getSaveFileName(this, Title,"",Ext + " (*." + Ext + ");;All files (*.*)");
     }
     return fileName;
 }
@@ -2067,13 +2072,13 @@ bool DACchannel::eventFilter(QObject *obj, QEvent *event)
         if((QApplication::queryKeyboardModifiers() & 0x8000000) != 0) delta *= 100;
         if(delta != 0)
         {
-           QString myString;
-           myString.sprintf((const char*)Format.toStdString().c_str(), Vdac->text().toFloat() + delta);
-           Vdac->setText(myString);
-           Vdac->setModified(true);
-           Vdac->editingFinished();
-           UpdateOff = false;
-           return true;
+            QString myString;
+            myString.sprintf((const char*)Format.toStdString().c_str(), Vdac->text().toFloat() + delta);
+            Vdac->setText(myString);
+            Vdac->setModified(true);
+            Vdac->editingFinished();
+            UpdateOff = false;
+            return true;
         }
     }
     UpdateOff = false;
@@ -2123,10 +2128,10 @@ QString DACchannel::ProcessCommand(QString cmd)
     QStringList resList = cmd.split("=");
     if(resList.count()==2)
     {
-       Vdac->setText(resList[1]);
-       Vdac->setModified(true);
-       Vdac->editingFinished();
-       return "";
+        Vdac->setText(resList[1]);
+        Vdac->setModified(true);
+        Vdac->editingFinished();
+        return "";
     }
     return "?";
 }
@@ -2155,14 +2160,14 @@ void DACchannel::Update(void)
 // writeValue = (display - b)/m
 void DACchannel::VdacChange(void)
 {
-   QString val;
+    QString val;
 
-   if(comms == NULL) return;
-   if(!Vdac->isModified()) return;
-   val.sprintf("%.3f",(Vdac->text().toFloat() - b)/m);
-   QString res = "SDACV,CH" + QString::number(Channel) + "," + val + "\n";
-   comms->SendCommand(res.toStdString().c_str());
-   Vdac->setModified(false);
+    if(comms == NULL) return;
+    if(!Vdac->isModified()) return;
+    val.sprintf("%.3f",(Vdac->text().toFloat() - b)/m);
+    QString res = "SDACV,CH" + QString::number(Channel) + "," + val + "\n";
+    comms->SendCommand(res.toStdString().c_str());
+    Vdac->setModified(false);
 }
 
 // *************************************************************************************************
@@ -2209,7 +2214,7 @@ bool DCBiasGroups::SetValues(QString strVals)
     QStringList resList = strVals.split(";");
     for(int i=0;i<resList.count();i++)
     {
-       comboGroups->addItem(resList[i]);
+        comboGroups->addItem(resList[i]);
     }
     return true;
 }
@@ -2346,22 +2351,22 @@ QString ESI::ProcessCommand(QString cmd)
     QStringList resList = cmd.split("=");
     if(resList.count()==2)
     {
-       if(resList[0] == Title)
-       {
-           ESIsp->setText(resList[1]);
-           ESIsp->setModified(true);
-           ESIsp->editingFinished();
-           return "";
-       }
-       if(resList[0] == res + ".ena")
-       {
-           if(resList[1] == "ON") ESIena->setChecked(true);
-           else if(resList[1] == "OFF") ESIena->setChecked(false);
-           else return "?";
-           if(resList[1] == "ON") ESIena->stateChanged(1);
-           else  ESIena->stateChanged(0);
-           return "";
-       }
+        if(resList[0] == Title)
+        {
+            ESIsp->setText(resList[1]);
+            ESIsp->setModified(true);
+            ESIsp->editingFinished();
+            return "";
+        }
+        if(resList[0] == res + ".ena")
+        {
+            if(resList[1] == "ON") ESIena->setChecked(true);
+            else if(resList[1] == "OFF") ESIena->setChecked(false);
+            else return "?";
+            if(resList[1] == "ON") ESIena->stateChanged(1);
+            else  ESIena->stateChanged(0);
+            return "";
+        }
     }
     return "?";
 }
@@ -2399,12 +2404,12 @@ void ESI::ESIChange(void)
 
 void ESI::ESIenaChange(void)
 {
-   QString res;
+    QString res;
 
-   if(comms == NULL) return;
-   if(ESIena->checkState()) res ="SHVENA," + QString::number(Channel) + "\n";
-   else res ="SHVDIS," + QString::number(Channel) + "\n";
-   comms->SendCommand(res.toStdString().c_str());
+    if(comms == NULL) return;
+    if(ESIena->checkState()) res ="SHVENA," + QString::number(Channel) + "\n";
+    else res ="SHVDIS," + QString::number(Channel) + "\n";
+    comms->SendCommand(res.toStdString().c_str());
 }
 
 void ESI::Shutdown(void)
@@ -2464,7 +2469,7 @@ Ccontrol::Ccontrol(QWidget *parent, QString name, QString MIPSname,QString Type,
     ShutdownValue.clear();
     Dtype = "Double";
     comboBox = NULL;
-//    qApp->installEventFilter(this);
+    //    qApp->installEventFilter(this);
 }
 
 void Ccontrol::Show(void)
@@ -2489,7 +2494,7 @@ void Ccontrol::Show(void)
             else if(ReadbackCmd.isEmpty())
             {
                 Vsp = new QLineEdit(frmCc);
-                Vsp->setGeometry(70,0,70,21);      
+                Vsp->setGeometry(70,0,70,21);
                 if(Dtype.toUpper() == "DOUBLE") Vsp->setValidator(new QDoubleValidator);
                 Vsp->setToolTip(MIPSnm + "," + SetCmd);
                 connect(Vsp,SIGNAL(editingFinished()),this,SLOT(VspChange()));
@@ -2616,7 +2621,7 @@ QString Ccontrol::Report(void)
     }
     if(Ctype == "ComboBox")
     {
-       return(res + "," + comboBox->currentText());
+        return(res + "," + comboBox->currentText());
     }
     return("");
 }
@@ -2686,7 +2691,7 @@ bool Ccontrol::SetValues(QString strVals)
         return true;
     }
     return false;
- }
+}
 
 void Ccontrol::Shutdown(void)
 {
@@ -2756,10 +2761,10 @@ QString Ccontrol::ProcessCommand(QString cmd)
         QStringList resList = cmd.split("=");
         if((resList.count()==2) && !SetCmd.isEmpty() && (resList[0] == res))
         {
-           Vsp->setText(resList[1].trimmed());
-           Vsp->setModified(true);
-           Vsp->editingFinished();
-           return "";
+            Vsp->setText(resList[1].trimmed());
+            Vsp->setModified(true);
+            Vsp->editingFinished();
+            return "";
         }
         return "?";
     }
@@ -2824,10 +2829,10 @@ QString Ccontrol::ProcessCommand(QString cmd)
 
 void Ccontrol::VspChange(void)
 {
-   if(!Vsp->isModified()) return;
-   QString res = SetCmd + "," + Vsp->text() + "\n";
-   if(comms != NULL) comms->SendCommand(res.toStdString().c_str());
-   Vsp->setModified(false);
+    if(!Vsp->isModified()) return;
+    QString res = SetCmd + "," + Vsp->text() + "\n";
+    if(comms != NULL) comms->SendCommand(res.toStdString().c_str());
+    Vsp->setModified(false);
 }
 
 void Ccontrol::pbButtonPressed(void)
@@ -2957,25 +2962,25 @@ QString StatusLight::ProcessCommand(QString cmd)
     QStringList resList = cmd.split("=");
     if(resList.count()==2)
     {
-       if((res + ".message") == resList[0].trimmed())
-       {
-           Status = resList[1];
-           ShowMessage();
-           return "";
-       }
-       else if((res + ".mode") == resList[0].trimmed())
-       {
-           Mode = resList[1];
-           ShowMessage();
-           return "";
-       }
-       widget->greenLight()->turnOff();
-       widget->redLight()->turnOff();
-       widget->yellowLight()->turnOff();
-       if(resList[1].trimmed() == "GREEN") widget->greenLight()->turnOn();
-       if(resList[1].trimmed() == "RED") widget->redLight()->turnOn();
-       if(resList[1].trimmed() == "YELLOW") widget->yellowLight()->turnOn();
-       return "";
+        if((res + ".message") == resList[0].trimmed())
+        {
+            Status = resList[1];
+            ShowMessage();
+            return "";
+        }
+        else if((res + ".mode") == resList[0].trimmed())
+        {
+            Mode = resList[1];
+            ShowMessage();
+            return "";
+        }
+        widget->greenLight()->turnOff();
+        widget->redLight()->turnOff();
+        widget->yellowLight()->turnOff();
+        if(resList[1].trimmed() == "GREEN") widget->greenLight()->turnOn();
+        if(resList[1].trimmed() == "RED") widget->redLight()->turnOn();
+        if(resList[1].trimmed() == "YELLOW") widget->yellowLight()->turnOn();
+        return "";
     }
     return "?";
 }

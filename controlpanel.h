@@ -21,6 +21,7 @@
 #include "plot.h"
 #include "device.h"
 #include "shuttertg.h"
+#include "autotrend.h"
 
 #include <QDialog>
 #include <QDebug>

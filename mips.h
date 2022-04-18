@@ -39,7 +39,6 @@ class ADC;
 class ControlPanel;
 class ScriptingConsole;
 class Properties;
-class AutoTrend;
 
 class DeleteHighlightedItemWhenShiftDelPressedEventFilter : public QObject
 {
@@ -147,7 +146,6 @@ private:
     QList<Comms*> Systems;
     ScriptingConsole *scriptconsole;
     QString NextCP;
-    AutoTrend* autotrend;
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
