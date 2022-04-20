@@ -31,19 +31,19 @@ AutoTrend::AutoTrend(QWidget *parent) :
     rightValueModel = new QStringListModel(this);
     mathOperatorsModel = new QStringListModel(this);
 
-    electrodeChannelHash.insert("FunnelIn", "leSDCB_1");
-    electrodeChannelHash.insert("FunnelOut", "leSDCB_2");
-    electrodeChannelHash.insert("FunnelCL", "leSDCB_3");
-    electrodeChannelHash.insert("SLIMBias", "leSDCB_4");
-    electrodeChannelHash.insert("ExitCL", "leSDCB_5");
-    electrodeChannelHash.insert("QuadBias", "leSDCB_6");
+    //    electrodeChannelHash.insert("FunnelIn", "leSDCB_1");
+    //    electrodeChannelHash.insert("FunnelOut", "leSDCB_2");
+    //    electrodeChannelHash.insert("FunnelCL", "leSDCB_3");
+    //    electrodeChannelHash.insert("SLIMBias", "leSDCB_4");
+    //    electrodeChannelHash.insert("ExitCL", "leSDCB_5");
+    //    electrodeChannelHash.insert("QuadBias", "leSDCB_6");
 
-    electrodeLabelValueMap.insert("label", QPair<QString, int>("FunnelIn", 10));
-    electrodeLabelValueMap.insert("label_2", QPair<QString, int>("FunnelOut", 10));
-    electrodeLabelValueMap.insert("label_3", QPair<QString, int>("FunnelCL", 10));
-    electrodeLabelValueMap.insert("label_4", QPair<QString, int>("SLIMBias", 10));
-    electrodeLabelValueMap.insert("label_5", QPair<QString, int>("ExitCL", 10));
-    electrodeLabelValueMap.insert("label_6", QPair<QString, int>("QuadBias", 10));
+    //    electrodeLabelValueMap.insert("label", QPair<QString, int>("FunnelIn", 10));
+    //    electrodeLabelValueMap.insert("label_2", QPair<QString, int>("FunnelOut", 10));
+    //    electrodeLabelValueMap.insert("label_3", QPair<QString, int>("FunnelCL", 10));
+    //    electrodeLabelValueMap.insert("label_4", QPair<QString, int>("SLIMBias", 10));
+    //    electrodeLabelValueMap.insert("label_5", QPair<QString, int>("ExitCL", 10));
+    //    electrodeLabelValueMap.insert("label_6", QPair<QString, int>("QuadBias", 10));
 
     initUI();
 
@@ -141,7 +141,10 @@ void AutoTrend::initUI()
 
 void AutoTrend::updateDCBias(QString name, double value)
 {
-// update according dv voltage on configuration panel
+    QString command = QString("mips.Command(\"%1=%2\")").arg(name).arg(value);
+    qDebug() << "update DC: " << command;
+    QScriptValue result = engine->evaluate(command);
+    qDebug() << result.toString();
 }
 
 bool AutoTrend::applyRelations(QString startWith, double startValue)
@@ -219,14 +222,12 @@ void AutoTrend::buildTrendSM()
         relationEnabled = ui->relationRatioButton->isChecked();
         fileFolder = QDate::currentDate().toString("yyyyMMdd") + "/" + QTime::currentTime().toString("hhmmss") + trendName + "Trend";
         ui->trendProgressBar->setValue(0);
-        //mipsui->chkPowerEnable->setChecked(true);
         emit nextState();
     });
     initState->addTransition(this, &AutoTrend::nextState, updateTrendState);
 
     connect(updateTrendState, &QState::entered, this, [=](){
-        if(electrodeChannelHash.contains(trendName))
-            updateDCBias(electrodeChannelHash.value(trendName), currentStep);
+        updateDCBias(trendName, currentStep);
 
         emit nextState();
     });
