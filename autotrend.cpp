@@ -13,6 +13,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QtMath>
+#include <QRandomGenerator>>
 
 AutoTrend::AutoTrend(QWidget *parent) :
     QWidget(parent),
@@ -29,21 +30,6 @@ AutoTrend::AutoTrend(QWidget *parent) :
     relationModel = new QStringListModel(this);
     leftValueModel = new QStringListModel(this);
     rightValueModel = new QStringListModel(this);
-    mathOperatorsModel = new QStringListModel(this);
-
-    //    electrodeChannelHash.insert("FunnelIn", "leSDCB_1");
-    //    electrodeChannelHash.insert("FunnelOut", "leSDCB_2");
-    //    electrodeChannelHash.insert("FunnelCL", "leSDCB_3");
-    //    electrodeChannelHash.insert("SLIMBias", "leSDCB_4");
-    //    electrodeChannelHash.insert("ExitCL", "leSDCB_5");
-    //    electrodeChannelHash.insert("QuadBias", "leSDCB_6");
-
-    //    electrodeLabelValueMap.insert("label", QPair<QString, int>("FunnelIn", 10));
-    //    electrodeLabelValueMap.insert("label_2", QPair<QString, int>("FunnelOut", 10));
-    //    electrodeLabelValueMap.insert("label_3", QPair<QString, int>("FunnelCL", 10));
-    //    electrodeLabelValueMap.insert("label_4", QPair<QString, int>("SLIMBias", 10));
-    //    electrodeLabelValueMap.insert("label_5", QPair<QString, int>("ExitCL", 10));
-    //    electrodeLabelValueMap.insert("label_6", QPair<QString, int>("QuadBias", 10));
 
     initUI();
 
@@ -104,10 +90,27 @@ void AutoTrend::on_addRelationButton_clicked()
     QString newRelation;
     newRelation = electrodes.at(leftIndex) + "=" + electrodes.at(rightIndex);
 
-    int mathOperatorIndex = ui->mathListView->currentIndex().row();
-    QString constString = ui->constInRelation->text();
-    if(mathOperatorIndex > 0 && !constString.isEmpty()){
-        newRelation += mathOperators.at(mathOperatorIndex) + constString;
+    QString leftValueString = engine->evaluate(QString("mips.Command(\"%1\")").arg(electrodes.at(leftIndex))).toString().trimmed();
+    QString rightValueString = engine->evaluate(QString("mips.Command(\"%1\")").arg(electrodes.at(rightIndex))).toString().trimmed();
+
+    if(leftValueString.isEmpty() || rightValueString.isEmpty()) return;
+    if(leftValueString == rightValueString){
+        relationList.append(newRelation);
+        relationModel->setStringList(relationList);
+        return;
+    }
+
+    bool ok_left, ok_right;
+    double leftValue = leftValueString.toDouble(&ok_left);
+    double rightValue = rightValueString.toDouble(&ok_right);
+
+    if(!ok_left || !ok_right) return;
+
+    double diff = leftValue - rightValue;
+    if(diff > 0){
+        newRelation += QString("+%1").arg(diff);
+    }else{
+        newRelation += QString("-%1").arg(diff * (-1));
     }
     relationList.append(newRelation);
     relationModel->setStringList(relationList);
@@ -118,15 +121,11 @@ void AutoTrend::initUI()
     relationModel->setStringList(relationList);
     leftValueModel->setStringList(electrodes);
     rightValueModel->setStringList(electrodes);
-    mathOperatorsModel->setStringList(mathOperators);
 
     ui->leftListView->setModel(leftValueModel);
     ui->rightListView->setModel(rightValueModel);
-    ui->mathListView->setModel(mathOperatorsModel);
     ui->trendComboBox->addItems(electrodes);
     ui->relationListView->setModel(relationModel);
-
-    ui->constInRelation->setValidator(new QDoubleValidator(0, 10000, 3, this));
     ui->trendFrom->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendStepSize->setValidator(new QIntValidator(-10000, 10000, this));
@@ -136,7 +135,6 @@ void AutoTrend::initUI()
         QLineEdit *sbcIp = ui->sbcIPEdit;
         sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
     });
-
 }
 
 void AutoTrend::updateDCBias(QString name, double value)
@@ -175,15 +173,10 @@ bool AutoTrend::applyRelations(QString startWith, double startValue)
                     if(rightList.size() == 2){
                         currentValue -= rightList.at(1).toDouble();
                     }
-                }else if(rightString.contains('*')){
-                    QStringList rightList = rightString.split('-');
-                    if(rightList.size() == 2){
-                        currentValue *= rightList.at(1).toDouble();
-                    }
                 }
 
-                if(electrodeChannelHash.contains(leftString))
-                    updateDCBias(electrodeChannelHash.value(leftString), currentValue);
+                if(electrodes.contains(leftString))
+                    updateDCBias(leftString, currentValue);
 
                 calQueue.enqueue(QPair<QString, double>(leftString, currentValue));
                 appliedRelations++;
@@ -431,8 +424,10 @@ void AutoTrend::onMessageReady(QString message)
 
 void AutoTrend::on_pushButton_clicked()
 {
-    qDebug() << "test button";
-    QScriptValue result = engine->evaluate("mips.Command(\"Funnel.Switch 1.State=OBA1\")");
-    qDebug() << result.toString();
+    int start = 1;
+    for(auto &v : electrodes){
+        engine->evaluate(QString("mips.Command(\"%1=%2\")").arg(v).arg(start + QRandomGenerator::global()->generateDouble()));
+        start++;
+    }
 }
 

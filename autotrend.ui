@@ -153,7 +153,7 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>490</x>
+     <x>540</x>
      <y>60</y>
      <width>20</width>
      <height>20</height>
@@ -168,7 +168,7 @@
     <rect>
      <x>370</x>
      <y>20</y>
-     <width>101</width>
+     <width>141</width>
      <height>111</height>
     </rect>
    </property>
@@ -176,20 +176,10 @@
   <widget class="QListView" name="rightListView">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>580</x>
      <y>20</y>
-     <width>101</width>
+     <width>131</width>
      <height>111</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QListView" name="mathListView">
-   <property name="geometry">
-    <rect>
-     <x>630</x>
-     <y>28</y>
-     <width>61</width>
-     <height>91</height>
     </rect>
    </property>
   </widget>
@@ -230,16 +220,6 @@
    </property>
    <property name="text">
     <string>Connect to SBC</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="constInRelation">
-   <property name="geometry">
-    <rect>
-     <x>710</x>
-     <y>60</y>
-     <width>61</width>
-     <height>24</height>
-    </rect>
    </property>
   </widget>
   <widget class="QLineEdit" name="sbcIPEdit">
@@ -357,6 +337,19 @@
    </property>
    <property name="text">
     <string>PushButton</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>740</x>
+     <y>60</y>
+     <width>49</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>...</string>
    </property>
   </widget>
  </widget>

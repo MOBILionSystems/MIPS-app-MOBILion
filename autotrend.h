@@ -78,12 +78,8 @@ private:
     QStringListModel* relationModel;
     QStringListModel* leftValueModel;
     QStringListModel* rightValueModel;
-    QStringListModel* mathOperatorsModel;
     QStringList electrodes = {"Funnel.NIF IN", "Funnel.NIF OUT", "Funnel.NIF CL", "Funnel.SLIMvolBias"};
-    QStringList mathOperators = {"None", "+", "-", "*"};
     QStringList relationList;
-    QHash<QString, QString> electrodeChannelHash;
-    QMap<QString, QPair<QString, int>> electrodeLabelValueMap;
     QString fileFolder;
 
 
