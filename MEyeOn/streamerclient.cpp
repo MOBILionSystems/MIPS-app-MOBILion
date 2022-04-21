@@ -16,9 +16,9 @@ StreamerClient::StreamerClient(QObject *parent)
     connect(m_webSocket, &QWebSocket::textMessageReceived, this, &StreamerClient::messageReady);
 }
 
-void StreamerClient::connectTo()
+void StreamerClient::connectTo(QString sbcStreamer)
 {
-    m_webSocket->open(QUrl(QStringLiteral("ws://192.168.1.212:4001")));
+    m_webSocket->open(QUrl(QString("ws://%1").arg(sbcStreamer))); //ws://192.168.1.212:4001
 }
 
 // REQUEST_FULL_SPECTRUM, REQUEST_DATA_STREAM(MASS),
@@ -28,14 +28,11 @@ void StreamerClient::request(QString message)
     //message = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + heatmapGUID + "\", \"type\": \"HEATMAP\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
     //message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + mobilityGUID + "\", \"type\": \"MOBILITY\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
     //message = "{\"dataDomainWindow\": {\"xRange\": [0, 250000], \"yRange\": [0, 300000]}, \"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + streamGUID + "\", \"type\": \"MASS\", \"xAxisPixels\": 100000, \"yAxisPixels\": 10000}";
-    QString message1 = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + streamGUID + "\", \"type\": \"MASS\", \"xAxisPixels\": 1000, \"yAxisPixels\": 500}";
-    QString message2 = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + mobilityGUID + "\", \"type\": \"MOBILITY\", \"xAxisPixels\": 1000, \"yAxisPixels\": 500}";
-    QString message3 = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + heatmapGUID + "\", \"type\": \"HEATMAP\", \"xAxisPixels\": 1000, \"yAxisPixels\": 500}";
-    qDebug() << "sending: " << message1;
+    QString message1 = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + streamGUID + "\", \"type\": \"MASS\", \"xAxisPixels\": 631, \"yAxisPixels\": 381}";
+    QString message2 = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + mobilityGUID + "\", \"type\": \"MOBILITY\", \"xAxisPixels\": 631, \"yAxisPixels\": 381}";
+    QString message3 = "{\"id\": \"REQUEST_DATA_STREAM\", \"guid\": \"" + guid + "\", \"streamGuid\": \"" + heatmapGUID + "\", \"type\": \"HEATMAP\", \"xAxisPixels\": 551, \"yAxisPixels\": 341}";
     m_webSocket->sendTextMessage(message1);
-    qDebug() << "sending: " << message2;
     m_webSocket->sendTextMessage(message2);
-    qDebug() << "sending: " << message3;
     m_webSocket->sendTextMessage(message3);
 }
 

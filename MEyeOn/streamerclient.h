@@ -9,7 +9,7 @@ class StreamerClient : public QObject
     Q_OBJECT
 public:
     explicit StreamerClient(QObject *parent = nullptr);
-    void connectTo();
+    void connectTo(QString sbcStreamer);
     void request(QString message);
     void resetFrameIndex();
 

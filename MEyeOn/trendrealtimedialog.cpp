@@ -5,6 +5,7 @@ TrendRealTimeDialog::TrendRealTimeDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::TrendRealTimeDialog)
 {
+    graphic_hm = new QGraphicsScene(this);
     dataProcess = new DataProcess(this);
     ui->setupUi(this);
     initPlot();
@@ -62,12 +63,15 @@ void TrendRealTimeDialog::mobilityPlot(QJsonArray dataPointsArray)
 
 void TrendRealTimeDialog::heatmapPlot(QJsonArray dataPointsArray)
 {
+    //qDebug() << "-----------------------";
+    //qDebug() << dataPointsArray;
     int sizeX = ui->heatmapView->width();
     int sizeY = ui->heatmapView->height();
     double xPixelStep = (heatmapMassH - heatmapMassL) / sizeX;
     double yPixelStep = (heatmapMobilityH - heatmapMobilityL) / sizeY;
 
     QImage image = QImage( sizeX, sizeY, QImage::Format_ARGB32);
+    image.fill(0);
     QJsonArray::Iterator i = dataPointsArray.begin();
 
     while (i != dataPointsArray.end()) {
@@ -82,13 +86,13 @@ void TrendRealTimeDialog::heatmapPlot(QJsonArray dataPointsArray)
         yindex = yindex >= sizeY ? (sizeY - 1) : yindex;
         yindex = sizeY - 1 - yindex;
 
-        image.setPixelColor(xindex, yindex, "#ff000000");// object.value("color").toString());
+        image.setPixelColor(xindex, yindex, 0Xff000000);// object.value("color").toString());
 
         i++;
     }
-    QGraphicsScene *graphic = new QGraphicsScene(this);
-    graphic->addPixmap(QPixmap::fromImage(image));
-    ui->heatmapView->setScene(graphic);
+    graphic_hm->clear();
+    graphic_hm->addPixmap(QPixmap::fromImage(image));
+    ui->heatmapView->setScene(graphic_hm);
 }
 
 void TrendRealTimeDialog::resetPlot()

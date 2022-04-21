@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "dataprocess.h"
+#include <QGraphicsScene>
 
 namespace Ui {
 class TrendRealTimeDialog;
@@ -24,6 +25,7 @@ public:
     void setRange(QJsonObject payload);
 
 private:
+    QGraphicsScene* graphic_hm;
     DataProcess* dataProcess;
     Ui::TrendRealTimeDialog *ui;
     void initPlot();

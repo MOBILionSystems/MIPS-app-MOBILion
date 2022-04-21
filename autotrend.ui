@@ -336,7 +336,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>PushButton</string>
+    <string>Init Voltages</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">

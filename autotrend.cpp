@@ -394,7 +394,7 @@ void AutoTrend::connectStreamer()
 {
     _streamerClient = new StreamerClient(this);
     connect(_streamerClient, &StreamerClient::messageReady, this, &AutoTrend::onMessageReady);
-    _streamerClient->connectTo();
+    _streamerClient->connectTo(_sbcIpAddress + ":" + _streamerPort);
     QTimer::singleShot(500, [=](){_streamerClient->request("");});
 }
 

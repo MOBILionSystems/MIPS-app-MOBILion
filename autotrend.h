@@ -72,6 +72,7 @@ private:
     TrendRealTimeDialog* trendRealTimeDialog;
     StreamerClient* _streamerClient;
     QString _sbcIpAddress;
+    QString _streamerPort = "4001";
     QStateMachine* trendSM;
     Ui::AutoTrend *ui;
     Broker* _broker{nullptr};
