@@ -66,6 +66,14 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_dcRadioButton_toggled(bool checked);
+
+    void on_rfRadioButton_toggled(bool checked);
+
+    void on_twRadioButton_3_toggled(bool checked);
+
+    void on_trendComboBox_currentTextChanged(const QString &arg1);
+
 private:
     QScriptValue mips; // Actually configuration panel instead of mips
     QScriptEngine *engine;
@@ -79,7 +87,9 @@ private:
     QStringListModel* relationModel;
     QStringListModel* leftValueModel;
     QStringListModel* rightValueModel;
-    QStringList electrodes = {"Funnel.NIF IN", "Funnel.NIF OUT", "Funnel.NIF CL", "Funnel.SLIMvolBias"};
+    QStringList dcElectrodes = {"Funnel.NIF IN", "Funnel.NIF OUT", "Funnel.NIF CL", "Funnel.SLIMvolBias"};
+    QStringList rfElectrodes = {"SLIM.SLIM Top.Drive", "SLIM.SLIM Bottom.Drive"};
+    QStringList twElectrodes = {"SLIM.Seperation.Frequency", "SLIM.Seperation.Amplitude"};
     QStringList relationList;
     QString fileFolder;
 

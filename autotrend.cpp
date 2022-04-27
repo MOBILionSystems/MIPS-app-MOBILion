@@ -13,7 +13,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QtMath>
-#include <QRandomGenerator>>
+#include <QRandomGenerator>
 
 AutoTrend::AutoTrend(QWidget *parent) :
     QWidget(parent),
@@ -32,7 +32,6 @@ AutoTrend::AutoTrend(QWidget *parent) :
     rightValueModel = new QStringListModel(this);
 
     initUI();
-
 
 }
 
@@ -88,10 +87,10 @@ void AutoTrend::on_addRelationButton_clicked()
     if( leftIndex < 0 || rightIndex < 0 || leftIndex == rightIndex) return;
 
     QString newRelation;
-    newRelation = electrodes.at(leftIndex) + "=" + electrodes.at(rightIndex);
+    newRelation = dcElectrodes.at(leftIndex) + "=" + dcElectrodes.at(rightIndex);
 
-    QString leftValueString = engine->evaluate(QString("mips.Command(\"%1\")").arg(electrodes.at(leftIndex))).toString().trimmed();
-    QString rightValueString = engine->evaluate(QString("mips.Command(\"%1\")").arg(electrodes.at(rightIndex))).toString().trimmed();
+    QString leftValueString = engine->evaluate(QString("mips.Command(\"%1\")").arg(dcElectrodes.at(leftIndex))).toString().trimmed();
+    QString rightValueString = engine->evaluate(QString("mips.Command(\"%1\")").arg(dcElectrodes.at(rightIndex))).toString().trimmed();
 
     if(leftValueString.isEmpty() || rightValueString.isEmpty()) return;
     if(leftValueString == rightValueString){
@@ -119,12 +118,13 @@ void AutoTrend::on_addRelationButton_clicked()
 void AutoTrend::initUI()
 {
     relationModel->setStringList(relationList);
-    leftValueModel->setStringList(electrodes);
-    rightValueModel->setStringList(electrodes);
+    leftValueModel->setStringList(dcElectrodes);
+    rightValueModel->setStringList(dcElectrodes);
 
     ui->leftListView->setModel(leftValueModel);
     ui->rightListView->setModel(rightValueModel);
-    ui->trendComboBox->addItems(electrodes);
+    ui->dcRadioButton->setChecked(true);
+    ui->trendComboBox->addItems(dcElectrodes);
     ui->relationListView->setModel(relationModel);
     ui->trendFrom->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
@@ -140,9 +140,10 @@ void AutoTrend::initUI()
 void AutoTrend::updateDCBias(QString name, double value)
 {
     QString command = QString("mips.Command(\"%1=%2\")").arg(name).arg(value);
-    qDebug() << "update DC: " << command;
-    QScriptValue result = engine->evaluate(command);
-    qDebug() << result.toString();
+    engine->evaluate(command);
+    if(name == ui->trendComboBox->currentText()){
+        ui->trendCurrentValue->setText(QString::number(value));
+    }
 }
 
 bool AutoTrend::applyRelations(QString startWith, double startValue)
@@ -175,7 +176,7 @@ bool AutoTrend::applyRelations(QString startWith, double startValue)
                     }
                 }
 
-                if(electrodes.contains(leftString))
+                if(dcElectrodes.contains(leftString))
                     updateDCBias(leftString, currentValue);
 
                 calQueue.enqueue(QPair<QString, double>(leftString, currentValue));
@@ -346,11 +347,9 @@ void AutoTrend::readResult()
     QLineEdit *sbcIp = ui->sbcIPEdit;
 
     if (res.contains("unreachable") || percentLost == 100) {
-        qDebug() << "host not found.";
         sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 0, 0);}");
         setupBroker(false);
     } else {
-        qDebug() << "host found." << res;
         sbcIp->setStyleSheet("QLineEdit { background: rgb(0, 255, 0);}");
         setupBroker(true);
     }
@@ -395,7 +394,7 @@ void AutoTrend::connectStreamer()
     _streamerClient = new StreamerClient(this);
     connect(_streamerClient, &StreamerClient::messageReady, this, &AutoTrend::onMessageReady);
     _streamerClient->connectTo(_sbcIpAddress + ":" + _streamerPort);
-    QTimer::singleShot(500, [=](){_streamerClient->request("");});
+    QTimer::singleShot(1000, [=](){_streamerClient->request("");});
 }
 
 
@@ -425,9 +424,58 @@ void AutoTrend::onMessageReady(QString message)
 void AutoTrend::on_pushButton_clicked()
 {
     int start = 1;
-    for(auto &v : electrodes){
+    for(auto &v : dcElectrodes){
         engine->evaluate(QString("mips.Command(\"%1=%2\")").arg(v).arg(start + QRandomGenerator::global()->generateDouble()));
         start++;
+    }
+}
+
+
+
+void AutoTrend::on_dcRadioButton_toggled(bool checked)
+{
+    if(checked){
+        ui->relationRatioButton->setEnabled(true);
+        ui->trendComboBox->clear();
+        ui->trendComboBox->addItems(dcElectrodes);
+    }else{
+        ui->relationRatioButton->setDisabled(true);
+        ui->relationRatioButton->setChecked(false);
+    }
+}
+
+
+void AutoTrend::on_rfRadioButton_toggled(bool checked)
+{
+    if(checked){
+        ui->trendComboBox->clear();
+        ui->trendComboBox->addItems(rfElectrodes);
+    }
+}
+
+
+void AutoTrend::on_twRadioButton_3_toggled(bool checked)
+{
+    if(checked){
+        ui->trendComboBox->clear();
+        ui->trendComboBox->addItems(twElectrodes);
+    }
+}
+
+
+void AutoTrend::on_trendComboBox_currentTextChanged(const QString &arg1)
+{
+    if(arg1.trimmed().isEmpty()){
+        ui->trendCurrentValue->setText("None");
+    }else{
+        qDebug() << QString("mips.Command(\"%1\")").arg(arg1);
+        QString v = engine->evaluate(QString("mips.Command(\"%1\")").arg(arg1)).toString().trimmed();
+        qDebug() << v;
+        if(v.isEmpty() || v == "?"){
+            ui->trendCurrentValue->setText("None");
+        }else{
+            ui->trendCurrentValue->setText(v);
+        }
     }
 }
 

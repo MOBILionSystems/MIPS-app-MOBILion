@@ -63,8 +63,6 @@ void TrendRealTimeDialog::mobilityPlot(QJsonArray dataPointsArray)
 
 void TrendRealTimeDialog::heatmapPlot(QJsonArray dataPointsArray)
 {
-    //qDebug() << "-----------------------";
-    //qDebug() << dataPointsArray;
     int sizeX = ui->heatmapView->width();
     int sizeY = ui->heatmapView->height();
     double xPixelStep = (heatmapMassH - heatmapMassL) / sizeX;
@@ -156,6 +154,8 @@ void TrendRealTimeDialog::initPlot()
     ui->msRealTimePlot->xAxis->setLabel("m/z");
     ui->msRealTimePlot->yAxis->setLabel("Intensity");
     ui->msRealTimePlot->addGraph();
+//    ui->msRealTimePlot->setInteraction(QCP::iRangeDrag, true);
+//    ui->msRealTimePlot->setInteraction(QCP::iRangeZoom, true);
 
     ui->mobilityRealTimePlot->xAxis->setLabel("Intensity");
     ui->mobilityRealTimePlot->xAxis->setRangeReversed(true);

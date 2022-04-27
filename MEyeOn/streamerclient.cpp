@@ -60,7 +60,6 @@ void StreamerClient::readyRead(QString message)
 {
     //qDebug() << "Reading..." << ++frameindex;
     QJsonDocument document = QJsonDocument::fromJson(message.toLocal8Bit());
-    //qDebug() << document;
     QJsonObject object = document.object();
     if(object.value("id").toString() == "CONNECT"){
         guid = document.object().value("payload").toObject().value("guid").toString();
