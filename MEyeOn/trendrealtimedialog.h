@@ -23,8 +23,11 @@ public:
     void resetPlot();
 
     void setRange(QJsonObject payload);
+    void startNewStep(double currentStep);
 
 private:
+    bool _newStep = false;
+    double _currentStep = 0;
     QGraphicsScene* graphic_hm;
     DataProcess* dataProcess;
     Ui::TrendRealTimeDialog *ui;

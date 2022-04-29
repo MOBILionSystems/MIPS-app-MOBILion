@@ -103,8 +103,6 @@ private:
     bool relationEnabled = false;
     bool toStopTrend = false;
 
-    int currentParameter = 0;
-
     void initUI();
     void updateDCBias(QString name, double value);
     bool applyRelations(QString startWith, double startValue);

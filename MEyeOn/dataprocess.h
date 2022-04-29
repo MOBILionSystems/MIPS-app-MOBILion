@@ -5,6 +5,8 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
+#include <QPair>
+#include <QVector>
 
 class DataProcess : public QObject
 {
@@ -12,9 +14,15 @@ class DataProcess : public QObject
 public:
     explicit DataProcess(QObject *parent = nullptr);
 
-    double sumProcess(QJsonArray data);
+    double sumProcess(QJsonArray data, bool newStep);
+    double frameSpectrumProcess();
+    bool isDoublesEqual(double a, double b);
+    void reset();
 
 signals:
+
+private:
+QVector<QPair<double, double>> frameSpectrum;
 
 };
 

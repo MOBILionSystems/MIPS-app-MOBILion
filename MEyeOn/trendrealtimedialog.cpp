@@ -40,9 +40,11 @@ void TrendRealTimeDialog::msPlot(QJsonArray dataPointsArray)
     ui->msRealTimePlot->yAxis->setRange(0, massIntensityH);
     ui->msRealTimePlot->replot();
 
-    //    double trendValue = 0;
-    //    trendValue = dataProcess->sumProcess(dataPointsArray);
-    //    addPoint(currentParameter, trendValue);
+    double trendValue = 0;
+    trendValue = dataProcess->sumProcess(dataPointsArray, _newStep);
+    if(trendValue > 0)
+        addPoint(_currentStep - 1, trendValue);
+    _newStep = false;
 }
 
 void TrendRealTimeDialog::mobilityPlot(QJsonArray dataPointsArray)
@@ -95,6 +97,7 @@ void TrendRealTimeDialog::heatmapPlot(QJsonArray dataPointsArray)
 
 void TrendRealTimeDialog::resetPlot()
 {
+    dataProcess->reset();
     xPoints.clear();
     yPoints.clear();
     replot();
@@ -138,10 +141,16 @@ void TrendRealTimeDialog::setRange(QJsonObject payload)
         mobilityIntensityH = mobilityIntensityRange.last().toDouble() * 1.05;
     }
 
-//        QJsonArray::Iterator i = ranges.begin();
-//        while (i != ranges.end()) {
-//            if(i->toArray().at())
-//        }
+    //        QJsonArray::Iterator i = ranges.begin();
+    //        while (i != ranges.end()) {
+    //            if(i->toArray().at())
+    //        }
+}
+
+void TrendRealTimeDialog::startNewStep(double currentStep)
+{
+    _currentStep = currentStep;
+    _newStep = true;
 }
 
 // refer to adc.cpp; https://www.qcustomplot.com/index.php/tutorials/basicplotting
@@ -154,8 +163,8 @@ void TrendRealTimeDialog::initPlot()
     ui->msRealTimePlot->xAxis->setLabel("m/z");
     ui->msRealTimePlot->yAxis->setLabel("Intensity");
     ui->msRealTimePlot->addGraph();
-//    ui->msRealTimePlot->setInteraction(QCP::iRangeDrag, true);
-//    ui->msRealTimePlot->setInteraction(QCP::iRangeZoom, true);
+    //    ui->msRealTimePlot->setInteraction(QCP::iRangeDrag, true);
+    //    ui->msRealTimePlot->setInteraction(QCP::iRangeZoom, true);
 
     ui->mobilityRealTimePlot->xAxis->setLabel("Intensity");
     ui->mobilityRealTimePlot->xAxis->setRangeReversed(true);

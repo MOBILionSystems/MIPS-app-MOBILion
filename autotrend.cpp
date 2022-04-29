@@ -213,6 +213,7 @@ void AutoTrend::buildTrendSM()
         trendRealTimeDialog->resetPlot();
         toStopTrend = false;
         currentStep = trendFrom;
+        trendRealTimeDialog->startNewStep(currentStep);
         relationEnabled = ui->relationRatioButton->isChecked();
         fileFolder = QDate::currentDate().toString("yyyyMMdd") + "/" + QTime::currentTime().toString("hhmmss") + trendName + "Trend";
         ui->trendProgressBar->setValue(0);
@@ -243,7 +244,6 @@ void AutoTrend::buildTrendSM()
     waitBeforeAcqState->addTransition(this, &AutoTrend::nextState, startAcqState);
 
     connect(startAcqState, &QState::entered, this, [=](){
-        currentParameter = currentStep;
         _streamerClient->resetFrameIndex();
         _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi"); emit nextState();
     });
@@ -257,6 +257,7 @@ void AutoTrend::buildTrendSM()
 
     connect(nextStepState, &QState::entered, this, [=](){
         currentStep += trendStepSize;
+        trendRealTimeDialog->startNewStep(currentStep);
         if(abs(trendTo - trendFrom) > 0){
             ui->trendProgressBar->setValue( (100 * abs(currentStep - trendFrom)) / (abs(trendTo - trendFrom) + abs(trendStepSize)));
         }
