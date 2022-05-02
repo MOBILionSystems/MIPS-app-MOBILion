@@ -252,7 +252,7 @@ void AutoTrend::buildTrendSM()
     connect(waitDuringAcqState, &QState::entered, this, [=](){QTimer::singleShot(stepDuration, this, [=](){emit nextState();});});
     waitDuringAcqState->addTransition(this, &AutoTrend::nextState, stopAcqState);
 
-    connect(stopAcqState, &QState::entered, this, [=](){_broker->stopAcquire(); emit nextState();});
+    connect(stopAcqState, &QState::entered, this, [=](){_broker->stopAcquire(); QTimer::singleShot(3000, this, [=](){emit nextState();});}); // add delay for wifi communication and data processing
     stopAcqState->addTransition(this, &AutoTrend::nextState, nextStepState);
 
     connect(nextStepState, &QState::entered, this, [=](){
@@ -270,7 +270,7 @@ void AutoTrend::buildTrendSM()
     nextStepState->addTransition(this, &AutoTrend::nextState, updateTrendState);
     nextStepState->addTransition(this, &AutoTrend::doneAllStates, finishState);
 
-    connect(trendSM, &QStateMachine::finished, this, [=](){ui->trendProgressBar->setValue(100);});
+    connect(trendSM, &QStateMachine::finished, this, [=](){trendRealTimeDialog->wrapLastStep(); ui->trendProgressBar->setValue(100);});
 }
 
 void AutoTrend::setupBroker(bool connected)

@@ -42,6 +42,7 @@ void TrendRealTimeDialog::msPlot(QJsonArray dataPointsArray)
 
     double trendValue = 0;
     trendValue = dataProcess->sumProcess(dataPointsArray, _newStep);
+    qDebug() << _currentStep << ", " << trendValue;
     if(trendValue > 0)
         addPoint(_currentStep - 1, trendValue);
     _newStep = false;
@@ -151,6 +152,15 @@ void TrendRealTimeDialog::startNewStep(double currentStep)
 {
     _currentStep = currentStep;
     _newStep = true;
+}
+
+void TrendRealTimeDialog::wrapLastStep()
+{
+    QJsonArray emptyArray;
+    double trendValue = dataProcess->sumProcess(emptyArray, true);
+    qDebug() << _currentStep << ", " << trendValue;
+    if(trendValue > 0)
+        addPoint(_currentStep - 1, trendValue);
 }
 
 // refer to adc.cpp; https://www.qcustomplot.com/index.php/tutorials/basicplotting

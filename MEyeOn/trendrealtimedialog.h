@@ -24,6 +24,7 @@ public:
 
     void setRange(QJsonObject payload);
     void startNewStep(double currentStep);
+    void wrapLastStep();
 
 private:
     bool _newStep = false;
