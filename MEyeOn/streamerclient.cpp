@@ -18,7 +18,8 @@ StreamerClient::StreamerClient(QObject *parent)
 
 void StreamerClient::connectTo(QString sbcStreamer)
 {
-    m_webSocket->open(QUrl(QString("ws://%1").arg(sbcStreamer))); //ws://192.168.1.212:4001
+    //m_webSocket->open(QUrl(QString("ws://%1").arg(sbcStreamer))); //ws://192.168.1.212:4001
+    m_webSocket->open(QUrl(QString("ws://192.168.1.213:4001")));
 }
 
 // REQUEST_FULL_SPECTRUM, REQUEST_DATA_STREAM(MASS),

@@ -480,3 +480,20 @@ void AutoTrend::on_trendComboBox_currentTextChanged(const QString &arg1)
     }
 }
 
+
+void AutoTrend::on_pushButton_2_clicked()
+{
+    connectStreamer();
+    trendRealTimeDialog->show();
+    trendRealTimeDialog->resetPlot();
+    toStopTrend = false;
+    currentStep = trendFrom;
+    trendRealTimeDialog->startNewStep(currentStep);
+}
+
+
+void AutoTrend::on_pushButton_3_clicked()
+{
+    trendRealTimeDialog->wrapLastStep();
+}
+
