@@ -74,10 +74,6 @@ private slots:
 
     void on_trendComboBox_currentTextChanged(const QString &arg1);
 
-    void on_pushButton_2_clicked();
-
-    void on_pushButton_3_clicked();
-
 private:
     QScriptValue mips; // Actually configuration panel instead of mips
     QScriptEngine *engine;

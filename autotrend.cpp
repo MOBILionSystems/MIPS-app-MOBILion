@@ -43,35 +43,6 @@ AutoTrend::~AutoTrend()
     }
 }
 
-//void AutoTrend::on_initDigitizerButton_clicked()
-//{
-//    if(!_broker){
-//        QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
-//        return;
-//    }
-//    _broker->initDigitizer();
-//}
-
-
-//void AutoTrend::on_startAcqButton_clicked()
-//{
-//    if(!_broker){
-//        QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
-//        return;
-//    }
-//    _broker->startAcquire("20220228/b.mbi");
-//}
-
-
-//void AutoTrend::on_stopAcqButton_clicked()
-//{
-//    if(!_broker){
-//        QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
-//        return;
-//    }
-//    _broker->stopAcquire();
-//}
-
 
 void AutoTrend::on_removeRelationButton_clicked()
 {
@@ -407,7 +378,6 @@ void AutoTrend::onMessageReady(QString message)
         QJsonObject payload = object.value("payload").toObject();
         if(payload.value("chartType").toString() == "MASS"){
             QJsonArray dataPointsArray = payload.value("dataPoints").toArray();
-            qDebug() << dataPointsArray;
             trendRealTimeDialog->msPlot(dataPointsArray);
         }else if(payload.value("chartType").toString() == "MOBILITY"){
             QJsonArray dataPointsArray = payload.value("dataPoints").toArray();
@@ -482,19 +452,13 @@ void AutoTrend::on_trendComboBox_currentTextChanged(const QString &arg1)
 }
 
 
-void AutoTrend::on_pushButton_2_clicked()
-{
-    connectStreamer();
-    trendRealTimeDialog->show();
-    trendRealTimeDialog->resetPlot();
-    toStopTrend = false;
-    currentStep = trendFrom;
-    trendRealTimeDialog->startNewStep(currentStep);
-}
-
-
-void AutoTrend::on_pushButton_3_clicked()
-{
-    trendRealTimeDialog->wrapLastStep();
-}
+//void AutoTrend::on_pushButton_2_clicked()
+//{
+//    connectStreamer();
+//    trendRealTimeDialog->show();
+//    trendRealTimeDialog->resetPlot();
+//    toStopTrend = false;
+//    currentStep = trendFrom;
+//    trendRealTimeDialog->startNewStep(currentStep);
+//}
 

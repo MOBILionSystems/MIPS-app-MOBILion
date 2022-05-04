@@ -34,21 +34,12 @@ double DataProcess::processMsFrameSpectrum(QVector<QPair<double, double>> frameS
         return -1;
     int size = frameSpectrum.size();
     QVector<QPair<double,double>> peaks;
-    double sum = 0;
     for(int i = 2; i < size; i++){
         if(frameSpectrum.at(i-1).second > frameSpectrum.at(i-2).second && frameSpectrum.at(i-1).second > frameSpectrum.at(i).second){
-            if(frameSpectrum.at(i-1).second < 5000){
-                i++;
-                continue;
-            }
             peaks.append(frameSpectrum.at(i-1));
-            sum += frameSpectrum.at(i-1).second;
             i++;
         }
     }
-    double mean = -1;
-    if(peaks.size() > 0)
-        mean = sum / peaks.size();
 
     double sumSquare = 0;
     for(auto p : peaks){
@@ -56,16 +47,6 @@ double DataProcess::processMsFrameSpectrum(QVector<QPair<double, double>> frameS
     }
 
     double intensityAndBalance = qSqrt(sumSquare);
-
-    if(mean > 0){
-        double sumMeanDiffSquare = 0;
-        for(auto p : peaks){
-            sumMeanDiffSquare += qPow(p.second - mean, 2);
-        }
-        intensityAndBalance -= qSqrt(sumMeanDiffSquare);
-    }else{
-        qWarning() << "mean < 0 in frameSpectrumProcess calculation";
-    }
 
     //qDebug() << peaks;
 
