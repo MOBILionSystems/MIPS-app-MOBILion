@@ -15,14 +15,17 @@ public:
     explicit DataProcess(QObject *parent = nullptr);
 
     double sumProcess(QJsonArray data, bool newStep);
-    double frameSpectrumProcess();
+    double processMsFrameSpectrum(QVector<QPair<double, double>> frameSpectrum);
+    double averageFrameData();
     bool isDoublesEqual(double a, double b);
     void reset();
+    double usToMz(double x);
+    double tofError(double uSecTOF);
 
 signals:
 
 private:
-QVector<QPair<double, double>> frameSpectrum;
+QVector<double> frameProcessedData;
 
 };
 

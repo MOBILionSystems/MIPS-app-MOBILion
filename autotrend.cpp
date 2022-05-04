@@ -407,6 +407,7 @@ void AutoTrend::onMessageReady(QString message)
         QJsonObject payload = object.value("payload").toObject();
         if(payload.value("chartType").toString() == "MASS"){
             QJsonArray dataPointsArray = payload.value("dataPoints").toArray();
+            qDebug() << dataPointsArray;
             trendRealTimeDialog->msPlot(dataPointsArray);
         }else if(payload.value("chartType").toString() == "MOBILITY"){
             QJsonArray dataPointsArray = payload.value("dataPoints").toArray();

@@ -27,7 +27,7 @@ public:
     void wrapLastStep();
 
 private:
-    bool _newStep = false;
+    bool _newStep = true;
     double _currentStep = 0;
     QGraphicsScene* graphic_hm;
     DataProcess* dataProcess;
@@ -35,7 +35,6 @@ private:
     void initPlot();
     QVector<double> xPoints, yPoints;
     void replot();
-    double calibrate(double x);
 
     double massL = 0;
     double massH = 0;

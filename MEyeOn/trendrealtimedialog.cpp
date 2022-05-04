@@ -30,7 +30,7 @@ void TrendRealTimeDialog::msPlot(QJsonArray dataPointsArray)
     QVector<double> xVector, yVector;
     QJsonArray::Iterator i = dataPointsArray.begin();
     while (i != dataPointsArray.end()) {
-        xVector.append(calibrate(i->toArray().at(0).toDouble()));
+        xVector.append(dataProcess->usToMz(i->toArray().at(0).toDouble()));
         yVector.append(i->toArray().at(1).toDouble());
         i++;
     }
@@ -77,7 +77,7 @@ void TrendRealTimeDialog::heatmapPlot(QJsonArray dataPointsArray)
 
     while (i != dataPointsArray.end()) {
         QJsonObject object = i->toObject();
-        int xindex = (calibrate(object.value("x").toDouble()) - heatmapMassL) / xPixelStep;
+        int xindex = (dataProcess->usToMz(object.value("x").toDouble()) - heatmapMassL) / xPixelStep;
         xindex = xindex < 0 ? 0 : xindex;
         xindex = xindex >= sizeX ? (sizeX - 1) : xindex;
 
@@ -88,6 +88,7 @@ void TrendRealTimeDialog::heatmapPlot(QJsonArray dataPointsArray)
         yindex = sizeY - 1 - yindex;
 
         image.setPixelColor(xindex, yindex, 0Xff000000);// object.value("color").toString());
+        //image.setPixelColor(xindex, yindex, object.value("color").toString());
 
         i++;
     }
@@ -173,8 +174,10 @@ void TrendRealTimeDialog::initPlot()
     ui->msRealTimePlot->xAxis->setLabel("m/z");
     ui->msRealTimePlot->yAxis->setLabel("Intensity");
     ui->msRealTimePlot->addGraph();
-    //    ui->msRealTimePlot->setInteraction(QCP::iRangeDrag, true);
-    //    ui->msRealTimePlot->setInteraction(QCP::iRangeZoom, true);
+
+    ui->msRealTimePlot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+    ui->msRealTimePlot->setInteraction(QCP::iRangeDrag, true);
+    ui->msRealTimePlot->setInteraction(QCP::iRangeZoom, true);
 
     ui->mobilityRealTimePlot->xAxis->setLabel("Intensity");
     ui->mobilityRealTimePlot->xAxis->setRangeReversed(true);
@@ -190,11 +193,4 @@ void TrendRealTimeDialog::replot()
     ui->trendRealTimePlot->xAxis->rescale(true);
     ui->trendRealTimePlot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 10));
     ui->trendRealTimePlot->replot();
-}
-
-double TrendRealTimeDialog::calibrate(double x)
-{
-    double slope = 0.3458;
-    double intercept = 0.093;
-    return qPow(slope * (x - intercept), 2);
 }
