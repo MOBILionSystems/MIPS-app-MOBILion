@@ -462,3 +462,9 @@ void AutoTrend::on_trendComboBox_currentTextChanged(const QString &arg1)
 //    trendRealTimeDialog->startNewStep(currentStep);
 //}
 
+
+void AutoTrend::on_singleShotButton_clicked()
+{
+
+}
+
