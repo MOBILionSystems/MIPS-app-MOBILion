@@ -188,9 +188,13 @@ void AutoTrend::buildTrendSM()
         relationEnabled = ui->relationRatioButton->isChecked();
         fileFolder = QDate::currentDate().toString("yyyyMMdd") + "/" + QTime::currentTime().toString("hhmmss") + trendName + "Trend";
         ui->trendProgressBar->setValue(0);
-        emit nextState();
+        if(singleShot)
+            emit nextForSingleShot();
+        else
+            emit nextState();
     });
     initState->addTransition(this, &AutoTrend::nextState, updateTrendState);
+    initState->addTransition(this, &AutoTrend::nextForSingleShot, startAcqState);
 
     connect(updateTrendState, &QState::entered, this, [=](){
         updateDCBias(trendName, currentStep);
@@ -223,8 +227,11 @@ void AutoTrend::buildTrendSM()
     connect(waitDuringAcqState, &QState::entered, this, [=](){QTimer::singleShot(stepDuration, this, [=](){emit nextState();});});
     waitDuringAcqState->addTransition(this, &AutoTrend::nextState, stopAcqState);
 
-    connect(stopAcqState, &QState::entered, this, [=](){_broker->stopAcquire(); QTimer::singleShot(3000, this, [=](){emit nextState();});}); // add delay for wifi communication and data processing
+    connect(stopAcqState, &QState::entered, this, [=](){_broker->stopAcquire();
+        QTimer::singleShot(3000, this, [=](){if(singleShot) emit nextForSingleShot(); else emit nextState();});
+    }); // add delay for wifi communication and data processing
     stopAcqState->addTransition(this, &AutoTrend::nextState, nextStepState);
+    stopAcqState->addTransition(this, &AutoTrend::nextForSingleShot, finishState);
 
     connect(nextStepState, &QState::entered, this, [=](){
         currentStep += trendStepSize;
@@ -241,7 +248,7 @@ void AutoTrend::buildTrendSM()
     nextStepState->addTransition(this, &AutoTrend::nextState, updateTrendState);
     nextStepState->addTransition(this, &AutoTrend::doneAllStates, finishState);
 
-    connect(trendSM, &QStateMachine::finished, this, [=](){trendRealTimeDialog->wrapLastStep(); ui->trendProgressBar->setValue(100);});
+    connect(trendSM, &QStateMachine::finished, this, [=](){trendRealTimeDialog->wrapLastStep(); ui->trendProgressBar->setValue(100); if(singleShot) singleShot = false;});
 }
 
 void AutoTrend::setupBroker(bool connected)
@@ -393,14 +400,14 @@ void AutoTrend::onMessageReady(QString message)
 }
 
 
-void AutoTrend::on_pushButton_clicked()
-{
-    int start = 1;
-    for(auto &v : dcElectrodes){
-        engine->evaluate(QString("mips.Command(\"%1=%2\")").arg(v).arg(start + QRandomGenerator::global()->generateDouble()));
-        start++;
-    }
-}
+//void AutoTrend::on_initvoltage_clicked()
+//{
+//    int start = 1;
+//    for(auto &v : dcElectrodes){
+//        engine->evaluate(QString("mips.Command(\"%1=%2\")").arg(v).arg(start + QRandomGenerator::global()->generateDouble()));
+//        start++;
+//    }
+//}
 
 
 
@@ -465,6 +472,19 @@ void AutoTrend::on_trendComboBox_currentTextChanged(const QString &arg1)
 
 void AutoTrend::on_singleShotButton_clicked()
 {
+    singleShot = true;
+    if(!_broker){
+        QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
+        return;
+    }
+    if( ui->singleDurationLineEdit->text().isEmpty()){
+        qWarning() << "Empty duraton time for single shot.";
+        QMessageBox::warning(this, "SingleShot Failed", "Invalid settings for duration.");
+        return;
+    }
 
+    trendName = "singleShot";
+    stepDuration = ui->singleDurationLineEdit->text().toInt();
+    trendSM->start();
 }
 

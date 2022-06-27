@@ -35,6 +35,7 @@ signals:
     void nextState();
     void doneAllStates();
     void abortTrend();
+    void nextForSingleShot();
 
 private slots:
 //    void on_initDigitizerButton_clicked();
@@ -64,7 +65,7 @@ private slots:
 
     void onMessageReady(QString message);
 
-    void on_pushButton_clicked();
+    //void on_initvoltage_clicked();
 
     void on_dcRadioButton_toggled(bool checked);
 
@@ -96,6 +97,7 @@ private:
     QString fileFolder;
 
 
+    bool singleShot = false;
     QString trendName;
     int trendFrom = 0;
     int trendTo = 0;
