@@ -1,6 +1,7 @@
 #include "commandGenerator.h"
 #include <QJsonArray>
 #include <QJsonValue>
+#include "dataprocess.h""
 
 CommandGenerator::CommandGenerator(QObject *parent)
     : QObject{parent}
@@ -88,33 +89,14 @@ void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileN
 
     QJsonObject frameObject;
     frameObject.insert("frm-metadata-id",  QJsonValue("1"));
-    frameObject.insert("frm-num-bin-ms",  QJsonValue("320000"));
-    frameObject.insert("frm-num-bin-dt",  QJsonValue("10000"));
     frameObject.insert("frm-mux-gate",  QJsonValue("0"));
     frameObject.insert("frm-method-state", QJsonValue("")); //too much
     frameObject.insert("frm-method-name",  QJsonValue("TuneMixTwAmp30"));
     frameObject.insert("frm-timing-intents", QJsonValue("")); //too much
     frameObject.insert("frm-polarity", "Negative");
 
-    frameObject.insert("cal-dt-polynomial", QJsonValue(""));
-    frameObject.insert("cal-dt-power-flags", QJsonValue(""));
-    frameObject.insert("cal-dt-traditional", QJsonValue(""));
-    frameObject.insert("cal_ms-polynomial", QJsonValue(""));
-    frameObject.insert("cal-ms-power-flags", QJsonValue(""));
 
-    QJsonObject msTraditional;
-    msTraditional.insert("slope", QJsonValue("0.345"));
-    msTraditional.insert("intercept", QJsonValue("-3.913"));
-    QJsonArray mzResidual;
-    mzResidual.insert(0, QJsonValue("1537.855"));
-    mzResidual.insert(0, QJsonValue("-73.017"));
-    mzResidual.insert(0, QJsonValue("1.36"));
-    mzResidual.insert(0, QJsonValue("-0.012"));
-    mzResidual.insert(0, QJsonValue("0.000056"));
-    mzResidual.insert(0, QJsonValue("-9.96e-8"));
-    msTraditional.insert("mz_residual_terms", QJsonValue(mzResidual));
-
-    frameObject.insert("cal-ms-traditional", QJsonValue(""));
+    frameObject.insert("cal-ms-traditional", QString("{\"slope\":%1,\"intercept\":%2,\"mz_residual_terms\":[%3]}").arg(DataProcess::SLOPE).arg(DataProcess::INTERCEPT).arg(DataProcess::getResidule()));
 
     QJsonArray frameArray;
     frameArray.insert(0, QJsonValue(frameObject));
@@ -179,6 +161,7 @@ void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileN
     global.insert("acq-vendor-metadata", QJsonValue("906b3a6910d84259a810e9d8c35a564f"));
 
     data.insert("global", global);
+    qDebug() << data;
 
     command.insert("data", data);
 }

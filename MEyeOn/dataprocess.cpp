@@ -1,6 +1,8 @@
 #include "dataprocess.h"
 #include <QtMath>
 
+const QVector<double> DataProcess::RESIDULE = {-229.24922242214916,16.236991249722326,-0.39444579353546055,0.0043708033832713265,-0.000022696140907354508,4.485435626557926e-8};
+
 DataProcess::DataProcess(QObject *parent)
     : QObject{parent}
 {
@@ -81,21 +83,27 @@ double DataProcess::usToMz(double x)
     * mass = ((t-t0)*k)^2  [has some error]
     * correctedMass = mass - Error(mass)
     */
-    double slope = 0.3458234001095313;
-    double intercept = 0.09326905279715753;
 
 
-    double mass = qPow(slope * (x - intercept), 2);
+    double mass = qPow(SLOPE * (x - INTERCEPT), 2);
     double error = tofError(x);
-    return mass; // mass - mass * error / 1E+6;
+    return mass - mass * error / 1E+6;
 }
 
 double DataProcess::tofError(double uSecTOF)
 {
-    QVector<double> residual = {-229.24922242214916,16.236991249722326,-0.39444579353546055,0.0043708033832713265,-0.000022696140907354508,4.485435626557926e-8};
     double error = 0;
-    for(int i = residual.size() - 1; i > -1; i--){
-        error = error * uSecTOF + residual[i];
+    for(int i = RESIDULE.size() - 1; i > -1; i--){
+        error = error * uSecTOF + RESIDULE[i];
     }
     return error;
+}
+
+QString DataProcess::getResidule()
+{
+    QStringList residuleSL;
+    for(int i = 0; i < RESIDULE.size(); i++){
+        residuleSL.append(QString::number(RESIDULE[i]));
+    }
+    return residuleSL.join(',');
 }

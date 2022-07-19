@@ -22,6 +22,11 @@ public:
     double usToMz(double x);
     double tofError(double uSecTOF);
 
+    constexpr static double SLOPE = 0.3458234001095313;
+    constexpr static double INTERCEPT = 0.09326905279715753;
+    static const QVector<double> RESIDULE;
+    static QString getResidule();
+
 signals:
 
 private:
