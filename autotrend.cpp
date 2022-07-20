@@ -512,6 +512,9 @@ void AutoTrend::on_loadMsCalibrationButton_clicked()
 {
     QString filter = "MBI File (*.mbi);; All File (*.*)";
     QString file_name = QFileDialog::getOpenFileName(this, "Open file", QDir::homePath(), filter);
+    if(file_name.isEmpty()){
+        return;
+    }
 
     MBI::MBIFile* mbiFile = new MBI::MBIFile(file_name);
     DataProcess::msCalibration = mbiFile->getCalMsCalibration();
