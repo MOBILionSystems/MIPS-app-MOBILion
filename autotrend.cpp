@@ -516,9 +516,9 @@ void AutoTrend::on_loadMsCalibrationButton_clicked()
         return;
     }
 
-    MBI::MBIFile* mbiFile = new MBI::MBIFile(file_name);
-    DataProcess::msCalibration = mbiFile->getCalMsCalibration();
-    qDebug() << DataProcess::msCalibration;
-
+    MBI::MBIFile mbiFile(file_name);
+    QString newMsCalibration = mbiFile.getCalMsCalibration();
+    if(!newMsCalibration.isEmpty())
+        DataProcess::msCalibration = newMsCalibration;
 }
 
