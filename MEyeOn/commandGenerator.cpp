@@ -1,7 +1,7 @@
 #include "commandGenerator.h"
 #include <QJsonArray>
 #include <QJsonValue>
-#include "dataprocess.h""
+#include "dataprocess.h"
 
 CommandGenerator::CommandGenerator(QObject *parent)
     : QObject{parent}
@@ -95,8 +95,11 @@ void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileN
     frameObject.insert("frm-timing-intents", QJsonValue("")); //too much
     frameObject.insert("frm-polarity", "Negative");
 
-
-    frameObject.insert("cal-ms-traditional", QString("{\"slope\":%1,\"intercept\":%2,\"mz_residual_terms\":[%3]}").arg(DataProcess::SLOPE).arg(DataProcess::INTERCEPT).arg(DataProcess::getResidule()));
+    if(DataProcess::isNonDefaultMsCalibrationAvailable()){
+        frameObject.insert("cal-ms-traditional", DataProcess::msCalibration);
+    }else{
+        frameObject.insert("cal-ms-traditional", QString("{\"slope\":%1,\"intercept\":%2,\"mz_residual_terms\":[%3]}").arg(DataProcess::SLOPE_DEFAULT).arg(DataProcess::INTERCEPT_DEFAULT).arg(DataProcess::getResidule()));
+    }
 
     QJsonArray frameArray;
     frameArray.insert(0, QJsonValue(frameObject));
@@ -145,16 +148,16 @@ void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileN
 
 
     // stuck with error
-//    QJsonObject acqBoardT; acqBoardT.insert("post", "59.96"); acqBoardT.insert("pre", "59.93");
-//    global.insert("acq-board-temp", QJsonValue(acqBoardT));
+    //    QJsonObject acqBoardT; acqBoardT.insert("post", "59.96"); acqBoardT.insert("pre", "59.93");
+    //    global.insert("acq-board-temp", QJsonValue(acqBoardT));
     global.insert("acq-Ic-model", QJsonValue("Agilent 1290 Infinity II"));
     global.insert("acq-ms-method", QJsonValue(""));
     global.insert("acq-ms-model", QJsonValue("Agilent 6545XT"));
     global.insert("acq-num-frames", QJsonValue(""));
     global.insert("acq-slim_path_length", QJsonValue(""));
     global.insert("acq_software-version", QJsonValue("release-v1.0.27"));
-//    QJsonObject acqTempCorr; acqTempCorr.insert("A", QJsonValue("0.0")); acqTempCorr.insert("B", QJsonValue("0.0"));
-//    global.insert("acq_temperature_correction", QJsonValue(acqTempCorr));
+    //    QJsonObject acqTempCorr; acqTempCorr.insert("A", QJsonValue("0.0")); acqTempCorr.insert("B", QJsonValue("0.0"));
+    //    global.insert("acq_temperature_correction", QJsonValue(acqTempCorr));
     global.insert("acq-timestamp", QJsonValue("2022-02-10 16:32:33.977127+00:00"));
     global.insert("acq-tune-file", QJsonValue(""));
     global.insert("acq-type", QJsonValue("Sample"));

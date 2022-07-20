@@ -25,10 +25,17 @@ TEMPLATE = app
 LIBS += -L$$PWD\libraries\librdkafka -llibrdkafka
 LIBS += -L$$PWD\libraries\librdkafka -llibrdkafka++
 
+LIBS += -L$$(HDF5_LIB) -lhdf5
+#LIBS += "C:/Program Files/HDF_Group/HDF5/1.12.1/lib/hdf5.lib"
+
 INCLUDEPATH += $$PWD\include\librdkafka\src-cpp
+INCLUDEPATH += $$(HDF5_INCLUDE)
+#INCLUDEPATH += "C:/Program Files/HDF_Group/HDF5/1.12.1/include"
 
 SOURCES += main.cpp\
     MEyeOn/Broker.cpp \
+    MEyeOn/MBI/mbifile.cpp \
+    MEyeOn/MBI/mbimetadata.cpp \
     MEyeOn/commandGenerator.cpp \
     MEyeOn/dataprocess.cpp \
     MEyeOn/streamerclient.cpp \
@@ -75,6 +82,10 @@ SOURCES += main.cpp\
 
 HEADERS  += mips.h \
     MEyeOn/Broker.h \
+    MEyeOn/MBI/MBIException.h \
+    MEyeOn/MBI/mbifile.h \
+    MEyeOn/MBI/mbimetadata.h \
+    MEyeOn/MBI/pch.h \
     MEyeOn/commandGenerator.h \
     MEyeOn/common.h \
     MEyeOn/dataprocess.h \

@@ -7,6 +7,8 @@
 #include "MEyeOn/Broker.h"
 #include "MEyeOn/streamerclient.h"
 #include "MEyeOn/trendrealtimedialog.h"
+#include "MEyeOn/MBI/mbifile.h"
+#include "MEyeOn/dataprocess.h"
 
 #include "ui_mips.h"
 #include "mips.h"
@@ -17,6 +19,7 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QScriptEngine>
+
 
 
 namespace Ui {
@@ -76,6 +79,8 @@ private slots:
     void on_trendComboBox_currentTextChanged(const QString &arg1);
 
     void on_singleShotButton_clicked();
+
+    void on_loadMsCalibrationButton_clicked();
 
 private:
     QScriptValue mips; // Actually configuration panel instead of mips

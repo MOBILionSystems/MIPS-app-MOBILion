@@ -1,7 +1,8 @@
 #include "dataprocess.h"
 #include <QtMath>
 
-const QVector<double> DataProcess::RESIDULE = {-229.24922242214916,16.236991249722326,-0.39444579353546055,0.0043708033832713265,-0.000022696140907354508,4.485435626557926e-8};
+const QVector<double> DataProcess::RESIDULE_DEFAULT = {-229.24922242214916,16.236991249722326,-0.39444579353546055,0.0043708033832713265,-0.000022696140907354508,4.485435626557926e-8};
+QString DataProcess::msCalibration;
 
 DataProcess::DataProcess(QObject *parent)
     : QObject{parent}
@@ -85,7 +86,7 @@ double DataProcess::usToMz(double x)
     */
 
 
-    double mass = qPow(SLOPE * (x - INTERCEPT), 2);
+    double mass = qPow(SLOPE_DEFAULT * (x - INTERCEPT_DEFAULT), 2);
     double error = tofError(x);
     return mass - mass * error / 1E+6;
 }
@@ -93,8 +94,8 @@ double DataProcess::usToMz(double x)
 double DataProcess::tofError(double uSecTOF)
 {
     double error = 0;
-    for(int i = RESIDULE.size() - 1; i > -1; i--){
-        error = error * uSecTOF + RESIDULE[i];
+    for(int i = RESIDULE_DEFAULT.size() - 1; i > -1; i--){
+        error = error * uSecTOF + RESIDULE_DEFAULT[i];
     }
     return error;
 }
@@ -102,8 +103,14 @@ double DataProcess::tofError(double uSecTOF)
 QString DataProcess::getResidule()
 {
     QStringList residuleSL;
-    for(int i = 0; i < RESIDULE.size(); i++){
-        residuleSL.append(QString::number(RESIDULE[i]));
+    for(int i = 0; i < RESIDULE_DEFAULT.size(); i++){
+        residuleSL.append(QString::number(RESIDULE_DEFAULT[i]));
     }
     return residuleSL.join(',');
+}
+
+
+bool DataProcess::isNonDefaultMsCalibrationAvailable()
+{
+    return !DataProcess::msCalibration.isEmpty();
 }

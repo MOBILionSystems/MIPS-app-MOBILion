@@ -468,6 +468,19 @@
     <string>1000</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="loadMsCalibrationButton">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>50</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Load MS Calibration</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

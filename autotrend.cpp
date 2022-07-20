@@ -32,7 +32,6 @@ AutoTrend::AutoTrend(QWidget *parent) :
     rightValueModel = new QStringListModel(this);
 
     initUI();
-
 }
 
 AutoTrend::~AutoTrend()
@@ -274,6 +273,7 @@ void AutoTrend::on_runTrendButton_clicked()
         QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
         return;
     }
+
     if( ui->trendComboBox->currentText().isEmpty() ||
             ui->trendFrom->text().isEmpty() ||
             ui->trendTo->text().isEmpty() ||
@@ -282,6 +282,15 @@ void AutoTrend::on_runTrendButton_clicked()
         qWarning() << "Invalid setting for autotrend.";
         QMessageBox::warning(this, "Autotrend Failed", "Invalid settings for autotrend.");
         return;
+    }
+
+    if(!DataProcess::isNonDefaultMsCalibrationAvailable()){
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Warning", "Shot with default ms calibration?",
+                                      QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::No) {
+            return;
+        }
     }
 
     trendName = ui->trendComboBox->currentText();
@@ -472,19 +481,41 @@ void AutoTrend::on_trendComboBox_currentTextChanged(const QString &arg1)
 
 void AutoTrend::on_singleShotButton_clicked()
 {
-    singleShot = true;
     if(!_broker){
         QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
         return;
     }
+
     if( ui->singleDurationLineEdit->text().isEmpty()){
         qWarning() << "Empty duraton time for single shot.";
         QMessageBox::warning(this, "SingleShot Failed", "Invalid settings for duration.");
         return;
     }
 
+    if(!DataProcess::isNonDefaultMsCalibrationAvailable()){
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Warning", "Shot with default ms calibration?",
+                                      QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::No) {
+            return;
+        }
+    }
+
+    singleShot = true;
     trendName = "singleShot";
     stepDuration = ui->singleDurationLineEdit->text().toInt();
     trendSM->start();
+}
+
+
+void AutoTrend::on_loadMsCalibrationButton_clicked()
+{
+    QString filter = "MBI File (*.mbi);; All File (*.*)";
+    QString file_name = QFileDialog::getOpenFileName(this, "Open file", QDir::homePath(), filter);
+
+    MBI::MBIFile* mbiFile = new MBI::MBIFile(file_name);
+    DataProcess::msCalibration = mbiFile->getCalMsCalibration();
+    qDebug() << DataProcess::msCalibration;
+
 }
 
