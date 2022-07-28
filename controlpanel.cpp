@@ -504,6 +504,14 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
                 connect(SL,SIGNAL(Save()),this,SLOT(pbSave()));
                 connect(SL,SIGNAL(Load()),this,SLOT(pbLoad()));
             }
+            if((resList[0].toUpper() == "AUTOTREND") && (resList.length()==4))
+            {
+                AT = new AutoTrendButton(Containers.last(),resList[1],resList[2].toInt(),resList[3].toInt());
+                AT->Show();
+                //connect(SD,SIGNAL(ShutdownSystem()),this,SLOT(pbSD()));
+                //connect(SD,SIGNAL(EnableSystem()),this,SLOT(pbSE()));
+                AT->setFocus();
+            }
             // COMPRESSOR,name,MIPS name,X,Y
             if((resList[0].toUpper() == "COMPRESSOR") && (resList.length()==5))
             {
@@ -2985,3 +2993,29 @@ QString StatusLight::ProcessCommand(QString cmd)
     return "?";
 }
 
+
+AutoTrendButton::AutoTrendButton(QWidget *parent, QString name, int x, int y)
+{
+    p      = parent;
+    Title  = name;
+    X      = x;
+    Y      = y;
+}
+
+void AutoTrendButton::Show()
+{
+    atbShutdown = new QPushButton("AutoTrend",p);
+    atbShutdown->setGeometry(X,Y,150,32);
+    atbShutdown->setAutoDefault(false);
+    connect(atbShutdown,SIGNAL(pressed()),this,SLOT(atbPressed()));
+}
+
+void AutoTrendButton::SetState(bool ShutDown)
+{
+
+}
+
+void AutoTrendButton::atbPressed()
+{
+    qDebug() << "AutoTrend button pressed";
+}
