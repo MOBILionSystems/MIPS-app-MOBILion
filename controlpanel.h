@@ -63,7 +63,6 @@ private:
     QLabel      *label;
 };
 
-
 class AutoTrendButton : public QWidget
 {
     Q_OBJECT
@@ -73,12 +72,13 @@ signals:
 public:
     AutoTrendButton(QWidget *parent, QString name, int x, int y);
     void Show(void);
-    void SetState(bool ShutDown);
     QWidget *p;
     QString Title;
     int     X,Y;
 private:
     QPushButton *atbShutdown;
+    AutoTrend* autotrend{};
+    QDialog* autoTrendDialog{};
 private slots:
     void atbPressed(void);
 };

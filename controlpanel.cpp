@@ -3010,12 +3010,18 @@ void AutoTrendButton::Show()
     connect(atbShutdown,SIGNAL(pressed()),this,SLOT(atbPressed()));
 }
 
-void AutoTrendButton::SetState(bool ShutDown)
-{
-
-}
-
 void AutoTrendButton::atbPressed()
 {
-    qDebug() << "AutoTrend button pressed";
+    if(!autotrend)
+        autotrend = new AutoTrend(this);
+
+    if(!autoTrendDialog){
+        autoTrendDialog = new QDialog(this);
+        autoTrendDialog->setFixedSize(720, 520);
+        QHBoxLayout *HLayout = new QHBoxLayout(autoTrendDialog);
+        HLayout->addWidget (autotrend);
+        autoTrendDialog->setLayout (HLayout);
+    }
+
+    autoTrendDialog->show();
 }
