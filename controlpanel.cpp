@@ -506,7 +506,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
             }
             if((resList[0].toUpper() == "AUTOTREND") && (resList.length()==4))
             {
-                AT = new AutoTrendButton(Containers.last(),resList[1],resList[2].toInt(),resList[3].toInt());
+                AT = new AutoTrendButton(this,resList[1],resList[2].toInt(),resList[3].toInt());
                 AT->Show();
                 //connect(SD,SIGNAL(ShutdownSystem()),this,SLOT(pbSD()));
                 //connect(SD,SIGNAL(EnableSystem()),this,SLOT(pbSE()));
@@ -3000,6 +3000,10 @@ AutoTrendButton::AutoTrendButton(QWidget *parent, QString name, int x, int y)
     Title  = name;
     X      = x;
     Y      = y;
+
+    engine = new QScriptEngine(this);
+    mips = engine->newQObject(parent);
+    engine->globalObject().setProperty("mips", mips);
 }
 
 void AutoTrendButton::Show()
@@ -3012,16 +3016,22 @@ void AutoTrendButton::Show()
 
 void AutoTrendButton::atbPressed()
 {
-    if(!autotrend)
-        autotrend = new AutoTrend(this);
+    if(!autotrend2)
+        autotrend2 = new AutoTrend(this);
 
     if(!autoTrendDialog){
         autoTrendDialog = new QDialog(this);
         autoTrendDialog->setFixedSize(720, 520);
         QHBoxLayout *HLayout = new QHBoxLayout(autoTrendDialog);
-        HLayout->addWidget (autotrend);
+        HLayout->addWidget (autotrend2);
         autoTrendDialog->setLayout (HLayout);
     }
+    connect(autotrend2, &AutoTrend::runScript, this, &AutoTrendButton::onRunScript);
 
     autoTrendDialog->show();
+}
+
+void AutoTrendButton::onRunScript(QString s)
+{
+    engine->evaluate(s); //QString("mips.Command(\"MIPS-2 TG.Trigger\")")
 }

@@ -77,10 +77,14 @@ public:
     int     X,Y;
 private:
     QPushButton *atbShutdown;
-    AutoTrend* autotrend{};
+    AutoTrend* autotrend2{};
     QDialog* autoTrendDialog{};
+    QScriptValue mips; // Actually configuration panel instead of mips
+    QScriptEngine *engine;
+
 private slots:
     void atbPressed(void);
+    void onRunScript(QString s);
 };
 
 

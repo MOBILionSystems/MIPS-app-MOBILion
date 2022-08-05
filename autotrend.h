@@ -39,6 +39,7 @@ signals:
     void doneAllStates();
     void abortTrend();
     void nextForSingleShot();
+    void runScript(QString s);
 
 private slots:
 //    void on_initDigitizerButton_clicked();
@@ -83,6 +84,8 @@ private slots:
     void on_loadMsCalibrationButton_clicked();
 
 private:
+   // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
+   // panel. So need to use signal and slot like runScript()
     QScriptValue mips; // Actually configuration panel instead of mips
     QScriptEngine *engine;
     TrendRealTimeDialog* trendRealTimeDialog;

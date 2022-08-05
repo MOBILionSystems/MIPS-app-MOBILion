@@ -505,6 +505,9 @@ void AutoTrend::on_singleShotButton_clicked()
     trendName = "singleShot";
     stepDuration = ui->singleDurationLineEdit->text().toInt();
     trendSM->start();
+
+    emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
+    emit runScript(QString("mips.Command(\"MIPS-1 TG.Trigger\")"));
 }
 
 

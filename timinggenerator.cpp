@@ -414,6 +414,7 @@ void TimingControl::pbEdit(void)
 
 void TimingControl::pbTrigger(void)
 {
+    qDebug() << "pbTrigger";
     Trigger->setDown(false);
     if(AD->TriggerMode == "Software")
     {
