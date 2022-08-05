@@ -37,6 +37,7 @@ void CommandGenerator::updateInitDigtizerCommand(QJsonObject &command)
 {
     QJsonArray target;
     target.append("ACORN_ACQUIRE");
+    target.append("ACORN_ARCHIVE");
     command.insert("target", QJsonValue(target));
 
     command.insert("command", QJsonValue("CONFIGURE_DIGITIZER"));
@@ -65,7 +66,7 @@ void CommandGenerator::updateInitDigtizerCommand(QJsonObject &command)
     initDigitizer.insert("adc-zs-hysteresis", QJsonValue("100"));
     initDigitizer.insert("adc-zs-postgate-samples", QJsonValue("0"));
     initDigitizer.insert("adc-zs-pregate-samples", QJsonValue("0"));
-    initDigitizer.insert("adc-zs-threshold", QJsonValue("-29706"));
+    initDigitizer.insert("adc-zs-threshold", QJsonValue("-26950")); //-29706
 
     command.insert("data", initDigitizer);
 }
