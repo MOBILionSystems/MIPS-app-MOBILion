@@ -481,6 +481,32 @@
     <string>Load MS Calibration</string>
    </property>
   </widget>
+  <widget class="QLineEdit" name="delayLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>90</y>
+     <width>41</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>200</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_11">
+   <property name="geometry">
+    <rect>
+     <x>278</x>
+     <y>95</y>
+     <width>21</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>ms </string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

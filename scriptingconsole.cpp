@@ -171,6 +171,7 @@ void ScriptButton::Show(void)
 // if he would like to abort script.
 void ScriptButton::pbButtonPressed(void)
 {
+    qDebug() << "+button pressed";
     ButtonPressed(true);
 }
 
