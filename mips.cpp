@@ -1640,7 +1640,7 @@ void MIPS::SelectCP(QString fileName)
     if(grid != NULL) return;
     if(cp   != NULL) return;
     ui->tabMIPS->setCurrentIndex(0);
-    ControlPanel *c = new ControlPanel(this,fileName,Systems,properties);
+    ControlPanel *c = new ControlPanel(0,fileName,Systems,properties);
     if(!c->LoadedConfig) return;
 //    c->show();
     connect(c, SIGNAL(DialogClosed(QString)), this, SLOT(CloseControlPanel(QString)));

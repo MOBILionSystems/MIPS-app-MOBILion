@@ -226,11 +226,13 @@ void ScriptButton::ButtonPressed(bool AlwaysLoad)
         {
             if(result.isError())
             {
+                qDebug() << "Script error";
                 if(properties != NULL) properties->Log("Script error: " + result.toString());
                 if(sb != NULL) sb->showMessage("Script error: " + result.toString());
             }
             else
             {
+                qDebug() << "No Script error";
                 if(properties != NULL) properties->Log("Script finished!");
                 if(sb != NULL) sb->showMessage("Script finished!");
             }
