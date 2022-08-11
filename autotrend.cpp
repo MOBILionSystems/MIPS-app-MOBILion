@@ -510,11 +510,13 @@ void AutoTrend::on_singleShotButton_clicked()
     int delay_ms = ui->delayLineEdit->text().toInt(&validDelay);
     if(validDelay){
         QTimer::singleShot(delay_ms, this, [=](){
-            emit runScript(QString("mips.Command(\"Operating mode.IMS\")"));
+            emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
+            emit runScript(QString("mips.Command(\"MIPS-1 TG.Trigger\")"));
         });
     }else{
         QMessageBox::warning(this, "Invalid delay", "Run timing table immediately.");
-        emit runScript(QString("mips.Command(\"Operating mode.IMS\")"));
+        emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
+        emit runScript(QString("mips.Command(\"MIPS-1 TG.Trigger\")"));
     }
 }
 

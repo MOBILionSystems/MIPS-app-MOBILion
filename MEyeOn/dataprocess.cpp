@@ -1,5 +1,6 @@
 #include "dataprocess.h"
 #include <QtMath>
+#include <QJsonDocument>
 
 const QVector<double> DataProcess::RESIDULE_DEFAULT = {-229.24922242214916,16.236991249722326,-0.39444579353546055,0.0043708033832713265,-0.000022696140907354508,4.485435626557926e-8};
 QString DataProcess::msCalibration;
@@ -87,10 +88,30 @@ double DataProcess::usToMz(double x)
     * correctedMass = mass - Error(mass)
     */
 
+    double slope = 0;
+    double intercept = 0;
+    if(isNonDefaultMsCalibrationAvailable()){
+        QJsonDocument doc = QJsonDocument::fromJson(msCalibration.toUtf8());
+        if(doc.isNull()){
+            slope = SLOPE_DEFAULT;
+            intercept = INTERCEPT_DEFAULT;
+        }else{
+            slope = doc.object()["slope"].toDouble(SLOPE_DEFAULT);
+            intercept = doc.object()["intercept"].toDouble(INTERCEPT_DEFAULT);
+        }
+    }else{
+        slope = SLOPE_DEFAULT;
+        intercept = INTERCEPT_DEFAULT;
+    }
 
-    double mass = qPow(SLOPE_DEFAULT * (x - INTERCEPT_DEFAULT), 2);
+    double mass = qPow(slope * (x - intercept), 2);
     double error = tofError(x);
     return mass - mass * error / 1E+6;
+}
+
+double DataProcess::scanCountToMS(double s)
+{
+    return s * FRM_DT_PERIOD;
 }
 
 double DataProcess::tofError(double uSecTOF)
