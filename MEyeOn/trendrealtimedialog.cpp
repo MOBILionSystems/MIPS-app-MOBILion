@@ -48,6 +48,9 @@ void TrendRealTimeDialog::msPlot(QJsonArray dataPointsArray)
     _newStep = false;
 }
 
+
+// mobility plot retate 90 degree and x axis is on vertical and y axis is on horizontal
+// So x of mobility is aligned to y of heatmap
 void TrendRealTimeDialog::mobilityPlot(QJsonArray dataPointsArray)
 {
     QVector<double> xVector, yVector;

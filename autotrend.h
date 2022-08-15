@@ -88,7 +88,7 @@ private:
    // panel. So need to use signal and slot like runScript()
     QScriptValue mips; // Actually configuration panel instead of mips
     QScriptEngine *engine;
-    TrendRealTimeDialog* trendRealTimeDialog;
+    TrendRealTimeDialog* trendRealTimeDialog{};
     StreamerClient* _streamerClient;
     QString _sbcIpAddress;
     QString _streamerPort = "4001";

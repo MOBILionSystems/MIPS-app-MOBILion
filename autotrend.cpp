@@ -179,6 +179,10 @@ void AutoTrend::buildTrendSM()
 
     trendSM->setInitialState(initState);
     connect(initState, &QState::entered, this, [=](){
+        if(trendRealTimeDialog){
+            delete trendRealTimeDialog;
+            trendRealTimeDialog = new TrendRealTimeDialog(this);
+        }
         trendRealTimeDialog->show();
         trendRealTimeDialog->resetPlot();
         toStopTrend = false;
