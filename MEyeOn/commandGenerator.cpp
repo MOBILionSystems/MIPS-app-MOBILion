@@ -37,7 +37,6 @@ void CommandGenerator::updateInitDigtizerCommand(QJsonObject &command)
 {
     QJsonArray target;
     target.append("ACORN_ACQUIRE");
-    target.append("ACORN_ARCHIVE");
     command.insert("target", QJsonValue(target));
 
     command.insert("command", QJsonValue("CONFIGURE_DIGITIZER"));
