@@ -53,7 +53,7 @@ void TrendRealTimeDialog::mobilityPlot(QJsonArray dataPointsArray)
     QVector<double> xVector, yVector;
     QJsonArray::Iterator i = dataPointsArray.begin();
     while (i != dataPointsArray.end()) {
-        xVector.append(i->toArray().at(0).toDouble());
+        xVector.append(dataProcess->scanCountToMS(i->toArray().at(0).toDouble()));
         yVector.append(i->toArray().at(1).toDouble());
         i++;
     }
@@ -134,7 +134,7 @@ void TrendRealTimeDialog::setRange(QJsonObject payload)
     QJsonArray mobilityRange = payload.value("mobilityRange").toArray();
     if(mobilityRange.size() == 2){
         mobilityL = 0;
-        mobilityH = mobilityRange.last().toDouble();
+        mobilityH = dataProcess->scanCountToMS(mobilityRange.last().toDouble());
     }
 
     QJsonArray mobilityIntensityRange = payload.value("mobilityIntensityRange").toArray();
