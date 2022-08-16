@@ -48,12 +48,15 @@ void TrendRealTimeDialog::msPlot(QJsonArray dataPointsArray)
     _newStep = false;
 }
 
+
+// mobility plot retate 90 degree and x axis is on vertical and y axis is on horizontal
+// So x of mobility is aligned to y of heatmap
 void TrendRealTimeDialog::mobilityPlot(QJsonArray dataPointsArray)
 {
     QVector<double> xVector, yVector;
     QJsonArray::Iterator i = dataPointsArray.begin();
     while (i != dataPointsArray.end()) {
-        xVector.append(i->toArray().at(0).toDouble());
+        xVector.append(dataProcess->scanCountToMS(i->toArray().at(0).toDouble()));
         yVector.append(i->toArray().at(1).toDouble());
         i++;
     }
@@ -134,7 +137,7 @@ void TrendRealTimeDialog::setRange(QJsonObject payload)
     QJsonArray mobilityRange = payload.value("mobilityRange").toArray();
     if(mobilityRange.size() == 2){
         mobilityL = 0;
-        mobilityH = mobilityRange.last().toDouble();
+        mobilityH = dataProcess->scanCountToMS(mobilityRange.last().toDouble());
     }
 
     QJsonArray mobilityIntensityRange = payload.value("mobilityIntensityRange").toArray();

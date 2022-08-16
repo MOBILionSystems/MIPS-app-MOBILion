@@ -171,6 +171,7 @@ void ScriptButton::Show(void)
 // if he would like to abort script.
 void ScriptButton::pbButtonPressed(void)
 {
+    qDebug() << "+button pressed";
     ButtonPressed(true);
 }
 
@@ -225,11 +226,13 @@ void ScriptButton::ButtonPressed(bool AlwaysLoad)
         {
             if(result.isError())
             {
+                qDebug() << "Script error";
                 if(properties != NULL) properties->Log("Script error: " + result.toString());
                 if(sb != NULL) sb->showMessage("Script error: " + result.toString());
             }
             else
             {
+                qDebug() << "No Script error";
                 if(properties != NULL) properties->Log("Script finished!");
                 if(sb != NULL) sb->showMessage("Script finished!");
             }
