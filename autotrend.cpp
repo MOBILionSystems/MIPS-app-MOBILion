@@ -223,7 +223,7 @@ void AutoTrend::buildTrendSM()
 
     connect(startAcqState, &QState::entered, this, [=](){
         _streamerClient->resetFrameIndex();
-        _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi"); emit nextState();
+        _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi");
     });
     startAcqState->addTransition(this, &AutoTrend::nextState, waitDuringAcqState);
 
@@ -263,6 +263,7 @@ void AutoTrend::setupBroker(bool connected)
     if(connected){
         delete _broker;
         _broker = new Broker(_sbcIpAddress, this);
+        connect(_broker, &Broker::acqStarted, this, &AutoTrend::onAcqStarted);
         _broker->initDigitizer();
 
         connectStreamer();
@@ -510,8 +511,8 @@ void AutoTrend::on_singleShotButton_clicked()
     stepDuration = ui->singleDurationLineEdit->text().toInt();
     trendSM->start();
 
-    bool validDelay = false;
-    int delay_ms = ui->delayLineEdit->text().toInt(&validDelay);
+    bool validDelay = true;
+    int delay_ms = 200;
     if(validDelay){
         QTimer::singleShot(delay_ms, this, [=](){
             emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
@@ -537,5 +538,11 @@ void AutoTrend::on_loadMsCalibrationButton_clicked()
     QString newMsCalibration = mbiFile.getCalMsCalibration();
     if(!newMsCalibration.isEmpty())
         DataProcess::msCalibration = newMsCalibration;
+}
+
+
+void AutoTrend::onAcqStarted()
+{
+    emit nextState();
 }
 

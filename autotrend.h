@@ -83,6 +83,8 @@ private slots:
 
     void on_loadMsCalibrationButton_clicked();
 
+    void onAcqStarted();
+
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
    // panel. So need to use signal and slot like runScript()

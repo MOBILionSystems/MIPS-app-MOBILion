@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <iostream>
 #include "commandGenerator.h"
+#include <QElapsedTimer>
 
 namespace Kafka {
 class Broker;
@@ -40,6 +41,8 @@ public:
     }
 };
 
+enum AckNack{Ack = 0, Nack, Empty, Other};
+
 class Broker : public QObject {
     Q_OBJECT
 public:
@@ -51,14 +54,24 @@ public:
     void startAcquire(QString fileName);
     void stopAcquire();
     bool isAcqiring();
+    AckNack getAck(QString talisman, QString service, QString command);
+    void waitAcqAck(unsigned int timeOutMs = 500);
+
+signals:
+    void acqStarted();
 
 private:
+    QElapsedTimer ackTimer;
+    bool ackTimerStarted = false;
     QString _ipaddress;
     bool startedAcquire = false;
     CommandGenerator commandGen;
     std::string _brokers;
-    RdKafka::Conf* _conf{nullptr};
-    RdKafka::Producer* _producer;
+    RdKafka::Conf* _producerConf{nullptr};
+    RdKafka::Conf* _consumerConf{nullptr};
+    RdKafka::Producer* _cmdProducer;
+    RdKafka::KafkaConsumer* _statusConsumer;
+    std::string groupID{};
 
     bool _config_error;
     std::string _recent_config_error;
@@ -66,4 +79,5 @@ private:
     void config();
 
     void SetConfigError(bool err, std::string err_msg);
+    std::string GenerateRandomHexString(const unsigned int len);
 };

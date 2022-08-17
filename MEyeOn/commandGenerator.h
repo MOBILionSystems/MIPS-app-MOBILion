@@ -12,6 +12,9 @@ class CommandGenerator : public QObject
 public:
     explicit CommandGenerator(QObject *parent = nullptr);
     QJsonObject getCommand(CommandType type, QString fileName = "");
+    static QString getUUID();
+    QString currentTalismanUUID() const;
+    unsigned int currentSequency() const;
 
 signals:
 
@@ -22,9 +25,6 @@ private:
     void updateInitDigtizerCommand(QJsonObject& command);
     void updateStartAcqCommand(QJsonObject& command, QString fileName);
     void updateStopAcqCommand(QJsonObject& command);
-
-    QString getUUID();
-
 };
 
 #endif // COMMANDGENERATOR_H

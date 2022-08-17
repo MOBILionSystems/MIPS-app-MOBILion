@@ -163,7 +163,6 @@ void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileN
     global.insert("acq-vendor-metadata", QJsonValue("906b3a6910d84259a810e9d8c35a564f"));
 
     data.insert("global", global);
-    qDebug() << data;
 
     command.insert("data", data);
 }
@@ -180,4 +179,14 @@ void CommandGenerator::updateStopAcqCommand(QJsonObject &command)
 QString CommandGenerator::getUUID()
 {
     return QUuid::createUuid().toString().remove('-').remove('{').remove('}');
+}
+
+QString CommandGenerator::currentTalismanUUID() const
+{
+    return talismanUUID;
+}
+
+unsigned int CommandGenerator::currentSequency() const
+{
+    return sequence;
 }
