@@ -41,7 +41,7 @@ public:
     }
 };
 
-enum AckNack{Ack = 0, Nack, Empty, Other};
+enum AckNack{Ack = 0, Nack, Empty, Other, TimeOut};
 
 class Broker : public QObject {
     Q_OBJECT
@@ -58,7 +58,7 @@ public:
     void waitAcqAck(unsigned int timeOutMs = 500);
 
 signals:
-    void acqStarted();
+    void acqAckNack(AckNack response);
 
 private:
     QElapsedTimer ackTimer;

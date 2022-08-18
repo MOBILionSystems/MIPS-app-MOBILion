@@ -172,6 +172,7 @@ void AutoTrend::buildTrendSM()
     QState* applyRelationState = new QState(trendSM);
     QState* waitBeforeAcqState = new QState(trendSM);
     QState* startAcqState = new QState(trendSM);
+    QState* startTimingTableState = new QState(trendSM);
     QState* waitDuringAcqState = new QState(trendSM);
     QState* stopAcqState = new QState(trendSM);
     QState* nextStepState = new QState(trendSM);
@@ -225,7 +226,14 @@ void AutoTrend::buildTrendSM()
         _streamerClient->resetFrameIndex();
         _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi");
     });
-    startAcqState->addTransition(this, &AutoTrend::nextState, waitDuringAcqState);
+    startAcqState->addTransition(this, &AutoTrend::nextState, startTimingTableState);
+
+    connect(startTimingTableState, &QState::entered, this, [=](){
+        emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
+        emit runScript(QString("mips.Command(\"MIPS-1 TG.Trigger\")"));
+        emit nextState();
+    });
+    startTimingTableState->addTransition(this, &AutoTrend::nextState, waitDuringAcqState);
 
     connect(waitDuringAcqState, &QState::entered, this, [=](){QTimer::singleShot(stepDuration, this, [=](){emit nextState();});});
     waitDuringAcqState->addTransition(this, &AutoTrend::nextState, stopAcqState);
@@ -263,7 +271,7 @@ void AutoTrend::setupBroker(bool connected)
     if(connected){
         delete _broker;
         _broker = new Broker(_sbcIpAddress, this);
-        connect(_broker, &Broker::acqStarted, this, &AutoTrend::onAcqStarted);
+        connect(_broker, &Broker::acqAckNack, this, &AutoTrend::onAcqAckNack);
         _broker->initDigitizer();
 
         connectStreamer();
@@ -510,19 +518,6 @@ void AutoTrend::on_singleShotButton_clicked()
     trendName = "singleShot";
     stepDuration = ui->singleDurationLineEdit->text().toInt();
     trendSM->start();
-
-    bool validDelay = true;
-    int delay_ms = 200;
-    if(validDelay){
-        QTimer::singleShot(delay_ms, this, [=](){
-            emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
-            emit runScript(QString("mips.Command(\"MIPS-1 TG.Trigger\")"));
-        });
-    }else{
-        QMessageBox::warning(this, "Invalid delay", "Run timing table immediately.");
-        emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
-        emit runScript(QString("mips.Command(\"MIPS-1 TG.Trigger\")"));
-    }
 }
 
 
@@ -541,8 +536,14 @@ void AutoTrend::on_loadMsCalibrationButton_clicked()
 }
 
 
-void AutoTrend::onAcqStarted()
+void AutoTrend::onAcqAckNack(AckNack response)
 {
+    if(response == AckNack::Nack){
+        QMessageBox::warning(this, "Warning", "Digitizer refused to acquire data.");
+    }else if(response == AckNack::TimeOut){
+        QMessageBox::warning(this, "Warning", "No response from Digitizer for acquisition.");
+    }
+
     emit nextState();
 }
 

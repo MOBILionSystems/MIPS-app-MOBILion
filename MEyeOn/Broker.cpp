@@ -116,25 +116,19 @@ void Broker::waitAcqAck(unsigned int timeOutMs){
     int remainingMs = timeOutMs - ackTimer.elapsed();
     if(remainingMs > 0){
         AckNack response = getAck(commandGen.currentTalismanUUID(), "ACORN_ACQUIRE", "START_ACQUISITION");
-        if(response == AckNack::Ack){
-            qDebug() << "Ack in " << timeOutMs - remainingMs;
+        if(response == AckNack::Ack || response == AckNack::Nack){
+            qDebug() << "Ack or Nack in " << timeOutMs - remainingMs << " ms.";
             ackTimerStarted = false;
-            emit acqStarted();
-        }else if(response == AckNack::Nack){
-            qDebug() << "NAck";
-            ackTimerStarted = false;
-            emit acqStarted();
+            emit acqAckNack(response);
         }else if(response == AckNack::Empty){
-            qDebug() << "Empty";
             QTimer::singleShot(10, [=](){waitAcqAck(timeOutMs);});
         }else{
             qDebug() << "Other";
             waitAcqAck(timeOutMs);
         }
     }else{
-        qWarning() << "timeout";
         ackTimerStarted = false;
-        emit acqStarted();
+        emit acqAckNack(AckNack::TimeOut);
     }
 }
 

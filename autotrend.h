@@ -83,7 +83,7 @@ private slots:
 
     void on_loadMsCalibrationButton_clicked();
 
-    void onAcqStarted();
+    void onAcqAckNack(AckNack response);
 
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration

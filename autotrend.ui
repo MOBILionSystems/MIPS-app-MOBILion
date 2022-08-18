@@ -232,7 +232,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>localhost</string>
+    <string>192.168.1.110</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="trendFrom">
