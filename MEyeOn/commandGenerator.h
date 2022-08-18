@@ -14,7 +14,7 @@ public:
     QJsonObject getCommand(CommandType type, QString fileName = "");
     static QString getUUID();
     QString currentTalismanUUID() const;
-    unsigned int currentSequency() const;
+    unsigned int lastUsedSequency() const;
 
 signals:
 

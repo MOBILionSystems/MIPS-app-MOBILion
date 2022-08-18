@@ -35,7 +35,10 @@ public:
     ~AutoTrend();
 
 signals:
-    void nextState();
+    void nextAcqState();
+    void nextConnectState();
+    void sbcFailed();
+    void goFinishState();
     void doneAllStates();
     void abortTrend();
     void nextForSingleShot();
@@ -85,17 +88,21 @@ private slots:
 
     void onAcqAckNack(AckNack response);
 
+    void onConfigureAckNack(AckNack response);
+
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
    // panel. So need to use signal and slot like runScript()
     QScriptValue mips; // Actually configuration panel instead of mips
     QScriptEngine *engine;
     TrendRealTimeDialog* trendRealTimeDialog{};
-    StreamerClient* _streamerClient;
+    StreamerClient* _streamerClient{nullptr};
     QString _sbcIpAddress;
     QString _streamerPort = "4001";
     QStateMachine* trendSM;
+    QStateMachine* sbcConnectSM;
     Ui::AutoTrend *ui;
+    QProcess *ping;
     Broker* _broker{nullptr};
     QStringListModel* relationModel;
     QStringListModel* leftValueModel;
@@ -121,8 +128,7 @@ private:
     void updateDCBias(QString name, double value);
     bool applyRelations(QString startWith, double startValue);
     void buildTrendSM();
-
-    void setupBroker(bool connected);
+    void buildSbcConnectSM();
 };
 
 #endif // AUTOTREND_H

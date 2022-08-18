@@ -59,6 +59,8 @@ void Broker::initDigitizer()
     if (resp != RdKafka::ERR_NO_ERROR) {
         qWarning() << "% Produce failed [" << dest << "]:" <<
                       QString::fromStdString(RdKafka::err2str(resp)) << "|" << resp;
+    }else{
+        waitInitAck();
     }
 }
 
@@ -115,15 +117,15 @@ void Broker::waitAcqAck(unsigned int timeOutMs){
 
     int remainingMs = timeOutMs - ackTimer.elapsed();
     if(remainingMs > 0){
-        AckNack response = getAck(commandGen.currentTalismanUUID(), "ACORN_ACQUIRE", "START_ACQUISITION");
+        AckNack response = getAck(QString::number(commandGen.lastUsedSequency()), "ACORN_ACQUIRE", "START_ACQUISITION");
         if(response == AckNack::Ack || response == AckNack::Nack){
-            qDebug() << "Ack or Nack in " << timeOutMs - remainingMs << " ms.";
+            // qDebug() << "Ack or Nack in " << timeOutMs - remainingMs << " ms.";
             ackTimerStarted = false;
             emit acqAckNack(response);
         }else if(response == AckNack::Empty){
-            QTimer::singleShot(10, [=](){waitAcqAck(timeOutMs);});
+            QTimer::singleShot(10, [=](){waitAcqAck();});
         }else{
-            qDebug() << "Other";
+            // qDebug() << "Other";
             waitAcqAck(timeOutMs);
         }
     }else{
@@ -132,7 +134,34 @@ void Broker::waitAcqAck(unsigned int timeOutMs){
     }
 }
 
-AckNack Broker::getAck(QString talisman, QString service, QString command)
+void Broker::waitInitAck(unsigned int timeOutMs)
+{
+    if(!ackTimerStarted){
+        ackTimer.start();
+        ackTimerStarted = true;
+    }
+
+    int remainingMs = timeOutMs - ackTimer.elapsed();
+    if(remainingMs > 0){
+        AckNack response = getAck(QString::number(commandGen.lastUsedSequency()), "ACORN_ACQUIRE", "CONFIGURE_DIGITIZER");
+        if(response == AckNack::Ack || response == AckNack::Nack){
+            //qDebug() << "Ack or Nack in " << timeOutMs - remainingMs << " ms.";
+            ackTimerStarted = false;
+            emit configureAckNack(response);
+        }else if(response == AckNack::Empty){
+            QTimer::singleShot(100, [=](){waitInitAck();});
+        }else{
+            //qDebug() << "Other";
+            waitAcqAck(timeOutMs);
+        }
+    }else{
+        ackTimerStarted = false;
+        //qDebug() << "Init timeout.";
+        emit configureAckNack(AckNack::TimeOut);
+    }
+}
+
+AckNack Broker::getAck(QString sequence, QString service, QString command)
 {
     //    qDebug() << "--------------------";
     RdKafka::Message *msg = _statusConsumer->consume(0);
@@ -147,7 +176,7 @@ AckNack Broker::getAck(QString talisman, QString service, QString command)
     delete msg;
     QJsonDocument doc = QJsonDocument::fromJson(payload.toUtf8());
     if(doc.isNull()) return AckNack::Other;
-        //qDebug() << doc;
+    //    qDebug() << doc;
 
     QJsonValue mod = doc["module"];
     if(mod == QJsonValue::Undefined){
@@ -167,16 +196,16 @@ AckNack Broker::getAck(QString talisman, QString service, QString command)
         return AckNack::Other;
     }
 
-    QJsonValue tal = doc["info"]["echo"]["talisman"];
-    if(tal == QJsonValue::Undefined) {
+    QJsonValue seq = doc["info"]["echo"]["sequence"];
+    if(seq == QJsonValue::Undefined) {
         //qDebug() << "3";
         return AckNack::Other;
     }
 
-    if(ser.toString() != service || com.toString() != command || tal.toString() != talisman){
+    if(ser.toString() != service || com.toString() != command || seq.toString() != sequence){
         //        qDebug() << ser.toString() << ", " << service;
         //        qDebug() << com.toString() << ", " << command;
-        //        qDebug() << tal.toString() << ", " << talisman;
+        //        qDebug() << seq.toString() << ", " << sequence;
         //        qDebug() << "4";
         return AckNack::Other;
     }

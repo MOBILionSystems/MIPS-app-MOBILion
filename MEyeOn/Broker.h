@@ -54,11 +54,12 @@ public:
     void startAcquire(QString fileName);
     void stopAcquire();
     bool isAcqiring();
-    AckNack getAck(QString talisman, QString service, QString command);
-    void waitAcqAck(unsigned int timeOutMs = 500);
+    AckNack getAck(QString sequence, QString service, QString command);
+
 
 signals:
     void acqAckNack(AckNack response);
+    void configureAckNack(AckNack response);
 
 private:
     QElapsedTimer ackTimer;
@@ -80,4 +81,7 @@ private:
 
     void SetConfigError(bool err, std::string err_msg);
     std::string GenerateRandomHexString(const unsigned int len);
+
+    void waitAcqAck(unsigned int timeOutMs = 500);
+    void waitInitAck(unsigned int timeOutMs = 10000);
 };

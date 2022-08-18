@@ -186,7 +186,7 @@ QString CommandGenerator::currentTalismanUUID() const
     return talismanUUID;
 }
 
-unsigned int CommandGenerator::currentSequency() const
+unsigned int CommandGenerator::lastUsedSequency() const
 {
-    return sequence;
+    return sequence - 1;
 }
