@@ -49,6 +49,7 @@ Broker::~Broker()
 
 void Broker::initDigitizer()
 {
+    //qDebug() << "initDigitizer";
     QString dest = "ACORN-CMD";
     QJsonObject commandObject = commandGen.getCommand(CommandType::Initialization);
     std::string payload = QJsonDocument(commandObject).toJson(QJsonDocument::JsonFormat::Compact).toStdString();
@@ -136,6 +137,7 @@ void Broker::waitAcqAck(unsigned int timeOutMs){
 
 void Broker::waitInitAck(unsigned int timeOutMs)
 {
+    //qDebug() << "waitInitAck";
     if(!ackTimerStarted){
         ackTimer.start();
         ackTimerStarted = true;

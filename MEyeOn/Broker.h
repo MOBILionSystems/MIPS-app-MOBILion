@@ -83,5 +83,5 @@ private:
     std::string GenerateRandomHexString(const unsigned int len);
 
     void waitAcqAck(unsigned int timeOutMs = 500);
-    void waitInitAck(unsigned int timeOutMs = 10000);
+    void waitInitAck(unsigned int timeOutMs = 5000);
 };
