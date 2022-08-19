@@ -3,7 +3,7 @@
 #include <QJsonValue>
 #include "dataprocess.h"
 
-const QHash<QString, QJsonValue> CommandGenerator::adcMap{
+QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-baseline-stabilize-enable", QJsonValue("1")},
     {"adc-channel", QJsonValue("Channel1")},
     {"adc-digital-offset", QJsonValue("-31456")},
@@ -30,7 +30,7 @@ const QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-zs-threshold", QJsonValue("-29706")}
 };
 
-const QHash<QString, QJsonValue> CommandGenerator::smpMap{
+QHash<QString, QJsonValue> CommandGenerator::smpMap{
     {"smp-type", QJsonValue("Calibration Tuning Mix")},
     {"smp-position", QJsonValue("p1-a1")},
     {"smp-concentration", QJsonValue("50.0")},
@@ -42,13 +42,13 @@ const QHash<QString, QJsonValue> CommandGenerator::smpMap{
     {"smp-balance-type", QJsonValue("")}
 };
 
-const QHash<QString, QJsonValue> CommandGenerator::usrMap{
+QHash<QString, QJsonValue> CommandGenerator::usrMap{
     {"usr-role", QJsonValue("Operator")},
     {"usr-name", QJsonValue("service")},
     {"usr-group", QJsonValue("MOBILIon Systems, Inc")}
 };
 
-const QHash<QString, QJsonValue> CommandGenerator::acqMap{
+QHash<QString, QJsonValue> CommandGenerator::acqMap{
     {"acq-Ic-model", QJsonValue("Agilent 1290 Infinity II")},
     {"acq-ms-method", QJsonValue("")},
     {"acq-ms-model", QJsonValue("Agilent 6545XT")},
@@ -61,7 +61,7 @@ const QHash<QString, QJsonValue> CommandGenerator::acqMap{
     {"acq-vendor-metadata", QJsonValue("906b3a6910d84259a810e9d8c35a564f")}
 };
 
-const QHash<QString, QJsonValue> CommandGenerator::frmMap{
+QHash<QString, QJsonValue> CommandGenerator::frmMap{
     {"frm-metadata-id",  QJsonValue("1")},
     {"frm-mux-gate",  QJsonValue("0")},
     {"frm-method-state", QJsonValue("")}, //too much
@@ -206,4 +206,22 @@ QString CommandGenerator::currentTalismanUUID() const
 unsigned int CommandGenerator::lastUsedSequency() const
 {
     return sequence - 1;
+}
+
+void CommandGenerator::updateInfo(QString key, QString value)
+{
+    if(adcMap.contains(key))
+        adcMap[key] = QJsonValue(value);
+
+    if(smpMap.contains(key))
+        smpMap[key] = QJsonValue(value);
+
+    if(usrMap.contains(key))
+        usrMap[key] = QJsonValue(value);
+
+    if(acqMap.contains(key))
+        acqMap[key] = QJsonValue(value);
+
+    if(frmMap.contains(key))
+        frmMap[key] = QJsonValue(value);
 }

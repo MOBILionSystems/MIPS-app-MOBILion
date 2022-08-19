@@ -55,6 +55,7 @@ public:
     void stopAcquire();
     bool isAcqiring();
     AckNack getAck(QString sequence, QString service, QString command);
+    void updateInfo(QString key, QString value);
 
 
 signals:

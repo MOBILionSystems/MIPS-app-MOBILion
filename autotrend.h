@@ -110,6 +110,7 @@ private:
     QStringList dcElectrodes = {"Funnel.NIF IN", "Funnel.NIF OUT", "Funnel.NIF CL", "Funnel.SLIMvolBias"};
     QStringList rfElectrodes = {"SLIM.SLIM Top.Drive", "SLIM.SLIM Bottom.Drive"};
     QStringList twElectrodes = {"SLIM.Seperation.Frequency", "SLIM.Seperation.Amplitude"};
+    QStringList polarities = {"Positive", "Negative"};
     QStringList relationList;
     QString fileFolder;
 

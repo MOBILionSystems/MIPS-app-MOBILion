@@ -101,6 +101,7 @@ void AutoTrend::initUI()
     ui->rightListView->setModel(rightValueModel);
     ui->dcRadioButton->setChecked(true);
     ui->trendComboBox->addItems(dcElectrodes);
+    ui->polarityComboBox->addItems(polarities);
     ui->relationListView->setModel(relationModel);
     ui->trendFrom->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
@@ -233,6 +234,7 @@ void AutoTrend::buildTrendSM()
     connect(startAcqState, &QState::entered, this, [=](){
         // qDebug() << "startAcqState";
         _streamerClient->resetFrameIndex();
+        _broker->updateInfo("frm-polarity", ui->polarityComboBox->currentText());
         _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi");
     });
     startAcqState->addTransition(this, &AutoTrend::nextAcqState, startTimingTableState);

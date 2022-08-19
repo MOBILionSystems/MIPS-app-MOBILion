@@ -16,11 +16,13 @@ public:
     static QString getUUID();
     QString currentTalismanUUID() const;
     unsigned int lastUsedSequency() const;
-    static const QHash<QString, QJsonValue> adcMap;
-    static const QHash<QString, QJsonValue> smpMap;
-    static const QHash<QString, QJsonValue> usrMap;
-    static const QHash<QString, QJsonValue> acqMap;
-    static const QHash<QString, QJsonValue> frmMap;
+    static QHash<QString, QJsonValue> adcMap;
+    static QHash<QString, QJsonValue> smpMap;
+    static QHash<QString, QJsonValue> usrMap;
+    static QHash<QString, QJsonValue> acqMap;
+    static QHash<QString, QJsonValue> frmMap;
+
+    void updateInfo(QString key, QString value);
 
 signals:
 

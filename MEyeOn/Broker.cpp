@@ -223,6 +223,11 @@ AckNack Broker::getAck(QString sequence, QString service, QString command)
     return AckNack::Other;
 }
 
+void Broker::updateInfo(QString key, QString value)
+{
+    commandGen.updateInfo(key, value);
+}
+
 
 void Broker::config()
 {
