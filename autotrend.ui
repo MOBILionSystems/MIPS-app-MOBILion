@@ -66,9 +66,9 @@
    <property name="geometry">
     <rect>
      <x>15</x>
-     <y>220</y>
+     <y>230</y>
      <width>41</width>
-     <height>21</height>
+     <height>27</height>
     </rect>
    </property>
    <property name="text">
@@ -79,9 +79,9 @@
    <property name="geometry">
     <rect>
      <x>55</x>
-     <y>220</y>
+     <y>230</y>
      <width>151</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
@@ -102,9 +102,9 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>260</y>
+     <y>270</y>
      <width>31</width>
-     <height>20</height>
+     <height>26</height>
     </rect>
    </property>
    <property name="text">
@@ -115,9 +115,9 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>300</y>
+     <y>310</y>
      <width>49</width>
-     <height>16</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="text">
@@ -128,9 +128,9 @@
    <property name="geometry">
     <rect>
      <x>165</x>
-     <y>266</y>
+     <y>276</y>
      <width>61</width>
-     <height>16</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="text">
@@ -141,9 +141,9 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>300</y>
+     <y>310</y>
      <width>81</width>
-     <height>20</height>
+     <height>26</height>
     </rect>
    </property>
    <property name="text">
@@ -232,16 +232,16 @@
     </rect>
    </property>
    <property name="text">
-    <string>192.168.1.156</string>
+    <string>192.168.1.110</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="trendFrom">
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>260</y>
+     <y>270</y>
      <width>61</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
@@ -252,9 +252,9 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>300</y>
+     <y>310</y>
      <width>61</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
@@ -265,9 +265,9 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>260</y>
+     <y>270</y>
      <width>71</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
@@ -278,9 +278,9 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>300</y>
+     <y>310</y>
      <width>71</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
@@ -343,9 +343,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>180</y>
+     <y>190</y>
      <width>91</width>
-     <height>22</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="text">
@@ -362,9 +362,9 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>180</y>
+     <y>190</y>
      <width>91</width>
-     <height>22</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="text">
@@ -378,9 +378,9 @@
    <property name="geometry">
     <rect>
      <x>240</x>
-     <y>180</y>
+     <y>190</y>
      <width>91</width>
-     <height>22</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="text">
@@ -394,9 +394,9 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>220</y>
+     <y>230</y>
      <width>111</width>
-     <height>20</height>
+     <height>26</height>
     </rect>
    </property>
    <property name="text">
@@ -407,9 +407,9 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>340</y>
+     <y>350</y>
      <width>131</width>
-     <height>21</height>
+     <height>27</height>
     </rect>
    </property>
    <property name="text">
@@ -420,9 +420,9 @@
    <property name="geometry">
     <rect>
      <x>160</x>
-     <y>340</y>
+     <y>350</y>
      <width>41</width>
-     <height>24</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
@@ -433,7 +433,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>130</y>
+     <y>160</y>
      <width>281</width>
      <height>31</height>
     </rect>
@@ -489,6 +489,45 @@
      <width>81</width>
      <height>31</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="mafCheckBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>77</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>MAF</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_11">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>130</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Alternate CE Voltage</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="ceVlineEdit">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>130</y>
+     <width>71</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>50</string>
    </property>
   </widget>
  </widget>

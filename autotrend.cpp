@@ -107,6 +107,7 @@ void AutoTrend::initUI()
     ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendStepSize->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendStepDuration->setValidator(new QIntValidator(0, 10000, this));
+    ui->ceVlineEdit->setValidator(new QIntValidator(0, 1000, this));
 
     connect(ui->sbcIPEdit, &QLineEdit::textChanged, this, [=](){
         QLineEdit *sbcIp = ui->sbcIPEdit;
@@ -179,6 +180,11 @@ void AutoTrend::buildTrendSM()
     QState* applyRelationState = new QState(trendSM);
     QState* waitBeforeAcqState = new QState(trendSM);
     QState* startAcqState = new QState(trendSM);
+
+    QState* mafQtofConnectState = new QState(trendSM);
+    QState* mafCEVoltageState = new QState(trendSM);
+    QState* mafTimingTableState = new QState(trendSM);
+
     QState* startTimingTableState = new QState(trendSM);
     QState* waitDuringAcqState = new QState(trendSM);
     QState* stopAcqState = new QState(trendSM);
@@ -200,6 +206,12 @@ void AutoTrend::buildTrendSM()
         relationEnabled = ui->relationRatioButton->isChecked();
         fileFolder = QDate::currentDate().toString("yyyyMMdd") + "/" + QTime::currentTime().toString("hhmmss") + trendName + "Trend";
         ui->trendProgressBar->setValue(0);
+
+        _maf = ui->mafCheckBox->isChecked();
+        if(_maf){
+            _mafCurrentCycle = 1;
+            _ceVol = ui->ceVlineEdit->text().toInt();
+        }
         if(singleShot)
             emit nextForSingleShot();
         else
@@ -232,12 +244,23 @@ void AutoTrend::buildTrendSM()
     waitBeforeAcqState->addTransition(this, &AutoTrend::nextAcqState, startAcqState);
 
     connect(startAcqState, &QState::entered, this, [=](){
-        // qDebug() << "startAcqState";
+         qDebug() << "startAcqState";
         _streamerClient->resetFrameIndex();
         _broker->updateInfo("frm-polarity", ui->polarityComboBox->currentText());
         _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi");
     });
     startAcqState->addTransition(this, &AutoTrend::nextAcqState, startTimingTableState);
+    startAcqState->addTransition(this, &AutoTrend::nextMafState, mafQtofConnectState);
+
+    connect(mafQtofConnectState, &QState::entered, this, [=](){emit nextMafState();});
+    mafQtofConnectState->addTransition(this, &AutoTrend::nextMafState, mafCEVoltageState);
+
+    connect(mafCEVoltageState, &QState::entered, this, &AutoTrend::applyMafCeVoltage);
+    mafCEVoltageState->addTransition(this, &AutoTrend::nextMafState, mafTimingTableState);
+    mafCEVoltageState->addTransition(this, &AutoTrend::doneMafState, stopAcqState);
+
+    connect(mafTimingTableState, &QState::entered, this, &AutoTrend::runMafTimingTable);
+    mafTimingTableState->addTransition(this, &AutoTrend::nextMafState, mafCEVoltageState);
 
     connect(startTimingTableState, &QState::entered, this, [=](){
         // qDebug() << "startTimingTableState";
@@ -251,7 +274,7 @@ void AutoTrend::buildTrendSM()
     waitDuringAcqState->addTransition(this, &AutoTrend::nextAcqState, stopAcqState);
 
     connect(stopAcqState, &QState::entered, this, [=](){
-        // qDebug() << "stopAcqState";
+         qDebug() << "stopAcqState";
         _broker->stopAcquire();
         QTimer::singleShot(3000, this, [=](){if(singleShot) emit nextForSingleShot(); else emit nextAcqState();});
     }); // add delay for wifi communication and data processing
@@ -276,6 +299,7 @@ void AutoTrend::buildTrendSM()
 
     connect(trendSM, &QStateMachine::finished, this, [=](){trendRealTimeDialog->wrapLastStep(); ui->trendProgressBar->setValue(100); if(singleShot) singleShot = false;});
 }
+
 
 void AutoTrend::buildSbcConnectSM()
 {
@@ -618,7 +642,10 @@ void AutoTrend::onAcqAckNack(AckNack response)
     }else if(response == AckNack::TimeOut){
         QMessageBox::warning(this, "Warning", "No response from Digitizer for acquisition.");
     }
-    emit nextAcqState();
+    if(_maf)
+        emit nextMafState();
+    else
+        emit nextAcqState();
 }
 
 void AutoTrend::onConfigureAckNack(AckNack response)
@@ -632,5 +659,22 @@ void AutoTrend::onConfigureAckNack(AckNack response)
     }else{
         emit nextConnectState();
     }
+}
+
+void AutoTrend::applyMafCeVoltage()
+{
+
+    qDebug() << "mafCurrentCycle: " << _mafCurrentCycle;
+    if(_mafCurrentCycle <= _mafTotalCycle)
+        emit nextMafState();
+    else
+        emit doneMafState();
+}
+
+void AutoTrend::runMafTimingTable()
+{
+    qDebug() << "runMafTimingTable";
+    _mafCurrentCycle++;
+    emit nextMafState();
 }
 

@@ -35,13 +35,15 @@ public:
     ~AutoTrend();
 
 signals:
-    void nextAcqState();
+    void nextAcqState();        // signal for autotrend
     void nextConnectState();
+    void nextMafState();        // signal for maf
+    void doneMafState();
     void sbcFailed();
     void goFinishState();
     void doneAllStates();
     void abortTrend();
-    void nextForSingleShot();
+    void nextForSingleShot();   // signal for nonMAF signal shot
     void runScript(QString s);
 
 private slots:
@@ -90,6 +92,10 @@ private slots:
 
     void onConfigureAckNack(AckNack response);
 
+    void applyMafCeVoltage();
+
+    void runMafTimingTable();
+
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
    // panel. So need to use signal and slot like runScript()
@@ -115,6 +121,10 @@ private:
     QString fileFolder;
 
 
+    int _mafTotalCycle = 10;
+    int _mafCurrentCycle = 1;
+    bool _maf = false;
+    int _ceVol = 50;
     bool singleShot = false;
     QString trendName;
     int trendFrom = 0;
