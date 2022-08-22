@@ -22,6 +22,8 @@ AutoTrend::AutoTrend(QWidget *parent) :
     ping = new QProcess(this);
     connect(ping, SIGNAL(readyReadStandardOutput()), SLOT(readResult()));
 
+    _qtofClient = new QtofAddonClient(this);
+
     engine = new QScriptEngine(this);
     mips = engine->newQObject(parent);
     engine->globalObject().setProperty("mips", mips);
@@ -181,7 +183,6 @@ void AutoTrend::buildTrendSM()
     QState* waitBeforeAcqState = new QState(trendSM);
     QState* startAcqState = new QState(trendSM);
 
-    QState* mafQtofConnectState = new QState(trendSM);
     QState* mafCEVoltageState = new QState(trendSM);
     QState* mafTimingTableState = new QState(trendSM);
 
@@ -250,13 +251,10 @@ void AutoTrend::buildTrendSM()
         _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi");
     });
     startAcqState->addTransition(this, &AutoTrend::nextAcqState, startTimingTableState);
-    startAcqState->addTransition(this, &AutoTrend::nextMafState, mafQtofConnectState);
-
-    connect(mafQtofConnectState, &QState::entered, this, [=](){emit nextMafState();});
-    mafQtofConnectState->addTransition(this, &AutoTrend::nextMafState, mafCEVoltageState);
+    startAcqState->addTransition(this, &AutoTrend::nextMafState, mafCEVoltageState);
 
     connect(mafCEVoltageState, &QState::entered, this, &AutoTrend::applyMafCeVoltage);
-    mafCEVoltageState->addTransition(this, &AutoTrend::nextMafState, mafTimingTableState);
+    mafCEVoltageState->addTransition(_qtofClient, &QtofAddonClient::ceVoltageReceived, mafTimingTableState);
     mafCEVoltageState->addTransition(this, &AutoTrend::doneMafState, stopAcqState);
 
     connect(mafTimingTableState, &QState::entered, this, &AutoTrend::runMafTimingTable);
@@ -663,10 +661,9 @@ void AutoTrend::onConfigureAckNack(AckNack response)
 
 void AutoTrend::applyMafCeVoltage()
 {
-
     qDebug() << "mafCurrentCycle: " << _mafCurrentCycle;
     if(_mafCurrentCycle <= _mafTotalCycle)
-        emit nextMafState();
+        _qtofClient->applyCeVoltage(_sbcIpAddress, 50);
     else
         emit doneMafState();
 }

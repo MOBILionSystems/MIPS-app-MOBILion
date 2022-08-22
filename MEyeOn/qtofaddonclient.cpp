@@ -1,5 +1,6 @@
 #include "qtofaddonclient.h"
 #include <QtMath>
+#include <QTimer>
 
 QtofAddonClient::QtofAddonClient(QObject *parent)
     : QObject{parent}
@@ -13,14 +14,15 @@ int32_t float_to_fixedpoint(float value){
     return (int32_t) scaled;
 }
 
-void QtofAddonClient::doConnect(QString ip)
+void QtofAddonClient::applyCeVoltage(QString ip, int voltage)
 {
+    _voltage = voltage;
     socket = new QTcpSocket(this);
 
-    QObject::connect(socket, SIGNAL(connected()),this, SLOT(connected()));
-    QObject::connect(socket, SIGNAL(disconnected()),this, SLOT(disconnected()));
-    QObject::connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64)));
-    QObject::connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
+    QObject::connect(socket, SIGNAL(connected()),this, SLOT(onConnected()));
+    QObject::connect(socket, SIGNAL(disconnected()),this, SLOT(onDisconnected()));
+    QObject::connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(onBytesWritten(qint64)));
+    QObject::connect(socket, SIGNAL(readyRead()),this, SLOT(onReadyRead()));
 
     qDebug() << "connecting...";
 
@@ -34,8 +36,10 @@ void QtofAddonClient::doConnect(QString ip)
     }
 }
 
-void QtofAddonClient::applyCeVoltage(int voltage)
+void QtofAddonClient::onConnected()
 {
+    qDebug() << "connected...";
+    qDebug() << "applyCeVoltage";
     ssize_t payload_length = sizeof(collision_energy_profile_t);
     //operation_t operation = Noop;
     QByteArray operation;
@@ -45,7 +49,7 @@ void QtofAddonClient::applyCeVoltage(int voltage)
     collision_energy_profile_t payloadorigin;
     payloadorigin.collision_energy_interval_us = 1000;
     payloadorigin.collision_energy[0].interval_count = 1;
-    payloadorigin.collision_energy[0].collision_energy_v = float_to_fixedpoint(voltage);
+    payloadorigin.collision_energy[0].collision_energy_v = float_to_fixedpoint(_voltage);
 
     // Hey server, tell me about you.
     socket->write(operation);
@@ -62,24 +66,20 @@ void QtofAddonClient::applyCeVoltage(int voltage)
             socket->write((const char*)buffer, chunk_size);
         }
     }
+    QTimer::singleShot(1000, [=](){emit ceVoltageReceived();});
 }
 
-void QtofAddonClient::connected()
-{
-    qDebug() << "connected...";
-}
-
-void QtofAddonClient::disconnected()
+void QtofAddonClient::onDisconnected()
 {
     qDebug() << "disconnected...";
 }
 
-void QtofAddonClient::bytesWritten(qint64 bytes)
+void QtofAddonClient::onBytesWritten(qint64 bytes)
 {
     qDebug() << bytes << " bytes written...";
 }
 
-void QtofAddonClient::readyRead()
+void QtofAddonClient::onReadyRead()
 {
     qDebug() << "reading...";
     // read the data from the socket

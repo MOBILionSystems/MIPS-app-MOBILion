@@ -9,6 +9,7 @@
 #include "MEyeOn/trendrealtimedialog.h"
 #include "MEyeOn/MBI/mbifile.h"
 #include "MEyeOn/dataprocess.h"
+#include "MEyeOn/qtofaddonclient.h"
 
 #include "ui_mips.h"
 #include "mips.h"
@@ -119,9 +120,10 @@ private:
     QStringList polarities = {"Positive", "Negative"};
     QStringList relationList;
     QString fileFolder;
+    QtofAddonClient* _qtofClient;
 
 
-    int _mafTotalCycle = 10;
+    int _mafTotalCycle = 3;
     int _mafCurrentCycle = 1;
     bool _maf = false;
     int _ceVol = 50;

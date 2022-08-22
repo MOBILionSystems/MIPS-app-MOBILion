@@ -36,9 +36,9 @@ SOURCES += main.cpp\
     MEyeOn/Broker.cpp \
     MEyeOn/MBI/mbifile.cpp \
     MEyeOn/MBI/mbimetadata.cpp \
-    MEyeOn/MBI/qtofaddonclient.cpp \
     MEyeOn/commandGenerator.cpp \
     MEyeOn/dataprocess.cpp \
+    MEyeOn/qtofaddonclient.cpp \
     MEyeOn/streamerclient.cpp \
     MEyeOn/trendrealtimedialog.cpp \
     autotrend.cpp \
@@ -87,10 +87,10 @@ HEADERS  += mips.h \
     MEyeOn/MBI/mbifile.h \
     MEyeOn/MBI/mbimetadata.h \
     MEyeOn/MBI/pch.h \
-    MEyeOn/MBI/qtofaddonclient.h \
     MEyeOn/commandGenerator.h \
     MEyeOn/common.h \
     MEyeOn/dataprocess.h \
+    MEyeOn/qtofaddonclient.h \
     MEyeOn/streamerclient.h \
     MEyeOn/trendrealtimedialog.h \
     autotrend.h \

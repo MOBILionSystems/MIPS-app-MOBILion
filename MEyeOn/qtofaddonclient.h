@@ -28,21 +28,22 @@ class QtofAddonClient : public QObject
 public:
     explicit QtofAddonClient(QObject *parent = nullptr);
 
-    void doConnect(QString ip);
-    void applyCeVoltage(int voltage);
+    void applyCeVoltage(QString ip, int voltage);
 
 signals:
+    void ceVoltageReceived();
 
 public slots:
-    void connected();
-    void disconnected();
-    void bytesWritten(qint64 bytes);
-    void readyRead();
+    void onConnected();
+    void onDisconnected();
+    void onBytesWritten(qint64 bytes);
+    void onReadyRead();
 
 private:
     QTcpSocket *socket;
     QString ip;
     bool isConnected = false;
+    int _voltage;
 
 };
 
