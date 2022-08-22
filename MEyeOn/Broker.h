@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <iostream>
 #include "commandGenerator.h"
+#include <QElapsedTimer>
 
 namespace Kafka {
 class Broker;
@@ -40,6 +41,8 @@ public:
     }
 };
 
+enum AckNack{Ack = 0, Nack, Empty, Other, TimeOut};
+
 class Broker : public QObject {
     Q_OBJECT
 public:
@@ -51,14 +54,26 @@ public:
     void startAcquire(QString fileName);
     void stopAcquire();
     bool isAcqiring();
+    AckNack getAck(QString sequence, QString service, QString command);
+    void updateInfo(QString key, QString value);
+
+
+signals:
+    void acqAckNack(AckNack response);
+    void configureAckNack(AckNack response);
 
 private:
+    QElapsedTimer ackTimer;
+    bool ackTimerStarted = false;
     QString _ipaddress;
     bool startedAcquire = false;
     CommandGenerator commandGen;
     std::string _brokers;
-    RdKafka::Conf* _conf{nullptr};
-    RdKafka::Producer* _producer;
+    RdKafka::Conf* _producerConf{nullptr};
+    RdKafka::Conf* _consumerConf{nullptr};
+    RdKafka::Producer* _cmdProducer;
+    RdKafka::KafkaConsumer* _statusConsumer;
+    std::string groupID{};
 
     bool _config_error;
     std::string _recent_config_error;
@@ -66,4 +81,8 @@ private:
     void config();
 
     void SetConfigError(bool err, std::string err_msg);
+    std::string GenerateRandomHexString(const unsigned int len);
+
+    void waitAcqAck(unsigned int timeOutMs = 500);
+    void waitInitAck(unsigned int timeOutMs = 5000);
 };

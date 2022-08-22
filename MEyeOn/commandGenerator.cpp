@@ -3,6 +3,73 @@
 #include <QJsonValue>
 #include "dataprocess.h"
 
+QHash<QString, QJsonValue> CommandGenerator::adcMap{
+    {"adc-baseline-stabilize-enable", QJsonValue("1")},
+    {"adc-channel", QJsonValue("Channel1")},
+    {"adc-digital-offset", QJsonValue("-31456")},
+    {"adc-driver-rev", QJsonValue("AqMD3-3.6.7279.14 (Acqiris: SA220P)")},
+    {"adc-firmware-rev", QJsonValue("Stage1 Version 3.7.173.0, FPGA Firmware Version 3.7.173.69125/AVG.CST.DGT, FE CPLD 1/0.4.0.0")},
+    {"adc-mass-spec-range", QJsonValue("3200")},
+    {"adc-min-nanoseconds", QJsonValue("15000")},
+    {"adc-model", QJsonValue("SA220P")},
+    {"adc-offset", QJsonValue("0.24")},
+    {"adc-pulse-threshold", QJsonValue("200")},
+    {"adc-range", QJsonValue("0.5")},
+    {"adc-record-size", QJsonValue("320000")},
+    {"adc-sample-rate", QJsonValue("2.0e+09")},
+    {"adc-self-trigger-duty-cycle", QJsonValue("10.000000")},
+    {"adc-self-trigger-enable", QJsonValue("0")},
+    {"adc-self-trigger-frequency", QJsonValue("10000.000000")},
+    {"adc-self-trigger-polarity", QJsonValue("1")},
+    {"adc-trigger-level", QJsonValue("2.5")},
+    {"adc-trigger-polarity", QJsonValue("1")},
+    {"adc-zero-value", QJsonValue("-31456")},
+    {"adc-zs-hysteresis", QJsonValue("100")},
+    {"adc-zs-postgate-samples", QJsonValue("0")},
+    {"adc-zs-pregate-samples", QJsonValue("0")},
+    {"adc-zs-threshold", QJsonValue("-29706")}
+};
+
+QHash<QString, QJsonValue> CommandGenerator::smpMap{
+    {"smp-type", QJsonValue("Calibration Tuning Mix")},
+    {"smp-position", QJsonValue("p1-a1")},
+    {"smp-concentration", QJsonValue("50.0")},
+    {"smp-injection-volume", QJsonValue("")},
+    {"smp-plate-code", QJsonValue("")},
+    {"smp-rack-code", QJsonValue("")},
+    {"smp-dilution-factor", QJsonValue("")},
+    {"smp-plate-position", QJsonValue("")},
+    {"smp-balance-type", QJsonValue("")}
+};
+
+QHash<QString, QJsonValue> CommandGenerator::usrMap{
+    {"usr-role", QJsonValue("Operator")},
+    {"usr-name", QJsonValue("service")},
+    {"usr-group", QJsonValue("MOBILIon Systems, Inc")}
+};
+
+QHash<QString, QJsonValue> CommandGenerator::acqMap{
+    {"acq-Ic-model", QJsonValue("Agilent 1290 Infinity II")},
+    {"acq-ms-method", QJsonValue("")},
+    {"acq-ms-model", QJsonValue("Agilent 6545XT")},
+    {"acq-num-frames", QJsonValue("")},
+    {"acq-slim_path_length", QJsonValue("")},
+    {"acq_software-version", QJsonValue("release-v1.0.27")},
+    {"acq-timestamp", QJsonValue("2022-02-10 16:32:33.977127+00:00")},
+    {"acq-tune-file", QJsonValue("")},
+    {"acq-type", QJsonValue("Sample")},
+    {"acq-vendor-metadata", QJsonValue("906b3a6910d84259a810e9d8c35a564f")}
+};
+
+QHash<QString, QJsonValue> CommandGenerator::frmMap{
+    {"frm-metadata-id",  QJsonValue("1")},
+    {"frm-mux-gate",  QJsonValue("0")},
+    {"frm-method-state", QJsonValue("")}, //too much
+    {"frm-method-name",  QJsonValue("TuneMixTwAmp30")},
+    {"frm-timing-intents", QJsonValue("")}, //too much
+    {"frm-polarity", QJsonValue("Negative")}
+};
+
 CommandGenerator::CommandGenerator(QObject *parent)
     : QObject{parent}
 {
@@ -42,30 +109,11 @@ void CommandGenerator::updateInitDigtizerCommand(QJsonObject &command)
     command.insert("command", QJsonValue("CONFIGURE_DIGITIZER"));
 
     QJsonObject initDigitizer;
-    initDigitizer.insert("adc-baseline-stabilize-enable", QJsonValue("1"));
-    initDigitizer.insert("adc-channel", QJsonValue("Channel1"));
-    initDigitizer.insert("adc-digital-offset", QJsonValue("-31456"));
-    initDigitizer.insert("adc-driver-rev", QJsonValue("AqMD3-3.6.7279.14 (Acqiris: SA220P)"));
-    initDigitizer.insert("adc-firmware-rev", QJsonValue("Stage1 Version 3.7.173.0, FPGA Firmware Version 3.7.173.69125/AVG.CST.DGT, FE CPLD 1/0.4.0.0"));
-    initDigitizer.insert("adc-mass-spec-range", QJsonValue("3200"));
-    initDigitizer.insert("adc-min-nanoseconds", QJsonValue("15000"));
-    initDigitizer.insert("adc-model", QJsonValue("SA220P"));
-    initDigitizer.insert("adc-offset", QJsonValue("0.24"));
-    initDigitizer.insert("adc-pulse-threshold", QJsonValue("200"));
-    initDigitizer.insert("adc-range", QJsonValue("0.5"));
-    initDigitizer.insert("adc-record-size", QJsonValue("320000"));
-    initDigitizer.insert("adc-sample-rate", QJsonValue("2.0e+09"));
-    initDigitizer.insert("adc-self-trigger-duty-cycle", QJsonValue("10.000000"));
-    initDigitizer.insert("adc-self-trigger-enable", QJsonValue("0"));
-    initDigitizer.insert("adc-self-trigger-frequency", QJsonValue("10000.000000"));
-    initDigitizer.insert("adc-self-trigger-polarity", QJsonValue("1"));
-    initDigitizer.insert("adc-trigger-level", QJsonValue("1.250000"));
-    initDigitizer.insert("adc-trigger-polarity", QJsonValue("1"));
-    initDigitizer.insert("adc-zero-value", QJsonValue("-31456"));
-    initDigitizer.insert("adc-zs-hysteresis", QJsonValue("100"));
-    initDigitizer.insert("adc-zs-postgate-samples", QJsonValue("0"));
-    initDigitizer.insert("adc-zs-pregate-samples", QJsonValue("0"));
-    initDigitizer.insert("adc-zs-threshold", QJsonValue("-29706"));
+    QHash<QString, QJsonValue>::const_iterator adc = adcMap.constBegin();
+    while(adc != CommandGenerator::adcMap.constEnd()){
+        initDigitizer.insert(adc.key(), adc.value());
+        adc++;
+    }
 
     command.insert("data", initDigitizer);
 }
@@ -88,12 +136,11 @@ void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileN
     data.insert("filename", QJsonValue("/acorn/data/" + fileName)); // "/acorn/data/20220228/b.mbi"
 
     QJsonObject frameObject;
-    frameObject.insert("frm-metadata-id",  QJsonValue("1"));
-    frameObject.insert("frm-mux-gate",  QJsonValue("0"));
-    frameObject.insert("frm-method-state", QJsonValue("")); //too much
-    frameObject.insert("frm-method-name",  QJsonValue("TuneMixTwAmp30"));
-    frameObject.insert("frm-timing-intents", QJsonValue("")); //too much
-    frameObject.insert("frm-polarity", "Negative");
+    QHash<QString, QJsonValue>::const_iterator frm = frmMap.constBegin();
+    while(frm != frmMap.constEnd()){
+        frameObject.insert(frm.key(), frm.value());
+        frm++;
+    }
 
     if(DataProcess::isNonDefaultMsCalibrationAvailable()){
         frameObject.insert("cal-ms-traditional", DataProcess::msCalibration);
@@ -108,63 +155,31 @@ void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileN
 
     QJsonObject global;
 
-    global.insert("smp-type", QJsonValue("Calibration Tuning Mix"));
-    global.insert("smp-position", QJsonValue("p1-a1"));
-    global.insert("smp-concentration", QJsonValue("50.0"));
-    global.insert("smp-injection-volume", QJsonValue(""));
-    global.insert("smp-plate-code", QJsonValue(""));
-    global.insert("smp-rack-code", QJsonValue(""));
-    global.insert("smp-dilution-factor", QJsonValue(""));
-    global.insert("smp-plate-position", QJsonValue(""));
-    global.insert("smp-balance-type", QJsonValue(""));
-    global.insert("usr-group", QJsonValue("MOBILIon Systems, Inc"));
-    global.insert("usr-role", QJsonValue("Operator"));
-    global.insert("usr-name", QJsonValue("service"));
+    QHash<QString, QJsonValue>::const_iterator smp = smpMap.constBegin();
+    while(smp != smpMap.constEnd()){
+        global.insert(smp.key(), smp.value());
+        smp++;
+    }
 
-    global.insert("adc-baseline-stabilize-enable", QJsonValue("1"));
-    global.insert("adc-channel", QJsonValue("Channel1"));
-    global.insert("adc-digital-offset", QJsonValue("-31456"));
-    global.insert("adc-driver-rev", QJsonValue("AqMD3-3.6.7279.14 (Acqiris: SA220P)"));
-    global.insert("adc-firmware-rev", QJsonValue("Stage1 Version 3.7.173.0, FPGA Firmware Version 3.7.173.69125/AVG.CST.DGT, FE CPLD 1/0.4.0.0"));
-    global.insert("adc-mass-spec-range", QJsonValue("3200"));
-    global.insert("adc-min-nanoseconds", QJsonValue("15000"));
-    global.insert("adc-model", QJsonValue("SA220P"));
-    global.insert("adc-offset", QJsonValue("0.24"));
-    global.insert("adc-pulse-threshold", QJsonValue("200"));
-    global.insert("adc-range", QJsonValue("0.5"));
-    global.insert("adc-record-size", QJsonValue("320000"));
-    global.insert("adc-sample-rate", QJsonValue("2.0e+09"));
-    global.insert("adc-self-trigger-duty-cycle", QJsonValue("10.000000"));
-    global.insert("adc-self-trigger-enable", QJsonValue("0"));
-    global.insert("adc-self-trigger-frequency", QJsonValue("10000.000000"));
-    global.insert("adc-self-trigger-polarity", QJsonValue("1"));
-    global.insert("adc-trigger-level", QJsonValue("1.250000"));
-    global.insert("adc-trigger-polarity", QJsonValue("1"));
-    global.insert("adc-zero-value", QJsonValue("-31456"));
-    global.insert("adc-zs-hysteresis", QJsonValue("100"));
-    global.insert("adc-zs-postgate-samples", QJsonValue("0"));
-    global.insert("adc-zs-pregate-samples", QJsonValue("0"));
-    global.insert("adc-zs-threshold", QJsonValue("-29706"));
+    QHash<QString, QJsonValue>::const_iterator usr = usrMap.constBegin();
+    while(usr != usrMap.constEnd()){
+        global.insert(usr.key(), usr.value());
+        usr++;
+    }
 
+    QHash<QString, QJsonValue>::const_iterator adc = adcMap.constBegin();
+    while(adc != adcMap.constEnd()){
+        global.insert(adc.key(), adc.value());
+        adc++;
+    }
 
-    // stuck with error
-    //    QJsonObject acqBoardT; acqBoardT.insert("post", "59.96"); acqBoardT.insert("pre", "59.93");
-    //    global.insert("acq-board-temp", QJsonValue(acqBoardT));
-    global.insert("acq-Ic-model", QJsonValue("Agilent 1290 Infinity II"));
-    global.insert("acq-ms-method", QJsonValue(""));
-    global.insert("acq-ms-model", QJsonValue("Agilent 6545XT"));
-    global.insert("acq-num-frames", QJsonValue(""));
-    global.insert("acq-slim_path_length", QJsonValue(""));
-    global.insert("acq_software-version", QJsonValue("release-v1.0.27"));
-    //    QJsonObject acqTempCorr; acqTempCorr.insert("A", QJsonValue("0.0")); acqTempCorr.insert("B", QJsonValue("0.0"));
-    //    global.insert("acq_temperature_correction", QJsonValue(acqTempCorr));
-    global.insert("acq-timestamp", QJsonValue("2022-02-10 16:32:33.977127+00:00"));
-    global.insert("acq-tune-file", QJsonValue(""));
-    global.insert("acq-type", QJsonValue("Sample"));
-    global.insert("acq-vendor-metadata", QJsonValue("906b3a6910d84259a810e9d8c35a564f"));
+    QHash<QString, QJsonValue>::const_iterator acq = acqMap.constBegin();
+    while(acq != acqMap.constEnd()){
+        global.insert(acq.key(), acq.value());
+        acq++;
+    }
 
     data.insert("global", global);
-    qDebug() << data;
 
     command.insert("data", data);
 }
@@ -181,4 +196,32 @@ void CommandGenerator::updateStopAcqCommand(QJsonObject &command)
 QString CommandGenerator::getUUID()
 {
     return QUuid::createUuid().toString().remove('-').remove('{').remove('}');
+}
+
+QString CommandGenerator::currentTalismanUUID() const
+{
+    return talismanUUID;
+}
+
+unsigned int CommandGenerator::lastUsedSequency() const
+{
+    return sequence - 1;
+}
+
+void CommandGenerator::updateInfo(QString key, QString value)
+{
+    if(adcMap.contains(key))
+        adcMap[key] = QJsonValue(value);
+
+    if(smpMap.contains(key))
+        smpMap[key] = QJsonValue(value);
+
+    if(usrMap.contains(key))
+        usrMap[key] = QJsonValue(value);
+
+    if(acqMap.contains(key))
+        acqMap[key] = QJsonValue(value);
+
+    if(frmMap.contains(key))
+        frmMap[key] = QJsonValue(value);
 }

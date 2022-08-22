@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QUuid>
 #include "common.h"
+#include <QHash>
 
 class CommandGenerator : public QObject
 {
@@ -12,19 +13,27 @@ class CommandGenerator : public QObject
 public:
     explicit CommandGenerator(QObject *parent = nullptr);
     QJsonObject getCommand(CommandType type, QString fileName = "");
+    static QString getUUID();
+    QString currentTalismanUUID() const;
+    unsigned int lastUsedSequency() const;
+    static QHash<QString, QJsonValue> adcMap;
+    static QHash<QString, QJsonValue> smpMap;
+    static QHash<QString, QJsonValue> usrMap;
+    static QHash<QString, QJsonValue> acqMap;
+    static QHash<QString, QJsonValue> frmMap;
+
+    void updateInfo(QString key, QString value);
 
 signals:
 
 private:
+
     QString talismanUUID;
     unsigned int sequence = 1;
     void initCommand(QJsonObject& command);
     void updateInitDigtizerCommand(QJsonObject& command);
     void updateStartAcqCommand(QJsonObject& command, QString fileName);
     void updateStopAcqCommand(QJsonObject& command);
-
-    QString getUUID();
-
 };
 
 #endif // COMMANDGENERATOR_H

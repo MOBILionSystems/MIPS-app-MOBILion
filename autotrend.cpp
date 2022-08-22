@@ -19,6 +19,9 @@ AutoTrend::AutoTrend(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AutoTrend)
 {
+    ping = new QProcess(this);
+    connect(ping, SIGNAL(readyReadStandardOutput()), SLOT(readResult()));
+
     engine = new QScriptEngine(this);
     mips = engine->newQObject(parent);
     engine->globalObject().setProperty("mips", mips);
@@ -26,6 +29,9 @@ AutoTrend::AutoTrend(QWidget *parent) :
     trendSM = new QStateMachine(this);
     buildTrendSM();
     ui->setupUi(this);
+
+    sbcConnectSM = new QStateMachine(this);
+    buildSbcConnectSM();
 
     relationModel = new QStringListModel(this);
     leftValueModel = new QStringListModel(this);
@@ -95,6 +101,7 @@ void AutoTrend::initUI()
     ui->rightListView->setModel(rightValueModel);
     ui->dcRadioButton->setChecked(true);
     ui->trendComboBox->addItems(dcElectrodes);
+    ui->polarityComboBox->addItems(polarities);
     ui->relationListView->setModel(relationModel);
     ui->trendFrom->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
@@ -172,6 +179,7 @@ void AutoTrend::buildTrendSM()
     QState* applyRelationState = new QState(trendSM);
     QState* waitBeforeAcqState = new QState(trendSM);
     QState* startAcqState = new QState(trendSM);
+    QState* startTimingTableState = new QState(trendSM);
     QState* waitDuringAcqState = new QState(trendSM);
     QState* stopAcqState = new QState(trendSM);
     QState* nextStepState = new QState(trendSM);
@@ -179,6 +187,7 @@ void AutoTrend::buildTrendSM()
 
     trendSM->setInitialState(initState);
     connect(initState, &QState::entered, this, [=](){
+        // qDebug() << "initState";
         if(trendRealTimeDialog){
             delete trendRealTimeDialog;
             trendRealTimeDialog = new TrendRealTimeDialog(this);
@@ -194,85 +203,152 @@ void AutoTrend::buildTrendSM()
         if(singleShot)
             emit nextForSingleShot();
         else
-            emit nextState();
+            emit nextAcqState();
     });
-    initState->addTransition(this, &AutoTrend::nextState, updateTrendState);
+    initState->addTransition(this, &AutoTrend::nextAcqState, updateTrendState);
     initState->addTransition(this, &AutoTrend::nextForSingleShot, startAcqState);
 
     connect(updateTrendState, &QState::entered, this, [=](){
+        // qDebug() << "updateTrendState";
         updateDCBias(trendName, currentStep);
-
-        emit nextState();
+        emit nextAcqState();
     });
-    updateTrendState->addTransition(this, &AutoTrend::nextState, applyRelationState);
+    updateTrendState->addTransition(this, &AutoTrend::nextAcqState, applyRelationState);
 
     connect(applyRelationState, &QState::entered, this, [=](){
+        // qDebug() << "applyRelationState";
         if(relationEnabled){
             if(!applyRelations(trendName, currentStep)){
                 emit abortTrend();
                 return;
             }
         }
-        emit nextState();
+        emit nextAcqState();
     });
-    applyRelationState->addTransition(this, &AutoTrend::nextState, waitBeforeAcqState);
+    applyRelationState->addTransition(this, &AutoTrend::nextAcqState, waitBeforeAcqState);
     applyRelationState->addTransition(this, &AutoTrend::abortTrend, finishState);
 
-    connect(waitBeforeAcqState, &QState::entered, this, [=](){QTimer::singleShot(2000, this, [=](){emit nextState();});});
-    waitBeforeAcqState->addTransition(this, &AutoTrend::nextState, startAcqState);
+    connect(waitBeforeAcqState, &QState::entered, this, [=](){QTimer::singleShot(2000, this, [=](){emit nextAcqState();});});
+    waitBeforeAcqState->addTransition(this, &AutoTrend::nextAcqState, startAcqState);
 
     connect(startAcqState, &QState::entered, this, [=](){
+        // qDebug() << "startAcqState";
         _streamerClient->resetFrameIndex();
-        _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi"); emit nextState();
+        _broker->updateInfo("frm-polarity", ui->polarityComboBox->currentText());
+        _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi");
     });
-    startAcqState->addTransition(this, &AutoTrend::nextState, waitDuringAcqState);
+    startAcqState->addTransition(this, &AutoTrend::nextAcqState, startTimingTableState);
 
-    connect(waitDuringAcqState, &QState::entered, this, [=](){QTimer::singleShot(stepDuration, this, [=](){emit nextState();});});
-    waitDuringAcqState->addTransition(this, &AutoTrend::nextState, stopAcqState);
+    connect(startTimingTableState, &QState::entered, this, [=](){
+        // qDebug() << "startTimingTableState";
+        emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
+        emit runScript(QString("mips.Command(\"MIPS-1 TG.Trigger\")"));
+        emit nextAcqState();
+    });
+    startTimingTableState->addTransition(this, &AutoTrend::nextAcqState, waitDuringAcqState);
 
-    connect(stopAcqState, &QState::entered, this, [=](){_broker->stopAcquire();
-        QTimer::singleShot(3000, this, [=](){if(singleShot) emit nextForSingleShot(); else emit nextState();});
+    connect(waitDuringAcqState, &QState::entered, this, [=](){QTimer::singleShot(stepDuration, this, [=](){emit nextAcqState();});});
+    waitDuringAcqState->addTransition(this, &AutoTrend::nextAcqState, stopAcqState);
+
+    connect(stopAcqState, &QState::entered, this, [=](){
+        // qDebug() << "stopAcqState";
+        _broker->stopAcquire();
+        QTimer::singleShot(3000, this, [=](){if(singleShot) emit nextForSingleShot(); else emit nextAcqState();});
     }); // add delay for wifi communication and data processing
-    stopAcqState->addTransition(this, &AutoTrend::nextState, nextStepState);
+    stopAcqState->addTransition(this, &AutoTrend::nextAcqState, nextStepState);
     stopAcqState->addTransition(this, &AutoTrend::nextForSingleShot, finishState);
 
     connect(nextStepState, &QState::entered, this, [=](){
+        // qDebug() << "nextStepState";
         currentStep += trendStepSize;
         trendRealTimeDialog->startNewStep(currentStep);
         if(abs(trendTo - trendFrom) > 0){
             ui->trendProgressBar->setValue( (100 * abs(currentStep - trendFrom)) / (abs(trendTo - trendFrom) + abs(trendStepSize)));
         }
         if(currentStep <= trendTo && !toStopTrend){
-            emit nextState();
+            emit nextAcqState();
         }else{
             emit doneAllStates();
         }
     });
-    nextStepState->addTransition(this, &AutoTrend::nextState, updateTrendState);
+    nextStepState->addTransition(this, &AutoTrend::nextAcqState, updateTrendState);
     nextStepState->addTransition(this, &AutoTrend::doneAllStates, finishState);
 
     connect(trendSM, &QStateMachine::finished, this, [=](){trendRealTimeDialog->wrapLastStep(); ui->trendProgressBar->setValue(100); if(singleShot) singleShot = false;});
 }
 
-void AutoTrend::setupBroker(bool connected)
+void AutoTrend::buildSbcConnectSM()
 {
-    if(_broker && trendSM->isRunning()){
-        QMessageBox::warning(this, "Warning", "Current SBC is running for Acquisition.");
-        return;
-    }
-    if(connected){
-        delete _broker;
-        _broker = new Broker(_sbcIpAddress, this);
-        _broker->initDigitizer();
+    QState* initState = new QState(sbcConnectSM);
+    QState* pingState = new QState(sbcConnectSM);
+    QState* configureState = new QState(sbcConnectSM);
+    QFinalState* failState = new QFinalState(sbcConnectSM);
+    QFinalState* finishState = new QFinalState(sbcConnectSM);
 
+    sbcConnectSM->setInitialState(initState);
+    connect(initState, &QState::entered, this, [=](){
+        if(_broker && trendSM->isRunning()){
+            QMessageBox::warning(this, "Warning", "Current SBC is running for Acquisition.");
+            emit goFinishState();
+        }
+
+        _sbcIpAddress = ui->sbcIPEdit->text();
+        QLineEdit *sbcIp = ui->sbcIPEdit;
+        sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 255, 255);}");
+        if(_broker){
+            delete _broker;
+            _broker = nullptr;
+        }
+
+        emit nextConnectState();
+    });
+    initState->addTransition(this, &AutoTrend::nextConnectState, pingState);
+    initState->addTransition(this, &AutoTrend::goFinishState, finishState);
+
+    connect(pingState, &QState::entered, this, [=](){
+        // qDebug() << "ping state";
+        ping->start("ping.exe", QStringList() << _sbcIpAddress);
+    });
+    pingState->addTransition(this, &AutoTrend::sbcFailed, failState);
+    pingState->addTransition(this, &AutoTrend::nextConnectState, configureState);
+
+    connect(configureState, &QState::entered, this, [=](){
+        // qDebug() << "configure state";
+        _broker = new Broker(_sbcIpAddress, this);
+        connect(_broker, &Broker::acqAckNack, this, &AutoTrend::onAcqAckNack);
+        connect(_broker, &Broker::configureAckNack, this, &AutoTrend::onConfigureAckNack);
+        _broker->initDigitizer();
+    });
+    configureState->addTransition(this, &AutoTrend::sbcFailed, failState);
+    configureState->addTransition(this, &AutoTrend::nextConnectState, finishState);
+
+    connect(failState, &QFinalState::entered, this, [=](){
+        // qDebug() << "failState";
+        QLineEdit *sbcIp = ui->sbcIPEdit;
+        sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 0, 0);}");
+
+        if(_broker){
+            delete _broker;
+            _broker = nullptr;
+        }
+    });
+
+    connect(finishState, &QFinalState::entered, this, [=](){
+        QLineEdit *sbcIp = ui->sbcIPEdit;
+        sbcIp->setStyleSheet("QLineEdit { background: rgb(0, 255, 0);}");
         connectStreamer();
-    }else{
-        _broker = nullptr;
-    }
+    });
+
 }
+
 
 void AutoTrend::on_runTrendButton_clicked()
 {
+    if(sbcConnectSM->isRunning() || trendSM->isRunning()){
+        QMessageBox::warning(this, "Warning", "Digitizer is busy. Try again later.");
+        return;
+    }
+
     if(!_broker){
         QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
         return;
@@ -318,32 +394,31 @@ void AutoTrend::on_stopTrendButton_clicked()
 // https://www.qtcentre.org/threads/23723-check-IPAddress-existence
 void AutoTrend::on_testSBCButton_clicked()
 {
-    setupBroker(false);
-
-    _sbcIpAddress = ui->sbcIPEdit->text();
-    QProcess *ping = new QProcess(this);
-    connect(ping, SIGNAL(readyReadStandardOutput()), SLOT(readResult()));
-    ping->start("ping.exe", QStringList() << ui->sbcIPEdit->text());
+    sbcConnectSM->start();
 }
 
 void AutoTrend::readResult()
 {
-    QProcess *ping = qobject_cast<QProcess *>(sender());
-    if (!ping)
+    QProcess *ping2 = qobject_cast<QProcess *>(sender());
+    if(!ping2){
         return;
-    QString res = ping->readAllStandardOutput();
-    if (!res.contains('%'))
+    }
+    QString res = ping2->readAllStandardOutput();
+    // qDebug() << "res: " << res;
+    if(res.contains("could not find")){
+        emit sbcFailed();
         return;
+    }
+
+    if (!res.contains('%')){
+        return;
+    }
 
     const int percentLost = res.section('(', -1).section('%', 0, 0).toInt();
-    QLineEdit *sbcIp = ui->sbcIPEdit;
-
     if (res.contains("unreachable") || percentLost == 100) {
-        sbcIp->setStyleSheet("QLineEdit { background: rgb(255, 0, 0);}");
-        setupBroker(false);
+        emit sbcFailed();
     } else {
-        sbcIp->setStyleSheet("QLineEdit { background: rgb(0, 255, 0);}");
-        setupBroker(true);
+        emit nextConnectState();
     }
 }
 
@@ -383,6 +458,10 @@ void AutoTrend::on_saveRelationButton_clicked()
 
 void AutoTrend::connectStreamer()
 {
+    if(!_streamerClient){
+        delete _streamerClient;
+        _streamerClient = nullptr;
+    }
     _streamerClient = new StreamerClient(this);
     connect(_streamerClient, &StreamerClient::messageReady, this, &AutoTrend::onMessageReady);
     _streamerClient->connectTo(_sbcIpAddress + ":" + _streamerPort);
@@ -485,6 +564,11 @@ void AutoTrend::on_trendComboBox_currentTextChanged(const QString &arg1)
 
 void AutoTrend::on_singleShotButton_clicked()
 {
+    if(sbcConnectSM->isRunning() || trendSM->isRunning()){
+        QMessageBox::warning(this, "Warning", "Digitizer is busy. Try again later.");
+        return;
+    }
+
     if(!_broker){
         QMessageBox::warning(this, "No SBC", "Please connect to SBC first.");
         return;
@@ -509,19 +593,6 @@ void AutoTrend::on_singleShotButton_clicked()
     trendName = "singleShot";
     stepDuration = ui->singleDurationLineEdit->text().toInt();
     trendSM->start();
-
-    bool validDelay = false;
-    int delay_ms = ui->delayLineEdit->text().toInt(&validDelay);
-    if(validDelay){
-        QTimer::singleShot(delay_ms, this, [=](){
-            emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
-            emit runScript(QString("mips.Command(\"MIPS-1 TG.Trigger\")"));
-        });
-    }else{
-        QMessageBox::warning(this, "Invalid delay", "Run timing table immediately.");
-        emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
-        emit runScript(QString("mips.Command(\"MIPS-1 TG.Trigger\")"));
-    }
 }
 
 
@@ -537,5 +608,29 @@ void AutoTrend::on_loadMsCalibrationButton_clicked()
     QString newMsCalibration = mbiFile.getCalMsCalibration();
     if(!newMsCalibration.isEmpty())
         DataProcess::msCalibration = newMsCalibration;
+}
+
+
+void AutoTrend::onAcqAckNack(AckNack response)
+{
+    if(response == AckNack::Nack){
+        QMessageBox::warning(this, "Warning", "Digitizer refused to acquire data.");
+    }else if(response == AckNack::TimeOut){
+        QMessageBox::warning(this, "Warning", "No response from Digitizer for acquisition.");
+    }
+    emit nextAcqState();
+}
+
+void AutoTrend::onConfigureAckNack(AckNack response)
+{
+    if(response == AckNack::Nack){
+        QMessageBox::warning(this, "Warning", "Digitizer refused to config.");
+        emit sbcFailed();
+    }else if(response == AckNack::TimeOut){
+        QMessageBox::warning(this, "Warning", "Time out for Digitizer configuration.");
+        emit sbcFailed();
+    }else{
+        emit nextConnectState();
+    }
 }
 
