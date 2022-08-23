@@ -31,7 +31,7 @@ public:
     void applyCeVoltage(QString ip, int voltage);
 
 signals:
-    void ceVoltageReceived();
+    void ceVoltageReceived(bool success);
 
 public slots:
     void onConnected();
@@ -44,6 +44,7 @@ private:
     QString ip;
     bool isConnected = false;
     int _voltage;
+    QByteArray response;
 
 };
 

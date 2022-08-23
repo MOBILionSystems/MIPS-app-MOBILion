@@ -97,6 +97,8 @@ private slots:
 
     void runMafTimingTable();
 
+    void onCeVoltageReceived(bool success);
+
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
    // panel. So need to use signal and slot like runScript()

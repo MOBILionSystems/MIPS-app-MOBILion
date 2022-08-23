@@ -23,6 +23,7 @@ AutoTrend::AutoTrend(QWidget *parent) :
     connect(ping, SIGNAL(readyReadStandardOutput()), SLOT(readResult()));
 
     _qtofClient = new QtofAddonClient(this);
+    connect(_qtofClient, &QtofAddonClient::ceVoltageReceived, this, &AutoTrend::onCeVoltageReceived);
 
     engine = new QScriptEngine(this);
     mips = engine->newQObject(parent);
@@ -254,7 +255,7 @@ void AutoTrend::buildTrendSM()
     startAcqState->addTransition(this, &AutoTrend::nextMafState, mafCEVoltageState);
 
     connect(mafCEVoltageState, &QState::entered, this, &AutoTrend::applyMafCeVoltage);
-    mafCEVoltageState->addTransition(_qtofClient, &QtofAddonClient::ceVoltageReceived, mafTimingTableState);
+    mafCEVoltageState->addTransition(this, &AutoTrend::nextMafState, mafTimingTableState);
     mafCEVoltageState->addTransition(this, &AutoTrend::doneMafState, stopAcqState);
 
     connect(mafTimingTableState, &QState::entered, this, &AutoTrend::runMafTimingTable);
@@ -673,5 +674,15 @@ void AutoTrend::runMafTimingTable()
     qDebug() << "runMafTimingTable";
     _mafCurrentCycle++;
     emit nextMafState();
+}
+
+void AutoTrend::onCeVoltageReceived(bool success)
+{
+    if(success){
+        QTimer::singleShot(1000, [=](){emit nextMafState();});
+    }else{
+        QMessageBox::warning(this, "Warning", "Failed to apply CE voltage.");
+        emit doneMafState();
+    }
 }
 

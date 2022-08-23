@@ -16,6 +16,7 @@ int32_t float_to_fixedpoint(float value){
 
 void QtofAddonClient::applyCeVoltage(QString ip, int voltage)
 {
+    response.clear();
     _voltage = voltage;
     socket = new QTcpSocket(this);
 
@@ -33,6 +34,7 @@ void QtofAddonClient::applyCeVoltage(QString ip, int voltage)
     if(!socket->waitForConnected(5000))
     {
         qDebug() << "Error: " << socket->errorString();
+        emit ceVoltageReceived(false);
     }
 }
 
@@ -66,12 +68,24 @@ void QtofAddonClient::onConnected()
             socket->write((const char*)buffer, chunk_size);
         }
     }
-    QTimer::singleShot(1000, [=](){emit ceVoltageReceived();});
 }
 
 void QtofAddonClient::onDisconnected()
 {
     qDebug() << "disconnected...";
+
+    QByteArray statusArray = response.left(2);
+    qDebug() << "status: " << statusArray;
+
+    response.remove(0, 2);
+    QString description(response);
+    qDebug() << "description: " << description;
+    if(description.contains("Collision Profile received, processing")){
+        emit ceVoltageReceived(true);
+    }else{
+        emit ceVoltageReceived(false);
+    }
+    response.clear();
 }
 
 void QtofAddonClient::onBytesWritten(qint64 bytes)
@@ -82,7 +96,9 @@ void QtofAddonClient::onBytesWritten(qint64 bytes)
 void QtofAddonClient::onReadyRead()
 {
     qDebug() << "reading...";
-    // read the data from the socket
-    qDebug() << socket->readAll();
+
+    QByteArray thisResponse = socket->readAll();
+    if(!thisResponse.isEmpty())
+        response.append(thisResponse);
 }
 
