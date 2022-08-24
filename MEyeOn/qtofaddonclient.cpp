@@ -16,6 +16,7 @@ int32_t float_to_fixedpoint(float value){
 
 void QtofAddonClient::applyCeVoltage(QString ip, int voltage)
 {
+    qDebug() << ip << ", " << voltage;
     response.clear();
     _voltage = voltage;
     socket = new QTcpSocket(this);

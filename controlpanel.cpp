@@ -3016,22 +3016,23 @@ void AutoTrendButton::Show()
 
 void AutoTrendButton::atbPressed()
 {
-    if(!autotrend2)
-        autotrend2 = new AutoTrend(this);
+    if(!autotrendA2RAD)
+        autotrendA2RAD = new AutoTrend(this);
 
     if(!autoTrendDialog){
         autoTrendDialog = new QDialog(this);
         autoTrendDialog->setFixedSize(720, 520);
         QHBoxLayout *HLayout = new QHBoxLayout(autoTrendDialog);
-        HLayout->addWidget (autotrend2);
+        HLayout->addWidget (autotrendA2RAD);
         autoTrendDialog->setLayout (HLayout);
     }
-    connect(autotrend2, &AutoTrend::runScript, this, &AutoTrendButton::onRunScript);
+    connect(autotrendA2RAD, &AutoTrend::runScript, this, &AutoTrendButton::onRunScript);
 
     autoTrendDialog->show();
 }
 
 void AutoTrendButton::onRunScript(QString s)
 {
-    engine->evaluate(s); //QString("mips.Command(\"MIPS-2 TG.Trigger\")")
+    QScriptValue response = engine->evaluate(s); //QString("mips.Command(\"MIPS-2 TG.Trigger\")")
+    autotrendA2RAD->updateScriptValue(response);
 }

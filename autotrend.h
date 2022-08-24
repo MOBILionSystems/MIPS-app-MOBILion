@@ -35,6 +35,8 @@ public:
     explicit AutoTrend(QWidget *parent = nullptr);
     ~AutoTrend();
 
+    void updateScriptValue(QScriptValue v);
+
 signals:
     void nextAcqState();        // signal for autotrend
     void nextConnectState();
@@ -123,10 +125,11 @@ private:
     QStringList relationList;
     QString fileFolder;
     QtofAddonClient* _qtofClient;
+    QScriptValue scriptValue;
 
 
-    int _mafTotalCycle = 3;
-    int _mafCurrentCycle = 1;
+    int _mafTotalCycle = 1;
+    int _mafCurrentCycle = 0;
     bool _maf = false;
     int _ceVol = 50;
     bool singleShot = false;

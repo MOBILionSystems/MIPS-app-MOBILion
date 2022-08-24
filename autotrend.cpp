@@ -211,7 +211,12 @@ void AutoTrend::buildTrendSM()
 
         _maf = ui->mafCheckBox->isChecked();
         if(_maf){
-            _mafCurrentCycle = 1;
+            emit runScript("mips.Command(\"IMS.Cycles\")");
+            _mafTotalCycle = scriptValue.toInteger();
+            emit runScript("mips.Command(\"IMS.Abort\")");
+            emit runScript("mips.Command(\"IMS.Cycles=1\")");
+            emit runScript("mips.Command(\"IMS.Apply\")");
+            _mafCurrentCycle = 0;
             _ceVol = ui->ceVlineEdit->text().toInt();
         }
         if(singleShot)
@@ -662,18 +667,29 @@ void AutoTrend::onConfigureAckNack(AckNack response)
 
 void AutoTrend::applyMafCeVoltage()
 {
+    _mafCurrentCycle++;
     qDebug() << "mafCurrentCycle: " << _mafCurrentCycle;
-    if(_mafCurrentCycle <= _mafTotalCycle)
-        _qtofClient->applyCeVoltage(_sbcIpAddress, 50);
-    else
+    if(_mafCurrentCycle <= _mafTotalCycle){
+        _qtofClient->applyCeVoltage(_sbcIpAddress, _mafCurrentCycle % 2 == 1 ? 0 : _ceVol);
+    }
+    else{
+        emit runScript(QString("mips.Command(\"IMS.Cycles=%1\")").arg(_mafTotalCycle));
+        emit runScript("mips.Command(\"IMS.Abort\")");
+        emit runScript("mips.Command(\"IMS.Apply\")");
         emit doneMafState();
+    }
 }
 
 void AutoTrend::runMafTimingTable()
 {
     qDebug() << "runMafTimingTable";
-    _mafCurrentCycle++;
-    emit nextMafState();
+    emit runScript("mips.Command(\"MIPS-2 TG.Trigger\")");
+    emit runScript("mips.Command(\"MIPS-1 TG.Trigger\")");
+    for(int i = 0; i < 10; i++){
+        qDebug() << "Are you done for timing table?";
+    }
+    qDebug() << "I am done";
+    QTimer::singleShot(1000, [=](){emit nextMafState();});
 }
 
 void AutoTrend::onCeVoltageReceived(bool success)
@@ -684,5 +700,10 @@ void AutoTrend::onCeVoltageReceived(bool success)
         QMessageBox::warning(this, "Warning", "Failed to apply CE voltage.");
         emit doneMafState();
     }
+}
+
+void AutoTrend::updateScriptValue(QScriptValue v)
+{
+    scriptValue = v;
 }
 
