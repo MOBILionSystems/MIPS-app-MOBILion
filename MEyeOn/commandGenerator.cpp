@@ -21,7 +21,7 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-self-trigger-enable", QJsonValue("0")},
     {"adc-self-trigger-frequency", QJsonValue("10000.000000")},
     {"adc-self-trigger-polarity", QJsonValue("1")},
-    {"adc-trigger-level", QJsonValue("2.5")},
+    {"adc-trigger-level", QJsonValue("1.25")},          // 1.25 is for A2RAD without peak split
     {"adc-trigger-polarity", QJsonValue("1")},
     {"adc-zero-value", QJsonValue("-31456")},
     {"adc-zs-hysteresis", QJsonValue("100")},
