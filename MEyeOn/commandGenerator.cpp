@@ -70,13 +70,16 @@ QHash<QString, QJsonValue> CommandGenerator::frmMap{
     {"frm-polarity", QJsonValue("Negative")}
 };
 
+QString CommandGenerator::ceProfile = "[{\"number_of_frames\": 1, \"frame_profile\": {\"interval_ms\": 1.0, \"setpoints\": [{\"interval_count\": 1, \"collision_energy_v\": 0.0}]}}, "
+                                      "{\"number_of_frames\": 1, \"frame_profile\": {\"interval_ms\": 1.0, \"setpoints\": [{\"interval_count\": 1, \"collision_energy_v\": 30.0}]}}]";
+
 CommandGenerator::CommandGenerator(QObject *parent)
     : QObject{parent}
 {
 
 }
 
-QJsonObject CommandGenerator::getCommand(CommandType type, QString fileName)
+QJsonObject CommandGenerator::getCommand(CommandType type, QString fileName, bool maf, int ceVoltage)
 {
     QJsonObject command;
     initCommand(command);
@@ -85,7 +88,7 @@ QJsonObject CommandGenerator::getCommand(CommandType type, QString fileName)
         updateInitDigtizerCommand(command);
         break;
     case CommandType::Start_Acquisition:
-        updateStartAcqCommand(command, fileName);
+        updateStartAcqCommand(command, fileName, maf, ceVoltage);
         break;
     case CommandType::Stop_Acquisition:
         updateStopAcqCommand(command);
@@ -118,7 +121,7 @@ void CommandGenerator::updateInitDigtizerCommand(QJsonObject &command)
     command.insert("data", initDigitizer);
 }
 
-void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileName)
+void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileName, bool maf, int ceVoltage)
 {
     talismanUUID = getUUID();
 
@@ -177,6 +180,11 @@ void CommandGenerator::updateStartAcqCommand(QJsonObject &command, QString fileN
     while(acq != acqMap.constEnd()){
         global.insert(acq.key(), acq.value());
         acq++;
+    }
+
+    if(maf){
+       ceProfile.replace("30.0", QString::number(ceVoltage));
+       global.insert("ce-profile", ceProfile);
     }
 
     data.insert("global", global);

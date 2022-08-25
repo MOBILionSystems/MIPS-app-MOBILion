@@ -136,7 +136,7 @@ private:
     int _mafTotalCycle = 1;
     int _mafCurrentCycle = 0;
     bool _maf = false;
-    int _ceVol = 50;
+    int _ceVol = 30;
     bool singleShot = false;
     QString trendName;
     int trendFrom = 0;

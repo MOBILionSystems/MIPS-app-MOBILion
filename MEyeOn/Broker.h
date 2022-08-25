@@ -51,7 +51,7 @@ public:
     ~Broker();
 
     void initDigitizer();
-    void startAcquire(QString fileName);
+    void startAcquire(QString fileName, bool maf = false, int ceVoltage = 30);
     void stopAcquire();
     bool isAcqiring();
     AckNack getAck(QString sequence, QString service, QString command);

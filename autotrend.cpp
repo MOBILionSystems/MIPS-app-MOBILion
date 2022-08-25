@@ -260,7 +260,7 @@ void AutoTrend::buildTrendSM()
         qDebug() << "startAcqState";
         _streamerClient->resetFrameIndex();
         _broker->updateInfo("frm-polarity", ui->polarityComboBox->currentText());
-        _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi");
+        _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi", _maf, _ceVol);
     });
     startAcqState->addTransition(this, &AutoTrend::nextAcqState, startTimingTableState);
     startAcqState->addTransition(this, &AutoTrend::nextMafState, mafCEVoltageState);
@@ -699,7 +699,7 @@ void AutoTrend::runMafTimingTable()
 void AutoTrend::onCeVoltageReceived(bool success)
 {
     if(success){
-        QTimer::singleShot(1000, [=](){emit nextMafState();});
+        QTimer::singleShot(100, this, [=](){emit nextMafState();});
     }else{
         QMessageBox::warning(this, "Warning", "Failed to apply CE voltage.");
         emit failMafState();

@@ -65,7 +65,7 @@ void Broker::initDigitizer()
     }
 }
 
-void Broker::startAcquire(QString fileName)
+void Broker::startAcquire(QString fileName, bool maf, int ceVoltage)
 {
     if(startedAcquire){
         stopAcquire();
@@ -73,7 +73,7 @@ void Broker::startAcquire(QString fileName)
     }
 
     QString dest = "ACORN-CMD";
-    QJsonObject commandObject = commandGen.getCommand(CommandType::Start_Acquisition, fileName);
+    QJsonObject commandObject = commandGen.getCommand(CommandType::Start_Acquisition, fileName, maf, ceVoltage);
     std::string payload = QJsonDocument(commandObject).toJson(QJsonDocument::JsonFormat::Compact).toStdString();
     char* payload_c = const_cast<char*>(payload.c_str());
     RdKafka::ErrorCode resp = _cmdProducer->produce(dest.toStdString(), RdKafka::Topic::PARTITION_UA, RdKafka::Producer::RK_MSG_COPY,

@@ -12,7 +12,7 @@ class CommandGenerator : public QObject
     Q_OBJECT
 public:
     explicit CommandGenerator(QObject *parent = nullptr);
-    QJsonObject getCommand(CommandType type, QString fileName = "");
+    QJsonObject getCommand(CommandType type, QString fileName = "", bool maf = false, int ceVoltage = 30);
     static QString getUUID();
     QString currentTalismanUUID() const;
     unsigned int lastUsedSequency() const;
@@ -21,6 +21,7 @@ public:
     static QHash<QString, QJsonValue> usrMap;
     static QHash<QString, QJsonValue> acqMap;
     static QHash<QString, QJsonValue> frmMap;
+    static QString ceProfile;
 
     void updateInfo(QString key, QString value);
 
@@ -32,7 +33,7 @@ private:
     unsigned int sequence = 1;
     void initCommand(QJsonObject& command);
     void updateInitDigtizerCommand(QJsonObject& command);
-    void updateStartAcqCommand(QJsonObject& command, QString fileName);
+    void updateStartAcqCommand(QJsonObject& command, QString fileName, bool maf, int ceVoltage);
     void updateStopAcqCommand(QJsonObject& command);
 };
 
