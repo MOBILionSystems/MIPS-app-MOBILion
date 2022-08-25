@@ -19,6 +19,7 @@ AutoTrend::AutoTrend(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AutoTrend)
 {
+    qDebug() << "AutoTrend created";
     tbMonitorTimer = new QTimer(this);
     tbMonitorTimer->setInterval(100);
     connect(tbMonitorTimer, &QTimer::timeout, this, &AutoTrend::onTBTimerTimeout);
@@ -49,6 +50,7 @@ AutoTrend::AutoTrend(QWidget *parent) :
 
 AutoTrend::~AutoTrend()
 {
+    qDebug() << "AutoTrend destroyed";
     delete ui;
     if(trendSM->isRunning()){
         qWarning() << "Trend state machine is still running when AutoTrend is destroied.";
@@ -216,7 +218,7 @@ void AutoTrend::buildTrendSM()
         _maf = ui->mafCheckBox->isChecked();
         if(_maf){
             emit runCommand("IMS.Cycles");
-            _mafTotalCycle = scriptValue.toInt();
+            _mafTotalCycle = cpResponse.toInt();
             emit runCommand("IMS.Abort");
             emit runCommand("IMS.Cycles=1");
             emit runCommand("IMS.Apply");
@@ -255,7 +257,7 @@ void AutoTrend::buildTrendSM()
     waitBeforeAcqState->addTransition(this, &AutoTrend::nextAcqState, startAcqState);
 
     connect(startAcqState, &QState::entered, this, [=](){
-         qDebug() << "startAcqState";
+        qDebug() << "startAcqState";
         _streamerClient->resetFrameIndex();
         _broker->updateInfo("frm-polarity", ui->polarityComboBox->currentText());
         _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi");
@@ -273,7 +275,7 @@ void AutoTrend::buildTrendSM()
     mafTimingTableState->addTransition(this, &AutoTrend::failMafState, stopAcqState);
 
     connect(startTimingTableState, &QState::entered, this, [=](){
-        // qDebug() << "startTimingTableState";
+        qDebug() << "startTimingTableState";
         emit runCommand("MIPS-2 TG.Trigger");
         emit runCommand("MIPS-1 TG.Trigger");
         emit nextAcqState();
@@ -284,7 +286,7 @@ void AutoTrend::buildTrendSM()
     waitDuringAcqState->addTransition(this, &AutoTrend::nextAcqState, stopAcqState);
 
     connect(stopAcqState, &QState::entered, this, [=](){
-         qDebug() << "stopAcqState";
+        qDebug() << "stopAcqState";
         _broker->stopAcquire();
         QTimer::singleShot(3000, this, [=](){if(singleShot) emit nextForSingleShot(); else emit nextAcqState();});
     }); // add delay for wifi communication and data processing
@@ -632,12 +634,6 @@ void AutoTrend::on_singleShotButton_clicked()
 
 void AutoTrend::on_loadMsCalibrationButton_clicked()
 {
-//    emit runCommand("IMS.Cycles");
-//    emit runCommand("IMS.Cycles=3");
-//    emit runCommand("IMS.Cycles");
-    emit sendMess("MIPS-1", "﻿TBLABRT\n");
-    return;
-    //
     QString filter = "MBI File (*.mbi);; All File (*.*)";
     QString file_name = QFileDialog::getOpenFileName(this, "Open file", QDir::homePath(), filter);
     if(file_name.isEmpty()){
@@ -712,24 +708,23 @@ void AutoTrend::onCeVoltageReceived(bool success)
 
 void AutoTrend::onTBTimerTimeout()
 {
-    //emit runScript("mips.SendMess(\"MIPS-1\",\"GTBLSTA\n\")");
-    if(scriptValue.contains("error", Qt::CaseInsensitive)){
-        qDebug() << scriptValue;
+    emit sendMess("MIPS-1","GTBLSTA\n");
+    if(cpResponse.contains("IDLE", Qt::CaseInsensitive) ||
+            cpResponse.contains("ABORTED", Qt::CaseInsensitive)){
+        tbMonitorTimer->stop();
+        emit nextMafState();
+    }else if(cpResponse.contains("TRIGGERED", Qt::CaseInsensitive)){
+        return;
+    }else{
         QMessageBox::warning(this, "Warning", "Got error from MIPS-1 for timing table.");
         tbMonitorTimer->stop();
         emit failMafState();
-    }else{
-        QString scriptString = scriptValue.trimmed();
-        qDebug() << "scriptString: " << scriptString;
-        if(scriptString == "IDLE" || scriptString == "ABORTED"){
-            tbMonitorTimer->stop();
-            emit nextMafState();
-        }
     }
 }
 
+
 void AutoTrend::updateScriptValue(QString v)
 {
-    scriptValue = v;
+    cpResponse = v;
 }
 

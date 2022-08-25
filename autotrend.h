@@ -130,7 +130,7 @@ private:
     QStringList relationList;
     QString fileFolder;
     QtofAddonClient* _qtofClient;
-    QString scriptValue;
+    QString cpResponse;
 
 
     int _mafTotalCycle = 1;
