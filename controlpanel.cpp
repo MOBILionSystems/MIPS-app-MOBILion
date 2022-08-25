@@ -3016,8 +3016,10 @@ void AutoTrendButton::Show()
 
 void AutoTrendButton::atbPressed()
 {
-    if(!autotrend2)
+    if(!autotrend2){
         autotrend2 = new AutoTrend(this);
+        connect(autotrend2, &AutoTrend::runScript, this, &AutoTrendButton::onRunScript);
+    }
 
     if(!autoTrendDialog){
         autoTrendDialog = new QDialog(this);
@@ -3026,7 +3028,6 @@ void AutoTrendButton::atbPressed()
         HLayout->addWidget (autotrend2);
         autoTrendDialog->setLayout (HLayout);
     }
-    connect(autotrend2, &AutoTrend::runScript, this, &AutoTrendButton::onRunScript);
 
     autoTrendDialog->show();
 }
