@@ -2994,7 +2994,7 @@ QString StatusLight::ProcessCommand(QString cmd)
 }
 
 
-AutoTrendButton::AutoTrendButton(QWidget *parent, QString name, int x, int y)
+AutoTrendButton::AutoTrendButton(ControlPanel *parent, QString name, int x, int y)
 {
     p      = parent;
     Title  = name;
@@ -3026,13 +3026,23 @@ void AutoTrendButton::atbPressed()
         HLayout->addWidget (autotrendA2RAD);
         autoTrendDialog->setLayout (HLayout);
     }
-    connect(autotrendA2RAD, &AutoTrend::runScript, this, &AutoTrendButton::onRunScript);
-
+    connect(autotrendA2RAD, &AutoTrend::runCommand, this, &AutoTrendButton::onRunCommand);
+    connect(autotrendA2RAD, &AutoTrend::sendMess, this, &AutoTrendButton::onSendMess);
     autoTrendDialog->show();
 }
 
-void AutoTrendButton::onRunScript(QString s)
+void AutoTrendButton::onRunCommand(QString s)
 {
-    QScriptValue response = engine->evaluate(s); //QString("mips.Command(\"MIPS-2 TG.Trigger\")")
+    QString response = p->Command(s);
+    qDebug() << "script: " << s;
+    qDebug() << "Command response: " << response;
+    autotrendA2RAD->updateScriptValue(response);
+}
+
+void AutoTrendButton::onSendMess(QString toWhom, QString message)
+{
+    QString response = p->SendMess(toWhom, message);
+    qDebug() << toWhom << ", " << message;
+    qDebug() << "Message response: " << response;
     autotrendA2RAD->updateScriptValue(response);
 }

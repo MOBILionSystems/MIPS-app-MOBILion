@@ -20,6 +20,7 @@
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QScriptEngine>
+#include <QTimer>
 
 
 
@@ -35,19 +36,21 @@ public:
     explicit AutoTrend(QWidget *parent = nullptr);
     ~AutoTrend();
 
-    void updateScriptValue(QScriptValue v);
+    void updateScriptValue(QString v);
 
 signals:
     void nextAcqState();        // signal for autotrend
     void nextConnectState();
     void nextMafState();        // signal for maf
     void doneMafState();
+    void failMafState();
     void sbcFailed();
     void goFinishState();
     void doneAllStates();
     void abortTrend();
     void nextForSingleShot();   // signal for nonMAF signal shot
-    void runScript(QString s);
+    void runCommand(QString s);
+    void sendMess(QString toWhom, QString message);
 
 private slots:
 //    void on_initDigitizerButton_clicked();
@@ -101,6 +104,8 @@ private slots:
 
     void onCeVoltageReceived(bool success);
 
+    void onTBTimerTimeout();
+
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
    // panel. So need to use signal and slot like runScript()
@@ -125,7 +130,7 @@ private:
     QStringList relationList;
     QString fileFolder;
     QtofAddonClient* _qtofClient;
-    QScriptValue scriptValue;
+    QString scriptValue;
 
 
     int _mafTotalCycle = 1;
@@ -147,6 +152,7 @@ private:
     bool applyRelations(QString startWith, double startValue);
     void buildTrendSM();
     void buildSbcConnectSM();
+    QTimer* tbMonitorTimer; // Timing table monitor timer
 };
 
 #endif // AUTOTREND_H

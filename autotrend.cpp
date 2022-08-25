@@ -19,6 +19,10 @@ AutoTrend::AutoTrend(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AutoTrend)
 {
+    tbMonitorTimer = new QTimer(this);
+    tbMonitorTimer->setInterval(100);
+    connect(tbMonitorTimer, &QTimer::timeout, this, &AutoTrend::onTBTimerTimeout);
+
     ping = new QProcess(this);
     connect(ping, SIGNAL(readyReadStandardOutput()), SLOT(readResult()));
 
@@ -211,11 +215,11 @@ void AutoTrend::buildTrendSM()
 
         _maf = ui->mafCheckBox->isChecked();
         if(_maf){
-            emit runScript("mips.Command(\"IMS.Cycles\")");
-            _mafTotalCycle = scriptValue.toInteger();
-            emit runScript("mips.Command(\"IMS.Abort\")");
-            emit runScript("mips.Command(\"IMS.Cycles=1\")");
-            emit runScript("mips.Command(\"IMS.Apply\")");
+            emit runCommand("IMS.Cycles");
+            _mafTotalCycle = scriptValue.toInt();
+            emit runCommand("IMS.Abort");
+            emit runCommand("IMS.Cycles=1");
+            emit runCommand("IMS.Apply");
             _mafCurrentCycle = 0;
             _ceVol = ui->ceVlineEdit->text().toInt();
         }
@@ -261,15 +265,17 @@ void AutoTrend::buildTrendSM()
 
     connect(mafCEVoltageState, &QState::entered, this, &AutoTrend::applyMafCeVoltage);
     mafCEVoltageState->addTransition(this, &AutoTrend::nextMafState, mafTimingTableState);
+    mafCEVoltageState->addTransition(this, &AutoTrend::failMafState, stopAcqState);
     mafCEVoltageState->addTransition(this, &AutoTrend::doneMafState, stopAcqState);
 
     connect(mafTimingTableState, &QState::entered, this, &AutoTrend::runMafTimingTable);
     mafTimingTableState->addTransition(this, &AutoTrend::nextMafState, mafCEVoltageState);
+    mafTimingTableState->addTransition(this, &AutoTrend::failMafState, stopAcqState);
 
     connect(startTimingTableState, &QState::entered, this, [=](){
         // qDebug() << "startTimingTableState";
-        emit runScript(QString("mips.Command(\"MIPS-2 TG.Trigger\")"));
-        emit runScript(QString("mips.Command(\"MIPS-1 TG.Trigger\")"));
+        emit runCommand("MIPS-2 TG.Trigger");
+        emit runCommand("MIPS-1 TG.Trigger");
         emit nextAcqState();
     });
     startTimingTableState->addTransition(this, &AutoTrend::nextAcqState, waitDuringAcqState);
@@ -626,6 +632,12 @@ void AutoTrend::on_singleShotButton_clicked()
 
 void AutoTrend::on_loadMsCalibrationButton_clicked()
 {
+//    emit runCommand("IMS.Cycles");
+//    emit runCommand("IMS.Cycles=3");
+//    emit runCommand("IMS.Cycles");
+    emit sendMess("MIPS-1", "﻿TBLABRT\n");
+    return;
+    //
     QString filter = "MBI File (*.mbi);; All File (*.*)";
     QString file_name = QFileDialog::getOpenFileName(this, "Open file", QDir::homePath(), filter);
     if(file_name.isEmpty()){
@@ -673,9 +685,9 @@ void AutoTrend::applyMafCeVoltage()
         _qtofClient->applyCeVoltage(_sbcIpAddress, _mafCurrentCycle % 2 == 1 ? 0 : _ceVol);
     }
     else{
-        emit runScript(QString("mips.Command(\"IMS.Cycles=%1\")").arg(_mafTotalCycle));
-        emit runScript("mips.Command(\"IMS.Abort\")");
-        emit runScript("mips.Command(\"IMS.Apply\")");
+        emit runCommand(QString("IMS.Cycles=%1").arg(_mafTotalCycle));
+        emit runCommand("IMS.Abort");
+        emit runCommand("IMS.Apply");
         emit doneMafState();
     }
 }
@@ -683,13 +695,9 @@ void AutoTrend::applyMafCeVoltage()
 void AutoTrend::runMafTimingTable()
 {
     qDebug() << "runMafTimingTable";
-    emit runScript("mips.Command(\"MIPS-2 TG.Trigger\")");
-    emit runScript("mips.Command(\"MIPS-1 TG.Trigger\")");
-    for(int i = 0; i < 10; i++){
-        qDebug() << "Are you done for timing table?";
-    }
-    qDebug() << "I am done";
-    QTimer::singleShot(1000, [=](){emit nextMafState();});
+    emit runCommand("MIPS-2 TG.Trigger");
+    emit runCommand("MIPS-1 TG.Trigger");
+    tbMonitorTimer->start();
 }
 
 void AutoTrend::onCeVoltageReceived(bool success)
@@ -698,11 +706,29 @@ void AutoTrend::onCeVoltageReceived(bool success)
         QTimer::singleShot(1000, [=](){emit nextMafState();});
     }else{
         QMessageBox::warning(this, "Warning", "Failed to apply CE voltage.");
-        emit doneMafState();
+        emit failMafState();
     }
 }
 
-void AutoTrend::updateScriptValue(QScriptValue v)
+void AutoTrend::onTBTimerTimeout()
+{
+    //emit runScript("mips.SendMess(\"MIPS-1\",\"GTBLSTA\n\")");
+    if(scriptValue.contains("error", Qt::CaseInsensitive)){
+        qDebug() << scriptValue;
+        QMessageBox::warning(this, "Warning", "Got error from MIPS-1 for timing table.");
+        tbMonitorTimer->stop();
+        emit failMafState();
+    }else{
+        QString scriptString = scriptValue.trimmed();
+        qDebug() << "scriptString: " << scriptString;
+        if(scriptString == "IDLE" || scriptString == "ABORTED"){
+            tbMonitorTimer->stop();
+            emit nextMafState();
+        }
+    }
+}
+
+void AutoTrend::updateScriptValue(QString v)
 {
     scriptValue = v;
 }

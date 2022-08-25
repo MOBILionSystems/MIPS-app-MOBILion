@@ -70,9 +70,9 @@ signals:
     void ShutdownSystem(void);
     void EnableSystem(void);
 public:
-    AutoTrendButton(QWidget *parent, QString name, int x, int y);
+    AutoTrendButton(ControlPanel *parent, QString name, int x, int y);
     void Show(void);
-    QWidget *p;
+    ControlPanel *p;
     QString Title;
     int     X,Y;
 private:
@@ -84,7 +84,8 @@ private:
 
 private slots:
     void atbPressed(void);
-    void onRunScript(QString s);
+    void onRunCommand(QString s);
+    void onSendMess(QString toWhom, QString message);
 };
 
 
