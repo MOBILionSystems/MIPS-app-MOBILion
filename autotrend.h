@@ -100,7 +100,7 @@ private slots:
 
     void applyMafCeVoltage();
 
-    void runMafTimingTable();
+    void runTimingTable();
 
     void onCeVoltageReceived(bool success);
 
@@ -142,7 +142,6 @@ private:
     int trendFrom = 0;
     int trendTo = 0;
     int trendStepSize = 1;
-    int stepDuration = 1;
     int currentStep = 0;
     bool relationEnabled = false;
     bool toStopTrend = false;

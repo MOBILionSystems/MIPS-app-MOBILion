@@ -452,20 +452,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Acquiration (ms):</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="singleDurationLineEdit">
-   <property name="geometry">
-    <rect>
-     <x>120</x>
-     <y>90</y>
-     <width>81</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>1000</string>
+    <string>Polarity</string>
    </property>
   </widget>
   <widget class="QPushButton" name="loadMsCalibrationButton">
@@ -484,19 +471,19 @@
   <widget class="QComboBox" name="polarityComboBox">
    <property name="geometry">
     <rect>
-     <x>220</x>
-     <y>90</y>
+     <x>70</x>
+     <y>100</y>
      <width>81</width>
-     <height>31</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
   <widget class="QCheckBox" name="mafCheckBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>21</x>
      <y>130</y>
-     <width>77</width>
+     <width>70</width>
      <height>22</height>
     </rect>
    </property>
