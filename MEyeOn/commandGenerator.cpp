@@ -15,7 +15,7 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-offset", QJsonValue("0.24")},
     {"adc-pulse-threshold", QJsonValue("200")},
     {"adc-range", QJsonValue("0.5")},
-    {"adc-record-size", QJsonValue("320000")},
+    {"adc-record-size", QJsonValue("280000")},
     {"adc-sample-rate", QJsonValue("2.0e+09")},
     {"adc-self-trigger-duty-cycle", QJsonValue("10.000000")},
     {"adc-self-trigger-enable", QJsonValue("0")},
@@ -27,7 +27,9 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-zs-hysteresis", QJsonValue("100")},
     {"adc-zs-postgate-samples", QJsonValue("0")},
     {"adc-zs-pregate-samples", QJsonValue("0")},
-    {"adc-zs-threshold", QJsonValue("-29706")}
+    {"adc-zs-threshold", QJsonValue("-29706")},
+    {"adc-rtb-mode-enable", QJsonValue("0")},
+    {"adc-avg-mode-enable", QJsonValue("0")}
 };
 
 QHash<QString, QJsonValue> CommandGenerator::smpMap{

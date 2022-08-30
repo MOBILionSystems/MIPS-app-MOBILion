@@ -728,3 +728,10 @@ void AutoTrend::updateScriptValue(QString v)
     cpResponse = v;
 }
 
+
+void AutoTrend::on_rtbCheckBox_stateChanged(int checkState)
+{
+    _broker->updateInfo("adc-avg-mode-enable", QString::number(checkState));
+    on_testSBCButton_clicked();
+}
+

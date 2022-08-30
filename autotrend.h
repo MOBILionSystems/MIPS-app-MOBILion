@@ -106,6 +106,8 @@ private slots:
 
     void onTBTimerTimeout();
 
+    void on_rtbCheckBox_stateChanged(int checkState);
+
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
    // panel. So need to use signal and slot like runScript()
