@@ -4,7 +4,7 @@
 #include "dataprocess.h"
 
 /*
-QTOF Model	m/z Range (amu)	TOF Period (us)	Num Samples (SA220)
+QTOF Model	m/z Range (amu)	TOF Period (us)	Num Samples (SA220) Valid Num Samples (SA220)
 6545        1700            120             233000
 6545        3200            163.5           320000
 6545        10000           288.5           570000
@@ -12,9 +12,9 @@ QTOF Model	m/z Range (amu)	TOF Period (us)	Num Samples (SA220)
 6545XT      3200            163.5           320000
 6545XT      10000           290.5           574000
 6545XT      30000           501             995000
-6546        1700            107             207000
-6546        3200            146             285000
-6546        10000           257.5           508000
+6546        1700            107             207000          200000
+6546        3200            146             285000          280000
+6546        10000           257.5           508000          508000
 */
 
 QHash<QString, QJsonValue> CommandGenerator::adcMap{
@@ -29,7 +29,7 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-offset", QJsonValue("0.24")},
     {"adc-pulse-threshold", QJsonValue("200")},
     {"adc-range", QJsonValue("0.5")},
-    {"adc-record-size", QJsonValue("280000")},          // 285000 for Agilent 6546 and mz range 3200
+    {"adc-record-size", QJsonValue("320000")},          // 285000 for Agilent 6546 and mz range 3200
     {"adc-sample-rate", QJsonValue("2.0e+09")},
     {"adc-self-trigger-duty-cycle", QJsonValue("10.000000")},
     {"adc-self-trigger-enable", QJsonValue("0")},

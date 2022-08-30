@@ -106,6 +106,8 @@ private slots:
 
     void onTBTimerTimeout();
 
+    void on_rangeComboBox_activated(int index);
+
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
    // panel. So need to use signal and slot like runScript()
@@ -127,6 +129,7 @@ private:
     QStringList rfElectrodes = {"SLIM.SLIM Top.Drive", "SLIM.SLIM Bottom.Drive"};
     QStringList twElectrodes = {"SLIM.Seperation.Frequency", "SLIM.Seperation.Amplitude"};
     QStringList polarities = {"Positive", "Negative"};
+    QStringList ranges = {"1700", "3200", "10000"};
     QStringList relationList;
     QString fileFolder;
     QtofAddonClient* _qtofClient;

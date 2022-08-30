@@ -111,6 +111,7 @@ void AutoTrend::initUI()
     ui->dcRadioButton->setChecked(true);
     ui->trendComboBox->addItems(dcElectrodes);
     ui->polarityComboBox->addItems(polarities);
+    ui->rangeComboBox->addItems(ranges);
     ui->relationListView->setModel(relationModel);
     ui->trendFrom->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
@@ -341,6 +342,15 @@ void AutoTrend::buildSbcConnectSM()
         _broker = new Broker(_sbcIpAddress, this);
         connect(_broker, &Broker::acqAckNack, this, &AutoTrend::onAcqAckNack);
         connect(_broker, &Broker::configureAckNack, this, &AutoTrend::onConfigureAckNack);
+        QString range = ui->rangeComboBox->currentText();
+        _broker->updateInfo("adc-mass-spec-range", range);
+        if(range == "1700"){
+            _broker->updateInfo("adc-record-size", "200000");
+        }else if(range == "3200"){
+            _broker->updateInfo("adc-record-size", "280000");
+        }else if(range == "10000"){
+            _broker->updateInfo("adc-record-size", "508000");
+        }
         _broker->initDigitizer();
     });
     configureState->addTransition(this, &AutoTrend::sbcFailed, failState);
@@ -710,5 +720,13 @@ void AutoTrend::onTBTimerTimeout()
 void AutoTrend::updateScriptValue(QString v)
 {
     cpResponse = v;
+}
+
+
+
+void AutoTrend::on_rangeComboBox_activated(int index)
+{
+    if(!_broker) return;    // reconnect when it is already connect
+    on_testSBCButton_clicked();
 }
 
