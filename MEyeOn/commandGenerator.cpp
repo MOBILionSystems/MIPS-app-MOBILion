@@ -29,7 +29,7 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-offset", QJsonValue("0.24")},
     {"adc-pulse-threshold", QJsonValue("200")},
     {"adc-range", QJsonValue("0.5")},
-    {"adc-record-size", QJsonValue("285000")},          // 285000 for Agilent 6546 and mz range 3200
+    {"adc-record-size", QJsonValue("280000")},          // 285000 for Agilent 6546 and mz range 3200
     {"adc-sample-rate", QJsonValue("2.0e+09")},
     {"adc-self-trigger-duty-cycle", QJsonValue("10.000000")},
     {"adc-self-trigger-enable", QJsonValue("0")},
