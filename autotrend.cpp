@@ -345,9 +345,9 @@ void AutoTrend::buildSbcConnectSM()
         QString range = ui->rangeComboBox->currentText();
         _broker->updateInfo("adc-mass-spec-range", range);
         if(range == "1700"){
-            _broker->updateInfo("adc-record-size", "200000");
+            _broker->updateInfo("adc-record-size", "206976");
         }else if(range == "3200"){
-            _broker->updateInfo("adc-record-size", "280000");
+            _broker->updateInfo("adc-record-size", "284992");
         }else if(range == "10000"){
             _broker->updateInfo("adc-record-size", "508000");
         }
