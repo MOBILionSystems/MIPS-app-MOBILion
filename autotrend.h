@@ -100,7 +100,7 @@ private slots:
 
     void applyMafCeVoltage();
 
-    void runMafTimingTable();
+    void runTimingTable();
 
     void onCeVoltageReceived(bool success);
 
@@ -109,6 +109,9 @@ private slots:
     void on_rtbCheckBox_stateChanged(int checkState);
 
     void on_rtbScansLineEdit_editingFinished();
+
+    void on_rangeComboBox_activated(int index);
+
 
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
@@ -131,6 +134,7 @@ private:
     QStringList rfElectrodes = {"SLIM.SLIM Top.Drive", "SLIM.SLIM Bottom.Drive"};
     QStringList twElectrodes = {"SLIM.Seperation.Frequency", "SLIM.Seperation.Amplitude"};
     QStringList polarities = {"Positive", "Negative"};
+    QStringList ranges = {"1700", "3200", "10000"};
     QStringList relationList;
     QString fileFolder;
     QtofAddonClient* _qtofClient;
@@ -146,7 +150,6 @@ private:
     int trendFrom = 0;
     int trendTo = 0;
     int trendStepSize = 1;
-    int stepDuration = 1;
     int currentStep = 0;
     bool relationEnabled = false;
     bool toStopTrend = false;

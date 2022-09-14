@@ -111,6 +111,7 @@ void AutoTrend::initUI()
     ui->dcRadioButton->setChecked(true);
     ui->trendComboBox->addItems(dcElectrodes);
     ui->polarityComboBox->addItems(polarities);
+    ui->rangeComboBox->addItems(ranges);
     ui->relationListView->setModel(relationModel);
     ui->trendFrom->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
@@ -191,11 +192,9 @@ void AutoTrend::buildTrendSM()
     QState* waitBeforeAcqState = new QState(trendSM);
     QState* startAcqState = new QState(trendSM);
 
-    QState* mafCEVoltageState = new QState(trendSM);
-    QState* mafTimingTableState = new QState(trendSM);
+    QState* ceVoltageState = new QState(trendSM);
+    QState* timingTableState = new QState(trendSM);
 
-    QState* startTimingTableState = new QState(trendSM);
-    QState* waitDuringAcqState = new QState(trendSM);
     QState* stopAcqState = new QState(trendSM);
     QState* nextStepState = new QState(trendSM);
     QFinalState* finishState = new QFinalState(trendSM);
@@ -263,28 +262,18 @@ void AutoTrend::buildTrendSM()
         _broker->updateInfo("frm-polarity", ui->polarityComboBox->currentText());
         _broker->startAcquire(fileFolder + "/" + trendName + QString::number(currentStep).remove('.') + ".mbi", _maf, _ceVol);
     });
-    startAcqState->addTransition(this, &AutoTrend::nextAcqState, startTimingTableState);
-    startAcqState->addTransition(this, &AutoTrend::nextMafState, mafCEVoltageState);
+    startAcqState->addTransition(this, &AutoTrend::nextAcqState, timingTableState);
+    startAcqState->addTransition(this, &AutoTrend::nextMafState, ceVoltageState);
 
-    connect(mafCEVoltageState, &QState::entered, this, &AutoTrend::applyMafCeVoltage);
-    mafCEVoltageState->addTransition(this, &AutoTrend::nextMafState, mafTimingTableState);
-    mafCEVoltageState->addTransition(this, &AutoTrend::failMafState, stopAcqState);
-    mafCEVoltageState->addTransition(this, &AutoTrend::doneMafState, stopAcqState);
+    connect(ceVoltageState, &QState::entered, this, &AutoTrend::applyMafCeVoltage);
+    ceVoltageState->addTransition(this, &AutoTrend::nextMafState, timingTableState);
+    ceVoltageState->addTransition(this, &AutoTrend::failMafState, stopAcqState);
+    ceVoltageState->addTransition(this, &AutoTrend::doneMafState, stopAcqState);
 
-    connect(mafTimingTableState, &QState::entered, this, &AutoTrend::runMafTimingTable);
-    mafTimingTableState->addTransition(this, &AutoTrend::nextMafState, mafCEVoltageState);
-    mafTimingTableState->addTransition(this, &AutoTrend::failMafState, stopAcqState);
-
-    connect(startTimingTableState, &QState::entered, this, [=](){
-        qDebug() << "startTimingTableState";
-        emit runCommand("MIPS-2 TG.Trigger");
-        emit runCommand("MIPS-1 TG.Trigger");
-        emit nextAcqState();
-    });
-    startTimingTableState->addTransition(this, &AutoTrend::nextAcqState, waitDuringAcqState);
-
-    connect(waitDuringAcqState, &QState::entered, this, [=](){QTimer::singleShot(stepDuration, this, [=](){emit nextAcqState();});});
-    waitDuringAcqState->addTransition(this, &AutoTrend::nextAcqState, stopAcqState);
+    connect(timingTableState, &QState::entered, this, &AutoTrend::runTimingTable);
+    timingTableState->addTransition(this, &AutoTrend::nextAcqState, stopAcqState);
+    timingTableState->addTransition(this, &AutoTrend::nextMafState, ceVoltageState);
+    timingTableState->addTransition(this, &AutoTrend::failMafState, stopAcqState);
 
     connect(stopAcqState, &QState::entered, this, [=](){
         qDebug() << "stopAcqState";
@@ -354,6 +343,15 @@ void AutoTrend::buildSbcConnectSM()
         _broker = new Broker(_sbcIpAddress, this);
         connect(_broker, &Broker::acqAckNack, this, &AutoTrend::onAcqAckNack);
         connect(_broker, &Broker::configureAckNack, this, &AutoTrend::onConfigureAckNack);
+        QString range = ui->rangeComboBox->currentText();
+        _broker->updateInfo("adc-mass-spec-range", range);
+        if(range == "1700"){
+            _broker->updateInfo("adc-record-size", "206976");
+        }else if(range == "3200"){
+            _broker->updateInfo("adc-record-size", "284992");
+        }else if(range == "10000"){
+            _broker->updateInfo("adc-record-size", "508000");
+        }
         _broker->initDigitizer();
     });
     configureState->addTransition(this, &AutoTrend::sbcFailed, failState);
@@ -414,7 +412,6 @@ void AutoTrend::on_runTrendButton_clicked()
     trendFrom = ui->trendFrom->text().toInt();
     trendTo = ui->trendTo->text().toInt();
     trendStepSize = ui->trendStepSize->text().toInt();
-    stepDuration = ui->trendStepDuration->text().toInt();
     trendSM->start();
 }
 
@@ -611,12 +608,6 @@ void AutoTrend::on_singleShotButton_clicked()
         return;
     }
 
-    if( ui->singleDurationLineEdit->text().isEmpty()){
-        qWarning() << "Empty duraton time for single shot.";
-        QMessageBox::warning(this, "SingleShot Failed", "Invalid settings for duration.");
-        return;
-    }
-
     if(!DataProcess::isNonDefaultMsCalibrationAvailable()){
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Warning", "Shot with default ms calibration?",
@@ -628,7 +619,6 @@ void AutoTrend::on_singleShotButton_clicked()
 
     singleShot = true;
     trendName = "singleShot";
-    stepDuration = ui->singleDurationLineEdit->text().toInt();
     trendSM->start();
 }
 
@@ -689,9 +679,9 @@ void AutoTrend::applyMafCeVoltage()
     }
 }
 
-void AutoTrend::runMafTimingTable()
+void AutoTrend::runTimingTable()
 {
-    qDebug() << "runMafTimingTable";
+    qDebug() << "runTimingTable";
     emit runCommand("MIPS-2 TG.Trigger");
     emit runCommand("MIPS-1 TG.Trigger");
     tbMonitorTimer->start();
@@ -713,7 +703,11 @@ void AutoTrend::onTBTimerTimeout()
     if(cpResponse.contains("IDLE", Qt::CaseInsensitive) ||
             cpResponse.contains("ABORTED", Qt::CaseInsensitive)){
         tbMonitorTimer->stop();
-        emit nextMafState();
+        if(_maf){
+            emit nextMafState();
+        }else{
+            emit nextAcqState();
+        }
     }else if(cpResponse.contains("TRIGGERED", Qt::CaseInsensitive)){
         return;
     }else{
@@ -729,7 +723,6 @@ void AutoTrend::updateScriptValue(QString v)
     cpResponse = v;
 }
 
-
 void AutoTrend::on_rtbCheckBox_stateChanged(int checkState)
 {
     _broker->updateInfo("adc-rtb-mode-enable", checkState > 0 ? "1" : "0");
@@ -741,4 +734,13 @@ void AutoTrend::on_rtbScansLineEdit_editingFinished()
 {
     _broker->updateInfo("adc-rtb-scans", ui->rtbScansLineEdit->text());
 }
+
+
+void AutoTrend::on_rangeComboBox_activated(int index)
+{
+    if(!_broker) return;    // reconnect when it is already connect
+    on_testSBCButton_clicked();
+}
+
+
 
