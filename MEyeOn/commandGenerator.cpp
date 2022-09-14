@@ -5,7 +5,7 @@
 
 QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-baseline-stabilize-enable", QJsonValue("1")},
-    {"adc-channel", QJsonValue("Channel1")},
+    {"adc-channel", QJsonValue("Channel2")},
     {"adc-digital-offset", QJsonValue("-31456")},
     {"adc-driver-rev", QJsonValue("AqMD3-3.6.7279.14 (Acqiris: SA220P)")},
     {"adc-firmware-rev", QJsonValue("Stage1 Version 3.7.173.0, FPGA Firmware Version 3.7.173.69125/AVG.CST.DGT, FE CPLD 1/0.4.0.0")},
@@ -15,13 +15,13 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-offset", QJsonValue("0.24")},
     {"adc-pulse-threshold", QJsonValue("200")},
     {"adc-range", QJsonValue("0.5")},
-    {"adc-record-size", QJsonValue("280000")},
+    {"adc-record-size", QJsonValue("284992")},
     {"adc-sample-rate", QJsonValue("2.0e+09")},
     {"adc-self-trigger-duty-cycle", QJsonValue("10.000000")},
     {"adc-self-trigger-enable", QJsonValue("0")},
     {"adc-self-trigger-frequency", QJsonValue("10000.000000")},
     {"adc-self-trigger-polarity", QJsonValue("1")},
-    {"adc-trigger-level", QJsonValue("1.25")},          // 1.25 is for A2RAD without peak split
+    {"adc-trigger-level", QJsonValue("1.25")},          // 1.25 is for A2RAD (2.5v)
     {"adc-trigger-polarity", QJsonValue("1")},
     {"adc-zero-value", QJsonValue("-31456")},
     {"adc-zs-hysteresis", QJsonValue("100")},
@@ -29,7 +29,8 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-zs-pregate-samples", QJsonValue("0")},
     {"adc-zs-threshold", QJsonValue("-29706")},
     {"adc-rtb-mode-enable", QJsonValue("0")},
-    {"adc-avg-mode-enable", QJsonValue("0")}
+    {"adc-avg-mode-enable", QJsonValue("0")},
+    {"adc-rtb-scans", QJsonValue("4")}
 };
 
 QHash<QString, QJsonValue> CommandGenerator::smpMap{

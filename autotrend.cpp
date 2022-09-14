@@ -117,6 +117,7 @@ void AutoTrend::initUI()
     ui->trendStepSize->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendStepDuration->setValidator(new QIntValidator(0, 10000, this));
     ui->ceVlineEdit->setValidator(new QIntValidator(0, 1000, this));
+    ui->rtbScansLineEdit->setValidator(new QIntValidator(4, 100, this));
 
     connect(ui->sbcIPEdit, &QLineEdit::textChanged, this, [=](){
         QLineEdit *sbcIp = ui->sbcIPEdit;
@@ -731,7 +732,13 @@ void AutoTrend::updateScriptValue(QString v)
 
 void AutoTrend::on_rtbCheckBox_stateChanged(int checkState)
 {
-    _broker->updateInfo("adc-avg-mode-enable", QString::number(checkState));
+    _broker->updateInfo("adc-rtb-mode-enable", checkState > 0 ? "1" : "0");
     on_testSBCButton_clicked();
+}
+
+
+void AutoTrend::on_rtbScansLineEdit_editingFinished()
+{
+    _broker->updateInfo("adc-rtb-scans", ui->rtbScansLineEdit->text());
 }
 
