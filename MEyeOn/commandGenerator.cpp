@@ -19,7 +19,7 @@ QTOF Model	m/z Range (amu)	TOF Period (us)	Num Samples (SA220)	Valid Num Samples
 
 QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-baseline-stabilize-enable", QJsonValue("1")},
-    {"adc-channel", QJsonValue("Channel2")},
+    {"adc-channel", QJsonValue("Channel1")},
     {"adc-digital-offset", QJsonValue("-31456")},
     {"adc-driver-rev", QJsonValue("AqMD3-3.6.7279.14 (Acqiris: SA220P)")},
     {"adc-firmware-rev", QJsonValue("Stage1 Version 3.7.173.0, FPGA Firmware Version 3.7.173.69125/AVG.CST.DGT, FE CPLD 1/0.4.0.0")},
