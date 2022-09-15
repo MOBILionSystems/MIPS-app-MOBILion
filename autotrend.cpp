@@ -202,6 +202,11 @@ void AutoTrend::buildTrendSM()
     trendSM->setInitialState(initState);
     connect(initState, &QState::entered, this, [=](){
         // qDebug() << "initState";
+        int scale = 1;
+        if(ui->rtbCheckBox->isChecked()){
+            scale *= ui->rtbScansLineEdit->text().toInt();
+        }
+        DataProcess::setDtPeriod(periods_us.at(ui->rangeComboBox->currentIndex()) * 0.000001 * scale);
         if(trendRealTimeDialog){
             delete trendRealTimeDialog;
             trendRealTimeDialog = new TrendRealTimeDialog(this);
@@ -344,14 +349,15 @@ void AutoTrend::buildSbcConnectSM()
         connect(_broker, &Broker::acqAckNack, this, &AutoTrend::onAcqAckNack);
         connect(_broker, &Broker::configureAckNack, this, &AutoTrend::onConfigureAckNack);
         QString range = ui->rangeComboBox->currentText();
-        _broker->updateInfo("adc-mass-spec-range", range);
-        if(range == "1700"){
-            _broker->updateInfo("adc-record-size", "206976");
-        }else if(range == "3200"){
-            _broker->updateInfo("adc-record-size", "284992");
-        }else if(range == "10000"){
-            _broker->updateInfo("adc-record-size", "508000");
+        int index = ui->rangeComboBox->currentIndex();
+        QStringList rangeList = range.split("(");
+        if(rangeList.size() < 2 || !rangeList.at(1).contains("m/z)")){
+            QMessageBox::warning(this, "Warning", "Invalid QTOF and range.");
+            emit sbcFailed();
+            return;
         }
+        _broker->updateInfo("adc-mass-spec-range", rangeList[1].replace("m/z)", "").trimmed());
+        _broker->updateInfo("adc-record-size", recordSize[index]);
         _broker->initDigitizer();
     });
     configureState->addTransition(this, &AutoTrend::sbcFailed, failState);
@@ -726,20 +732,12 @@ void AutoTrend::updateScriptValue(QString v)
 void AutoTrend::on_rtbCheckBox_stateChanged(int checkState)
 {
     _broker->updateInfo("adc-rtb-mode-enable", checkState > 0 ? "1" : "0");
-    on_testSBCButton_clicked();
 }
 
 
 void AutoTrend::on_rtbScansLineEdit_editingFinished()
 {
     _broker->updateInfo("adc-rtb-scans", ui->rtbScansLineEdit->text());
-}
-
-
-void AutoTrend::on_rangeComboBox_activated(int index)
-{
-    if(!_broker) return;    // reconnect when it is already connect
-    on_testSBCButton_clicked();
 }
 
 

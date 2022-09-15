@@ -110,8 +110,6 @@ private slots:
 
     void on_rtbScansLineEdit_editingFinished();
 
-    void on_rangeComboBox_activated(int index);
-
 
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
@@ -134,7 +132,21 @@ private:
     QStringList rfElectrodes = {"SLIM.SLIM Top.Drive", "SLIM.SLIM Bottom.Drive"};
     QStringList twElectrodes = {"SLIM.Seperation.Frequency", "SLIM.Seperation.Amplitude"};
     QStringList polarities = {"Positive", "Negative"};
-    QStringList ranges = {"1700", "3200", "10000"};
+    QStringList ranges = {"None",
+                          "6545(1700m/z)", "6545(3200m/z)", "6545(10000m/z)",
+                          "6545XT(1700m/z)", "6545XT(3200m/z)", "6545XT(10000m/z)", "6545XT(30000m/z)",
+                          "6546(1700m/z)", "6546(3200m/z)", "6546(10000m/z)",
+                          "6230(1700m/z)", "6230(3200m/z)", "6230(20000m/z)"};
+    QStringList recordSize = {"320000",
+                             "232992", "320000", "569984",
+                             "232992", "320000", "573984", "994976",
+                             "206976", "284992", "508000",
+                             "320000", "320000", "320000"}; // Todo update later
+    QVector<double> periods_us = {163.5,
+                              120, 163.5, 288.5,
+                              120, 163.5, 290.5, 501,
+                              107, 146, 257.5,
+                              163.5, 163.5, 163.5}; // Todo update later
     QStringList relationList;
     QString fileFolder;
     QtofAddonClient* _qtofClient;

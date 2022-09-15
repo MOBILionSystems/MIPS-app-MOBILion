@@ -212,14 +212,14 @@
   <widget class="QPushButton" name="testSBCButton">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>170</x>
      <y>50</y>
      <width>131</width>
      <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string>Connect to SBC</string>
+    <string>Connect and Configure</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="sbcIPEdit">
@@ -459,7 +459,7 @@
    <property name="geometry">
     <rect>
      <x>170</x>
-     <y>50</y>
+     <y>90</y>
      <width>131</width>
      <height>31</height>
     </rect>
@@ -546,9 +546,9 @@
   <widget class="QComboBox" name="rangeComboBox">
    <property name="geometry">
     <rect>
-     <x>221</x>
-     <y>97</y>
-     <width>81</width>
+     <x>20</x>
+     <y>56</y>
+     <width>131</width>
      <height>20</height>
     </rect>
    </property>
