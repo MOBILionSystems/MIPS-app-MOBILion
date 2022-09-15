@@ -25,9 +25,10 @@ public:
 
     constexpr static double SLOPE_DEFAULT = 0.3458234001095313;
     constexpr static double INTERCEPT_DEFAULT = 0.09326905279715753;
-    constexpr static double FRM_DT_PERIOD = 0.2925275; // period of trigger from QTOF
+    static double frm_dt_period; // period of trigger from QTOF
     static const QVector<double> RESIDULE_DEFAULT;
     static QString getResidule();
+    static void setDtPeriod(double dt);
 
     static bool isNonDefaultMsCalibrationAvailable();
     static QString msCalibration;

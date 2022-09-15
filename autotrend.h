@@ -106,7 +106,12 @@ private slots:
 
     void onTBTimerTimeout();
 
+    void on_rtbCheckBox_stateChanged(int checkState);
+
+    void on_rtbScansLineEdit_editingFinished();
+
     void on_rangeComboBox_activated(int index);
+
 
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
