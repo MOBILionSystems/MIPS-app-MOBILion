@@ -690,7 +690,11 @@ void AutoTrend::runTimingTable()
     qDebug() << "runTimingTable";
     emit runCommand("MIPS-2 TG.Trigger");
     emit runCommand("MIPS-1 TG.Trigger");
-    tbMonitorTimer->start();
+    if(test1s){
+        QTimer::singleShot(1000, this, [=](){emit nextAcqState();});
+    }else{
+        tbMonitorTimer->start();
+    }
 }
 
 void AutoTrend::onCeVoltageReceived(bool success)
