@@ -130,7 +130,7 @@ private:
     QStringListModel* rightValueModel;
     QStringList dcElectrodes = {"Funnel.NIF IN", "Funnel.NIF OUT", "Funnel.NIF CL", "Funnel.SLIMvolBias"};
     QStringList rfElectrodes = {"SLIM.SLIM Top.Drive", "SLIM.SLIM Bottom.Drive"};
-    QStringList twElectrodes = {"SLIM.Seperation.Frequency", "SLIM.Seperation.Amplitude"};
+    QStringList twElectrodes = {"Seperation TW.Frequency", "Seperation TW.Amplitude"};
     QStringList polarities = {"Positive", "Negative"};
     QStringList ranges = {"None",
                           "6545(1700m/z)", "6545(3200m/z)", "6545(10000m/z)",
@@ -174,6 +174,7 @@ private:
     QTimer* tbMonitorTimer; // Timing table monitor timer
 
     bool test1s = true;
+    void updateTrendCurrentValue(QString s = "");
 };
 
 #endif // AUTOTREND_H

@@ -3034,7 +3034,7 @@ void AutoTrendButton::atbPressed()
 
 void AutoTrendButton::onRunCommand(QString s)
 {
-    QString response = p->Command(s);
+    QString response = p->Command(s).trimmed();
     qDebug() << "script: " << s;
     qDebug() << "Command response: " << response;
     autotrendA2RAD->updateScriptValue(response);
@@ -3042,7 +3042,7 @@ void AutoTrendButton::onRunCommand(QString s)
 
 void AutoTrendButton::onSendMess(QString toWhom, QString message)
 {
-    QString response = p->SendMess(toWhom, message);
+    QString response = p->SendMess(toWhom, message).trimmed();
     qDebug() << toWhom << ", " << message;
     qDebug() << "Message response: " << response;
     autotrendA2RAD->updateScriptValue(response);

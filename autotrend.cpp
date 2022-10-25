@@ -128,10 +128,11 @@ void AutoTrend::initUI()
 
 void AutoTrend::updateDCBias(QString name, double value)
 {
-    QString command = QString("mips.Command(\"%1=%2\")").arg(name).arg(value);
-    engine->evaluate(command);
+    emit runCommand(QString("%1=%2").arg(name).arg(value));
     if(name == ui->trendComboBox->currentText()){
-        ui->trendCurrentValue->setText(QString::number(value));
+        updateTrendCurrentValue(QString::number(value));
+    }else{
+        qDebug() << "name != trendComboBox: " << name << ui->trendComboBox->currentText();
     }
 }
 
@@ -382,6 +383,20 @@ void AutoTrend::buildSbcConnectSM()
 
 }
 
+void AutoTrend::updateTrendCurrentValue(QString s)
+{
+    if(!s.isEmpty()){
+        ui->trendCurrentValue->setText(s);
+        return;
+    }
+
+    if(cpResponse.isEmpty() || cpResponse == "?"){
+        ui->trendCurrentValue->setText("None");
+    }else{
+        ui->trendCurrentValue->setText(cpResponse);
+    }
+}
+
 
 void AutoTrend::on_runTrendButton_clicked()
 {
@@ -579,14 +594,10 @@ void AutoTrend::on_trendComboBox_currentTextChanged(const QString &arg1)
     if(arg1.trimmed().isEmpty()){
         ui->trendCurrentValue->setText("None");
     }else{
-        qDebug() << QString("mips.Command(\"%1\")").arg(arg1);
-        QString v = engine->evaluate(QString("mips.Command(\"%1\")").arg(arg1)).toString().trimmed();
-        qDebug() << v;
-        if(v.isEmpty() || v == "?"){
-            ui->trendCurrentValue->setText("None");
-        }else{
-            ui->trendCurrentValue->setText(v);
-        }
+        qDebug() << arg1;
+        emit runCommand(QString("%1").arg(arg1));
+        qDebug() << cpResponse;
+        updateTrendCurrentValue();
     }
 }
 
