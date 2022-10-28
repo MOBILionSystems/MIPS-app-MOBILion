@@ -11,8 +11,10 @@ QT       += network
 QT       += script
 QT       += websockets
 
-win32:RC_ICONS += GAACElogo.ico
-ICON = GAACElogo.icns
+#win32:RC_ICONS += GAACElogo.ico
+#ICON = GAACElogo.icns
+win32:RC_ICONS += Mobilion_logo.ico
+ICON = Mobilion_logo.icns
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 

@@ -141,12 +141,12 @@ private:
                              "232992", "320000", "569984",
                              "232992", "320000", "573984", "994976",
                              "206976", "284992", "508000",
-                             "320000", "320000", "320000"}; // Todo update later
+                             "137984", "190976", "485984"};
     QVector<double> periods_us = {163.5,
                               120, 163.5, 288.5,
                               120, 163.5, 290.5, 501,
                               107, 146, 257.5,
-                              163.5, 163.5, 163.5}; // Todo update later
+                              72.5, 99, 246.5};
     QStringList relationList;
     QString fileFolder;
     QtofAddonClient* _qtofClient;
@@ -173,7 +173,7 @@ private:
     void buildSbcConnectSM();
     QTimer* tbMonitorTimer; // Timing table monitor timer
 
-    bool test1s = true;
+    bool test1s = false;
 };
 
 #endif // AUTOTREND_H
