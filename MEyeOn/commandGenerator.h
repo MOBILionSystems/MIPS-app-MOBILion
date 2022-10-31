@@ -24,6 +24,7 @@ public:
     static QString ceProfile;
 
     void updateInfo(QString key, QString value);
+    void updateOffsetForInversion();
 
 signals:
 

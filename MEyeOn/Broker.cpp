@@ -226,6 +226,8 @@ AckNack Broker::getAck(QString sequence, QString service, QString command)
 void Broker::updateInfo(QString key, QString value)
 {
     commandGen.updateInfo(key, value);
+    if(key == "adc-data-inversion")
+        commandGen.updateOffsetForInversion();
 }
 
 

@@ -356,6 +356,11 @@ void AutoTrend::buildSbcConnectSM()
             emit sbcFailed();
             return;
         }
+        if(rangeList.at(0).startsWith("6230")){
+            _broker->updateInfo("adc-data-inversion", "1");
+        }else{
+            _broker->updateInfo("adc-data-inversion", "0");
+        }
         _broker->updateInfo("adc-mass-spec-range", rangeList[1].replace("m/z)", "").trimmed());
         _broker->updateInfo("adc-record-size", recordSize[index]);
         _broker->initDigitizer();

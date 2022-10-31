@@ -44,7 +44,8 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-zs-threshold", QJsonValue("-29706")},
     {"adc-rtb-mode-enable", QJsonValue("0")},
     {"adc-avg-mode-enable", QJsonValue("0")},
-    {"adc-rtb-scans", QJsonValue("4")}
+    {"adc-rtb-scans", QJsonValue("4")},
+    {"adc-data-inversion", QJsonValue("0")}
 };
 
 QHash<QString, QJsonValue> CommandGenerator::smpMap{
@@ -249,4 +250,16 @@ void CommandGenerator::updateInfo(QString key, QString value)
 
     if(frmMap.contains(key))
         frmMap[key] = QJsonValue(value);
+}
+
+void CommandGenerator::updateOffsetForInversion()
+{
+    double offset = adcMap["adc-offset"].toDouble();
+    if(adcMap["adc-data-inversion"].toInt() == 0){
+        if(offset < 0)
+            adcMap["adc-offset"] = QJsonValue(offset * (-1));
+    }else{
+        if(offset > 0)
+            adcMap["adc-offset"] = QJsonValue(offset * (-1));
+    }
 }
