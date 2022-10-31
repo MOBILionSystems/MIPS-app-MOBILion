@@ -357,6 +357,7 @@ void AutoTrend::buildSbcConnectSM()
             return;
         }
         if(rangeList.at(0).startsWith("6230")){
+            qDebug() << "6230 configure";
             _broker->updateInfo("adc-data-inversion", "1");
         }else{
             _broker->updateInfo("adc-data-inversion", "0");
