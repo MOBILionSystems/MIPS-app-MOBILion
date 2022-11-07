@@ -37,6 +37,8 @@ public:
     ~AutoTrend();
 
     void updateScriptValue(QString v);
+    void updateAllTrendList();
+    void initUI();
 
 signals:
     void nextAcqState();        // signal for autotrend
@@ -51,6 +53,7 @@ signals:
     void nextForSingleShot();   // signal for nonMAF signal shot
     void runCommand(QString s);
     void sendMess(QString toWhom, QString message);
+    void getTrendList(QString forWhat);
 
 private slots:
 //    void on_initDigitizerButton_clicked();
@@ -130,7 +133,7 @@ private:
     QStringListModel* rightValueModel;
     QStringList dcElectrodes = {"Funnel.NIF IN", "Funnel.NIF OUT", "Funnel.NIF CL", "Funnel.SLIMvolBias"};
     QStringList rfElectrodes = {"SLIM.SLIM Top.Drive", "SLIM.SLIM Bottom.Drive"};
-    QStringList twElectrodes = {"SLIM.Seperation.Frequency", "SLIM.Seperation.Amplitude"};
+    QStringList twElectrodes = {"Seperation TW.Frequency", "Seperation TW.Amplitude", "Entrance TW.Frequency", "Entrance TW.Amplitude"};
     QStringList polarities = {"Positive", "Negative"};
     QStringList ranges = {"None",
                           //"6545(1700m/z)", "6545(3200m/z)", "6545(10000m/z)",
@@ -166,7 +169,6 @@ private:
     bool relationEnabled = false;
     bool toStopTrend = false;
 
-    void initUI();
     void updateDCBias(QString name, double value);
     bool applyRelations(QString startWith, double startValue);
     void buildTrendSM();
@@ -174,6 +176,8 @@ private:
     QTimer* tbMonitorTimer; // Timing table monitor timer
 
     bool test1s = false;
+    void updateTrendCurrentValue(QString s = "");
+
 };
 
 #endif // AUTOTREND_H

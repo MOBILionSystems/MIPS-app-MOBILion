@@ -1557,6 +1557,33 @@ DCBchannel * ControlPanel::FindDCBchannel(QString name)
     return NULL;
 }
 
+QStringList ControlPanel::getARBchannelList() const
+{
+    QStringList list;
+    for(auto arb : ARBchans){
+        list.append(arb->Title);
+    }
+    return list;
+}
+
+QStringList ControlPanel::getDCBchannelList() const
+{
+    QStringList list;
+    for(auto dcb : DCBchans){
+        list.append(dcb->p->objectName() + "." + dcb->Title);
+    }
+    return list;
+}
+
+QStringList ControlPanel::getRFchannelList() const
+{
+    QStringList list;
+    for(auto rf : RFchans){
+        list.append(rf->Title);
+    }
+    return list;
+}
+
 void ControlPanel::DCBgroupEnable(void)
 {
     DCBchannel            *dcb;
@@ -3020,7 +3047,11 @@ void AutoTrendButton::atbPressed()
         autotrendA2RAD = new AutoTrend(this);
         connect(autotrendA2RAD, &AutoTrend::runCommand, this, &AutoTrendButton::onRunCommand);
         connect(autotrendA2RAD, &AutoTrend::sendMess, this, &AutoTrendButton::onSendMess);
+        connect(autotrendA2RAD, &AutoTrend::getTrendList, this, &AutoTrendButton::onGetTrendList);
+        autotrendA2RAD->updateAllTrendList();
+        autotrendA2RAD->initUI();
     }
+
 
     if(!autoTrendDialog){
         autoTrendDialog = new QDialog(this);
@@ -3034,7 +3065,7 @@ void AutoTrendButton::atbPressed()
 
 void AutoTrendButton::onRunCommand(QString s)
 {
-    QString response = p->Command(s);
+    QString response = p->Command(s).trimmed();
     qDebug() << "script: " << s;
     qDebug() << "Command response: " << response;
     autotrendA2RAD->updateScriptValue(response);
@@ -3042,8 +3073,24 @@ void AutoTrendButton::onRunCommand(QString s)
 
 void AutoTrendButton::onSendMess(QString toWhom, QString message)
 {
-    QString response = p->SendMess(toWhom, message);
+    QString response = p->SendMess(toWhom, message).trimmed();
     qDebug() << toWhom << ", " << message;
     qDebug() << "Message response: " << response;
     autotrendA2RAD->updateScriptValue(response);
+}
+
+void AutoTrendButton::onGetTrendList(const QString forWhat)
+{
+    qDebug() << "onGetTrendList";
+    qDebug() << forWhat;
+    QStringList list;
+    if(forWhat == "ARBchannel"){
+        list = p->getARBchannelList();
+    }else if(forWhat == "DCBchannel"){
+        list = p->getDCBchannelList();
+    }else if(forWhat == "RFchannel"){
+        list = p->getRFchannelList();
+    }
+    qDebug() << list;
+    autotrendA2RAD->updateScriptValue(list.join(";"));
 }
