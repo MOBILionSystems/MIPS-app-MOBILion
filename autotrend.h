@@ -162,6 +162,7 @@ private:
     int _ceVol = 30;
     bool singleShot = false;
     QString trendName;
+    QString trendOriginValue;
     int trendFrom = 0;
     int trendTo = 0;
     int trendStepSize = 1;
@@ -175,7 +176,7 @@ private:
     void buildSbcConnectSM();
     QTimer* tbMonitorTimer; // Timing table monitor timer
 
-    bool test1s = false;
+    bool test1s = true;
     void updateTrendCurrentValue(QString s = "");
 
 };

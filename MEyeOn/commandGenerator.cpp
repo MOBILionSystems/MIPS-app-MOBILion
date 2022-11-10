@@ -20,15 +20,15 @@ QTOF Model	m/z Range (amu)	TOF Period (us)	Num Samples (SA220)	Valid Num Samples
 QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-baseline-stabilize-enable", QJsonValue("1")},
     {"adc-channel", QJsonValue("Channel1")},
-    {"adc-digital-offset", QJsonValue("0")},
+    {"adc-digital-offset", QJsonValue("-31456")},
     {"adc-driver-rev", QJsonValue("AqMD3-3.6.7279.14 (Acqiris: SA220P)")},
     {"adc-firmware-rev", QJsonValue("Stage1 Version 3.7.173.0, FPGA Firmware Version 3.7.173.69125/AVG.CST.DGT, FE CPLD 1/0.4.0.0")},
     {"adc-mass-spec-range", QJsonValue("3200")},
     {"adc-min-nanoseconds", QJsonValue("15000")},
     {"adc-model", QJsonValue("SA220P")},
-    {"adc-offset", QJsonValue("0")},
-    {"adc-pulse-threshold", QJsonValue("40")},
-    {"adc-range", QJsonValue("2.5")},
+    {"adc-offset", QJsonValue("-0.24")},
+    {"adc-pulse-threshold", QJsonValue("200")},
+    {"adc-range", QJsonValue("0.5")},
     {"adc-record-size", QJsonValue("284992")},
     {"adc-sample-rate", QJsonValue("2.0e+09")},
     {"adc-self-trigger-duty-cycle", QJsonValue("10.000000")},
@@ -37,15 +37,15 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-self-trigger-polarity", QJsonValue("1")},
     {"adc-trigger-level", QJsonValue("1.25")},          // 1.25 is for A2RAD (2.5v)
     {"adc-trigger-polarity", QJsonValue("1")},
-    {"adc-zero-value", QJsonValue("0")},
+    {"adc-zero-value", QJsonValue("-31456")},
     {"adc-zs-hysteresis", QJsonValue("100")},
     {"adc-zs-postgate-samples", QJsonValue("0")},
     {"adc-zs-pregate-samples", QJsonValue("0")},
-    {"adc-zs-threshold", QJsonValue("350")},
+    {"adc-zs-threshold", QJsonValue("-29706")},
     {"adc-rtb-mode-enable", QJsonValue("0")},
     {"adc-avg-mode-enable", QJsonValue("0")},
     {"adc-rtb-scans", QJsonValue("4")},
-    {"adc-data-inversion", QJsonValue("0")}
+    {"adc-data-inversion", QJsonValue("1")}
 };
 
 QHash<QString, QJsonValue> CommandGenerator::smpMap{

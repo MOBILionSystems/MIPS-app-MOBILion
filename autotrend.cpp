@@ -303,7 +303,15 @@ void AutoTrend::buildTrendSM()
     nextStepState->addTransition(this, &AutoTrend::nextAcqState, updateTrendState);
     nextStepState->addTransition(this, &AutoTrend::doneAllStates, finishState);
 
-    connect(trendSM, &QStateMachine::finished, this, [=](){trendRealTimeDialog->wrapLastStep(); ui->trendProgressBar->setValue(100); if(singleShot) singleShot = false;});
+    connect(trendSM, &QStateMachine::finished, this, [=](){
+        trendRealTimeDialog->wrapLastStep();
+        ui->trendProgressBar->setValue(100);
+        if(singleShot){
+            singleShot = false;
+        }else{
+            emit runCommand(trendName + "=" + trendOriginValue);
+            updateTrendCurrentValue(trendOriginValue);
+        }});
 }
 
 
@@ -410,6 +418,8 @@ void AutoTrend::updateAllTrendList()
     for(auto &i : prelist){
         twElectrodes.append(i + ".Frequency");
         twElectrodes.append(i + ".Amplitude");
+        twElectrodes.append(i + ".Aux output");
+        twElectrodes.append(i + ".Offset output");
     }
 
     emit getTrendList("DCBchannel");
@@ -464,6 +474,8 @@ void AutoTrend::on_runTrendButton_clicked()
     }
 
     trendName = ui->trendComboBox->currentText();
+    emit runCommand(trendName);
+    trendOriginValue = cpResponse;
     trendFrom = ui->trendFrom->text().toInt();
     trendTo = ui->trendTo->text().toInt();
     trendStepSize = ui->trendStepSize->text().toInt();
