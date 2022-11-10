@@ -114,7 +114,6 @@ void AutoTrend::initUI()
     ui->trendFrom->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendStepSize->setValidator(new QIntValidator(-10000, 10000, this));
-    ui->trendStepDuration->setValidator(new QIntValidator(0, 10000, this));
     ui->ceVlineEdit->setValidator(new QIntValidator(0, 1000, this));
     ui->rtbScansLineEdit->setValidator(new QIntValidator(4, 100, this));
 
@@ -457,8 +456,7 @@ void AutoTrend::on_runTrendButton_clicked()
     if( ui->trendComboBox->currentText().isEmpty() ||
             ui->trendFrom->text().isEmpty() ||
             ui->trendTo->text().isEmpty() ||
-            ui->trendStepSize->text().isEmpty() ||
-            ui->trendStepDuration->text().isEmpty()){
+            ui->trendStepSize->text().isEmpty()){
         qWarning() << "Invalid setting for autotrend.";
         QMessageBox::warning(this, "Autotrend Failed", "Invalid settings for autotrend.");
         return;
