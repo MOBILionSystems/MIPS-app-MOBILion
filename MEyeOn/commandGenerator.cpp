@@ -26,7 +26,7 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-mass-spec-range", QJsonValue("3200")},
     {"adc-min-nanoseconds", QJsonValue("15000")},
     {"adc-model", QJsonValue("SA220P")},
-    {"adc-offset", QJsonValue("0.24")},
+    {"adc-offset", QJsonValue("-0.24")},
     {"adc-pulse-threshold", QJsonValue("200")},
     {"adc-range", QJsonValue("0.5")},
     {"adc-record-size", QJsonValue("284992")},
@@ -45,7 +45,7 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-rtb-mode-enable", QJsonValue("0")},
     {"adc-avg-mode-enable", QJsonValue("0")},
     {"adc-rtb-scans", QJsonValue("4")},
-    {"adc-data-inversion", QJsonValue("0")}
+    {"adc-data-inversion", QJsonValue("1")}
 };
 
 QHash<QString, QJsonValue> CommandGenerator::smpMap{
@@ -254,12 +254,15 @@ void CommandGenerator::updateInfo(QString key, QString value)
 
 void CommandGenerator::updateOffsetForInversion()
 {
-    double offset = adcMap["adc-offset"].toDouble();
-    if(adcMap["adc-data-inversion"].toInt() == 0){
+    qDebug() << "update offset";
+    double offset = adcMap["adc-offset"].toString().toDouble();
+    qDebug() << "offset: " << offset;
+    if(adcMap["adc-data-inversion"].toString().toInt() == 0){
         if(offset < 0)
-            adcMap["adc-offset"] = QJsonValue(offset * (-1));
+            adcMap["adc-offset"] = QJsonValue(QString::number(offset * (-1)));
     }else{
         if(offset > 0)
-            adcMap["adc-offset"] = QJsonValue(offset * (-1));
+            adcMap["adc-offset"] = QJsonValue(QString::number(offset * (-1)));
     }
+    qDebug() << "new offset: " << adcMap["adc-offset"];
 }

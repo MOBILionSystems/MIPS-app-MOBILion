@@ -15,8 +15,6 @@ DataProcess::DataProcess(QObject *parent)
 
 double DataProcess::sumProcess(QJsonArray dataPoints, bool newStep)
 {
-    return 1;
-
     double sum = -1;
     if(newStep){
         sum = averageFrameData();

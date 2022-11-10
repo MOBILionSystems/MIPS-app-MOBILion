@@ -86,6 +86,7 @@ private slots:
     void atbPressed(void);
     void onRunCommand(QString s);
     void onSendMess(QString toWhom, QString message);
+    void onGetTrendList(const QString forWhat);
 };
 
 
@@ -428,6 +429,9 @@ public:
     QList<Comms*> Systems;
     QStatusBar  *statusBar;
     DCBchannel  *FindDCBchannel(QString name);
+    QStringList getARBchannelList() const;
+    QStringList getDCBchannelList() const;
+    QStringList getRFchannelList() const;
     bool LoadedConfig;
     Properties *properties;
     QList<QWidget *> Containers;
