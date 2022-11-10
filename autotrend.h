@@ -176,7 +176,7 @@ private:
     void buildSbcConnectSM();
     QTimer* tbMonitorTimer; // Timing table monitor timer
 
-    bool test1s = false;
+    bool test1s = true;
     void updateTrendCurrentValue(QString s = "");
 
 };

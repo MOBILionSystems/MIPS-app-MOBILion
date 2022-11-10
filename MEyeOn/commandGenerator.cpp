@@ -26,7 +26,7 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-mass-spec-range", QJsonValue("3200")},
     {"adc-min-nanoseconds", QJsonValue("15000")},
     {"adc-model", QJsonValue("SA220P")},
-    {"adc-offset", QJsonValue("-0.24")},
+    {"adc-offset", QJsonValue("0.24")},
     {"adc-pulse-threshold", QJsonValue("200")},
     {"adc-range", QJsonValue("0.5")},
     {"adc-record-size", QJsonValue("284992")},
@@ -45,7 +45,7 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-rtb-mode-enable", QJsonValue("0")},
     {"adc-avg-mode-enable", QJsonValue("0")},
     {"adc-rtb-scans", QJsonValue("4")},
-    {"adc-data-inversion", QJsonValue("1")}
+    {"adc-data-inversion", QJsonValue("0")}
 };
 
 QHash<QString, QJsonValue> CommandGenerator::smpMap{
