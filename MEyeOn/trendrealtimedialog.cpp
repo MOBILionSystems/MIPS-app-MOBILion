@@ -113,7 +113,7 @@ void TrendRealTimeDialog::setRange(QJsonObject payload)
     QJsonArray heatmapMassRange = payload.value("heatmapMassRange").toArray();
     if(heatmapMassRange.size() == 2){
         heatmapMassL = 0;
-        heatmapMassH = heatmapMassRange.last().toDouble();
+        heatmapMassH = 3200; // heatmapMassRange.last().toDouble();
     }
 
     QJsonArray heatmapMobilityRange = payload.value("heatmapMobilityRange").toArray();
@@ -125,7 +125,7 @@ void TrendRealTimeDialog::setRange(QJsonObject payload)
     QJsonArray massRange = payload.value("massRange").toArray();
     if(massRange.size() == 2){
         massL = 0;
-        massH = massRange.last().toDouble();
+        massH = 3200; // massRange.last().toDouble();
     }
 
     QJsonArray massIntensityRange = payload.value("massIntensityRange").toArray();
