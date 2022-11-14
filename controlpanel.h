@@ -220,6 +220,36 @@ private slots:
     void ESIenaChange(void);
 };
 
+class TextMessage : public QWidget
+{
+    Q_OBJECT
+public:
+    TextMessage(QWidget *parent, QString name, QString MIPSname,QString Type, QString Gcmd, QString Scmd, QString RBcmd, QString Units, int x, int y);
+    void    Show(void);
+    bool    SetValues(QString strVals);
+    QString ProcessCommand(QString cmd);
+    QWidget          *p;
+    QString          Title;
+    int              X,Y;
+    QString          MIPSnm;
+    QString          Ctype;
+    QString          Dtype;
+    QString          GetCmd;
+    QString          SetCmd;
+    QString          ReadbackCmd;
+    QString          UnitsText;
+    QString          ActiveValue;
+    QString          ShutdownValue;
+    Comms            *comms;
+    bool             isShutdown;
+private:
+    QFrame                *frmCc;
+    QLineEdit             *Vsp;
+    QLineEdit             *Vrb;
+    QLabel                *labels[2];
+
+};
+
 class Ccontrol : public QWidget
 {
     Q_OBJECT
@@ -497,6 +527,7 @@ private:
     QList<ARBchannel *>    ARBchans;
     QList<RFamp *>         rfa;
     QList<Ccontrol *>      Ccontrols;
+    QList<TextMessage *>   TextMessages;
     QList<QStringList *>   CSVdata;
     QList<Plot *>          plots;
     QList<Device *>        devices;

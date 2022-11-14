@@ -134,6 +134,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     ESIchans.clear();
     ARBchans.clear();
     Ccontrols.clear();
+    TextMessages.clear();
     Cpanels.clear();
     GroupBoxes.clear();
     Tabs.clear();
@@ -268,6 +269,11 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
                 if(resList.length()>=11) Ccontrols.last()->Dtype = resList[10];
                 Ccontrols.last()->comms = FindCommPort(resList[2],Systems);
                 Ccontrols.last()->Show();
+            }
+            if((resList[0].toUpper() == "TEXTMESSAGE") && (resList.length()>=10))
+            {
+                TextMessages.append(new TextMessage(Containers.last(),resList[1],resList[2],resList[3],resList[4],resList[5],resList[6],resList[7],resList[8].toInt(),resList[9].toInt()));
+                TextMessages.last()->Show();
             }
             if(resList[0].toUpper() == "COMBOBOXLIST")
             {
@@ -1846,6 +1852,7 @@ QString ControlPanel::Command(QString cmd)
     for(i=0;i<ESIchans.count();i++)    if((res = ESIchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
     for(i=0;i<ARBchans.count();i++)    if((res = ARBchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
     for(i=0;i<Ccontrols.count();i++)   if((res = Ccontrols[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<TextMessages.count();i++)   if((res = TextMessages[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
     for(i=0;i<devices.count();i++)     if((res = devices[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
     for(i=0;i<ScripButtons.count();i++) if((res = ScripButtons[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
     for(i=0;i<Cpanels.count();i++) if((res = Cpanels[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
@@ -3093,4 +3100,107 @@ void AutoTrendButton::onGetTrendList(const QString forWhat)
     }
     qDebug() << list;
     autotrendA2RAD->updateScriptValue(list.join(";"));
+}
+
+TextMessage::TextMessage(QWidget *parent, QString name, QString MIPSname, QString Type, QString Gcmd, QString Scmd, QString RBcmd, QString Units, int x, int y)
+{
+    p      = parent;
+    Title  = name;
+    MIPSnm = MIPSname;
+    GetCmd = Gcmd.replace("_",",");
+    SetCmd = Scmd.replace("_",",");
+    ReadbackCmd = RBcmd.replace("_",",");
+    UnitsText = Units;
+    Ctype = Type;
+    X      = x;
+    Y      = y;
+    comms  = NULL;
+    isShutdown = false;
+    ShutdownValue.clear();
+    Dtype = "Double";
+}
+
+void TextMessage::Show()
+{
+    frmCc = new QFrame(p);
+    labels[0] = new QLabel(Title,frmCc); labels[0]->setGeometry(0,0,59,16);
+    labels[1] = new QLabel(UnitsText,frmCc);
+    // If Read back command or set command are empty then its only one lineEdit
+    // box, else two.
+    if(SetCmd.isEmpty() || ReadbackCmd.isEmpty())
+    {
+        // Only 1 line edit box
+        frmCc->setGeometry(X,Y,175,21);
+        if(SetCmd.isEmpty())
+        {
+            Vrb = new QLineEdit(frmCc);
+            Vrb->setGeometry(70,0,70,21);
+            Vrb->setReadOnly(true);
+        }
+        else if(ReadbackCmd.isEmpty())
+        {
+            Vsp = new QLineEdit(frmCc);
+            Vsp->setGeometry(70,0,70,21);
+            if(Dtype.toUpper() == "DOUBLE") Vsp->setValidator(new QDoubleValidator);
+            Vsp->setToolTip(MIPSnm + "," + SetCmd);
+            connect(Vsp,SIGNAL(editingFinished()),this,SLOT(VspChange()));
+        }
+        labels[1]->setGeometry(150,0,30,16);
+    }
+}
+
+bool TextMessage::SetValues(QString strVals)
+{
+    QStringList resList;
+    QString res;
+
+    res.clear();
+    if(p->objectName() != "") res = p->objectName() + ".";
+    res += Title;
+
+    if(!strVals.startsWith(res)) return false;
+    resList = strVals.split(",");
+    if(resList.count() < 2) return false;
+    if(resList[0] != res) return false;
+    if(SetCmd.isEmpty()) return false;
+    if(isShutdown) ActiveValue = resList[1];
+    else
+    {
+        Vsp->setText(resList[1]);
+        Vsp->setModified(true);
+        emit Vsp->editingFinished();
+    }
+    return true;
+
+}
+
+QString TextMessage::ProcessCommand(QString cmd)
+{
+    QString res;
+
+    res.clear();
+    if(p->objectName() != "") res = p->objectName() + ".";
+    res += Title;
+
+    if(!cmd.startsWith(res)) return "?";
+    if(cmd == res)
+    {
+        if(!SetCmd.isEmpty() || !GetCmd.isEmpty()) return Vsp->text();
+        if(!ReadbackCmd.isEmpty()) return Vrb->text();
+    }
+    if(cmd == res + ".readback")
+    {
+        if((!SetCmd.isEmpty() || !GetCmd.isEmpty()) && !ReadbackCmd.isEmpty()) return Vrb->text();
+        return "?";
+    }
+    QStringList resList = cmd.split("=");
+    if((resList.count()==2) && !SetCmd.isEmpty() && (resList[0] == res))
+    {
+        Vsp->setText(resList[1].trimmed());
+        Vsp->setModified(true);
+        Vsp->editingFinished();
+        return "";
+    }
+    return "?";
+
 }
