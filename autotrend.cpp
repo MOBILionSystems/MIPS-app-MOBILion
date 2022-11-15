@@ -200,11 +200,7 @@ void AutoTrend::buildTrendSM()
     trendSM->setInitialState(initState);
     connect(initState, &QState::entered, this, [=](){
         // qDebug() << "initState";
-        int scale = 1;
-        if(ui->rtbCheckBox->isChecked()){
-            scale *= ui->rtbScansLineEdit->text().toInt();
-        }
-        DataProcess::setDtPeriod(periods_us.at(ui->rangeComboBox->currentIndex()) * 0.000001 * scale);
+        DataProcess::setRecordSize(recordSize.at(ui->rangeComboBox->currentIndex()).toInt());
         if(trendRealTimeDialog){
             delete trendRealTimeDialog;
             trendRealTimeDialog = new TrendRealTimeDialog(this);

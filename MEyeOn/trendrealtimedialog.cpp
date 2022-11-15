@@ -110,10 +110,13 @@ void TrendRealTimeDialog::resetPlot()
 
 void TrendRealTimeDialog::setRange(QJsonObject payload)
 {
+    QJsonValue tofPeriod = payload.value("tofPeriod");
+    DataProcess::setDtPeriod(tofPeriod.toDouble());
+
     QJsonArray heatmapMassRange = payload.value("heatmapMassRange").toArray();
     if(heatmapMassRange.size() == 2){
         heatmapMassL = 0;
-        heatmapMassH = 3200; // heatmapMassRange.last().toDouble();
+        heatmapMassH = dataProcess->usToMz(DataProcess::getUsRange());
     }
 
     QJsonArray heatmapMobilityRange = payload.value("heatmapMobilityRange").toArray();
@@ -125,7 +128,7 @@ void TrendRealTimeDialog::setRange(QJsonObject payload)
     QJsonArray massRange = payload.value("massRange").toArray();
     if(massRange.size() == 2){
         massL = 0;
-        massH = 3200; // massRange.last().toDouble();
+        massH = dataProcess->usToMz(DataProcess::getUsRange());
     }
 
     QJsonArray massIntensityRange = payload.value("massIntensityRange").toArray();
@@ -150,6 +153,8 @@ void TrendRealTimeDialog::setRange(QJsonObject payload)
     //        while (i != ranges.end()) {
     //            if(i->toArray().at())
     //        }
+
+
 }
 
 void TrendRealTimeDialog::startNewStep(double currentStep)

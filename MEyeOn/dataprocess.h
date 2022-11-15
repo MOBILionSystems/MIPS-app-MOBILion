@@ -25,10 +25,14 @@ public:
 
     constexpr static double SLOPE_DEFAULT = 0.3458234001095313;
     constexpr static double INTERCEPT_DEFAULT = 0.09326905279715753;
+    constexpr static int samplingRate = 2e3; // per us
     static double frm_dt_period; // period of trigger from QTOF
+    static int recordSize; // for ms range calculation
     static const QVector<double> RESIDULE_DEFAULT;
     static QString getResidule();
     static void setDtPeriod(double dt);
+    static void setRecordSize(int rs);
+    static int getUsRange();
 
     static bool isNonDefaultMsCalibrationAvailable();
     static QString msCalibration;
