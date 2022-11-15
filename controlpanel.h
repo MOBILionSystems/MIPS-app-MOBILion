@@ -220,6 +220,22 @@ private slots:
     void ESIenaChange(void);
 };
 
+class TextMessage : public QWidget
+{
+    Q_OBJECT
+public:
+    TextMessage(QWidget *parent, QString name, int x, int y, int w = 350, int h = 21);
+    void    Show(void);
+    QString ProcessCommand(QString cmd);
+    QWidget          *p;
+    QString          Title;
+    int              X,Y,W,H;
+private:
+    QFrame                *frmCc;
+    QLineEdit             *Vsp;
+
+};
+
 class Ccontrol : public QWidget
 {
     Q_OBJECT
@@ -497,6 +513,7 @@ private:
     QList<ARBchannel *>    ARBchans;
     QList<RFamp *>         rfa;
     QList<Ccontrol *>      Ccontrols;
+    QList<TextMessage *>   TextMessages;
     QList<QStringList *>   CSVdata;
     QList<Plot *>          plots;
     QList<Device *>        devices;

@@ -134,6 +134,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     ESIchans.clear();
     ARBchans.clear();
     Ccontrols.clear();
+    TextMessages.clear();
     Cpanels.clear();
     GroupBoxes.clear();
     Tabs.clear();
@@ -268,6 +269,11 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
                 if(resList.length()>=11) Ccontrols.last()->Dtype = resList[10];
                 Ccontrols.last()->comms = FindCommPort(resList[2],Systems);
                 Ccontrols.last()->Show();
+            }
+            if((resList[0].toUpper() == "TEXTMESSAGE") && (resList.length()>=10))
+            {
+                TextMessages.append(new TextMessage(Containers.last(),resList[1],resList[8].toInt(),resList[9].toInt()));
+                TextMessages.last()->Show();
             }
             if(resList[0].toUpper() == "COMBOBOXLIST")
             {
@@ -1846,6 +1852,7 @@ QString ControlPanel::Command(QString cmd)
     for(i=0;i<ESIchans.count();i++)    if((res = ESIchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
     for(i=0;i<ARBchans.count();i++)    if((res = ARBchans[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
     for(i=0;i<Ccontrols.count();i++)   if((res = Ccontrols[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
+    for(i=0;i<TextMessages.count();i++)   if((res = TextMessages[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
     for(i=0;i<devices.count();i++)     if((res = devices[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
     for(i=0;i<ScripButtons.count();i++) if((res = ScripButtons[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
     for(i=0;i<Cpanels.count();i++) if((res = Cpanels[i]->ProcessCommand(cmd)) != "?") return(res + "\n");
@@ -3093,4 +3100,43 @@ void AutoTrendButton::onGetTrendList(const QString forWhat)
     }
     qDebug() << list;
     autotrendA2RAD->updateScriptValue(list.join(";"));
+}
+
+TextMessage::TextMessage(QWidget *parent, QString name, int x, int y, int w, int h)
+{
+    p      = parent;
+    Title  = name;
+    X      = x;
+    Y      = y;
+    W = w;
+    H = h;
+}
+
+void TextMessage::Show()
+{
+    frmCc = new QFrame(p);
+
+    frmCc->setGeometry(X,Y,W,H);
+
+    Vsp = new QLineEdit(frmCc);
+    Vsp->setGeometry(0,0,W,H);
+    Vsp->setReadOnly(true);
+    Vsp->setStyleSheet("QLineEdit { border: none }");
+}
+
+
+QString TextMessage::ProcessCommand(QString cmd)
+{
+    QString res;
+
+    res.clear();
+    if(p->objectName() != "") res = p->objectName() + ".";
+    res += Title;
+
+    if(!cmd.startsWith(res)) return "?";
+
+    QStringList resList = cmd.split("=");
+
+    Vsp->setText(Title + " " + resList[1].trimmed());
+    return "";
 }
