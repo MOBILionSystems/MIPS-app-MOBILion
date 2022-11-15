@@ -145,11 +145,6 @@ private:
                              "232992", "320000", "573984", "994976",
                              "206976", "284992", "508000",
                              "137984", "190976", "485984"};
-    QVector<double> periods_us = {163.5,
-                              120, 163.5, 288.5,
-                              120, 163.5, 290.5, 501,
-                              107, 146, 257.5,
-                              72.5, 99, 246.5};
     QStringList relationList;
     QString fileFolder;
     QtofAddonClient* _qtofClient;

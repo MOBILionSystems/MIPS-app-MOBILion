@@ -6,6 +6,7 @@ const QVector<double> DataProcess::RESIDULE_DEFAULT = {-229.24922242214916,16.23
 QString DataProcess::msCalibration;
 
 double DataProcess::frm_dt_period = 0.2925275;
+int DataProcess::recordSize = 320000;
 
 DataProcess::DataProcess(QObject *parent)
     : QObject{parent}
@@ -135,6 +136,16 @@ QString DataProcess::getResidule()
 void DataProcess::setDtPeriod(double dt)
 {
     DataProcess::frm_dt_period = dt;
+}
+
+void DataProcess::setRecordSize(int rs)
+{
+    DataProcess::recordSize = rs;
+}
+
+int DataProcess::getUsRange()
+{
+    return DataProcess::recordSize / DataProcess::samplingRate;
 }
 
 
