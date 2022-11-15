@@ -224,29 +224,15 @@ class TextMessage : public QWidget
 {
     Q_OBJECT
 public:
-    TextMessage(QWidget *parent, QString name, QString MIPSname,QString Type, QString Gcmd, QString Scmd, QString RBcmd, QString Units, int x, int y);
+    TextMessage(QWidget *parent, QString name, int x, int y, int w = 350, int h = 21);
     void    Show(void);
-    bool    SetValues(QString strVals);
     QString ProcessCommand(QString cmd);
     QWidget          *p;
     QString          Title;
-    int              X,Y;
-    QString          MIPSnm;
-    QString          Ctype;
-    QString          Dtype;
-    QString          GetCmd;
-    QString          SetCmd;
-    QString          ReadbackCmd;
-    QString          UnitsText;
-    QString          ActiveValue;
-    QString          ShutdownValue;
-    Comms            *comms;
-    bool             isShutdown;
+    int              X,Y,W,H;
 private:
     QFrame                *frmCc;
     QLineEdit             *Vsp;
-    QLineEdit             *Vrb;
-    QLabel                *labels[2];
 
 };
 
