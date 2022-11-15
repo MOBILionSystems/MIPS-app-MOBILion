@@ -5,7 +5,7 @@
 const QVector<double> DataProcess::RESIDULE_DEFAULT = {-229.24922242214916,16.236991249722326,-0.39444579353546055,0.0043708033832713265,-0.000022696140907354508,4.485435626557926e-8};
 QString DataProcess::msCalibration;
 
-double DataProcess::frm_dt_period = 0.2925275;
+double DataProcess::frm_dt_period_s = 0.2925275;
 int DataProcess::recordSize = 320000;
 
 DataProcess::DataProcess(QObject *parent)
@@ -112,7 +112,7 @@ double DataProcess::usToMz(double x)
 
 double DataProcess::scanCountToMS(double s)
 {
-    return s * frm_dt_period;
+    return s * frm_dt_period_s;
 }
 
 double DataProcess::tofError(double uSecTOF)
@@ -133,9 +133,9 @@ QString DataProcess::getResidule()
     return residuleSL.join(',');
 }
 
-void DataProcess::setDtPeriod(double dt)
+void DataProcess::setDtPeriod_S(double dt)
 {
-    DataProcess::frm_dt_period = dt;
+    DataProcess::frm_dt_period_s = dt;
 }
 
 void DataProcess::setRecordSize(int rs)

@@ -111,7 +111,7 @@ void TrendRealTimeDialog::resetPlot()
 void TrendRealTimeDialog::setRange(QJsonObject payload)
 {
     QJsonValue tofPeriod = payload.value("tofPeriod");
-    DataProcess::setDtPeriod(tofPeriod.toDouble());
+    DataProcess::setDtPeriod_S(tofPeriod.toDouble() * 1e-6);
 
     QJsonArray heatmapMassRange = payload.value("heatmapMassRange").toArray();
     if(heatmapMassRange.size() == 2){
@@ -189,7 +189,7 @@ void TrendRealTimeDialog::initPlot()
 
     ui->mobilityRealTimePlot->xAxis->setLabel("Intensity");
     ui->mobilityRealTimePlot->xAxis->setRangeReversed(true);
-    ui->mobilityRealTimePlot->yAxis->setLabel("arrive time");
+    ui->mobilityRealTimePlot->yAxis->setLabel("arrive time (s)");
     ui->mobilityRealTimePlot->addGraph(ui->mobilityRealTimePlot->yAxis, ui->mobilityRealTimePlot->xAxis);
     //ui->mobilityRealTimePlot->graph(0)->
 }
