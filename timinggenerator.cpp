@@ -24,19 +24,19 @@
 // option. If its in table mode then a NAK will be received from MIPS
 bool isTblMode(Comms *comms, QString TriggerSource)
 {
-   if(comms == NULL) return false;
-   QString res = TriggerSource.toUpper();
-   if(res == "SOFTWARE") res = "SW";
-   comms->rb.clear();
-   comms->SendString("STBLTRG," + res + "\n");
-   comms->waitforline(1000);
-   if(comms->rb.numLines() >= 1)
-   {
-       res = comms->rb.getline();
-       if(res == "?") return true;
-       if(res == "") return false;
-   }
-   return false;
+    if(comms == NULL) return false;
+    QString res = TriggerSource.toUpper();
+    if(res == "SOFTWARE") res = "SW";
+    comms->rb.clear();
+    comms->SendString("STBLTRG," + res + "\n");
+    comms->waitforline(1000);
+    if(comms->rb.numLines() >= 1)
+    {
+        res = comms->rb.getline();
+        if(res == "?") return true;
+        if(res == "") return false;
+    }
+    return false;
 }
 
 // Download table parameters to MIPS.
@@ -45,26 +45,26 @@ bool isTblMode(Comms *comms, QString TriggerSource)
 // Returns false if an error is detected
 bool DownloadTable(Comms *comms, QString Table, QString ClockSource, QString TriggerSource)
 {
-   if(comms == NULL) return false;
-   comms->SendCommand("SMOD,LOC\n");        // Make sure the system is in local mode
-   comms->SendCommand("STBLREPLY,FALSE\n"); // Turn off any table messages from MIPS
-   // Make sure a table has been generated
-   if(Table == "")
-   {
-       QMessageBox msgBox;
-       msgBox.setText("There is no Pulse Sequence to download to MIPS!");
-       msgBox.exec();
-       return false;
-   }
-   // Set clock
-   comms->SendCommand("STBLCLK," + ClockSource.toUpper() + "\n");
-   // Set trigger
-   QString res = TriggerSource.toUpper();
-   if(res == "SOFTWARE") res = "SW";
-   comms->SendCommand("STBLTRG," + res + "\n");
-   // Send table
-   comms->SendCommand(Table.trimmed());
-   return true;
+    if(comms == NULL) return false;
+    comms->SendCommand("SMOD,LOC\n");        // Make sure the system is in local mode
+    comms->SendCommand("STBLREPLY,FALSE\n"); // Turn off any table messages from MIPS
+    // Make sure a table has been generated
+    if(Table == "")
+    {
+        QMessageBox msgBox;
+        msgBox.setText("There is no Pulse Sequence to download to MIPS!");
+        msgBox.exec();
+        return false;
+    }
+    // Set clock
+    comms->SendCommand("STBLCLK," + ClockSource.toUpper() + "\n");
+    // Set trigger
+    QString res = TriggerSource.toUpper();
+    if(res == "SOFTWARE") res = "SW";
+    comms->SendCommand("STBLTRG," + res + "\n");
+    // Send table
+    comms->SendCommand(Table.trimmed());
+    return true;
 }
 
 QString MakePathUnique(QString path)
@@ -76,18 +76,18 @@ QString MakePathUnique(QString path)
     // name
     while(true)
     {
-       if(QDir(path).exists())
-       {
-           for(i=0;i<path.length();i++) if(!path[path.length()-1-i].isDigit()) break;
-           if(i == 0) path += "-0001";
-           else
-           {
-               num = path.right(i).toInt();
-               num++;
-               path = path.left(path.length()-i) += QString("%1").arg(num,4,10,QLatin1Char('0'));
-           }
-       }
-       else break;
+        if(QDir(path).exists())
+        {
+            for(i=0;i<path.length();i++) if(!path[path.length()-1-i].isDigit()) break;
+            if(i == 0) path += "-0001";
+            else
+            {
+                num = path.right(i).toInt();
+                num++;
+                path = path.left(path.length()-i) += QString("%1").arg(num,4,10,QLatin1Char('0'));
+            }
+        }
+        else break;
     }
     // At this point path is unique
     return path;
@@ -197,8 +197,8 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
                     }
                     else
                     {
-                       if(comms != NULL) comms->SendCommand("SMOD,LOC\n"); // Return to local mode
-                       return;
+                        if(comms != NULL) comms->SendCommand("SMOD,LOC\n"); // Return to local mode
+                        return;
                     }
                 }
                 // Create the folder and define the data storage path and file
@@ -243,15 +243,15 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
         }
         if(cla == NULL)
         {
-           // Here is the command line window has not been created or destroved by
-           // the user.
-           cla = new cmdlineapp(p);
-           // connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()),Qt::QueuedConnection);
-           // connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()),Qt::QueuedConnection);
-           // connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()),Qt::QueuedConnection);
-           connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()));
-           connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()));
-           connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()));
+            // Here is the command line window has not been created or destroved by
+            // the user.
+            cla = new cmdlineapp(p);
+            // connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()),Qt::QueuedConnection);
+            // connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()),Qt::QueuedConnection);
+            // connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()),Qt::QueuedConnection);
+            connect(cla,SIGNAL(Ready()),this,SLOT(slotAppReady()));
+            connect(cla,SIGNAL(AppCompleted()),this,SLOT(slotAppFinished()));
+            connect(cla,SIGNAL(DialogClosed()),this,SLOT(slotDialogClosed()));
         }
         cla->appPath = cmd;
         fileName.remove(" -L");
@@ -279,33 +279,33 @@ void AcquireData::StartAcquire(QString path, int FrameSize, int Accumulations)
         // for an external trigger
         if(TriggerMode == "Software")
         {
-           if(comms->SendCommand("TBLSTRT\n")) {if(statusBar != NULL) statusBar->showMessage("Table trigger command accepted!", 5000);}
-           else if(statusBar != NULL) statusBar->showMessage("Table trigger command rejected!", 5000);
+            if(comms->SendCommand("TBLSTRT\n")) {if(statusBar != NULL) statusBar->showMessage("Table trigger command accepted!", 5000);}
+            else if(statusBar != NULL) statusBar->showMessage("Table trigger command rejected!", 5000);
         }
     }
 }
 
 void AcquireData::slotDialogClosed(void)
 {
-// These disconnects cause it to crash if connect is Qt::QueuedConnection, ??
-//    disconnect(cla,SIGNAL(Ready()),0,0);
-//    disconnect(cla,SIGNAL(AppCompleted()),0,0);
-//    disconnect(cla,SIGNAL(DialogClosed()),0,0);
+    // These disconnects cause it to crash if connect is Qt::QueuedConnection, ??
+    //    disconnect(cla,SIGNAL(Ready()),0,0);
+    //    disconnect(cla,SIGNAL(AppCompleted()),0,0);
+    //    disconnect(cla,SIGNAL(DialogClosed()),0,0);
     if(properties != NULL) properties->Log("Aquire application dialog was closed!");
     cla = NULL;
 }
 
 bool AcquireData::isRunning(void)
 {
-   // Oct 8, 2019. Changed this to use the MIPS system table state
-   if(cla != NULL) cla->raise();
-   if(isTblMode(comms, TriggerMode)) return(true);
-   return(false);
-   // Old logic
-   if(cla == NULL) return(false);
-   if(cla->process.state() == QProcess::NotRunning) return(false);
-   cla->raise();
-   return(true);
+    // Oct 8, 2019. Changed this to use the MIPS system table state
+    if(cla != NULL) cla->raise();
+    if(isTblMode(comms, TriggerMode)) return(true);
+    return(false);
+    // Old logic
+    if(cla == NULL) return(false);
+    if(cla->process.state() == QProcess::NotRunning) return(false);
+    cla->raise();
+    return(true);
 }
 
 void AcquireData::slotAppReady(void)
@@ -407,9 +407,9 @@ void TimingControl::Show(void)
 
 void TimingControl::pbEdit(void)
 {
-   Edit->setDown(false);
-   TG->show();
-   TG->raise();
+    Edit->setDown(false);
+    TG->show();
+    TG->raise();
 }
 
 void TimingControl::pbTrigger(void)
@@ -625,10 +625,10 @@ QString EventControl::ProcessCommand(QString cmd)
     QStringList resList = cmd.split("=");
     if(resList.count()==2)
     {
-       EventValue->setText(resList[1]);
-       EventValue->setModified(true);
-       EventValue->editingFinished();
-       return "";
+        EventValue->setText(resList[1]);
+        EventValue->setModified(true);
+        EventValue->editingFinished();
+        return "";
     }
     return "?";
 }
@@ -640,7 +640,7 @@ void EventControl::EventChange(void)
     //if(comms == NULL) return;
     if(!EventValue->isModified()) return;
     QString res = Scommand + "," + EventValue->text() + "\n";
-//    qDebug() << res;
+    //    qDebug() << res;
     if(comms != NULL) comms->SendCommand(res.toStdString().c_str());
     EventValue->setModified(false);
 }
@@ -793,7 +793,7 @@ QString TimingGenerator::Report(void)
     // Time mode
     if(ui->chkTimeMode->isChecked()) res += "TimeMode," + Title + ",TRUE\n";
     else res += "TimeMode," + Title + ",FALSE\n";
-//    res += "TCparametersEnd\n";
+    //    res += "TCparametersEnd\n";
     return res;
 }
 
@@ -803,29 +803,29 @@ bool TimingGenerator::SetValues(QString strVals)
 
     if(strVals.startsWith("TGevent," + Title + ","))
     {
-       resList = strVals.split(",");
-       if(resList.count() != 8) return false;
-       Event *event = new Event();
-       event->Name = resList[2];
-       event->Channel = resList[3];
-       event->Start = resList[4];
-       event->Width = resList[5];
-       event->Value = resList[6].toFloat();
-       event->ValueOff = resList[7].toFloat();
-       Events.append(event);
-       if(Events.count()==1)
-       {
-           disconnect(ui->comboSelectEvent, SIGNAL(currentIndexChanged(int)), 0, 0);
-           ui->comboSelectEvent->clear();
-           ui->comboSelectEvent->addItem("");
-           ui->comboSelectEvent->addItem("New event");
-           ui->comboSelectEvent->addItem("Rename event");
-           ui->comboSelectEvent->addItem("Delete current");
-           connect(ui->comboSelectEvent,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventChange()));
-       }
-       ui->comboSelectEvent->addItem(resList[2]);
-//       connect(ui->comboSelectEvent,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventChange()));
-       return true;
+        resList = strVals.split(",");
+        if(resList.count() != 8) return false;
+        Event *event = new Event();
+        event->Name = resList[2];
+        event->Channel = resList[3];
+        event->Start = resList[4];
+        event->Width = resList[5];
+        event->Value = resList[6].toFloat();
+        event->ValueOff = resList[7].toFloat();
+        Events.append(event);
+        if(Events.count()==1)
+        {
+            disconnect(ui->comboSelectEvent, SIGNAL(currentIndexChanged(int)), 0, 0);
+            ui->comboSelectEvent->clear();
+            ui->comboSelectEvent->addItem("");
+            ui->comboSelectEvent->addItem("New event");
+            ui->comboSelectEvent->addItem("Rename event");
+            ui->comboSelectEvent->addItem("Delete current");
+            connect(ui->comboSelectEvent,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventChange()));
+        }
+        ui->comboSelectEvent->addItem(resList[2]);
+        //       connect(ui->comboSelectEvent,SIGNAL(currentIndexChanged(int)),this,SLOT(slotEventChange()));
+        return true;
     }
     if(strVals.startsWith("TGframe," + Title + ","))
     {
@@ -1063,8 +1063,8 @@ QString TimingGenerator::GenerateMuxSeq(QString Seq)
             {
                 if(evt->WidthT > 0)
                 {
-                   if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
-                   table += ":" + evt->Channel + ":" + QString::number(evt->ValueOff);
+                    if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
+                    table += ":" + evt->Channel + ":" + QString::number(evt->ValueOff);
                 }
             }
         }
@@ -1081,7 +1081,7 @@ QString TimingGenerator::GenerateMuxSeq(QString Seq)
             if(!timeFlag) { table += "," + QString::number(i); timeFlag=true; }
             if(ui->comboEnable->currentText() != "")
             {
-               table += ":" +  ui->comboEnable->currentText() + ":0";
+                table += ":" +  ui->comboEnable->currentText() + ":0";
             }
             table += ":];";
         }
@@ -1169,8 +1169,8 @@ void  TimingGenerator::slotGenerate(void)
             {
                 if(abs(evt->WidthT) > 0)
                 {
-                   if(!timeFlag) { table += "," + QString::number((int)(evt->StartT + evt->WidthT)); timeFlag=true; }
-                   table += ":" + Chan + ":" + QString::number(evt->ValueOff);
+                    if(!timeFlag) { table += "," + QString::number((int)(evt->StartT + evt->WidthT)); timeFlag=true; }
+                    table += ":" + Chan + ":" + QString::number(evt->ValueOff);
                 }
             }
         }
@@ -1187,7 +1187,7 @@ void  TimingGenerator::slotGenerate(void)
             if(!timeFlag) { table += "," + QString::number((int)maxCount); timeFlag=true; }
             if(ui->comboEnable->currentText() != "")
             {
-               table += ":" +  ui->comboEnable->currentText() + ":0";
+                table += ":" +  ui->comboEnable->currentText() + ":0";
             }
             table += ":];";
         }
@@ -1256,38 +1256,38 @@ void TimingGenerator::slotEventChange(void)
     }
     else if(ui->comboSelectEvent->currentText() == "Rename event")
     {
-       if(!ui->leEventName->text().isEmpty())
-       {
-           while(true)
-           {
-               text = QInputDialog::getText(0, "Rename event", "Enter new event name, must be unique:", QLineEdit::Normal,"", &ok );
-               if (ok && !text.isEmpty() )
-               {
-                   if(ui->comboSelectEvent->findText(text) >= 0)
-                   {
-                       QMessageBox msgBox;
-                       msgBox.setText("Name must be unique, try again!");
-                       msgBox.exec();
-                   }
-                   else break;
-               }
-               else return;
-           }
-           // Rename the event if here
-           ui->comboSelectEvent->removeItem(ui->comboSelectEvent->findText(ui->leEventName->text()));
-                   //ui->comboSelectEvent->findText(ui->leEventName->text());
-           ui->comboSelectEvent->addItem(text);
-           ui->leEventName->setText(text);
-           slotEventUpdated();
-           ui->comboSelectEvent->setCurrentIndex(0);
-           ui->leEventName->setText("");
-           ui->comboEventSignal->setCurrentIndex(0);
-           ui->leEventStart->setText("");
-           ui->leEventWidth->setText("");
-           ui->leEventValue->setText("");
-           ui->leEventValueOff->setText("");
-           selectedEvent = NULL;
-       }
+        if(!ui->leEventName->text().isEmpty())
+        {
+            while(true)
+            {
+                text = QInputDialog::getText(0, "Rename event", "Enter new event name, must be unique:", QLineEdit::Normal,"", &ok );
+                if (ok && !text.isEmpty() )
+                {
+                    if(ui->comboSelectEvent->findText(text) >= 0)
+                    {
+                        QMessageBox msgBox;
+                        msgBox.setText("Name must be unique, try again!");
+                        msgBox.exec();
+                    }
+                    else break;
+                }
+                else return;
+            }
+            // Rename the event if here
+            ui->comboSelectEvent->removeItem(ui->comboSelectEvent->findText(ui->leEventName->text()));
+            //ui->comboSelectEvent->findText(ui->leEventName->text());
+            ui->comboSelectEvent->addItem(text);
+            ui->leEventName->setText(text);
+            slotEventUpdated();
+            ui->comboSelectEvent->setCurrentIndex(0);
+            ui->leEventName->setText("");
+            ui->comboEventSignal->setCurrentIndex(0);
+            ui->leEventStart->setText("");
+            ui->leEventWidth->setText("");
+            ui->leEventValue->setText("");
+            ui->leEventValueOff->setText("");
+            selectedEvent = NULL;
+        }
     }
     else if(ui->comboSelectEvent->currentText() == "Delete current")
     {
@@ -1389,11 +1389,11 @@ QString TimingGenerator::ProcessCommand(QString cmd)
     else if(resList[0].trimmed() == Title + ".Edit") pb = Edit;
     if(le != NULL)
     {
-       if(resList.count() == 1) return le->text();
-       le->setText(resList[1]);
-       le->setModified(true);
-       le->editingFinished();
-       return "";
+        if(resList.count() == 1) return le->text();
+        le->setText(resList[1]);
+        le->setModified(true);
+        le->editingFinished();
+        return "";
     }
     if(rb != NULL)
     {
@@ -1413,11 +1413,11 @@ QString TimingGenerator::ProcessCommand(QString cmd)
     }
     if(combo != NULL)
     {
-       if(resList.count() == 1) return combo->currentText();
-       int i = combo->findText(resList[1].trimmed());
-       if(i<0) return "?";
-       combo->setCurrentIndex(i);
-       return "";
+        if(resList.count() == 1) return combo->currentText();
+        int i = combo->findText(resList[1].trimmed());
+        if(i<0) return "?";
+        combo->setCurrentIndex(i);
+        return "";
     }
     if(pb != NULL)
     {
@@ -1429,13 +1429,13 @@ QString TimingGenerator::ProcessCommand(QString cmd)
 
 void TimingGenerator::slotClearEvents(void)
 {
-   ui->pbClearEvents->setDown(false);
-   Events.clear();
-   ui->comboSelectEvent->clear();
-   ui->comboSelectEvent->addItem("");
-   ui->comboSelectEvent->addItem("New event");
-   ui->comboSelectEvent->addItem("Rename event");
-   ui->comboSelectEvent->addItem("Delete current");
+    ui->pbClearEvents->setDown(false);
+    Events.clear();
+    ui->comboSelectEvent->clear();
+    ui->comboSelectEvent->addItem("");
+    ui->comboSelectEvent->addItem("New event");
+    ui->comboSelectEvent->addItem("Rename event");
+    ui->comboSelectEvent->addItem("Delete current");
 }
 
 void TimingGenerator::slotLoad(void)
@@ -1649,7 +1649,7 @@ void IFTtiming::pbGenerate(void)
 // Download table parameters to MIPS
 void IFTtiming::pbDownload(void)
 {
-   TableDownloaded = DownloadTable(comms, Table->text(), ClockSource->currentText(), TriggerSource->currentText());
+    TableDownloaded = DownloadTable(comms, Table->text(), ClockSource->currentText(), TriggerSource->currentText());
 }
 
 void IFTtiming::pbTrigger(void)
@@ -1677,7 +1677,7 @@ void IFTtiming::AcquireData(QString path)
 {
     AD->TableDownloaded = TableDownloaded;
     AD->StartAcquire(path, FrameSize->text().toInt(), Accumulations->text().toInt());
-//    connect(AD,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
+    //    connect(AD,SIGNAL(dataAcquired(QString)),this,SLOT(slotDataAcquired(QString)));
 }
 
 // The function sends the table abort command to MIPS. Returns ACK if ok, else returns NAK.
