@@ -438,22 +438,22 @@ void TimingControl::pbTrigger(void)
         {
             if(properties != NULL) properties->Log("Timing control trigger pressed while running!");
             // Now ask user about forcing a trigger
-            QMessageBox msgBox;
-            QString msg = "The system is in external trigger mode waiting for a trigger event.\n";
-            msg += "Select Yes if you would like to force a trigger or No to exit and keep waiting.\n";
-            msgBox.setText(msg);
-            msgBox.setInformativeText("Select Yes to force a trigger?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            msgBox.setDefaultButton(QMessageBox::Yes);
-            int ret = msgBox.exec();
-            if(ret == QMessageBox::Yes)
-            {
-                if(properties != NULL) properties->Log("Timing control trigger forced.");
-                if(comms->SendCommand("TBLSTRT\n")) {if(statusBar != NULL) statusBar->showMessage("Table trigger command accepted!", 5000);}
-                else if(statusBar != NULL) statusBar->showMessage("Table trigger command rejected!", 5000);
-                return;
-            }
-            else return;
+            //            QMessageBox msgBox;
+            //            QString msg = "The system is in external trigger mode waiting for a trigger event.\n";
+            //            msg += "Select Yes if you would like to force a trigger or No to exit and keep waiting.\n";
+            //            msgBox.setText(msg);
+            //            msgBox.setInformativeText("Select Yes to force a trigger?");
+            //            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            //            msgBox.setDefaultButton(QMessageBox::Yes);
+            //            int ret = msgBox.exec();
+            //            if(ret == QMessageBox::Yes)
+            //            {
+            if(properties != NULL) properties->Log("Timing control trigger forced.");
+            if(comms->SendCommand("TBLSTRT\n")) {if(statusBar != NULL) statusBar->showMessage("Table trigger command accepted!", 5000);}
+            else if(statusBar != NULL) statusBar->showMessage("Table trigger command rejected!", 5000);
+            return;
+            //            }
+            //            else return;
         }
         if(properties != NULL) properties->Log("Timing control trigger pressed, external triggers enabled.");
     }
