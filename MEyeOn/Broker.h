@@ -83,6 +83,6 @@ private:
     void SetConfigError(bool err, std::string err_msg);
     std::string GenerateRandomHexString(const unsigned int len);
 
-    void waitAcqAck(unsigned int timeOutMs = 500);
+    void waitAcqAck(unsigned int timeOutMs = 1000);
     void waitInitAck(unsigned int timeOutMs = 5000);
 };
