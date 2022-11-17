@@ -118,7 +118,7 @@ private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
    // panel. So need to use signal and slot like runScript()
     QScriptValue mips; // Actually configuration panel instead of mips
-    QScriptEngine *engine;
+//    QScriptEngine *engine;
     TrendRealTimeDialog* trendRealTimeDialog{};
     StreamerClient* _streamerClient{nullptr};
     QString _sbcIpAddress;

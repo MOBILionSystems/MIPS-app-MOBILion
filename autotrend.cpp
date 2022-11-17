@@ -30,9 +30,9 @@ AutoTrend::AutoTrend(QWidget *parent) :
     _qtofClient = new QtofAddonClient(this);
     connect(_qtofClient, &QtofAddonClient::ceVoltageReceived, this, &AutoTrend::onCeVoltageReceived);
 
-    engine = new QScriptEngine(this);
-    mips = engine->newQObject(parent);
-    engine->globalObject().setProperty("mips", mips);
+//    engine = new QScriptEngine(this);
+//    mips = engine->newQObject(parent);
+//    engine->globalObject().setProperty("mips", mips);
     trendRealTimeDialog = new TrendRealTimeDialog(this);
     trendSM = new QStateMachine(this);
     buildTrendSM();
@@ -72,8 +72,10 @@ void AutoTrend::on_addRelationButton_clicked()
     QString newRelation;
     newRelation = dcElectrodes.at(leftIndex) + "=" + dcElectrodes.at(rightIndex);
 
-    QString leftValueString = engine->evaluate(QString("mips.Command(\"%1\")").arg(dcElectrodes.at(leftIndex))).toString().trimmed();
-    QString rightValueString = engine->evaluate(QString("mips.Command(\"%1\")").arg(dcElectrodes.at(rightIndex))).toString().trimmed();
+    emit runCommand(dcElectrodes.at(leftIndex));
+    QString leftValueString = cpResponse.trimmed();
+    emit runCommand(dcElectrodes.at(rightIndex));
+    QString rightValueString = cpResponse.trimmed();
 
     if(leftValueString.isEmpty() || rightValueString.isEmpty()) return;
     if(leftValueString == rightValueString){
@@ -306,6 +308,8 @@ void AutoTrend::buildTrendSM()
         }else{
             emit runCommand(trendName + "=" + trendOriginValue);
             updateTrendCurrentValue(trendOriginValue);
+            if(relationEnabled)
+                applyRelations(trendName, trendOriginValue.toDouble());
         }});
 }
 
