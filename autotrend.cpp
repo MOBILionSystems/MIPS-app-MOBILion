@@ -704,7 +704,7 @@ void AutoTrend::onAcqAckNack(AckNack response)
     if(response == AckNack::Nack){
         QMessageBox::warning(this, "Warning", "Digitizer refused to acquire data.");
     }else if(response == AckNack::TimeOut){
-        QMessageBox::warning(this, "Warning", "No response from Digitizer for acquisition.");
+        //QMessageBox::warning(this, "Warning", "No response from Digitizer for acquisition.");
     }
     if(_maf)
         emit nextMafState();
