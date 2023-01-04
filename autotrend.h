@@ -176,9 +176,6 @@ private:
     void buildSbcConnectSM();
     QTimer* tbMonitorTimer; // Timing table monitor timer
     QTimer* autoAcqTimer;
-    int autoAcqTimeout_s = 60; // 60s
-    int autoAcqInterval_ms = 10;
-    int autoAcqTimeCount = 0;
 
     bool test1s = false;
     void updateTrendCurrentValue(QString s = "");

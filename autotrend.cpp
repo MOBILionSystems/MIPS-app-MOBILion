@@ -25,7 +25,7 @@ AutoTrend::AutoTrend(QWidget *parent) :
     connect(tbMonitorTimer, &QTimer::timeout, this, &AutoTrend::onTBTimerTimeout);
 
     autoAcqTimer = new QTimer(this);
-    autoAcqTimer->setInterval(autoAcqInterval_ms);
+    autoAcqTimer->setInterval(10);
     connect(autoAcqTimer, &QTimer::timeout, this, &AutoTrend::onAutoAcqTimeout);
 
     ping = new QProcess(this);
@@ -123,7 +123,6 @@ void AutoTrend::initUI()
     ui->trendStepSize->setValidator(new QIntValidator(-10000, 10000, this));
     ui->ceVlineEdit->setValidator(new QIntValidator(0, 1000, this));
     ui->rtbScansLineEdit->setValidator(new QIntValidator(4, 100, this));
-    ui->autoAcqLineEdit->setValidator(new QIntValidator(1, 1000, this));
 
     connect(ui->sbcIPEdit, &QLineEdit::textChanged, this, [=](){
         QLineEdit *sbcIp = ui->sbcIPEdit;
@@ -224,7 +223,6 @@ void AutoTrend::buildTrendSM()
         ui->trendProgressBar->setValue(0);
 
         _maf = ui->mafCheckBox->isChecked();
-        autoAcqTimeout_s = ui->autoAcqLineEdit->text().toInt();
 
         if(_maf){
             emit runCommand("IMS.Cycles");
@@ -789,7 +787,6 @@ void AutoTrend::runAutoAcq()
     if(cpResponse == "0"){
         QMessageBox::warning(this, "Warning", "Failed to start Auto-Acq.");
     }else{
-        autoAcqTimeCount = 0;
         autoAcqTimer->start();
     }
 }
@@ -826,10 +823,9 @@ void AutoTrend::onTBTimerTimeout()
 
 void AutoTrend::onAutoAcqTimeout()
 {
-    autoAcqTimeCount++;
-    if(autoAcqTimeCount > autoAcqTimeout_s * 1000 / autoAcqInterval_ms){
+    if(!ui->acqCheckBox->isChecked()){
         autoAcqTimer->stop();
-        QMessageBox::warning(this, "Warning", "Timeout for Auto-Acq.");
+        QMessageBox::warning(this, "Warning", "Force to finish AutoAcq.");
         emit goFinishState();
         return;
     }
