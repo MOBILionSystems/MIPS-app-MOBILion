@@ -3053,6 +3053,7 @@ void AutoTrendButton::atbPressed()
     if(!autotrendA2RAD){
         autotrendA2RAD = new AutoTrend(this);
         connect(autotrendA2RAD, &AutoTrend::runCommand, this, &AutoTrendButton::onRunCommand);
+        connect(autotrendA2RAD, &AutoTrend::sendCommand, this, &AutoTrendButton::onSendCommand);
         connect(autotrendA2RAD, &AutoTrend::sendMess, this, &AutoTrendButton::onSendMess);
         connect(autotrendA2RAD, &AutoTrend::getTrendList, this, &AutoTrendButton::onGetTrendList);
         autotrendA2RAD->updateAllTrendList();
@@ -3084,6 +3085,14 @@ void AutoTrendButton::onSendMess(QString toWhom, QString message)
     qDebug() << toWhom << ", " << message;
     qDebug() << "Message response: " << response;
     autotrendA2RAD->updateScriptValue(response);
+}
+
+void AutoTrendButton::onSendCommand(QString toWhom, QString command)
+{
+    bool sentSuccess = p->SendCommand(toWhom, command);
+    qDebug() << toWhom << ", " << command;
+    qDebug() << "command response: " << sentSuccess;
+    autotrendA2RAD->updateScriptValue(QString::number(sentSuccess));
 }
 
 void AutoTrendButton::onGetTrendList(const QString forWhat)

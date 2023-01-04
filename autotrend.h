@@ -52,6 +52,7 @@ signals:
     void abortTrend();
     void nextForSingleShot();   // signal for nonMAF signal shot
     void runCommand(QString s);
+    void sendCommand(QString toWhom, QString command);
     void sendMess(QString toWhom, QString message);
     void getTrendList(QString forWhat);
 
@@ -105,9 +106,13 @@ private slots:
 
     void runTimingTable();
 
+    void runAutoAcq();
+
     void onCeVoltageReceived(bool success);
 
     void onTBTimerTimeout();
+
+    void onAutoAcqTimeout();
 
     void on_rtbCheckBox_stateChanged(int checkState);
 
@@ -170,8 +175,12 @@ private:
     void buildTrendSM();
     void buildSbcConnectSM();
     QTimer* tbMonitorTimer; // Timing table monitor timer
+    QTimer* autoAcqTimer;
+    int autoAcqTimeout_s = 60; // 60s
+    int autoAcqInterval_ms = 10;
+    int autoAcqTimeCount = 0;
 
-    bool test1s = true;
+    bool test1s = false;
     void updateTrendCurrentValue(QString s = "");
 
 };

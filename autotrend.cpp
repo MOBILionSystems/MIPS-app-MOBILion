@@ -24,15 +24,19 @@ AutoTrend::AutoTrend(QWidget *parent) :
     tbMonitorTimer->setInterval(100);
     connect(tbMonitorTimer, &QTimer::timeout, this, &AutoTrend::onTBTimerTimeout);
 
+    autoAcqTimer = new QTimer(this);
+    autoAcqTimer->setInterval(autoAcqInterval_ms);
+    connect(autoAcqTimer, &QTimer::timeout, this, &AutoTrend::onAutoAcqTimeout);
+
     ping = new QProcess(this);
     connect(ping, SIGNAL(readyReadStandardOutput()), SLOT(readResult()));
 
     _qtofClient = new QtofAddonClient(this);
     connect(_qtofClient, &QtofAddonClient::ceVoltageReceived, this, &AutoTrend::onCeVoltageReceived);
 
-//    engine = new QScriptEngine(this);
-//    mips = engine->newQObject(parent);
-//    engine->globalObject().setProperty("mips", mips);
+    //    engine = new QScriptEngine(this);
+    //    mips = engine->newQObject(parent);
+    //    engine->globalObject().setProperty("mips", mips);
     trendRealTimeDialog = new TrendRealTimeDialog(this);
     trendSM = new QStateMachine(this);
     buildTrendSM();
@@ -112,12 +116,14 @@ void AutoTrend::initUI()
     ui->trendComboBox->addItems(dcElectrodes);
     ui->polarityComboBox->addItems(polarities);
     ui->rangeComboBox->addItems(ranges);
+    ui->rangeComboBox->setCurrentIndex(11);
     ui->relationListView->setModel(relationModel);
     ui->trendFrom->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendTo->setValidator(new QIntValidator(-10000, 10000, this));
     ui->trendStepSize->setValidator(new QIntValidator(-10000, 10000, this));
     ui->ceVlineEdit->setValidator(new QIntValidator(0, 1000, this));
     ui->rtbScansLineEdit->setValidator(new QIntValidator(4, 100, this));
+    ui->autoAcqLineEdit->setValidator(new QIntValidator(1, 1000, this));
 
     connect(ui->sbcIPEdit, &QLineEdit::textChanged, this, [=](){
         QLineEdit *sbcIp = ui->sbcIPEdit;
@@ -190,6 +196,7 @@ void AutoTrend::buildTrendSM()
     QState* updateTrendState = new QState(trendSM);
     QState* applyRelationState = new QState(trendSM);
     QState* waitBeforeAcqState = new QState(trendSM);
+    QState* autoAcqState = new QState(trendSM);
     QState* startAcqState = new QState(trendSM);
 
     QState* ceVoltageState = new QState(trendSM);
@@ -217,6 +224,8 @@ void AutoTrend::buildTrendSM()
         ui->trendProgressBar->setValue(0);
 
         _maf = ui->mafCheckBox->isChecked();
+        autoAcqTimeout_s = ui->autoAcqLineEdit->text().toInt();
+
         if(_maf){
             emit runCommand("IMS.Cycles");
             _mafTotalCycle = cpResponse.toInt();
@@ -232,7 +241,7 @@ void AutoTrend::buildTrendSM()
             emit nextAcqState();
     });
     initState->addTransition(this, &AutoTrend::nextAcqState, updateTrendState);
-    initState->addTransition(this, &AutoTrend::nextForSingleShot, startAcqState);
+    initState->addTransition(this, &AutoTrend::nextForSingleShot, autoAcqState);
 
     connect(updateTrendState, &QState::entered, this, [=](){
         // qDebug() << "updateTrendState";
@@ -255,7 +264,11 @@ void AutoTrend::buildTrendSM()
     applyRelationState->addTransition(this, &AutoTrend::abortTrend, finishState);
 
     connect(waitBeforeAcqState, &QState::entered, this, [=](){QTimer::singleShot(2000, this, [=](){emit nextAcqState();});});
-    waitBeforeAcqState->addTransition(this, &AutoTrend::nextAcqState, startAcqState);
+    waitBeforeAcqState->addTransition(this, &AutoTrend::nextAcqState, autoAcqState);
+
+    connect(autoAcqState, &QState::entered, this, &AutoTrend::runAutoAcq);
+    autoAcqState->addTransition(this, &AutoTrend::nextAcqState, startAcqState);
+    autoAcqState->addTransition(this, &AutoTrend::goFinishState, finishState);
 
     connect(startAcqState, &QState::entered, this, [=](){
         qDebug() << "startAcqState";
@@ -304,6 +317,10 @@ void AutoTrend::buildTrendSM()
         trendRealTimeDialog->wrapLastStep();
         ui->trendProgressBar->setValue(100);
         if(singleShot){
+            if(ui->acqCheckBox->isChecked()){
+                trendSM->start();
+                return;
+            }
             singleShot = false;
         }else{
             emit runCommand(trendName + "=" + trendOriginValue);
@@ -752,6 +769,31 @@ void AutoTrend::runTimingTable()
     }
 }
 
+/*
+mips.SendCommand("MIPS-3","SDIO,A,1\n");
+res = mips.SendMess("MIPS-3","GDIO,S\n");
+while(res == 0){
+    res = mips.SendMess("MIPS-3","GDIO,S\n");
+}
+*/
+
+void AutoTrend::runAutoAcq()
+{
+    if(!ui->acqCheckBox->isChecked()){
+        emit nextAcqState();
+        return;
+    }
+
+    qDebug() << "runAutoAcq";
+    emit sendCommand("MIPS-3","SDIO,A,1\n");
+    if(cpResponse == "0"){
+        QMessageBox::warning(this, "Warning", "Failed to start Auto-Acq.");
+    }else{
+        autoAcqTimeCount = 0;
+        autoAcqTimer->start();
+    }
+}
+
 void AutoTrend::onCeVoltageReceived(bool success)
 {
     if(success){
@@ -780,6 +822,27 @@ void AutoTrend::onTBTimerTimeout()
         tbMonitorTimer->stop();
         emit failMafState();
     }
+}
+
+void AutoTrend::onAutoAcqTimeout()
+{
+    autoAcqTimeCount++;
+    if(autoAcqTimeCount > autoAcqTimeout_s * 1000 / autoAcqInterval_ms){
+        autoAcqTimer->stop();
+        QMessageBox::warning(this, "Warning", "Timeout for Auto-Acq.");
+        emit goFinishState();
+        return;
+    }
+
+    emit sendMess("MIPS-3","GDIO,S\n");
+    if(cpResponse == "1"){
+        autoAcqTimer->stop();
+        emit nextAcqState();
+        return;
+    }
+
+
+
 }
 
 

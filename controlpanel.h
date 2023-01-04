@@ -86,6 +86,7 @@ private slots:
     void atbPressed(void);
     void onRunCommand(QString s);
     void onSendMess(QString toWhom, QString message);
+    void onSendCommand(QString toWhom, QString command);
     void onGetTrendList(const QString forWhat);
 };
 
