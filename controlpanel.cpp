@@ -606,6 +606,10 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
     file.close();
     foreach(TimingControl *tc, TC)
     {
+        tc->TG->AddSignal("A", "A");
+        tc->TG->AddSignal("B", "B");
+        tc->TG->AddSignal("C", "C");
+        tc->TG->AddSignal("D", "D");
         tc->TG->AddSignal("Trig out","t");
         tc->TG->AddSignal("Delta t","d");
         foreach(ARBchannel *arb, ARBchans)

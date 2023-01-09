@@ -1,0 +1,63 @@
+// Updated 1/9/2023
+// Set timing generator 1 events
+TG = "MIPS-1 TG"
+mips.Command(TG + ".Frame.Accumulations=" + mips.Command("IMS.Cycles").trim())
+SetTGevent("FillTime","IMS.Fill","Event.Width=")
+SetTGevent("TrapTime","IMS.Trap","Event.Width=")
+SetTGevent("ReleaseTime","IMS.Release","Event.Width=")
+SetTGevent("SeparateTime","IMS.Separate","Event.Width=")
+SetTGevent("FlushTime","IMS.Flush","Event.Width=")
+guardV = mips.Command("DC voltage.D grd").trim()
+SetTGevent("D gnd","","Event.Value off=" + guardV)
+SetTGevent("D gnd","IMS.Flush","Event.Width=")
+SetTGevent("D gnd","IMS.Flush V","Event.Value=")
+guardV = mips.Command("DC voltage.S grd").trim()
+SetTGevent("ENT SG","","Event.Value off=" + guardV)
+SetTGevent("ENT SG","IMS.Ent SG","Event.Value=")
+mips.Command(TG + ".Generate")
+
+// Set timing generator 2 events
+TG = "MIPS-2 TG"
+SetTGevent("FillTime","IMS.Fill","Event.Width=")
+SetTGevent("TrapTime","IMS.Trap","Event.Width=")
+SetTGevent("ReleaseTime","IMS.Release","Event.Width=")
+mips.Command(TG + ".Generate")
+
+// This function will set the IMS MIPS-A timing generator's selected event.
+// gcmd will read the selected value from the control panel if its not and
+// empty string. scmd will send the data to the elected timing generator
+// value in its not an empty string.
+function SetTGevent(event,gcmd,scmd)
+{
+   res = mips.Command(TG + ".Event.Select event=" + event).trim()
+   if(res == "?")
+   {
+     mips.popupMessage("!Can't locate " + event);
+     throw new Error("BADVAL")
+   }
+   return SetTGValue(gcmd,scmd)
+}
+
+function SetTGValue(gcmd,scmd)
+{
+   res = ""
+   if(gcmd != "")
+   {
+      res = mips.Command(gcmd).trim()
+      if((isNaN(res) == true) || (res == ""))
+      {
+        mips.popupMessage("Invalid parameter in " + gcmd);
+        throw new Error("BADVAL")
+      }
+   }
+   if(scmd != "")
+   {
+      ans = mips.Command(TG + "." + scmd + res).trim()
+      if(ans == "?")
+      {
+         mips.popupMessage("!Can't locate " + TG + "." + scmd);
+         throw new Error("BADVAL")
+      }
+   }
+   return res
+}

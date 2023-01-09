@@ -1,0 +1,17 @@
+# Timing sequence, Mon Jan 9 13:35:08 2023
+TGevent,MIPS-1 TG,FillTime,,0,600,0,0
+TGevent,MIPS-1 TG,TrapTime,,FillTime.Start+FillTime.Width,2,0,0
+TGevent,MIPS-1 TG,ReleaseTime,,TrapTime.Start+TrapTime.Width,5,0,0
+TGevent,MIPS-1 TG,SeparateTime,A,ReleaseTime.Start+ReleaseTime.Width,500,1,0
+TGevent,MIPS-1 TG,FlushTime,,SeparateTime.Start+SeparateTime.Width,20,0,0
+TGevent,MIPS-1 TG,Trigger,B,0,1,1,0
+TGevent,MIPS-1 TG,ENT SG,8,FillTime.Start,FillTime.Width,70,75
+TGevent,MIPS-1 TG,D gnd,5,FlushTime.Start,FlushTime.Width,30,65
+TGframe,MIPS-1 TG,0,FillTime.Width+TrapTime.Width+ReleaseTime.Width+SeparateTime.Width+FlushTime.Width,60,
+TGclock,MIPS-1 TG,656250
+TGtrigger,MIPS-1 TG,Software
+TGmux,MIPS-1 TG,None
+TGtable,MIPS-1 TG,STBLDAT;0:[A:61,0:B:1:8:70,656:B:0,393750:8:75,395062:A:1,726468:A:0:5:30,739593:5:65:];
+ExtClock,MIPS-1 TG,6135
+TimeMode,MIPS-1 TG,TRUE
+

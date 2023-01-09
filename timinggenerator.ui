@@ -331,6 +331,9 @@
     </property>
    </widget>
    <widget class="QComboBox" name="comboEnable">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>109</x>

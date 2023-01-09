@@ -1,0 +1,114 @@
+# Control panel settings, Mon Jan 9 15:44:13 2023
+# MIPS, Version 1.93 Jan 15, 2022
+# Control panel file, C:/Users/Phoenix/Desktop/MIP_Data_Acquisition2023/A2RAD(0808)/A2RAD-NEW-RFmega.cfg
+# MIPS-3: Version 1.153, Feb 21, 2019
+# ?: MIPS RF Mega Version 1.1, May 5, 2022
+# MIPS-2: Version 1.217t,Feb 23,2022
+# MIPS-1: Version 1.217t,Feb 23,2022
+# MIPS-3: System has been up for at least: 21259.10 minutes
+# MIPS-2: System has been up for at least: 7.75 minutes
+# MIPS-1: System has been up for at least: 4461.62 minutes
+DCB offsets,2
+DC voltage.1-8 off,0.00
+DC voltage.9-16 off,0.00
+RF channels,5
+Funnel RF,28.00,1155000,172.96,183.74,4.75
+Quad RF,25.00,1079000,180.99,209.25,3.37
+Long Path Top RF,0.00,787000,12.41,6.27,0.00
+Long Path Bottom RF,0.00,764000,6.85,5.83,0.00
+Short Path RF,40.00,932000,247.68,268.15,9.83
+DCB channels,16
+DC voltage.Fun in,165.00,164.99
+DC voltage.Fun out,100.00,100.09
+DC voltage.Fun CL,95.00,95.04
+DC voltage.S grd,75.00,75.02
+DC voltage.D grd,65.00,64.93
+DC voltage.LOBAR G1,75.00,75.04
+DC voltage.LOBAR G2,80.00,80.02
+DC voltage.ENT SG,75.00,75.19
+DC voltage.EXT SG,65.00,64.90
+DC voltage.EntExt PG,70.00,70.03
+DC voltage.EntExt ICD,70.00,70.12
+DC voltage.Deflect,65.00,65.09
+DC voltage.Quad,50.00,50.12
+DC voltage.Exit CL,55.00,54.96
+DC voltage.ARB,60.00,60.04
+DC voltage.RF bias,60.00,60.09
+DCB enables,1
+DC voltage.DC bias enable,ON
+DIO channels,7
+MIPS-1 DIO.ARB trig,0
+MIPS-2 DIO.Ent PG,1
+MIPS-2 DIO.Ent ICD,0
+MIPS-2 DIO.Exit PG,1
+MIPS-2 DIO.Exit ICD,0
+MIPS-2 DIO.LOBAR G1 SW,1
+MIPS-2 DIO.LOBAR G2 SW,1
+ARB channels,4
+Entrance TW,24764,15.00,0.00,0.00,FWD,SIN
+LOBAR TW,24764,30.00,0.00,0.00,FWD,SIN
+TW Switch,24764,30.00,0.00,0.00,REV,SIN
+Seperation TW,24764,32.00,0.00,0.00,FWD,SIN
+Custom control channels,27
+Operating mode.ICD.Entrance,FALSE
+Operating mode.ICD.Exit,FALSE
+Operating mode.Path Lng,Long
+IMS.Fill,600,600
+IMS.Trap,0.2,0.2
+IMS.Release,5,5
+IMS.Separate,,
+IMS.Flush,20,20
+IMS.Cycles,60,60
+IMS.Ent SG,70,70
+IMS.Flush V,30,30
+ARB Sweep.ARB,1,1
+ARB Sweep.Start F,5000,5000
+ARB Sweep.Stop F,40000,40000
+ARB Sweep.Start V,25.00,25.00
+ARB Sweep.Stop V,25.00,25.00
+ARB Sweep.Sweep T,0.10,0.10
+ARB Sweep.Status,IDLE,IDLE
+?.Enable,TRUE
+?.Drive,35.30,35.30
+?.Freq,970000,970000
+?.RF+,214.83
+?.RF-,212.33
+?.Power,91.58
+
+DS1 DS2 guards.DS1,70,70
+DS1 DS2 guards.DS2,70,70
+External devices,2
+Pressures.Funnel,0Pressures.SLIM,Port: COM6 failed to open!ExternalDevicesEnd
+Timing control parameters
+TGevent,MIPS-1 TG,FillTime,,0,600,0,0
+TGevent,MIPS-1 TG,TrapTime,,FillTime.Start+FillTime.Width,2,0,0
+TGevent,MIPS-1 TG,ReleaseTime,,TrapTime.Start+TrapTime.Width,5,0,0
+TGevent,MIPS-1 TG,SeparateTime,A,ReleaseTime.Start+ReleaseTime.Width,500,1,0
+TGevent,MIPS-1 TG,FlushTime,,SeparateTime.Start+SeparateTime.Width,20,0,0
+TGevent,MIPS-1 TG,Trigger,B,0,1,1,0
+TGevent,MIPS-1 TG,ENT SG,8,FillTime.Start,FillTime.Width,70,75
+TGevent,MIPS-1 TG,D gnd,5,FlushTime.Start,FlushTime.Width,30,65
+TGframe,MIPS-1 TG,0,FillTime.Width+TrapTime.Width+ReleaseTime.Width+SeparateTime.Width+FlushTime.Width,60,
+TGclock,MIPS-1 TG,656250
+TGtrigger,MIPS-1 TG,Software
+TGmux,MIPS-1 TG,None
+TGtable,MIPS-1 TG,STBLDAT;0:[A:61,0:B:1:8:70,656:B:0,393750:8:75,398343:A:1,726468:A:0:5:30,739593:5:65:];
+ExtClock,MIPS-1 TG,6135
+TimeMode,MIPS-1 TG,TRUE
+
+TGevent,MIPS-2 TG,FillTime,,0,600,0,0
+TGevent,MIPS-2 TG,TrapTime,,FillTime.Start+FillTime.Width,2,0,0
+TGevent,MIPS-2 TG,ReleaseTime,,TrapTime.Start+TrapTime.Width,5,0,0
+TGevent,MIPS-2 TG,Ent PG,A,FillTime.Start,FillTime.Width,1,0
+TGevent,MIPS-2 TG,Ent ICD,B,FillTime.Start,FillTime.Width,0,1
+TGevent,MIPS-2 TG,LOBAR G1 SW,E,ReleaseTime.Start,ReleaseTime.Width,1,0
+TGevent,MIPS-2 TG,LOBAR G2 SW,F,ReleaseTime.Start,ReleaseTime.Width,1,0
+TGframe,MIPS-2 TG,0,FillTime.Width+TrapTime.Width+ReleaseTime.Width+10,1,
+TGclock,MIPS-2 TG,656250
+TGtrigger,MIPS-2 TG,Pos
+TGmux,MIPS-2 TG,None
+TGtable,MIPS-2 TG,STBLDAT;0:[A:1,0:A:1:B:0,393750:A:0:B:1,395062:E:1:F:1,398343:E:0:F:0,404906:];
+ExtClock,MIPS-2 TG,6135
+TimeMode,MIPS-2 TG,TRUE
+
+TCparametersEnd
