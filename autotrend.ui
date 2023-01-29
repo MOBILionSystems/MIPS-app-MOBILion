@@ -66,7 +66,7 @@
    <property name="geometry">
     <rect>
      <x>15</x>
-     <y>230</y>
+     <y>250</y>
      <width>41</width>
      <height>27</height>
     </rect>
@@ -79,7 +79,7 @@
    <property name="geometry">
     <rect>
      <x>55</x>
-     <y>230</y>
+     <y>250</y>
      <width>151</width>
      <height>30</height>
     </rect>
@@ -102,7 +102,7 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>270</y>
+     <y>290</y>
      <width>31</width>
      <height>26</height>
     </rect>
@@ -115,7 +115,7 @@
    <property name="geometry">
     <rect>
      <x>25</x>
-     <y>310</y>
+     <y>330</y>
      <width>49</width>
      <height>22</height>
     </rect>
@@ -128,7 +128,7 @@
    <property name="geometry">
     <rect>
      <x>165</x>
-     <y>276</y>
+     <y>296</y>
      <width>61</width>
      <height>22</height>
     </rect>
@@ -200,7 +200,7 @@
    <property name="geometry">
     <rect>
      <x>170</x>
-     <y>50</y>
+     <y>79</y>
      <width>131</width>
      <height>31</height>
     </rect>
@@ -226,7 +226,7 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>270</y>
+     <y>290</y>
      <width>61</width>
      <height>30</height>
     </rect>
@@ -239,7 +239,7 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>310</y>
+     <y>330</y>
      <width>61</width>
      <height>30</height>
     </rect>
@@ -252,7 +252,7 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>270</y>
+     <y>290</y>
      <width>71</width>
      <height>30</height>
     </rect>
@@ -317,8 +317,8 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>190</y>
-     <width>91</width>
+     <y>219</y>
+     <width>51</width>
      <height>28</height>
     </rect>
    </property>
@@ -336,8 +336,8 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>190</y>
-     <width>91</width>
+     <y>219</y>
+     <width>51</width>
      <height>28</height>
     </rect>
    </property>
@@ -352,8 +352,8 @@
    <property name="geometry">
     <rect>
      <x>240</x>
-     <y>190</y>
-     <width>91</width>
+     <y>219</y>
+     <width>51</width>
      <height>28</height>
     </rect>
    </property>
@@ -368,8 +368,8 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>230</y>
-     <width>111</width>
+     <y>250</y>
+     <width>101</width>
      <height>26</height>
     </rect>
    </property>
@@ -377,37 +377,11 @@
     <string>TextLabel</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_9">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>350</y>
-     <width>131</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Peaks balance weight:</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="peakBalanceWeightlineEdit">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>350</y>
-     <width>41</width>
-     <height>30</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>1</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="singleShotButton">
    <property name="geometry">
     <rect>
      <x>120</x>
-     <y>160</y>
+     <y>189</y>
      <width>181</width>
      <height>31</height>
     </rect>
@@ -420,7 +394,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>100</y>
+     <y>129</y>
      <width>91</width>
      <height>21</height>
     </rect>
@@ -433,7 +407,7 @@
    <property name="geometry">
     <rect>
      <x>170</x>
-     <y>90</y>
+     <y>119</y>
      <width>131</width>
      <height>31</height>
     </rect>
@@ -446,7 +420,7 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>100</y>
+     <y>129</y>
      <width>81</width>
      <height>21</height>
     </rect>
@@ -456,7 +430,7 @@
    <property name="geometry">
     <rect>
      <x>21</x>
-     <y>130</y>
+     <y>159</y>
      <width>70</width>
      <height>22</height>
     </rect>
@@ -469,7 +443,7 @@
    <property name="geometry">
     <rect>
      <x>100</x>
-     <y>130</y>
+     <y>159</y>
      <width>111</width>
      <height>20</height>
     </rect>
@@ -482,7 +456,7 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>130</y>
+     <y>159</y>
      <width>41</width>
      <height>24</height>
     </rect>
@@ -521,7 +495,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>56</y>
+     <y>85</y>
      <width>131</width>
      <height>20</height>
     </rect>
@@ -537,14 +511,14 @@
     </rect>
    </property>
    <property name="text">
-    <string>(4-100)</string>
+    <string>(4-64)</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_13">
    <property name="geometry">
     <rect>
      <x>264</x>
-     <y>134</y>
+     <y>163</y>
      <width>49</width>
      <height>16</height>
     </rect>
@@ -557,13 +531,39 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>161</y>
+     <y>190</y>
      <width>81</width>
      <height>22</height>
     </rect>
    </property>
    <property name="text">
     <string>Auto-ACQ</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>50</y>
+     <width>61</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Threshold:</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="rtbThresholdLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>230</x>
+     <y>50</y>
+     <width>71</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>1750</string>
    </property>
   </widget>
  </widget>

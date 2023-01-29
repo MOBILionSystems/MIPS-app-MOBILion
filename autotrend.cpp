@@ -123,6 +123,7 @@ void AutoTrend::initUI()
     ui->trendStepSize->setValidator(new QIntValidator(-10000, 10000, this));
     ui->ceVlineEdit->setValidator(new QIntValidator(0, 1000, this));
     ui->rtbScansLineEdit->setValidator(new QIntValidator(4, 100, this));
+    ui->rtbThresholdLineEdit->setValidator(new QIntValidator(200, 60000, this));
 
     connect(ui->sbcIPEdit, &QLineEdit::textChanged, this, [=](){
         QLineEdit *sbcIp = ui->sbcIPEdit;
@@ -859,4 +860,10 @@ void AutoTrend::on_rtbScansLineEdit_editingFinished()
 }
 
 
+
+
+void AutoTrend::on_rtbThresholdLineEdit_editingFinished()
+{
+    _broker->updateInfo("rtb_mode_threshold_above_baseline", ui->rtbThresholdLineEdit->text());
+}
 

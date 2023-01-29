@@ -119,6 +119,8 @@ private slots:
     void on_rtbScansLineEdit_editingFinished();
 
 
+    void on_rtbThresholdLineEdit_editingFinished();
+
 private:
    // if Autotrend is a dialog, scriptEngine will not work. The parent of AutoTrend need to be configuration
    // panel. So need to use signal and slot like runScript()
