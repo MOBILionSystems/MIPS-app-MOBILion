@@ -177,7 +177,7 @@ private:
     QTimer* tbMonitorTimer; // Timing table monitor timer
     QTimer* autoAcqTimer;
 
-    bool test1s = false;
+    bool test1s = true;
     void updateTrendCurrentValue(QString s = "");
 
 };
