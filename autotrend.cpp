@@ -864,6 +864,6 @@ void AutoTrend::on_rtbScansLineEdit_editingFinished()
 
 void AutoTrend::on_rtbThresholdLineEdit_editingFinished()
 {
-    _broker->updateInfo("rtb_mode_threshold_above_baseline", ui->rtbThresholdLineEdit->text());
+    _broker->updateInfo("adc-rtb-mode-threshold-above_baseline", ui->rtbThresholdLineEdit->text());
 }
 

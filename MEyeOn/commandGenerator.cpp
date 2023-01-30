@@ -45,7 +45,7 @@ QHash<QString, QJsonValue> CommandGenerator::adcMap{
     {"adc-rtb-mode-enable", QJsonValue("0")},
     {"adc-avg-mode-enable", QJsonValue("0")},
     {"adc-rtb-scans", QJsonValue("4")},
-    {"adc-rtb-mode-threshold-above_baseline", QJsonValue("1750")},
+    {"adc-rtb-mode-threshold-above-baseline", QJsonValue("1750")},
     {"adc-data-inversion", QJsonValue("0")}
 };
 
