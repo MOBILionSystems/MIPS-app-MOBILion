@@ -106,6 +106,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
 
     ui->setupUi(this);
     ControlPanel::setWindowTitle("Custom control panel, right click for options");
+    ControlPanel::setWindowFlag(Qt::WindowMinimizeButtonHint);
     Systems = S;
 
     // Init a number of variables
@@ -660,6 +661,7 @@ ControlPanel::ControlPanel(QWidget *parent, QString CPfileName, QList<Comms*> S,
 
 ControlPanel::~ControlPanel()
 {
+    qDebug() << "control panel deleted";
     // Press the on edit button to run the exit script
     Command("On exit");
     //
@@ -680,6 +682,7 @@ ControlPanel::~ControlPanel()
     QApplication::processEvents();
     delete tcp;
     delete ui;
+    delete AT;
 }
 
 void ControlPanel::reject()
@@ -3044,6 +3047,13 @@ AutoTrendButton::AutoTrendButton(ControlPanel *parent, QString name, int x, int 
     engine->globalObject().setProperty("mips", mips);
 }
 
+AutoTrendButton::~AutoTrendButton()
+{
+    qDebug() << "AutoTrendButton deleted";
+    autoTrendDialog->close();
+    autotrendA2RAD->deleteLater();
+}
+
 void AutoTrendButton::Show()
 {
     atbShutdown = new QPushButton("AutoTrend",p);
@@ -3055,7 +3065,7 @@ void AutoTrendButton::Show()
 void AutoTrendButton::atbPressed()
 {
     if(!autotrendA2RAD){
-        autotrendA2RAD = new AutoTrend(this);
+        autotrendA2RAD = new AutoTrend();
         connect(autotrendA2RAD, &AutoTrend::runCommand, this, &AutoTrendButton::onRunCommand);
         connect(autotrendA2RAD, &AutoTrend::sendCommand, this, &AutoTrendButton::onSendCommand);
         connect(autotrendA2RAD, &AutoTrend::sendMess, this, &AutoTrendButton::onSendMess);
@@ -3066,11 +3076,12 @@ void AutoTrendButton::atbPressed()
 
 
     if(!autoTrendDialog){
-        autoTrendDialog = new QDialog(this);
+        autoTrendDialog = new QDialog();
         autoTrendDialog->setFixedSize(720, 520);
         QHBoxLayout *HLayout = new QHBoxLayout(autoTrendDialog);
         HLayout->addWidget (autotrendA2RAD);
         autoTrendDialog->setLayout (HLayout);
+        autoTrendDialog->setWindowFlag(Qt::WindowMinimizeButtonHint);
     }
     autoTrendDialog->show();
 }

@@ -71,6 +71,7 @@ signals:
     void EnableSystem(void);
 public:
     AutoTrendButton(ControlPanel *parent, QString name, int x, int y);
+    ~AutoTrendButton();
     void Show(void);
     ControlPanel *p;
     QString Title;
