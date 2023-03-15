@@ -666,6 +666,18 @@ void Comms::GetMIPSnameAndVersion(void)
 {
     MIPSname = SendMessage("GNAME\n");
     // Get the version string
+    int count = 0;
+    while(MIPSname.contains("?")){
+        if(count % 5 == 0){
+            SendMessage("GVER\n");
+        }
+        MIPSname = SendMessage("GNAME\n");
+        count++;
+        if(count > 20){
+            MIPSname = "Invalid";
+            break;
+        }
+    }
     QStringList reslist = SendMessage("GVER\n").split(" ");
     major = minor = 1;
     if(reslist.count() > 2)
