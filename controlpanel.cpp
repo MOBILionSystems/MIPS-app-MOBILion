@@ -3050,8 +3050,10 @@ AutoTrendButton::AutoTrendButton(ControlPanel *parent, QString name, int x, int 
 AutoTrendButton::~AutoTrendButton()
 {
     qDebug() << "AutoTrendButton deleted";
-    autoTrendDialog->close();
-    autotrendA2RAD->deleteLater();
+    if(autoTrendDialog)
+        autoTrendDialog->close();
+    if(autotrendA2RAD)
+        autotrendA2RAD->deleteLater();
 }
 
 void AutoTrendButton::Show()
